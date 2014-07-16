@@ -4,42 +4,21 @@ from vecrec import Rect
 class Widget (pyglet.event.EventDispatcher):
 
     def __init__(self):
-        self.parent = None
-        self.connector = self
-        self.rect = None
+        self._parent = None
+        self._group = None
+        self._connector = self
+        self._rect = None
         self.min_width = 0
         self.min_height = 0
 
     def __contains__(self, point):
         return point in self.rect
 
-    @property
-    def root(self):
-        return None if self.parent is None else self.parent.root
-
-    @property
-    def window(self):
-        return self.root.window
-
-    @property
-    def batch(self):
-        return self.root.batch
-
-    @property
-    def group(self):
-        return self.root.group
-
-    @property
-    def min_rect(self):
-        return Rect.from_size(self.min_width, self.min_height)
-
-    def is_attached(self):
-        return self.parent is not None
 
     def attach(self, parent):
         """ Meant to be called by a container widget. """
         assert not self.is_attached()
-        self.parent = parent
+        self._parent = parent
         self.claim()
 
     def detach(self):
@@ -73,7 +52,7 @@ class Widget (pyglet.event.EventDispatcher):
 
     def resize(self, rect):
         assert self.parent
-        self.rect = rect
+        self._rect = rect
         self.undraw()
         self.draw()
 
@@ -82,6 +61,63 @@ class Widget (pyglet.event.EventDispatcher):
 
     def undraw(self):
         pass
+
+
+    def get_parent(self):
+        return self._parent
+
+    def get_root(self):
+        return None if self._parent is None else self._parent.root
+
+    def get_window(self):
+        return self.root.window
+
+    def get_batch(self):
+        return self.root.batch
+
+    def get_group(self):
+        return self._group or self.parent.group
+
+    def get_connector(self):
+        return self._connector
+
+    def get_rect(self):
+        return self._rect
+
+    def get_min_rect(self):
+        return Rect.from_size(self.min_width, self.min_height)
+
+    def is_attached(self):
+        return self.parent is not None
+
+    def set_group(self, group):
+        self._group = group
+
+    def set_connector(self, connector):
+        assert self._connector is None
+        self._connector = connector
+
+
+    # Properties (fold)
+
+    parent = property(
+            lambda self: self.get_parent())
+    root = property(
+            lambda self: self.get_root())
+    window = property(
+            lambda self: self.get_window())
+    batch = property(
+            lambda self: self.get_batch())
+    group = property(
+            lambda self: self.get_group(),
+            lambda self, group: self.set_group(group))
+    connector = property(
+            lambda self: self.get_connector(),
+            lambda self, conn: self.set_connector(conn))
+    rect = property(
+            lambda self: self.get_rect())
+    min_rect = property(
+            lambda self: self.get_min_rect())
 
 
 Widget.register_event_type('on_mouse_press')

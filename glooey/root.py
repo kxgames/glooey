@@ -6,29 +6,13 @@ class Root (Bin):
     def __init__(self, rect, window, batch=None, group=None):
         Bin.__init__(self)
 
-        self.parent = self
-        self.rect = rect
+        self._parent = self
+        self._rect = rect
         self._window = window
         self._batch = batch or pyglet.graphics.Batch()
         self._group = group
 
         window.push_handlers(self)
-
-    @property
-    def root(self):
-        return self
-
-    @property
-    def window(self):
-        return self._window
-
-    @property
-    def batch(self):
-        return self._batch
-
-    @property
-    def group(self):
-        return self._group
 
     def repack(self):
         self.claim()
@@ -46,6 +30,18 @@ class Root (Bin):
                         self.rect.width, self.rect.height))
 
         self.resize(self.rect)
+
+    def get_root(self):
+        return self
+
+    def get_window(self):
+        return self._window
+
+    def get_batch(self):
+        return self._batch
+
+    def get_group(self):
+        return self._group
 
 
 class Gui (Root):

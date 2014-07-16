@@ -151,8 +151,11 @@ class Bin (Widget):
         self.repack()
 
     def claim(self):
-        self.min_width = self.child.min_width + 2 * self.padding
-        self.min_height = self.child.min_height + 2 * self.padding
+        self.min_width = 2 * self.padding
+        self.min_height = 2 * self.padding
+        if self.child is not None:
+            self.min_width += self.child.min_width
+            self.min_height += self.child.min_height
 
     def resize(self, rect):
         Widget.resize(self, rect)
@@ -226,8 +229,8 @@ class Bin (Widget):
 
 class Frame (Bin):
 
-    def __init__(self):
-        Bin.__init__(self)
+    def __init__(self, padding=0, align='fill'):
+        Bin.__init__(self, padding, align)
         self.edge_image = None
         self.edge_orientation = None
         self.corner_image = None
@@ -288,6 +291,12 @@ class HVBox (Container):
     def remove(self, child):
         self.expandable.discard(child)
         Container.remove(self, child)
+
+    def claim(self):
+        raise NotImplementedError
+
+    def resize(self):
+        raise NotImplementedError
 
 
     _dimensions = {     # (fold)
