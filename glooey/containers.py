@@ -1,4 +1,5 @@
-from vecrec import Rect
+import pyglet
+from vecrec import Vector, Rect
 from .widget import Widget
 from . import drawing
 
@@ -268,6 +269,96 @@ class Frame (Bin):
             vertex_list.delete()
         self.vertex_lists = ()
 
+
+class Viewport (Bin):
+
+    class PanningGroup (pyglet.graphics.Group):
+
+        # Might want to have this class derive from OrderedGroup, to put the 
+        # viewport behind the gui.
+
+        def __init__(self, parent=None):
+            super(Viewport.PanningGroup, self).__init__(parent)
+            self.offset = Vector.null()
+
+        def set_state(self):
+            pyglet.gl.glPushMatrix()
+            pyglet.gl.glTranslatef(self.offset.x, self.offset.y, 0)
+
+        def unset_state(self):
+            pyglet.gl.glPopMatrix()
+
+
+    def __init__(self):
+        # Should clipping the child be optional?
+        super(Viewport, self).__init__()
+        self.panning_group = Viewport.PanningGroup()
+
+    def attach(self, parent):
+        # Add on_mouse_motion handler to root that dispatches on_mouse_push 
+        # events.
+        super(Viewport, self).attach(parent)
+        self.panning_group.parent = self.group
+
+        # If this line raises a pyglet EventException, you may be trying to 
+        # attach this widget to a GUI that doesn't support mouse push events.  
+        # See the Viewport documentation for more information.
+        self.root.push_handlers(self.on_mouse_push)
+
+    def unattach(self, parent):
+        self.window.remove_handler(self.on_mouse_push)
+        super(Viewport, self).unattach()
+
+    def wrap(self, child):
+        # Give child a group that's hooked up to:
+        # 1. translate on my command
+        # 2. get clipped.
+        child.group = self.panning_group
+        super(Viewport, self).wrap(child)
+
+    def claim(self):
+        self.min_width = 2 * self.padding
+        self.min_height = 2 * self.padding
+
+    def resize(self, rect):
+        Widget.resize(self, rect)
+        if self.child is not None:
+            self.child.resize(self.child.min_rect)
+
+    def draw(self):
+        # update clipping mask.
+        pass
+
+    def on_mouse_push(self, direction, dt):
+        # let direction be an arbitrary vector.
+        # translate child group according to direction.
+        self.panning_group.offset -= direction * dt
+        print(self.panning_group.offset)
+
+        if -self.panning_group.offset.x < self.child.rect.left:
+            self.panning_group.offset.x = self.child.rect.left
+
+        if -self.panning_group.offset.x > self.child.rect.right - self.rect.width:
+            self.panning_group.offset.x = -self.child.rect.right + self.rect.width
+
+        if -self.panning_group.offset.y < self.child.rect.bottom:
+            self.panning_group.offset.y = -self.child.rect.bottom
+
+        if -self.panning_group.offset.y > self.child.rect.top - self.rect.height:
+            self.panning_group.offset.y = -self.child.rect.top + self.rect.height
+
+
+    def on_mouse_etc(self, x, y, etc):
+        # Update coordinates before passing on to child.
+        pass
+
+
+Viewport.register_event_type('on_mouse_push')
+
+# The game widget will automatically get all its coordinates in world pixels.
+# It will be responsible for translating that into game coords.  That's a nice, 
+# clean division, though.  Viewport goes screen pixels -> world pixels, Map 
+# widget goes world pixels -> world coords.
 
 
 class HVBox (Container):
