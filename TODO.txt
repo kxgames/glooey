@@ -1,0 +1,12 @@
+1. Dialogs: Gonna need the Root widgets to connect to keyboard event as well, 
+   and mark all events as handled.  That way events won't propagate between 
+   dialogs.
+
+2. Entry: Gonna have the root widgets manage keyboard focus, since otherwise 
+   dialogs will mess things up.
+
+3. ViewPort: Let's do it!  This should be a bin, not a miscellaneous widget.
+
+4. Frame: Should have a background image too.  Imagine wanting to make a dialog 
+   box.
+
