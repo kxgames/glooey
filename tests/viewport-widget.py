@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import pyglet
 import glooey
@@ -9,12 +9,30 @@ batch = pyglet.graphics.Batch()
 cursor = pyglet.image.load('cursor-image.png')
 hotspot = 4, 24
 
-root = glooey.GuiWithExclusiveMouse(window, cursor, hotspot, batch=batch)
+root = glooey.PanningGui(window, cursor, hotspot, batch=batch)
 viewport = glooey.Viewport()
-widget = glooey.PlaceHolder(width=1000, height=1000)
+menu = glooey.PlaceHolder(height=200, color=glooey.drawing.purple)
+widgets = [
+        glooey.PlaceHolder(width=300, height=900),
+        glooey.EventLogger(width=200, height=900, color=glooey.drawing.yellow),
+        glooey.PlaceHolder(width=300, height=900),
+]
 
+hbox = glooey.HBox(padding=50)
+for logger in widgets:
+    hbox.add(logger)
+viewport.wrap(hbox)
+
+#vbox = glooey.VBox()
+#vbox.add(viewport)
+#vbox.add(menu)
+#
+#root.wrap(vbox)
 root.wrap(viewport)
-viewport.wrap(widget)
+print(viewport.min_width, viewport.min_height)
+print(hbox.min_width, hbox.min_height)
+for widget in widgets:
+    print(widget.min_width, widget.min_height)
 
 @window.event
 def on_draw():

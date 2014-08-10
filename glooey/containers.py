@@ -6,21 +6,21 @@ from . import drawing
 def center_within_rect(child_rect, parent_rect):
     child_rect.center = parent_rect.center
 
-placement_algorithms = { # (fold)
+placement_functions = { # (fold)
         'fill': lambda child_rect, parent_rect: child_rect.set(parent_rect),
         'center': center_within_rect,
 }
 
 def resize_child(child, key_or_function, box_rect, child_rect=None):
     try:
-        place_rect = placement_algorithms[key_or_function]
+        placement_function = placement_functions[key_or_function]
     except KeyError:
-        place_rect = key_or_function
+        placement_function = key_or_function
 
     if child_rect is None:
         child_rect = child.min_rect
 
-    place_rect(child_rect, box_rect)
+    placement_function(child_rect, box_rect)
     child.resize(child_rect)
 
 
@@ -43,22 +43,26 @@ class Container (Widget):
         child = child.connector
         if index is None: index = len(self.children)
         self.children.insert(index, child)
-        child.attach(self)
+        child.parent = self
         self.repack()
 
     def remove(self, child):
-        child.detach()
+        child.parent = None
         self.children.remove(child)
 
-    def claim(self):
-        self.min_width = sum(x.min_width for x in self.children)
-        self.min_height = sum(x.min_height for x in self.children)
 
+    def on_attach(self):
+        for child in self.children:
+            child.dispatch_event('on_attach')
+
+    def on_detach(self):
+        for child in self.children:
+            child.dispatch_event('on_detach')
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.child_under_mouse is not None:
             self.child_under_mouse.dispatch_event(
-                    'on_mouse_release', x, y, button, modifiers)
+                    'on_mouse_press', x, y, button, modifiers)
 
     def on_mouse_release(self, x, y, button, modifiers):
         if self.child_under_mouse is not None:
@@ -66,15 +70,17 @@ class Container (Widget):
                     'on_mouse_release', x, y, button, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        child, previous_child = self._update_child_under_mouse(x, y)
+        current_child, previous_child = self._update_child_under_mouse(x, y)
 
-        if child is not None:
-            if child is not previous_child:
-                if previous_child is not None:
-                    previous_child.dispatch_event('on_mouse_leave', x, y)
-                child.dispatch_event('on_mouse_enter', x, y)
+        if previous_child is not None:
+            if previous_child is not current_child:
+                previous_child.dispatch_event('on_mouse_leave', x, y)
 
-            child.dispatch_event('on_mouse_motion', x, y, dx, dy)
+        if current_child is not None:
+            if current_child is not previous_child:
+                current_child.dispatch_event('on_mouse_enter', x, y)
+
+            current_child.dispatch_event('on_mouse_motion', x, y, dx, dy)
 
     def on_mouse_enter(self, x, y):
         child, previous_child = self._update_child_under_mouse(x, y)
@@ -87,15 +93,17 @@ class Container (Widget):
         self.child_under_mouse = None
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        child, previous_child = self._update_child_under_mouse(x, y)
+        current_child, previous_child = self._update_child_under_mouse(x, y)
 
-        if child is not None:
-            if child is not previous_child:
-                if previous_child is not None:
-                    previous_child.dispatch_event('on_mouse_drag_leave', x, y)
-                child.dispatch_event('on_mouse_drag_enter', x, y)
+        if previous_child is not None:
+            if previous_child is not current_child:
+                previous_child.dispatch_event('on_mouse_drag_leave', x, y)
 
-            child.dispatch_event(
+        if current_child is not None:
+            if current_child is not previous_child:
+                current_child.dispatch_event('on_mouse_drag_enter', x, y)
+
+            current_child.dispatch_event(
                     'on_mouse_drag', x, y, dx, dy, buttons, modifiers)
 
     def on_mouse_drag_enter(self, x, y):
@@ -145,16 +153,18 @@ class Bin (Widget):
 
     def wrap(self, child):
         if self.child is not None:
-            child.detach()
+            self.child.parent = None
 
-        self.child = child.connector
-        self.child.attach(self)
+        self.child = child.get_connector()
+        self.child.parent = self
         self.repack()
 
     def claim(self):
         self.min_width = 2 * self.padding
         self.min_height = 2 * self.padding
+
         if self.child is not None:
+            self.child.claim()
             self.min_width += self.child.min_width
             self.min_height += self.child.min_height
 
@@ -163,6 +173,14 @@ class Bin (Widget):
         if self.child is not None:
             resize_child(self.child, self.align, rect.get_shrunk(self.padding))
 
+
+    def on_attach(self):
+        if self.child is not None:
+            self.child.dispatch_event('on_attach')
+
+    def on_detach(self):
+        if self.child is not None:
+            self.child.dispatch_event('on_detach')
 
     def on_mouse_press(self, x, y, button, modifiers):
         if self.child_under_mouse:
@@ -277,48 +295,39 @@ class Viewport (Bin):
         # Might want to have this class derive from OrderedGroup, to put the 
         # viewport behind the gui.
 
-        def __init__(self, parent=None):
+        def __init__(self, viewport, parent=None):
             super(Viewport.PanningGroup, self).__init__(parent)
-            self.offset = Vector.null()
+            self.viewport = viewport
 
         def set_state(self):
             pyglet.gl.glPushMatrix()
-            pyglet.gl.glTranslatef(self.offset.x, self.offset.y, 0)
+            pyglet.gl.glTranslatef(
+                    -self.viewport.offset.x, -self.viewport.offset.y, 0)
 
         def unset_state(self):
             pyglet.gl.glPopMatrix()
 
 
-    def __init__(self):
-        # Should clipping the child be optional?
-        super(Viewport, self).__init__()
-        self.panning_group = Viewport.PanningGroup()
-
-    def attach(self, parent):
-        # Add on_mouse_motion handler to root that dispatches on_mouse_push 
-        # events.
-        super(Viewport, self).attach(parent)
-        self.panning_group.parent = self.group
-
-        # If this line raises a pyglet EventException, you may be trying to 
-        # attach this widget to a GUI that doesn't support mouse push events.  
-        # See the Viewport documentation for more information.
-        self.root.push_handlers(self.on_mouse_push)
-
-    def unattach(self, parent):
-        self.window.remove_handler(self.on_mouse_push)
-        super(Viewport, self).unattach()
+    def __init__(self, sensitivity=3, clip=False):
+        Bin.__init__(self)
+        self.offset = Vector.null()
+        self.sensitivity = sensitivity
+        self.panning_group = Viewport.PanningGroup(self)
+        self.enable_clipping = clip
 
     def wrap(self, child):
         # Give child a group that's hooked up to:
         # 1. translate on my command
         # 2. get clipped.
         child.group = self.panning_group
-        super(Viewport, self).wrap(child)
+        Bin.wrap(self, child)
 
     def claim(self):
         self.min_width = 2 * self.padding
         self.min_height = 2 * self.padding
+
+        if self.child is not None:
+            self.child.claim()
 
     def resize(self, rect):
         Widget.resize(self, rect)
@@ -329,36 +338,76 @@ class Viewport (Bin):
         # update clipping mask.
         pass
 
-    def on_mouse_push(self, direction, dt):
-        # let direction be an arbitrary vector.
-        # translate child group according to direction.
-        self.panning_group.offset -= direction * dt
-        print(self.panning_group.offset)
 
-        if -self.panning_group.offset.x < self.child.rect.left:
-            self.panning_group.offset.x = self.child.rect.left
+    def on_attach(self):
+        Bin.on_attach(self)
+        self.panning_group.parent = self.group
 
-        if -self.panning_group.offset.x > self.child.rect.right - self.rect.width:
-            self.panning_group.offset.x = -self.child.rect.right + self.rect.width
+        # If this line raises a pyglet EventException, you may be trying to 
+        # attach this widget to a GUI that doesn't support mouse pan events.  
+        # See the Viewport documentation for more information.
 
-        if -self.panning_group.offset.y < self.child.rect.bottom:
-            self.panning_group.offset.y = -self.child.rect.bottom
+        self.root.push_handlers(self.on_mouse_pan)
 
-        if -self.panning_group.offset.y > self.child.rect.top - self.rect.height:
-            self.panning_group.offset.y = -self.child.rect.top + self.rect.height
+    def on_detach(self):
+        self.window.remove_handler(self.on_mouse_pan)
+        Bin.on_detach(self)
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_press(self, x, y, button, modifiers)
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_release(self, x, y, button, modifiers)
+
+    def on_mouse_motion(self, x, y, dx, dy):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_motion(self, x, y, dx, dy)
+
+    def on_mouse_enter(self, x, y):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_enter(self, x, y)
+
+    def on_mouse_leave(self, x, y):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_leave(self, x, y)
+
+    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_drag(self, x, y, dx, dy, buttons, modifiers)
+
+    def on_mouse_drag_enter(self, x, y):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_drag_enter(self, x, y)
+
+    def on_mouse_drag_leave(self, x, y):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_drag_leave(self, x, y)
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        x, y = self.offset + (x, y)
+        Bin.on_mouse_scroll(self, x, y, scroll_x, scroll_y)
+
+    def on_mouse_pan(self, direction, dt):
+        self.offset += direction * self.sensitivity * dt
+
+        # This should be a vector method.
+
+        if self.offset.x < self.child.rect.left:
+            self.offset.x = self.child.rect.left
+
+        if self.offset.x > self.child.rect.right - self.rect.width:
+            self.offset.x = self.child.rect.right - self.rect.width
+
+        if self.offset.y < self.child.rect.bottom:
+            self.offset.y = self.child.rect.bottom
+
+        if self.offset.y > self.child.rect.top - self.rect.height:
+            self.offset.y = self.child.rect.top - self.rect.height
 
 
-    def on_mouse_etc(self, x, y, etc):
-        # Update coordinates before passing on to child.
-        pass
-
-
-Viewport.register_event_type('on_mouse_push')
-
-# The game widget will automatically get all its coordinates in world pixels.
-# It will be responsible for translating that into game coords.  That's a nice, 
-# clean division, though.  Viewport goes screen pixels -> world pixels, Map 
-# widget goes world pixels -> world coords.
+Viewport.register_event_type('on_mouse_pan')
 
 
 class HVBox (Container):
@@ -401,7 +450,22 @@ class HVBox (Container):
 
 
     def _claim(self, orientation):
-        Container.claim(self)
+        
+        # Account for children
+
+        for child in self.children:
+            child.claim()
+
+            if orientation == 'horizontal':
+                self.min_width += child.min_width
+                self.min_height = max(self.min_height, child.min_height)
+            elif orientation == 'vertical':
+                self.min_height += child.min_height
+                self.min_width = max(self.min_width, child.min_width)
+            else:
+                raise ValueError("Unknown orientation: {}".format(orientation))
+
+        # Account for padding
 
         primary_padding = self.padding * (1 + len(self))
         secondary_padding = self.padding * 2

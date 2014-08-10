@@ -15,18 +15,6 @@ class Widget (pyglet.event.EventDispatcher):
         return point in self.rect
 
 
-    def attach(self, parent):
-        """ Meant to be called by a container widget. """
-        assert not self.is_attached()
-        self._parent = parent
-        self.claim()
-
-    def detach(self):
-        """ Meant to be called by a container widget. """
-        assert self.is_attached()
-        self.undraw()
-        self.parent = None
-
     def claim(self):
         """ 
         Opportunity to set min_width and min_height before repacking.
@@ -51,9 +39,8 @@ class Widget (pyglet.event.EventDispatcher):
             self.resize(self.rect)
 
     def resize(self, rect):
-        assert self.parent
+        assert self.parent, str(self.parent) + str(self)
         self._rect = rect
-        self.undraw()
         self.draw()
 
     def draw(self):
@@ -76,7 +63,9 @@ class Widget (pyglet.event.EventDispatcher):
         return self.root.batch
 
     def get_group(self):
-        return self._group or self.parent.group
+        if self._group is not None: return self._group
+        if self.parent is not None: return self.parent.group
+        return None
 
     def get_connector(self):
         return self._connector
@@ -87,8 +76,14 @@ class Widget (pyglet.event.EventDispatcher):
     def get_min_rect(self):
         return Rect.from_size(self.min_width, self.min_height)
 
-    def is_attached(self):
-        return self.parent is not None
+    def set_parent(self, parent):
+        if self.parent is not None and self.parent.root is not None:
+            self.dispatch_event('on_detach')
+
+        self._parent = parent
+
+        if self.parent is not None and self.parent.root is not None:
+            self.dispatch_event('on_attach')
 
     def set_group(self, group):
         self._group = group
@@ -97,11 +92,15 @@ class Widget (pyglet.event.EventDispatcher):
         assert self._connector is None
         self._connector = connector
 
+    def is_attached(self):
+        return self.parent is not None
+
 
     # Properties (fold)
 
     parent = property(
-            lambda self: self.get_parent())
+            lambda self: self.get_parent(),
+            lambda self, parent: self.set_parent(parent))
     root = property(
             lambda self: self.get_root())
     window = property(
@@ -120,6 +119,8 @@ class Widget (pyglet.event.EventDispatcher):
             lambda self: self.get_min_rect())
 
 
+Widget.register_event_type('on_attach')
+Widget.register_event_type('on_detach')
 Widget.register_event_type('on_mouse_press')
 Widget.register_event_type('on_mouse_release')
 Widget.register_event_type('on_mouse_motion')

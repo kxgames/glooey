@@ -171,34 +171,5 @@ Button.register_event_type('on_click')
 class Entry (Widget):
     pass
 
-class ViewPort (Widget):
-
-    def __init__(self, push_margin=5):
-        self.push_margin = push_margin
-
-    def attach(self, parent):
-        Widget.attach(self, parent)
-        self.root.window.push_handler(self)
-
-    def detach(self):
-        self.root.window.pop_handler(self)
-        Widget.detach(self)
-
-    def on_mouse_motion(self, x, y, dx, dy):
-        pushes = (
-                x < self.push_margin,                       # left
-                x > self.window.width - self.push_margin,   # right
-                y > self.window_height - self.push_margin,  # up
-                y < self.push_margin,                       # down
-        )
-        if any(pushes):
-            self.dispatch_event('on_mouse_push')
-
-    def on_mouse_push(self, left, right, up, down):
-        pass
-
-
-ViewPort.register_event_type('on_mouse_push')
-
 
 
