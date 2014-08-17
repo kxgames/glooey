@@ -8,7 +8,7 @@ batch = pyglet.graphics.Batch()
 
 root = glooey.Gui(window, batch=batch)
 widget = glooey.PlaceHolder()
-root.wrap(widget)
+root.add(widget)
 
 @window.event
 def on_draw():

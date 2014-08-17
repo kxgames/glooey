@@ -17,11 +17,11 @@ button.set_over_image(over_image)
 button.set_down_image(down_image)
 
 bin = glooey.Bin(align='center')
-bin.wrap(button)
+bin.add(button)
 
 root = glooey.Gui(window, batch=batch)
 root.padding = 100
-root.wrap(bin)
+root.add(bin)
 
 @button.event
 def on_click(button):

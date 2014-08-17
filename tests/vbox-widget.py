@@ -15,7 +15,7 @@ vbox.add(PlaceHolder(color=blue), expand=True)
 vbox.add(PlaceHolder(color=yellow), expand=True)
 vbox.add_front(PlaceHolder(color=red), expand=True)
 
-root.wrap(vbox)
+root.add(vbox)
 
 @window.event
 def on_draw():

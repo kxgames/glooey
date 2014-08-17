@@ -17,8 +17,8 @@ frame.set_corner(corner, 'top left')
 
 widget = glooey.PlaceHolder()
 
-frame.wrap(widget)
-root.wrap(frame)
+frame.add(widget)
+root.add(frame)
 
 @window.event
 def on_draw():

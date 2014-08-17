@@ -3,19 +3,18 @@
 import pyglet
 from glooey import *
 from glooey.drawing import *
+from itertools import product
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
 root = Gui(window, batch=batch)
-hbox = HBox(padding=5)
+grid = Grid(5, 5, padding=5)
 
-hbox.add(PlaceHolder(color=green, width=320))
-hbox.add(PlaceHolder(color=blue), expand=True)
-hbox.add(PlaceHolder(color=yellow), expand=True)
-hbox.add_front(PlaceHolder(color=red), expand=True)
+for row, col in grid.yield_cells():
+    grid[row, col] = PlaceHolder(color=rainbow_cycle[row])
 
-root.add(hbox)
+root.add(grid)
 
 @window.event
 def on_draw():

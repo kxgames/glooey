@@ -11,24 +11,27 @@ hotspot = 4, 24
 
 root = glooey.PanningGui(window, cursor, hotspot, batch=batch)
 viewport = glooey.Viewport()
+content = glooey.Grid(5, 5, padding=50)
 menu = glooey.PlaceHolder(height=200, color=glooey.drawing.purple)
-widgets = [
-        glooey.PlaceHolder(width=300, height=900),
-        glooey.EventLogger(width=200, height=900, color=glooey.drawing.yellow),
-        glooey.PlaceHolder(width=300, height=900),
-]
-
-hbox = glooey.HBox(padding=50)
-for logger in widgets: hbox.add(logger)
-
-viewport.set_center_of_view(500, 500)
-viewport.wrap(hbox)
-
 vbox = glooey.VBox()
+
+for row, col in content.yield_cells():
+    if row == col:
+        style = dict(color=glooey.drawing.yellow)
+        WidgetClass = glooey.EventLogger
+    else:
+        style = dict(color=glooey.drawing.green)
+        WidgetClass = glooey.PlaceHolder
+
+    content[row, col] = WidgetClass(width=300, height=300, **style)
+
+viewport.add(content)
 vbox.add(viewport, expand=True)
 vbox.add(menu)
+root.add(vbox)
 
-root.wrap(vbox)
+center_of_view = content[2, 2].rect.center
+viewport.set_center_of_view(center_of_view)
 
 @window.event
 def on_draw():

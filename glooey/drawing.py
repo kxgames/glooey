@@ -168,6 +168,7 @@ colors = {
         'gray': gray,
         'white': white }
 
+rainbow_cycle = red, orange, yellow, green, blue, purple, brown
 
 # Drawing utilities
 

@@ -36,29 +36,23 @@ class Container (Widget):
         self.min_height = 0
 
     def __iter__(self):
-        yield from self.children
+        raise NotImplementedError
 
     def __len__(self):
-        return len(self.children)
+        return sum(1 for child in self)
 
-    def insert(self, child, index=None):
-        child = child.connector
-        if index is None: index = len(self.children)
-        self.children.insert(index, child)
-        child.parent = self
-        self.repack()
 
-    def remove(self, child):
-        child.parent = None
-        self.children.remove(child)
+    def claim(self):
+        for child in self:
+            child.claim()
 
 
     def on_attach(self):
-        for child in self.children:
+        for child in self:
             child.dispatch_event('on_attach')
 
     def on_detach(self):
-        for child in self.children:
+        for child in self:
             child.dispatch_event('on_detach')
 
     def on_mouse_press(self, x, y, button, modifiers):
@@ -124,6 +118,16 @@ class Container (Widget):
                     'on_mouse_scroll', x, y, scroll_x, scroll_y)
 
 
+    def _attach_child_widget(self, child, attacher):
+        child = child.connector
+        attacher(child)
+        child.parent = self
+        self.repack()
+
+    def _detach_child_widget(self, child, detacher):
+        child.parent = None
+        detacher(child)
+
     def _update_child_under_mouse(self, x, y):
         previous_child = self.child_under_mouse
         self.child_under_mouse = None
@@ -133,7 +137,7 @@ class Container (Widget):
                 yield previous_child
 
             yield from (
-                    child for child in self.children
+                    child for child in self
                     if child is not previous_child)
 
         for child in yield_previous_child_then_others():
@@ -144,24 +148,26 @@ class Container (Widget):
         return self.child_under_mouse, previous_child
 
 
-class Bin (Widget):
+class Bin (Container):
 
     def __init__(self, padding=0, align='fill'):
-        Widget.__init__(self)
+        Container.__init__(self)
         self.child = None
-        self.child_under_mouse = False
         self.padding = padding
         self.align = align
 
-    def wrap(self, child):
-        if self.child is not None:
-            self.child.parent = None
+    def __iter__(self):
+        if self.child is not None: yield self.child
 
-        self.child = child.get_connector()
-        self.child.parent = self
-        self.repack()
+
+    def add(self, child):
+        if self.child is not None: self.child.parent = None
+        def attacher(child): self.child = child
+        self._attach_child_widget(child, attacher)
 
     def claim(self):
+        super(Bin, self).claim()
+
         self.min_width = 2 * self.padding
         self.min_height = 2 * self.padding
 
@@ -171,81 +177,9 @@ class Bin (Widget):
             self.min_height += self.child.min_height
 
     def resize(self, rect):
-        Widget.resize(self, rect)
+        Container.resize(self, rect)
         if self.child is not None:
             resize_child(self.child, self.align, rect.get_shrunk(self.padding))
-
-
-    def on_attach(self):
-        if self.child is not None:
-            self.child.dispatch_event('on_attach')
-
-    def on_detach(self):
-        if self.child is not None:
-            self.child.dispatch_event('on_detach')
-
-    def on_mouse_press(self, x, y, button, modifiers):
-        if self.child_under_mouse:
-            self.child.dispatch_event(
-                    'on_mouse_press', x, y, button, modifiers)
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        if self.child_under_mouse:
-            self.child.dispatch_event(
-                    'on_mouse_release', x, y, button, modifiers)
-
-    def on_mouse_motion(self, x, y, dx, dy):
-        child_previously_under_mouse = self.child_under_mouse
-        self.child_under_mouse = (x, y) in self.child
-
-        if self.child_under_mouse:
-            if not child_previously_under_mouse:
-                self.child.dispatch_event('on_mouse_enter', x, y)
-
-            self.child.dispatch_event('on_mouse_motion', x, y, dx, dy)
-
-        else:
-            if child_previously_under_mouse:
-                self.child.dispatch_event('on_mouse_leave', x, y)
-
-    def on_mouse_enter(self, x, y):
-        self.child_under_mouse = (x, y) in self.child
-        if self.child_under_mouse:
-            self.child.dispatch_event('on_mouse_enter', x, y)
-
-    def on_mouse_leave(self, x, y):
-        if self.child_under_mouse:
-            self.child.dispatch_event('on_mouse_leave', x, y)
-        self.child_under_mouse = False
-
-    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        child_previously_under_mouse = self.child_under_mouse
-        self.child_under_mouse = (x, y) in self.child
-
-        if self.child_under_mouse:
-            if not child_previously_under_mouse:
-                self.child.dispatch_event('on_mouse_drag_enter', x, y)
-
-            self.child.dispatch_event(
-                    'on_mouse_drag', x, y, dx, dy, buttons, modifiers)
-        else:
-            if child_previously_under_mouse:
-                self.child.dispatch_event('on_mouse_drag_leave', x, y)
-
-    def on_mouse_drag_enter(self, x, y):
-        self.child_under_mouse = (x, y) in self.child
-        if self.child_under_mouse:
-            self.child.dispatch_event('on_mouse_drag_enter', x, y)
-
-    def on_mouse_drag_leave(self, x, y):
-        if self.child_under_mouse:
-            self.child.dispatch_event('on_mouse_drag_leave', x, y)
-        self.child_under_mouse = False
-
-    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        if self.child_under_mouse:
-            self.child.dispatch_event(
-                    'on_mouse_scroll', x, y, scroll_x, scroll_y)
 
 
 class Frame (Bin):
@@ -330,19 +264,25 @@ class Viewport (Bin):
         self.visible_group = drawing.WhereStencilIs(self.stencil_group)
         self.panning_group = Viewport.PanningGroup(self, self.visible_group)
 
-    def wrap(self, child):
+    def add(self, child):
         child.group = self.panning_group
-        Bin.wrap(self, child)
+        Bin.add(self, child)
 
     def claim(self):
+        super(Bin, self).claim()
+
+        # The parent claim() method will claim enough space to contain the 
+        # entire child widget.  This isn't necessary for the viewport, though, 
+        # because the point is to scroll around a bigger widget.
+
         self.min_width = 2 * self.padding
         self.min_height = 2 * self.padding
 
-        if self.child is not None:
-            self.child.claim()
-
     def resize(self, rect):
-        Widget.resize(self, rect)
+        Container.resize(self, rect)
+
+        # Allow the child to be whatever size it wants.
+
         if self.child is not None:
             self.child.resize(self.child.min_rect)
 
@@ -475,33 +415,130 @@ class Viewport (Bin):
 
 Viewport.register_event_type('on_mouse_pan')
 
+class Grid (Container):
+
+    def __init__(self, rows, cols, padding=0, align='fill'):
+        Container.__init__(self)
+        self.grid = dict()
+        self.padding = padding
+        self.align = align
+        self.rows = rows
+        self.cols = cols
+
+    def __iter__(self):
+        yield from self.grid.values()
+
+    def __len__(self):
+        return len(self.grid)
+
+    def __getitem__(self, index):
+        return self.grid[index]
+
+    def __setitem__(self, index, child):
+        row, col = index
+        self.add(row, col, child)
+
+
+    def add(self, row, col, child):
+        if not 0 <= row < self.rows: raise IndexError("Row out-of-bounds: row={} num_rows=0..{}".format(row, self.rows))
+        if not 0 <= col < self.cols: raise IndexError("Column out-of-bounds: col={} num_cols=0..{}".format(col, self.cols))
+
+        if (row, col) in self.grid: self.grid[row, col].parent = None
+        def attacher(child): self.grid[row, col] = child
+        self._attach_child_widget(child, attacher)
+
+    def remove(self, row, col):
+        def detacher(child): del self.grid[row, col]
+        self._attach_child_widget(self.grid[row, col], attacher)
+
+    def claim(self):
+        super(Grid, self).claim()
+
+        self.min_width = self.padding * (self.cols + 1)
+        self.min_height = self.padding * (self.rows + 1)
+
+        for row in range(self.rows):
+            row_height = 0
+            for col in range(self.cols):
+                if (row, col) in self.grid:
+                    child = self.grid[row, col]
+                    row_height = max(child.min_height, row_height)
+            self.min_height += row_height
+
+        for col in range(self.cols):
+            col_width = 0
+            for row in range(self.rows):
+                if (row, col) in self.grid:
+                    child = self.grid[row, col]
+                    col_width = max(child.min_width, col_width)
+            self.min_width += col_width
+
+    def resize(self, rect):
+        super(Grid, self).resize(rect)
+
+        available_width = self.rect.width - self.padding * (self.cols + 1)
+        available_height = self.rect.height - self.padding * (self.cols + 1)
+
+        child_width = available_width / self.cols
+        child_height = available_height / self.rows
+
+        for row, col in self.grid:
+            left = self.rect.left + (child_width * col) + (
+                    self.padding * (col + 1))
+            bottom = self.rect.bottom + (child_height * (self.rows - row - 1)) + (
+                    self.padding * (self.rows - row))
+            rect = Rect.from_dimensions(
+                    bottom=bottom, left=left,
+                    width=child_width, height=child_height)
+
+            child = self.grid[row, col]
+            resize_child(child, self.align, rect)
+
+
+    def yield_cells(self):
+        for row in range(self.rows):
+            for col in range(self.cols):
+                yield row, col
 
 class HVBox (Container):
 
     def __init__(self, padding=0, align='fill'):
         Container.__init__(self)
+        self.children = list()
+        self.expandable = set()
         self.padding = padding
         self.align = align
-        self.expandable = set()
+
+    def __iter__(self):
+        yield from self.children
+
+    def __len__(self):
+        return len(self.children)
+
+
+    def add(self, child, expand=False):
+        self.add_back(child, expand)
 
     def add_front(self, child, expand=False):
-        if expand: self.expandable.add(child)
-        Container.insert(self, child, 0)
+        self.insert(child, 0, expand)
 
     def add_back(self, child, expand=False):
-        if expand: self.expandable.add(child)
-        Container.insert(self, child)
+        self.insert(child, len(self.children), expand)
 
-    add = add_back
+    def insert(self, child, index, expand=False):
+        if expand: self.expandable.add(child)
+        self._attach_child_widget(child,
+                lambda child: self.children.insert(index, child))
 
     def remove(self, child):
         self.expandable.discard(child)
-        Container.remove(self, child)
+        self._detach_child_widget(child,
+                lambda child: self.children.remove(child))
 
     def claim(self):
         raise NotImplementedError
 
-    def resize(self):
+    def resize(self, rect):
         raise NotImplementedError
 
 
@@ -516,6 +553,8 @@ class HVBox (Container):
 
 
     def _claim(self, orientation):
+        self.min_width = 0
+        self.min_height = 0
         
         # Account for children
 

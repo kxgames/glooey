@@ -54,16 +54,6 @@ class Gui (Root):
         Root.__init__(self, rect, window, batch, group)
 
 
-
-# Not bad.  I still have to:
-#
-# 1. Propogate all events.  Make sure this works with buttons inside and 
-#    outside the viewport.
-# 2. Clip the viewport.
-# 3. Write a better docstring.
-#
-# But all the hard stuff is in place!
-
 class PanningGui (Root):
     """ A window with mouse exclusivity enabled.  This makes it possible to 
     emit mouse push events, but it also complicates a lot of things.  First of 
@@ -196,6 +186,5 @@ PanningGui.register_event_type('on_mouse_pan')
 class Dialog (Root):
     # Have to set size manually.
     pass
-
 
 
