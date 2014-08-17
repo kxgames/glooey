@@ -27,11 +27,6 @@ root.add(bin)
 def on_click(button):
     print("Button clicked!")
 
-@window.event
-def on_draw():
-    window.clear()
-    batch.draw()
-
 
 pyglet.app.run()
 

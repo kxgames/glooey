@@ -53,6 +53,10 @@ class Gui (Root):
         rect = Rect.from_pyglet_window(window)
         Root.__init__(self, rect, window, batch, group)
 
+    def on_draw(self):
+        self.window.clear()
+        self.batch.draw()
+
 
 class PanningGui (Root):
     """ A window with mouse exclusivity enabled.  This makes it possible to 
@@ -88,6 +92,10 @@ class PanningGui (Root):
     def undraw(self):
         self.cursor.visible = False
 
+
+    def on_draw(self):
+        self.window.clear()
+        self.batch.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
         Root.on_mouse_press(self, self.mouse.x, self.mouse.y, button, modifiers)

@@ -17,12 +17,6 @@ vbox.add_front(PlaceHolder(color=red), expand=True)
 
 root.add(vbox)
 
-@window.event
-def on_draw():
-    window.clear()
-    batch.draw()
-
-
 pyglet.app.run()
 
 

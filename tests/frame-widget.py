@@ -20,12 +20,6 @@ widget = glooey.PlaceHolder()
 frame.add(widget)
 root.add(frame)
 
-@window.event
-def on_draw():
-    window.clear()
-    batch.draw()
-
-
 pyglet.app.run()
 
 

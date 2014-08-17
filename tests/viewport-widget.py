@@ -33,11 +33,5 @@ root.add(vbox)
 center_of_view = content[2, 2].rect.center
 viewport.set_center_of_view(center_of_view)
 
-@window.event
-def on_draw():
-    window.clear()
-    batch.draw()
-
-
 pyglet.app.run()
 

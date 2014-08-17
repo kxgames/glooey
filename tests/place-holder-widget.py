@@ -10,11 +10,5 @@ root = glooey.Gui(window, batch=batch)
 widget = glooey.PlaceHolder()
 root.add(widget)
 
-@window.event
-def on_draw():
-    window.clear()
-    batch.draw()
-
-
 pyglet.app.run()
 
