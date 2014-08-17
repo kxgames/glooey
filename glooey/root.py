@@ -59,7 +59,7 @@ class Gui (Root):
 
     def on_resize(self, width, height):
         rect = Rect.from_pyglet_window(self.window)
-        super(Gui, self).resize(rect)
+        self.resize(rect)
 
 
 
@@ -88,6 +88,10 @@ class PanningGui (Gui):
         self.shadow_mouse = None
         self.cursor = pyglet.sprite.Sprite(
                 cursor, batch=batch, group=mouse_group)
+
+    def resize(self, rect):
+        super(PanningGui, self).resize(rect)
+        self.mouse = rect.center
 
     def draw(self):
         self.cursor.visible = True
