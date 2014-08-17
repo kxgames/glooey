@@ -194,7 +194,6 @@ class PanningGui (Root):
 PanningGui.register_event_type('on_mouse_pan')
 
 class Dialog (Root):
-    # No mouse push event.
     # Have to set size manually.
     pass
 

@@ -2,6 +2,7 @@ import math
 import pyglet
 
 from pyglet.gl import *
+from pyglet.graphics import Group, OrderedGroup
 from vecrec import Vector, Rect
 
 # Color utilities
@@ -578,5 +579,80 @@ class _BoundVertexList:
 
     def delete(self):
         self.vertex_list.delete()
+
+
+
+# Clipping mask utilities
+
+class StencilGroup (Group):
+
+    def __init__(self, parent=None):
+        Group.__init__(self, parent)
+
+    def set_state(self):
+        from pyglet.gl import GL_STENCIL_TEST
+        from pyglet.gl import GL_STENCIL_BUFFER_BIT
+        from pyglet.gl import GL_DEPTH_BUFFER_BIT
+
+        pyglet.gl.glEnable(GL_STENCIL_TEST)
+        pyglet.gl.glClear(GL_DEPTH_BUFFER_BIT)
+        pyglet.gl.glClear(GL_STENCIL_BUFFER_BIT)
+
+    def unset_state(self):
+        from pyglet.gl import GL_STENCIL_TEST
+        pyglet.gl.glDisable(GL_STENCIL_TEST)
+
+
+class StencilMask (Group):
+
+    def __init__(self, parent=None):
+        Group.__init__(self, parent)
+
+    def set_state(self):
+        from pyglet.gl import GL_FALSE, GL_NEVER
+        from pyglet.gl import GL_REPLACE, GL_KEEP
+
+        pyglet.gl.glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
+        pyglet.gl.glDepthMask(GL_FALSE)
+        pyglet.gl.glStencilFunc(GL_NEVER, 1, 0xFF)
+        pyglet.gl.glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP)
+
+        pyglet.gl.glStencilMask(0xFF)
+
+    def unset_state(self):
+        from pyglet.gl import GL_TRUE
+        pyglet.gl.glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
+        pyglet.gl.glDepthMask(GL_TRUE);
+
+
+class WhereStencilIs (Group):
+
+    def __init__(self, parent=None):
+        Group.__init__(self, parent)
+
+    def set_state(self):
+        from pyglet.gl import GL_EQUAL
+
+        pyglet.gl.glStencilMask(0x00)
+        pyglet.gl.glStencilFunc(GL_EQUAL, 1, 0xFF)
+
+    def unset_state(self):
+        pass
+
+
+class WhereStencilIsnt (Group):
+
+    def __init__(self, parent=None):
+        Group.__init__(self, parent)
+
+    def set_state(self):
+        from pyglet.gl import GL_EQUAL
+
+        pyglet.gl.glStencilMask(0x00);
+        pyglet.gl.glStencilFunc(GL_EQUAL, 0, 0xFF)
+
+    def unset_state(self):
+        pass
+
 
 

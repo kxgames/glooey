@@ -39,7 +39,7 @@ class Widget (pyglet.event.EventDispatcher):
             self.resize(self.rect)
 
     def resize(self, rect):
-        assert self.parent, str(self.parent) + str(self)
+        assert self.parent
         self._rect = rect
         self.draw()
 

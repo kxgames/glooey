@@ -1,4 +1,6 @@
 import pyglet
+import vecrec
+
 from vecrec import Vector, Rect
 from .widget import Widget
 from . import drawing
@@ -300,25 +302,35 @@ class Viewport (Bin):
             self.viewport = viewport
 
         def set_state(self):
+            translation = -self.viewport.get_child_coords(0, 0)
             pyglet.gl.glPushMatrix()
-            pyglet.gl.glTranslatef(
-                    -self.viewport.offset.x, -self.viewport.offset.y, 0)
+            pyglet.gl.glTranslatef(translation.x, translation.y, 0)
 
         def unset_state(self):
             pyglet.gl.glPopMatrix()
 
 
-    def __init__(self, sensitivity=3, clip=False):
+    def __init__(self, sensitivity=3):
         Bin.__init__(self)
-        self.offset = Vector.null()
+
+        # The panning_vector is the displacement between the bottom-left corner 
+        # of this widget and the bottom-left corner of the child widget.
+
+        self._panning_vector = Vector.null()
+        self._deferred_center_of_view = None
         self.sensitivity = sensitivity
-        self.panning_group = Viewport.PanningGroup(self)
-        self.enable_clipping = clip
+
+        # The stencil_group, mask_group, and visible_group members manage the 
+        # clipping mask to make sure the child is only visible inside the 
+        # viewport.  The panning_group member is used to translate the child in 
+        # response to panning events.
+
+        self.stencil_group = drawing.StencilGroup(self.group)
+        self.mask_group = drawing.StencilMask(self.stencil_group)
+        self.visible_group = drawing.WhereStencilIs(self.stencil_group)
+        self.panning_group = Viewport.PanningGroup(self, self.visible_group)
 
     def wrap(self, child):
-        # Give child a group that's hooked up to:
-        # 1. translate on my command
-        # 2. get clipped.
         child.group = self.panning_group
         Bin.wrap(self, child)
 
@@ -334,14 +346,23 @@ class Viewport (Bin):
         if self.child is not None:
             self.child.resize(self.child.min_rect)
 
+        # Set the center of view if it was previously specified.  The center of 
+        # view cannot be directly set until the size of the viewport is known, 
+        # but this limitation is hidden from the user by indirectly setting the 
+        # center of view as soon as the viewport has a size.
+
+        if self._deferred_center_of_view is not None:
+            self.set_center_of_view(self._deferred_center_of_view)
+
     def draw(self):
-        # update clipping mask.
-        pass
+        drawing.draw_rectangle(
+                self.rect, batch=self.batch, group=self.mask_group)
 
 
     def on_attach(self):
         Bin.on_attach(self)
-        self.panning_group.parent = self.group
+    
+        self.stencil_group.parent = self.group
 
         # If this line raises a pyglet EventException, you may be trying to 
         # attach this widget to a GUI that doesn't support mouse pan events.  
@@ -354,57 +375,102 @@ class Viewport (Bin):
         Bin.on_detach(self)
 
     def on_mouse_press(self, x, y, button, modifiers):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_press(self, x, y, button, modifiers)
 
     def on_mouse_release(self, x, y, button, modifiers):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_release(self, x, y, button, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_motion(self, x, y, dx, dy)
 
     def on_mouse_enter(self, x, y):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_enter(self, x, y)
 
     def on_mouse_leave(self, x, y):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_leave(self, x, y)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_drag(self, x, y, dx, dy, buttons, modifiers)
 
     def on_mouse_drag_enter(self, x, y):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_drag_enter(self, x, y)
 
     def on_mouse_drag_leave(self, x, y):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_drag_leave(self, x, y)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        x, y = self.offset + (x, y)
+        x, y = self.get_child_coords(x, y)
         Bin.on_mouse_scroll(self, x, y, scroll_x, scroll_y)
 
     def on_mouse_pan(self, direction, dt):
-        self.offset += direction * self.sensitivity * dt
+        self.panning_vector += direction * self.sensitivity * dt
 
-        # This should be a vector method.
 
-        if self.offset.x < self.child.rect.left:
-            self.offset.x = self.child.rect.left
+    @vecrec.accept_anything_as_vector
+    def get_child_coords(self, screen_coords):
+        viewport_origin = self.rect.bottom_left
+        viewport_coords = screen_coords - viewport_origin
+        child_origin = self.child.rect.bottom_left
+        child_coords = child_origin + self.panning_vector + viewport_coords
+        return child_coords
 
-        if self.offset.x > self.child.rect.right - self.rect.width:
-            self.offset.x = self.child.rect.right - self.rect.width
+    @vecrec.accept_anything_as_vector
+    def get_screen_coords(self, child_coords):
+        child_origin = self.child.rect.bottom_left
+        viewport_origin = self.rect.bottom_left
+        viewport_coords = child_coords - child_origin - self.panning_vector
+        screen_coords = view_port_coords + viewport_origin
+        return screen_coords
 
-        if self.offset.y < self.child.rect.bottom:
-            self.offset.y = self.child.rect.bottom
+    def get_visible_area(self):
+        left, bottom = self.get_child_coords(self.rect.left, self.rect.bottom)
+        return Rect.from_dimensions(
+                left, bottom, self.rect.width, self.rect.height)
 
-        if self.offset.y > self.child.rect.top - self.rect.height:
-            self.offset.y = self.child.rect.top - self.rect.height
+    def get_panning_vector(self):
+        return self._panning_vector
+
+    def set_panning_vector(self, vector):
+        self._panning_vector = vector
+
+        if self._panning_vector.x < self.child.rect.left:
+            self._panning_vector.x = self.child.rect.left
+
+        if self._panning_vector.x > self.child.rect.right - self.rect.width:
+            self._panning_vector.x = self.child.rect.right - self.rect.width
+
+        if self._panning_vector.y < self.child.rect.bottom:
+            self._panning_vector.y = self.child.rect.bottom
+
+        if self._panning_vector.y > self.child.rect.top - self.rect.height:
+            self._panning_vector.y = self.child.rect.top - self.rect.height
+
+    @vecrec.accept_anything_as_vector
+    def set_center_of_view(self, child_coords):
+        # In order to set the center of view, the size of the viewport widget 
+        # is needed.  Unfortunately this information is not available until the 
+        # viewport has been attached to a root widget.  To allow this method to 
+        # be called at any time, the _focus_point member is used in conjunction 
+        # with on_attach() to cache the desired center of view.
+
+        if self.root is None:
+            self._deferred_center_of_view = child_coords
+        else:
+            viewport_center = self.rect.center - self.rect.bottom_left
+            self.panning_vector = child_coords - viewport_center
+            self._deferred_center_of_view = None
+
+
+    # Properties (fold)
+    panning_vector = property(get_panning_vector, set_panning_vector)
 
 
 Viewport.register_event_type('on_mouse_pan')

@@ -19,20 +19,16 @@ widgets = [
 ]
 
 hbox = glooey.HBox(padding=50)
-for logger in widgets:
-    hbox.add(logger)
+for logger in widgets: hbox.add(logger)
+
+viewport.set_center_of_view(500, 500)
 viewport.wrap(hbox)
 
-#vbox = glooey.VBox()
-#vbox.add(viewport)
-#vbox.add(menu)
-#
-#root.wrap(vbox)
-root.wrap(viewport)
-print(viewport.min_width, viewport.min_height)
-print(hbox.min_width, hbox.min_height)
-for widget in widgets:
-    print(widget.min_width, widget.min_height)
+vbox = glooey.VBox()
+vbox.add(viewport, expand=True)
+vbox.add(menu)
+
+root.wrap(vbox)
 
 @window.event
 def on_draw():
