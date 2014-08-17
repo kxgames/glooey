@@ -57,8 +57,13 @@ class Gui (Root):
         self.window.clear()
         self.batch.draw()
 
+    def on_resize(self, width, height):
+        rect = Rect.from_pyglet_window(self.window)
+        super(Gui, self).resize(rect)
 
-class PanningGui (Root):
+
+
+class PanningGui (Gui):
     """ A window with mouse exclusivity enabled.  This makes it possible to 
     emit mouse push events, but it also complicates a lot of things.  First of 
     all, an image must be provided so that the mouse can be manually drawn.  
@@ -69,18 +74,17 @@ class PanningGui (Root):
     particular, the mouse might go behind things in the given group. """
 
     def __init__(self, window, cursor, hotspot, batch=None, group=None):
-        rect = Rect.from_pyglet_window(window)
         mouse_group = pyglet.graphics.OrderedGroup(1, parent=group)
         gui_group = pyglet.graphics.OrderedGroup(0, parent=group)
 
-        Root.__init__(self, rect, window, batch, gui_group)
+        super(PanningGui, self).__init__(window, batch, gui_group)
         window.set_exclusive_mouse(True)
 
         hotspot = vecrec.cast_anything_to_vector(hotspot)
         cursor.anchor_x = hotspot.x
         cursor.anchor_y = hotspot.y
 
-        self.mouse = rect.center
+        self.mouse = self.rect.center
         self.shadow_mouse = None
         self.cursor = pyglet.sprite.Sprite(
                 cursor, batch=batch, group=mouse_group)
@@ -92,10 +96,6 @@ class PanningGui (Root):
     def undraw(self):
         self.cursor.visible = False
 
-
-    def on_draw(self):
-        self.window.clear()
-        self.batch.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
         Root.on_mouse_press(self, self.mouse.x, self.mouse.y, button, modifiers)
