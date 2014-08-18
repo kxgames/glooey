@@ -23,7 +23,7 @@ for row, col in content.yield_cells():
         style = dict(color=glooey.drawing.green)
         WidgetClass = glooey.PlaceHolder
 
-    content[row, col] = WidgetClass(width=300, height=300, **style)
+    content[row, col] = WidgetClass(width=300, height=200, **style)
 
 viewport.add(content)
 vbox.add(viewport, expand=True)
