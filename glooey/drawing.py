@@ -11,21 +11,29 @@ class Color (object):
 
     @staticmethod
     def from_hex(hex):
-        red, green, blue, alpha =   \
-                int(hex[1:3]), int(hex[3:5]), int(hex[5:7]), int(hex[7:9])
-        return Color.__init__(red, green, blue, alpha)
+        import re
+
+        hex_digits = '([0-9a-fA-f]{2})'
+        hex_pattern = '#?' + (3 * hex_digits) + (hex_digits + '?')
+        hex_match = re.match(hex_pattern, hex)
+
+        if hex_match:
+            hex_ints = [int(x, 16) for x in hex_match.groups() if x is not None]
+            return Color.from_int_tuple(hex_ints)
+        else:
+            raise ValueError("Couldn't interpret '{}' as a hex color.".format(hex))
 
     @staticmethod
     def from_ints(red, green, blue, alpha=255):
-        return Color.__init__(red, green, blue, alpha)
+        return Color(red, green, blue, alpha)
 
     @staticmethod
     def from_int_tuple(rgba):
-        return Color.__init__(*rgba)
+        return Color(*rgba)
 
     @staticmethod
     def from_floats(red, green, blue, alpha=1.0):
-        return Color.__init__(255 * red, 255 * green, 255 * blue)
+        return Color(255 * red, 255 * green, 255 * blue)
 
     @staticmethod
     def from_float_tuple(rgba):
