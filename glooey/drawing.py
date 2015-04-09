@@ -1,5 +1,6 @@
 import math
 import pyglet
+import more_itertools
 
 from pyglet.gl import *
 from pyglet.graphics import Group, OrderedGroup
@@ -178,7 +179,45 @@ colors = {
 
 rainbow_cycle = red, orange, yellow, green, blue, purple, brown
 
+
 # Drawing utilities
+
+def draw_line(
+        vertices, color=green,
+        batch=None, group=None, usage='static'):
+    """
+    Draw a line that passes through all the given coordinates.
+    
+    Parameters
+    ----------
+    vertices: [vector-like, ...]
+        Where to draw the line.  Vertices are expected as a list of vector-like 
+        objects.  This includes vecrec.Vector and 2-tuples.  3D coordinates are 
+        not supported by this function.
+
+    color: glooey.drawing.Color
+        What color to make the line.
+    """
+
+    gl_vertices = ()
+
+    for head, tail in more_itertools.pairwise(vertices):
+        gl_vertices += head.tuple
+        gl_vertices += tail.tuple
+
+    num_gl_vertices = len(gl_vertices) // 2
+
+    # Note that GL_LINE_STRIP doesn't work right in pyglet.  If a single batch 
+    # has two GL_LINE_STRIPS, they will be drawn connected (unless a particular 
+    # "fencing" extension happens to be installed).  With GL_TRIANGLE_STRIP and 
+    # GL_QUAD_STRIP this problem can be worked around by duplicating the first 
+    # coordinate in each list, but this trick doesn't work for GL_LINE_STRIP.  
+    # Instead we have to use GL_LINES, which is still reasonably performant.
+
+    return _make_vertex_list(
+            batch, group, num_gl_vertices, GL_LINES,
+            ('v2f/' + usage, gl_vertices),
+            ('c4B', color.tuple * num_gl_vertices))
 
 def draw_circle(
         center, radius,
