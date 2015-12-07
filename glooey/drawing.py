@@ -54,7 +54,7 @@ class Color (object):
         return '#%02x%02x%02x%02x' % self.tuple
 
     def __repr__(self):
-        return self.__str__()
+        return 'Color({0.red}, {0.green}, {0.blue}, {0.alpha})'.format(self)
 
 
     def __add__(self, other):
@@ -78,7 +78,7 @@ class Color (object):
                 scalar * self.b,
                 scalar * self.a)
 
-    def __div__(self, scalar):
+    def __truediv__(self, scalar):
         return Color(
                 self.r / scalar,
                 self.g / scalar,
@@ -102,7 +102,10 @@ class Color (object):
         return self.r, self.g, self.b, self.a
     
     def get_float(self):
-        return (self / 255).tuple
+        return (self.r / 255,
+                self.g / 255,
+                self.b / 255,
+                self.a / 255)
 
     def get_rgba(self):
         return 
@@ -151,6 +154,12 @@ class Color (object):
     float = property(get_float, set_float)
 
     
+def hex_to_float(hex):
+    return Color.from_hex(hex).float
+
+def hex_to_int(hex):
+    return Color.from_hex(hex).tuple
+
 # Colors (fold)
 red = Color(164, 0, 0)
 brown = Color(143, 89, 2)
