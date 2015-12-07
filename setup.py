@@ -16,4 +16,10 @@ distutils.core.setup(
         license='LICENSE.txt',
         description="An object-oriented GUI library for pyglet.",
         long_description=open('README.rst').read(),
-        keywords=['pyglet', 'gui', 'library'])
+        keywords=['pyglet', 'gui', 'library'],
+        install_requires=[
+            'pyglet',
+            'more_itertools',
+            # not available on PyPI yet: 'vecrec', 
+        ],
+)
