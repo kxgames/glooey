@@ -8,6 +8,12 @@ from vecrec import Vector, Rect
 
 # Color utilities
 
+# Right now, the color class's internal representation is integers.  I don't 
+# know if this is a good thing, because integers aren't as expressive as 
+# floats.  This surprised me when I tried to use __truediv__ to implement 
+# get_float().  It didn't work because the RGBA values got converted to ints 
+# before being returned.
+
 class Color (object):
 
     @staticmethod
