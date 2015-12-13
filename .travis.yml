@@ -1,18 +1,18 @@
 language: python
 env:
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "nightly"
+- '3.2'
+- '3.3'
+- '3.4'
+- '3.5'
+- nightly
 install:
-  - pip install .
-script: 
-  - py.test tests
+- pip install .
+script:
+- py.test tests
 deploy:
-    provider: pypi
-    user: kalekundert
-    on:
-        tags: true
-
-
+  provider: pypi
+  user: kalekundert
+  password:
+    secure: cDuG5VAtB8056/vZhiEp24P9hzbs+wP++e6GYqfkPuUoc7OYTTTdBmvSyBM6jQgUrrBnZ+IKaSyk1cTDUjyXYOItCkiYeFdrDghhR0wY9y48TfHViX7pTFICi9CkvxtUyai2NAbJqtHHBsAFkfBg2IpUZ5ZZMXXGtX35STP4R19WxdRG8Thm6qzp8+10yrDj64iVnO5jA1FwAmeBYrvFJQW/ICb7XCIVGTR+VqHF7W2CoFnwv+eBWHLDN+HUI8dhmwKlzDIuNBpUY4OdVwTaCFhKzroYcg/sM0hI2+3LvmJzRMtfFU79J5Ti26l9VRph5ZVm7JZrZFDAybMa+2Asmf8x6jb2z4MZxsoE7XxVwInpm4XTEsp5grfHh1zPikajCfFQH71CQNrLe/Fx22sTZKlfCVmlntgUv3enl9WIQN81h2FM4PblDfWJcMd4QvVX0SWa0HTReNbG+u2oYX2VmDmF1rLkAHQSr8gyJoLkYVFamI0p1oqKGFLv6R9woagitK67AaGCE73iV19B2kPpQskzwaMx2s0wmIYyIxFVaBy5LsSOB5xWdeSw9x2tWuaACK4ahwHgE7AZ2MrfplaL+BWgcIxp2F7zd3aTnQXlWg+49VCjO3GzkuzVGnLSsViZXphvU7fBcoUXCsGfWndRcm3NWvDPztRtKeuTIJnrN1s=
+  on:
+    tags: true
