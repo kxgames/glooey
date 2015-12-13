@@ -1,0 +1,18 @@
+language: python
+env:
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "nightly"
+install:
+  - pip install .
+script: 
+  - py.test tests
+deploy:
+    provider: pypi
+    user: kalekundert
+    on:
+        tags: true
+
+
