@@ -1,0 +1,72 @@
+These are integration tests.
+
+Many of the tests could be integration-style.  
+
+But some of the programs are interactive: clicking on buttons, moving the 
+viewport, etc.
+
+I should write some standard tests: are paddings calculated correctly, etc.
+
+I want to specify what the gold standards should be for the integration tests.  
+These will of course be the same functions as run the tests, so I need a way to 
+tell individual tests to capture themselves.  I also need to be able to just 
+flat-out run GUIs so I can test the interactive stuff manually.
+
+So three modes, I think:
+
+1. run via pytest without GUI, compare to gold standard as integration test
+2. run with GUI, generate new gold standard if it looks ok.
+3. run with GUI
+
+# test_draw_circle.py
+
+import glooey
+import main
+
+# Nope, that's not the test...
+
+def draw_circle(window, batch):
+    rect = vecrec.Rect.from_pyglet_window(window)
+    dx, r = 100, 40
+
+    glooey.drawing.draw_circle(rect.center + (dx, 0), r, batch=batch)
+    glooey.drawing.draw_circle(rect.center +  (0, 0), r, batch=batch)
+    glooey.drawing.draw_circle(rect.center - (dx, 0), r, batch=batch)
+
+def test_draw_circle():
+    from filecmp import cmp
+
+    # Make new screenshot.
+    ...
+
+    # This approach could be fragile.
+    cmp('new_screenshot.png', 'old_screenshot.png')
+
+    # Alternatively:
+    # 1. Parse images into numpy arrays.
+    # 2. Subtract new image from old image.
+    # 3. Make sure it's all pretty close to zero.
+
+def main():
+    window = pyglet.window.Window()
+    batch = pyglet.graphics.Batch()
+
+    draw_circle(window, batch)
+
+    @window.event
+    def on_draw():
+        window.clear()
+        batch.draw()
+        cb = pyglet.image.get_buffer_manager().get_color_buffer()
+        cb.save('screenshot.png')
+
+
+    pyglet.app.run()
+
+    # This would be obnoxious during debugging...
+    input("Save screenshot? ")
+
+
+if __name__ == '__main__':
+    main()
+

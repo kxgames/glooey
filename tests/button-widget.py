@@ -10,7 +10,6 @@ base_image = pyglet.image.load('button.png')
 over_image = pyglet.image.load('button-over.png')
 down_image = pyglet.image.load('button-down.png')
 
-#button = glooey.EventLogger(width=197, height=197)
 button = glooey.Button()
 button.set_base_image(base_image)
 button.set_over_image(over_image)

@@ -3,17 +3,18 @@ import vecrec
 
 from vecrec import Vector, Rect
 from .containers import Bin
+from .helpers import *
 
 class Root (Bin):
 
     def __init__(self, rect, window, batch=None, group=None):
-        Bin.__init__(self)
+        super().__init__()
 
         self._parent = self
         self._rect = rect
         self._window = window
         self._batch = batch or pyglet.graphics.Batch()
-        self._group = group
+        self._group = group or pyglet.graphics.Group()
 
         window.push_handlers(self)
 
@@ -23,16 +24,20 @@ class Root (Bin):
         too_narrow = self.rect.width < self.min_width
         too_short = self.rect.height < self.min_height
 
-        # Complain if too much space is requested.
+        # Complain if the GUI needs more space than is available in the window.
         if too_narrow or too_short:
-            message = '{}x{} required to render GUI, but the {} is only {}x{}.'
+            message = "The {} is only {}x{}, but its children are {}x{}."
             raise RuntimeError(
                     message.format(
-                        self.min_width, self.min_height,
                         self.__class__.__name__,
-                        self.rect.width, self.rect.height))
+                        self.rect.width, self.rect.height,
+                        self.min_width, self.min_height,
+            ))
 
-        self.resize(self.rect)
+        self.do_resize_children()
+
+    def regroup(self, group):
+        super().regroup(group or pyglet.graphics.Group())
 
     def get_root(self):
         return self
@@ -51,7 +56,7 @@ class Gui (Root):
 
     def __init__(self, window, batch=None, group=None):
         rect = Rect.from_pyglet_window(window)
-        Root.__init__(self, rect, window, batch, group)
+        super().__init__(rect, window, batch, group)
 
     def on_draw(self):
         self.window.clear()
@@ -62,22 +67,20 @@ class Gui (Root):
         self.resize(rect)
 
 
-
 class PanningGui (Gui):
-    """ A window with mouse exclusivity enabled.  This makes it possible to 
+    """
+    A window with mouse exclusivity enabled.  This makes it possible to 
     emit mouse push events, but it also complicates a lot of things.  First of 
     all, an image must be provided so that the mouse can be manually drawn.  
-    Second, the x, y coordinates of the mouse must be manually tracked and fed 
-    to the event handlers. 
-    
-    You can specify a group, but things might be screwy if you do.  In 
-    particular, the mouse might go behind things in the given group. """
+    Second, the mouse coordinates must be manually tracked and fed to the event 
+    handlers. 
+    """
 
     def __init__(self, window, cursor, hotspot, batch=None, group=None):
         mouse_group = pyglet.graphics.OrderedGroup(1, parent=group)
         gui_group = pyglet.graphics.OrderedGroup(0, parent=group)
 
-        super(PanningGui, self).__init__(window, batch, gui_group)
+        super().__init__(window, batch, gui_group)
         window.set_exclusive_mouse(True)
 
         hotspot = vecrec.cast_anything_to_vector(hotspot)
@@ -89,27 +92,26 @@ class PanningGui (Gui):
         self.cursor = pyglet.sprite.Sprite(
                 cursor, batch=batch, group=mouse_group)
 
-    def resize(self, rect):
-        super(PanningGui, self).resize(rect)
+    def do_resize(self, rect):
         self.mouse = rect.center
 
-    def draw(self):
+    def do_draw(self):
         self.cursor.visible = True
         self.cursor.position = self.mouse.tuple
 
-    def undraw(self):
+    def do_undraw(self):
         self.cursor.visible = False
 
 
     def on_mouse_press(self, x, y, button, modifiers):
-        Root.on_mouse_press(self, self.mouse.x, self.mouse.y, button, modifiers)
+        super().on_mouse_press(self.mouse.x, self.mouse.y, button, modifiers)
 
     def on_mouse_release(self, x, y, button, modifiers):
-        Root.on_mouse_release(self, self.mouse.x, self.mouse.y, button, modifiers)
+        super().on_mouse_release(self.mouse.x, self.mouse.y, button, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
         self._update_mouse(dx, dy)
-        Root.on_mouse_motion(self, self.mouse.x, self.mouse.y, dx, dy)
+        super().on_mouse_motion(self.mouse.x, self.mouse.y, dx, dy)
 
     def on_mouse_enter(self, x, y):
         # The mouse never really enters or exits a window with mouse 
@@ -134,16 +136,16 @@ class PanningGui (Gui):
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         self._update_mouse(dx, dy)
-        Root.on_mouse_drag(self, self.mouse.x, self.mouse.y, dx, dy, buttons, modifiers)
+        super().on_mouse_drag(self.mouse.x, self.mouse.y, dx, dy, buttons, modifiers)
 
     def on_mouse_drag_enter(self, x, y):
-        Root.on_mouse_drag_enter(self, self.mouse.x, self.mouse.y)
+        super().on_mouse_drag_enter(self.mouse.x, self.mouse.y)
 
     def on_mouse_drag_leave(self, x, y):
-        Root.on_mouse_drag_leave(self, self.mouse.x, self.mouse.y)
+        super().on_mouse_drag_leave(self.mouse.x, self.mouse.y)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        Root.on_mouse_scroll(self, self.mouse.x, self.mouse.y, scroll_x, scroll_y)
+        super().on_mouse_scroll(self.mouse.x, self.mouse.y, scroll_x, scroll_y)
 
 
     def _update_mouse(self, dx, dy):
@@ -169,7 +171,8 @@ class PanningGui (Gui):
             if self.rect.bottom < self.mouse.y < self.rect.top:
                 self.shadow_mouse.y = self.mouse.y
 
-        # Keep the mouse on screen.  This should be a vector method.
+        # Keep the mouse on screen.  This feels like there should be a function 
+        # for this in vecrec...
 
         if self.mouse.x < self.rect.left: self.mouse.x = self.rect.left
         if self.mouse.x > self.rect.right: self.mouse.x = self.rect.right

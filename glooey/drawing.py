@@ -1,6 +1,7 @@
 import math
 import pyglet
 import more_itertools
+import vecrec
 
 from pyglet.gl import *
 from pyglet.graphics import Group, OrderedGroup
@@ -180,7 +181,7 @@ gray = Color(85, 87, 83)
 light = Color(255, 250, 240)
 white = Color(255, 255, 255)
 
-colors = {
+colors = {  # (no fold)
         'red': red,
         'brown': brown,
         'orange': orange,
@@ -196,6 +197,90 @@ rainbow_cycle = red, orange, yellow, green, blue, purple, brown
 
 
 # Drawing utilities
+
+class Artist:
+
+    def __init__(self, batch, group, count, mode, *data):
+        self._batch = batch
+        self._group = group
+        self._count = count
+        self._mode = mode
+        self._vertex_list = batch.add(count, mode, group, *data)
+
+    @property
+    def batch(self):
+        return self._batch
+
+    @batch.setter
+    def batch(self, new_batch):
+        if self._batch is not new_batch:
+            self._batch.migrate(
+                    self._vertex_list, self._mode, self._group, new_batch)
+
+    @property
+    def group(self):
+        return self._group
+
+    @group.setter
+    def group(self, new_group):
+        if self._group is not new_group:
+            self._batch.migrate(
+                    self._vertex_list, self._mode, new_group, self._batch)
+
+    @property
+    def count(self):
+        return self._count
+
+    @count.setter
+    def count(self, new_count):
+        self._vertex_list.resize(new_count)
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @property
+    def vertex_list(self):
+        return self._vertex_list
+
+    def delete(self):
+        self._vertex_list.delete()
+
+
+class Rectangle(Artist):
+
+    def __init__(self, rect, color=green,
+            batch=None, group=None, usage='static'):
+
+        data = 'v2f/' + usage, 'c4B/' + usage
+        super().__init__(batch, group, 4, GL_QUADS, *data)
+        self.rect = rect
+        self.color = color
+
+    @property
+    def rect(self):
+        return self._rect
+
+    @rect.setter
+    def rect(self, new_rect):
+        self._rect = new_rect
+        self.vertex_list.vertices = (
+                new_rect.bottom_left.tuple +
+                new_rect.bottom_right.tuple +
+                new_rect.top_right.tuple +
+                new_rect.top_left.tuple
+        )
+
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, new_color):
+        self._color = new_color
+        self.vertex_list.colors = 4 * new_color.tuple
+
+
 
 def draw_line(
         vertices, color=green,
@@ -217,8 +302,8 @@ def draw_line(
     gl_vertices = ()
 
     for head, tail in more_itertools.pairwise(vertices):
-        gl_vertices += head.tuple
-        gl_vertices += tail.tuple
+        gl_vertices += vecrec.cast_anything_to_vector(head).tuple
+        gl_vertices += vecrec.cast_anything_to_vector(tail).tuple
 
     num_gl_vertices = len(gl_vertices) // 2
 
@@ -270,6 +355,31 @@ def draw_rectangle(
             batch, group, 4, GL_QUADS,
             ('v2f/' + usage, vertices),
             ('c4B', color.tuple * 4))
+
+def draw_convex_polygon(
+        vertices, color=green,
+        batch=None, group=None, usage='static'):
+    """
+    Draw a filled-in polygon with the given vertices.  The polygon must be 
+    convex, otherwise the algorithm used to convert it to triangles will not 
+    work properly.
+    """
+
+    assert len(vertices) > 2
+
+    # If you use this function to render more than one polygon per batch, they 
+    # will end up all connected.  I haven't figured out how to solve this 
+    # problem yet.
+
+    gl_vertices = sum((
+        vecrec.cast_anything_to_vector(vertex).tuple
+        for vertex in vertices), ())
+    num_gl_vertices = len(gl_vertices) // 2
+
+    return _make_vertex_list(
+            batch, group, num_gl_vertices, GL_TRIANGLE_FAN,
+            ('v2f/' + usage, gl_vertices),
+            ('c4B', color.tuple * num_gl_vertices))
 
 def draw_image(
         rect, image, tex_coords=None,
@@ -342,7 +452,7 @@ def draw_tiled_image(
     # Figure out which texture coordinates are bound to which vertices.  This 
     # is not always an intuitive mapping, because textures can be rotated by 
     # changing which texture coordinates are bound to which vertices.  The 
-    # in-line diagram shows which vertex is represent by each variable.
+    # in-line diagram shows which vertex is represented by each variable.
 
     a = Vector(*texture.tex_coords[0:2])     #   D +---+ C
     b = Vector(*texture.tex_coords[3:5])     #     |   |
@@ -376,17 +486,6 @@ def draw_tiled_image(
     return draw_image(
             rect, texture, tex_coords,
             batch=batch, group=group, usage=usage)
-
-    #x1, x2 = rect.left, rect.right
-    #y1, y2 = rect.bottom, rect.top
-
-    #vertices   = x1, y1,   x2, y1,   x2, y2,   x1, y2
-    #tex_coords = a.tuple + b.tuple + c.tuple + d.tuple
-
-    #return _make_vertex_list(
-    #        batch, group, 4, GL_QUADS,
-    #        ('v2f/' + usage, vertices),
-    #        ('t2f', tex_coords))
 
 def draw_pretty_line(
         start, end, stroke, color=green,
@@ -429,11 +528,29 @@ def draw_donut(
                 num_vertices + 3,
                 ('v2f/%' % usage, vertices),
                 ('c4B', color.tuple * (num_vertices + 4)))
+
     else:
         return batch.add(
                 num_vertices + 4, GL_TRIANGLE_STRIP, group,
                 ('v2f', vertices),
                 ('c4B', color.tuple * (num_vertices + 4)))
+
+
+class BoundVertexList:
+
+    def __init__(self, group, count, mode, *data):
+        self.vertex_list = pyglet.graphics.vertex_list(count, *data)
+        self.mode = mode
+        self.group = group
+
+    def draw(self):
+        self.group.set_state()
+        self.vertex_list.draw(self.mode)
+        self.group.unset_state()
+
+    def delete(self):
+        self.vertex_list.delete()
+
 
 
 def path_to_array(path):
@@ -612,6 +729,10 @@ def _fill_below(box, start, end):
     return enter_area + exit_area + line_area
 
 def _is_power_of_two(x):
+    """
+    Return true if ``x`` is a power of two, e.g. 1, 2, 4, 8, etc.
+    """
+
     # Like most binary tricks, this is best explained with examples.  First, 
     # consider a case where x is a power of two, e.g. x = 16:
     #
@@ -666,20 +787,21 @@ class StencilGroup (Group):
         pyglet.gl.glDisable(GL_STENCIL_TEST)
 
 
-class StencilMask (Group):
+class StencilMask (OrderedGroup):
 
-    def __init__(self, parent=None):
-        Group.__init__(self, parent)
+    def __init__(self, parent=None, order=0):
+        super().__init__(order, parent)
 
     def set_state(self):
         from pyglet.gl import GL_FALSE, GL_NEVER
         from pyglet.gl import GL_REPLACE, GL_KEEP
 
+        # Disable writing the to color or depth buffers.
         pyglet.gl.glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
         pyglet.gl.glDepthMask(GL_FALSE)
+
         pyglet.gl.glStencilFunc(GL_NEVER, 1, 0xFF)
         pyglet.gl.glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP)
-
         pyglet.gl.glStencilMask(0xFF)
 
     def unset_state(self):
@@ -688,10 +810,10 @@ class StencilMask (Group):
         pyglet.gl.glDepthMask(GL_TRUE);
 
 
-class WhereStencilIs (Group):
+class WhereStencilIs (OrderedGroup):
 
-    def __init__(self, parent=None):
-        Group.__init__(self, parent)
+    def __init__(self, parent=None, order=1):
+        super().__init__(order, parent)
 
     def set_state(self):
         from pyglet.gl import GL_EQUAL
@@ -703,10 +825,10 @@ class WhereStencilIs (Group):
         pass
 
 
-class WhereStencilIsnt (Group):
+class WhereStencilIsnt (OrderedGroup):
 
-    def __init__(self, parent=None):
-        Group.__init__(self, parent)
+    def __init__(self, parent=None, order=1):
+        super().__init__(order, parent)
 
     def set_state(self):
         from pyglet.gl import GL_EQUAL
