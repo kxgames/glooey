@@ -1,8 +1,9 @@
 import pyglet
 
 from vecrec import Vector, Rect
-from .widget import Widget
 from . import drawing
+from .widget import Widget
+from .helpers import late_binding_property
 
 class PlaceHolder (Widget):
 
@@ -191,37 +192,39 @@ class Label (Widget):
 class Image (Widget):
 
     def __init__(self, image=None):
-        self.image = image
-
-    def get_image(self):
-        return self.image
-
-    def set_image(self, image):
-        self.image = image
+        super().__init__()
+        self._image = image
+        self._sprite = None
 
     def do_claim(self):
-        image = self.get_image()
-        return image.width, image.height
+        return self.image.width, self.image.height
 
     def do_regroup(self):
-        if self.sprite is not None:
-            self.sprite.group = group
+        if self._sprite is not None:
+            self._sprite.group = group
 
     def do_draw(self):
-        image = self.get_image()
-
-        if self.sprite is None:
-            self.sprite = pyglet.sprite.Sprite(
-                    image, batch=self.batch, group=self.group)
+        if self._sprite is None:
+            self._sprite = pyglet.sprite.Sprite(
+                    self.image, batch=self.batch, group=self.group)
         else:
-            self.sprite.image = image
+            self._sprite.image = self.image
 
-        self.sprite.x = self.rect.left
-        self.sprite.y = self.rect.bottom
+        self._sprite.x = self.rect.left
+        self._sprite.y = self.rect.bottom
 
     def do_undraw(self):
-        if self.sprite is not None:
-            self.sprite.delete()
+        if self._sprite is not None:
+            self._sprite.delete()
+
+    def get_image(self):
+        return self._image
+
+    def set_image(self, new_image):
+        self._image = new_image
+        self.draw()
+
+    image = late_binding_property(get_image, set_image)
 
 
 
