@@ -15,8 +15,9 @@ batch = pyglet.graphics.Batch()
 root = Gui(window, batch=batch)
 grid = Grid(5, 5, padding=5)
 
-for row, col in grid.yield_cells():
-    grid[row, col] = PlaceHolder(30, 30, color=rainbow_cycle[row])
+for row, col in grid.indices:
+    widget = PlaceHolder(30, 30, color=rainbow_cycle[row])
+    grid.add(row, col, widget, placement=('fill' if row == col else None))
 
 root.add(grid)
 

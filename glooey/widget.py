@@ -337,13 +337,11 @@ class Widget (pyglet.event.EventDispatcher):
     def on_mouse_drag_leave(self, x, y):
         for child in self._children_under_mouse:
             child.dispatch_event('on_mouse_leave', x, y)
-
         self._children_under_mouse = set()
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         for child in self._children_under_mouse:
-            self.child_under_mouse.dispatch_event(
-                    'on_mouse_scroll', x, y, scroll_x, scroll_y)
+            child.dispatch_event('on_mouse_scroll', x, y, scroll_x, scroll_y)
 
     def get_parent(self):
         return self._parent

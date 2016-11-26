@@ -68,13 +68,20 @@ def place_child_in_box(child, box_rect, key_or_function, child_rect=None):
     child.resize(child_rect)
 
 
-class Bin (Widget):
+class BinMixin:
+    """
+    Provide add() and clear() methods for containers that can only have one 
+    child widget at a time.  The add() method will automatically remove the 
+    existing child if necessary.
 
-    def __init__(self, padding=0, placement='fill'):
-        super().__init__()
+    This mixin is intended for classes that are like Bins in the sense that 
+    they can only have one child, but don't want to inherit the rest of the 
+    actual Bin class's interface, namely support for padding and custom child 
+    placement.
+    """
+
+    def __init__(self):
         self._child = None
-        self._padding = padding
-        self._placement = placement
 
     def add(self, child):
         if self._child is not None:
@@ -95,23 +102,67 @@ class Bin (Widget):
 
     child = late_binding_property(get_child)
 
+
+class PaddingMixin:
+
+    def __init__(self, padding=0):
+        self._padding = padding
+
     def get_padding(self):
         return self._padding
 
     def set_padding(self, new_padding):
-        self._padding = new_padding
-        self.repack()
+        if new_padding is not None:
+            self._padding = new_padding
+            self.repack()
 
     padding = late_binding_property(get_padding, set_padding)
 
+
+class PlacementMixin:
+
+    def __init__(self, placement='fill'):
+        self._default_placement = placement
+        self._custom_placements = {}
+
     def get_placement(self):
-        return self._placement
+        return self._default_placement
 
     def set_placement(self, new_placement):
-        self._placement = new_placement
+        self._default_placement = new_placement
         self.repack()
 
     placement = late_binding_property(get_placement, set_placement)
+
+    def _get_placement(self, key):
+        return self._custom_placements.get(key, self._default_placement)
+
+    def _set_custom_placement(self, key, new_placement, repack=True):
+        if new_placement is not None:
+            self._custom_placements[key] = new_placement
+            if repack: self.repack()
+
+    def _unset_custom_placement(self, key, repack=True):
+        self._custom_placements.pop(key, None)
+        if repack: self.repack()
+
+
+
+class Bin (Widget, BinMixin, PaddingMixin, PlacementMixin):
+
+    def __init__(self, padding=0, placement='fill'):
+        Widget.__init__(self)
+        BinMixin.__init__(self)
+        PaddingMixin.__init__(self, padding)
+        PlacementMixin.__init__(self, placement)
+
+    def add(self, child, placement=None):
+        self._set_custom_placement(child, placement, repack=False)
+        BinMixin.add(self, child)
+
+    def clear(self):
+        self._unset_custom_placement(child, placement, repack=False)
+        BinMixin.clear(self)
 
     def do_claim(self):
         min_width = 2 * self.padding
@@ -173,12 +224,12 @@ class Frame (Bin):
         self.vertex_lists = ()
 
 
-class Viewport (Bin):
+class Viewport (Widget, BinMixin):
 
     class PanningGroup (pyglet.graphics.Group):
 
         def __init__(self, viewport, parent=None):
-            super(Viewport.PanningGroup, self).__init__(parent)
+            pyglet.graphics.Group.__init__(self, parent)
             self.viewport = viewport
 
         def set_state(self):
@@ -189,9 +240,9 @@ class Viewport (Bin):
         def unset_state(self):
             pyglet.gl.glPopMatrix()
 
-
     def __init__(self, sensitivity=3):
-        super().__init__()
+        Widget.__init__(self)
+        BinMixin.__init__(self)
 
         # The panning_vector is the displacement between the bottom-left corner 
         # of this widget and the bottom-left corner of the child widget.
@@ -213,10 +264,9 @@ class Viewport (Bin):
 
     def do_claim(self):
         # The widget being displayed in the viewport can claim however much 
-        # space it wants.  The viewport can be much smaller, because the whole 
-        # point is to scroll around a bigger widget, so it will just claim 
-        # enough space for its padding.
-        return 2 * self.padding, 2 * self.padding
+        # space it wants.  The viewport doesn't claim any space, because it can 
+        # be as small as it needs to be.
+        return 0, 0
 
     def do_resize(self):
         # Set the center of view if it was previously specified.  The center of 
@@ -368,15 +418,15 @@ class Viewport (Bin):
 
 Viewport.register_event_type('on_mouse_pan')
 
-class Grid (Widget):
+class Grid (Widget, PaddingMixin, PlacementMixin):
 
     def __init__(self, rows, cols, padding=0, placement='fill'):
-        super().__init__()
+        Widget.__init__(self)
+        PaddingMixin.__init__(self, padding)
+        PlacementMixin.__init__(self, placement)
         self._grid = dict()
         self._num_rows = rows
         self._num_cols = cols
-        self._padding = padding
-        self._placement = placement
 
     def __iter__(self):
         yield from self._grid.values()
@@ -384,14 +434,14 @@ class Grid (Widget):
     def __len__(self):
         return len(self._grid)
 
-    def __getitem__(self, index):
-        return self._grid[index]
+    def __getitem__(self, row_col):
+        return self._grid[row_col]
 
-    def __setitem__(self, index, child):
-        row, col = index
+    def __setitem__(self, row_col, child):
+        row, col = row_col
         self.add(row, col, child)
 
-    def add(self, row, col, child):
+    def add(self, row, col, child, placement=None):
         if not 0 <= row < self.num_rows:
             raise IndexError("Row out-of-bounds: row={} num_rows=0..{}".format(row, self.num_rows))
         if not 0 <= col < self.num_cols:
@@ -402,11 +452,13 @@ class Grid (Widget):
 
         self._attach_child(child)
         self._grid[row, col] = child
+        self._set_custom_placement((row, col), placement, repack=False)
         self._resize_and_regroup_children()
 
     def remove(self, row, col):
         self._detach_child(self._grid[row, col])
         del self._grid[row, col]
+        self._unset_custom_placement((row, col), placement, repack=False)
         self._resize_and_regroup_children()
 
     def do_claim(self):
@@ -448,25 +500,8 @@ class Grid (Widget):
                     width=child_width, height=child_height)
 
             child = self._grid[row, col]
-            place_child_in_box(child, cell_rect, self.placement)
-
-    def get_padding(self):
-        return self._padding
-
-    def set_padding(self, new_padding):
-        self._padding = new_padding
-        self.repack()
-
-    padding = late_binding_property(get_padding, set_padding)
-
-    def get_placement(self):
-        return self._placement
-
-    def set_placement(self, new_placement):
-        self._placement = new_placement
-        self.repack()
-
-    placement = late_binding_property(get_placement, set_placement)
+            placement = self._get_placement((row, col))
+            place_child_in_box(child, cell_rect, placement)
 
     def get_num_rows(self):
         return self._num_rows
@@ -478,45 +513,49 @@ class Grid (Widget):
 
     num_cols = late_binding_property(get_num_cols)
 
-    def yield_cells(self):
+    def get_indices(self):
         for row in range(self.num_rows):
             for col in range(self.num_cols):
                 yield row, col
 
+    indices = late_binding_property(get_indices)
 
-class HVBox (Widget):
+
+class HVBox (Widget, PaddingMixin, PlacementMixin):
 
     def __init__(self, padding=0, placement='fill'):
-        super().__init__()
+        Widget.__init__(self)
+        PaddingMixin.__init__(self, padding)
+        PlacementMixin.__init__(self, placement)
         self._children = list()
         self._expandable = set()
-        self._padding = padding
-        self._placement = placement
 
-    def add(self, child, expand=False):
-        self.add_back(child, expand)
+    def add(self, child, expand=False, placement=None):
+        self.add_back(child, expand, placement)
 
-    def add_front(self, child, expand=False):
-        self.insert(child, 0, expand)
+    def add_front(self, child, expand=False, placement=None):
+        self.insert(child, 0, expand, placement)
 
-    def add_back(self, child, expand=False):
-        self.insert(child, len(self._children), expand)
+    def add_back(self, child, expand=False, placement=None):
+        self.insert(child, len(self._children), expand, placement)
 
-    def insert(self, child, index, expand=False):
+    def insert(self, child, index, expand=False, placement=None):
         if expand: self._expandable.add(child)
         self._attach_child(child)
         self._children.insert(index, child)
-        self._resize_and_regroup_children()
-
-    def remove(self, child):
-        self._expandable.discard(child)
-        self._detach_child(child)
-        self._children.remove(child)
+        self._set_custom_placement(child, placement, repack=False)
         self._resize_and_regroup_children()
 
     def replace(self, index, child):
         self.remove(self._children[index])
         self.insert(child, index)
+
+    def remove(self, child):
+        self._expandable.discard(child)
+        self._detach_child(child)
+        self._children.remove(child)
+        self._unset_custom_placement(child)
+        self._resize_and_regroup_children()
 
     def do_claim(self):
         raise NotImplementedError
@@ -533,24 +572,6 @@ class HVBox (Widget):
         return self._expandable
 
     expandable_children = late_binding_property(get_expandable_children)
-
-    def get_padding(self):
-        return self._padding
-
-    def set_padding(self, new_padding):
-        self._padding = new_padding
-        self.repack()
-
-    padding = late_binding_property(get_padding, set_padding)
-
-    def get_placement(self):
-        return self._placement
-
-    def set_placement(self, new_placement):
-        self._placement = new_placement
-        self.repack()
-
-    placement = late_binding_property(get_placement, set_placement)
 
 
     _dimensions = {     # (fold)
@@ -633,7 +654,7 @@ class HVBox (Widget):
             setattr(box_rect, coordinate[0], box_coord_0)
             setattr(box_rect, coordinate[1], box_coord_1)
 
-            place_child_in_box(child, box_rect, self.placement)
+            place_child_in_box(child, box_rect, self._get_placement(child))
 
     def _place_cursor(self, orientation):
         top = self.rect.top - self.padding
@@ -655,33 +676,32 @@ class HVBox (Widget):
 class HBox (HVBox):
 
     def do_claim(self):
-        return super()._help_claim('horizontal')
+        return HVBox._help_claim(self, 'horizontal')
 
     def do_resize_children(self):
-        super()._help_resize_children('horizontal')
+        HVBox._help_resize_children(self, 'horizontal')
 
 
 class VBox (HVBox):
 
     def do_claim(self):
-        return super()._help_claim('vertical')
+        return HVBox._help_claim(self, 'vertical')
 
     def do_resize_children(self):
-        super()._help_resize_children('vertical')
+        HVBox._help_resize_children(self, 'vertical')
 
 
-class Stack (Widget):
+class Stack (Widget, PaddingMixin, PlacementMixin):
     """
     Have any number of children, claim enough space for the biggest one, and 
     just draw them all in the order they were added.
     """
 
     def __init__(self, padding=0, placement='fill'):
-        super().__init__()
-        self._layers = []
-        self._padding = padding
-        self._custom_placements = {}
-        self._default_placement = placement
+        Widget.__init__(self)
+        PaddingMixin.__init__(self, padding)
+        PlacementMixin.__init__(self, placement)
+        self._children = []
 
     def add(self, child, placement=None):
         self.add_back(child, placement)
@@ -690,31 +710,30 @@ class Stack (Widget):
         self.insert(child, 0, placement)
 
     def add_back(self, child, placement=None):
-        self.insert(child, len(self.layers), placement)
+        self.insert(child, len(self.children), placement)
 
     def insert(self, child, index, placement=None):
         self._attach_child(child)
-        self._layers.insert(index, child)
-        if placement is not None:
-            self._custom_placements[child] = placement
+        self._children.insert(index, child)
+        self._set_custom_placement(child, placement, repack=False)
         self._resize_and_regroup_children()
 
     def replace(self, index, child):
-        old_child = self._layers[index]
-        old_placement = self._custom_placements.get(old_child)
+        old_child = self._children[index]
+        old_placement = self._get_placement(old_child)
         self.remove(old_child)
         self.insert(child, index, old_placement)
 
     def remove(self, child):
         self._detach_child(child)
-        self._layers.remove(child)
-        self._custom_placements.pop(child, None)
+        self._children.remove(child)
+        self._unset_custom_placement(child, repack=False)
         self._resize_and_regroup_children()
 
     def clear(self):
-        for child in self.layers:
+        for child in self.children:
             self._detach_child(child)
-        self._layers = []
+        self._children = []
         self._custom_placements = {}
         self._resize_and_regroup_children()
 
@@ -722,7 +741,7 @@ class Stack (Widget):
         max_child_width = 0
         max_child_height = 0
 
-        for child in self.layers:
+        for child in self.children:
             max_child_width = max(max_child_height, child.min_width)
             max_child_height = max(max_child_height, child.min_height)
 
@@ -732,35 +751,18 @@ class Stack (Widget):
         return min_width, min_height
 
     def do_resize_children(self):
-        for child in self.layers:
+        for child in self.children:
             place_child_in_box(
                     child,
                     self.rect.get_shrunk(self.padding),
-                    self._custom_placements.get(child, self._default_placement))
+                    self._get_placement(child))
 
     def do_regroup_children(self):
-        for i, child in enumerate(self.layers):
+        for i, child in enumerate(self.children):
             child.regroup(pyglet.graphics.OrderedGroup(i, self.group))
 
-    def get_layers(self):
-        return self._layers
+    def get_children(self):
+        return self._children
 
-    layers = late_binding_property(get_layers)
+    children = late_binding_property(get_children)
 
-    def get_padding(self):
-        return self._padding
-
-    def set_padding(self, new_padding):
-        self._padding = new_padding
-        self.repack()
-
-    padding = late_binding_property(get_padding, set_padding)
-
-    def get_placement(self):
-        return self._default_placement
-
-    def set_placement(self, new_placement):
-        self._default_placement = new_placement
-        self.repack()
-
-    placement = late_binding_property(get_placement, set_placement)
