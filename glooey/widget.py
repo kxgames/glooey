@@ -66,9 +66,9 @@ class Widget (pyglet.event.EventDispatcher):
             self.do_resize()
             self.do_resize_children()
 
-            # Try to redraw the widget.  This won't do anything if the widget 
-            # isn't ready to draw.
-            self.draw()
+        # Try to redraw the widget.  This won't do anything if the widget isn't 
+        # ready to draw.
+        self.draw()
 
     def regroup(self, new_group):
         """
@@ -80,9 +80,9 @@ class Widget (pyglet.event.EventDispatcher):
             self.do_regroup()
             self.do_regroup_children()
 
-            # Try to redraw the widget.  This won't do anything if the widget 
-            # isn't ready to draw.
-            self.draw()
+        # Try to redraw the widget.  This won't do anything if the widget 
+        # isn't ready to draw.
+        self.draw()
 
     def draw(self):
         """

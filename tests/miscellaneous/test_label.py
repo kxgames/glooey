@@ -10,12 +10,11 @@ lorem_ipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam just
 root = glooey.Gui(window, batch=batch)
 label = glooey.Label(lorem_ipsum)
 label.font_size = 12
-label.enable_line_wrap(300)
-root.add(label)
+label.enable_line_wrap(400)
+root.add(label, 'center')
 
 @window.event
 def on_key_press(symbol, modifier):
-
     if symbol == pyglet.window.key.Q:
         label.bold = not label.bold
 
@@ -51,6 +50,14 @@ def on_key_press(symbol, modifier):
 
     if symbol == pyglet.window.key.K:
         label.line_spacing = 15
+
+    if symbol == pyglet.window.key.SPACE:
+        if label.text == lorem_ipsum:
+            label.set_text('Lorem ipsum', 0)
+        elif label.text == 'Lorem ipsum':
+            label.set_text('')
+        else:
+            label.set_text(lorem_ipsum, 400)
 
 @window.event
 def on_mouse_scroll(x, y, scroll_x, scroll_y):

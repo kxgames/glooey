@@ -11,9 +11,12 @@ print(__doc__)
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-sprite_sheet = pyglet.image.load('walking.png')
-images = pyglet.image.ImageGrid(sprite_sheet, 1, 6)
 i = 0
+images = [
+        pyglet.image.load('cursor_sword_silver.png'),
+        pyglet.image.load('cursor_sword_bronze.png'),
+        pyglet.image.load('cursor_sword_gold.png'),
+]
 
 root = glooey.Gui(window, batch=batch)
 widget = glooey.Image(images[i])

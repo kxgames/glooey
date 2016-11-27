@@ -4,9 +4,10 @@ from vecrec import Vector, Rect
 from pprint import pprint
 from . import drawing
 from .widget import Widget
+from .containers import place_child_in_box
 from .helpers import late_binding_property
 
-class PlaceHolder (Widget):
+class PlaceHolder(Widget):
 
     def __init__(self, width=0, height=0, color=drawing.green):
         Widget.__init__(self)
@@ -58,7 +59,7 @@ class PlaceHolder (Widget):
             self.vertex_list = None
 
 
-class EventLogger (PlaceHolder):
+class EventLogger(PlaceHolder):
 
     def on_mouse_press(self, x, y, button, modifiers):
         message = 'on_mouse_press(x={}, y={}, button={}, modifiers={})'
@@ -97,12 +98,12 @@ class EventLogger (PlaceHolder):
         print(message.format(x, y, scroll_x, scroll_y))
 
 
-class Label (Widget):
+class Label(Widget):
 
     def __init__(self, text="", **style):
         super().__init__()
         self._layout = None
-        self._document = pyglet.text.decode_text(text)
+        self._text = text
         self._style = dict(color=drawing.green.tuple)
         self._style.update(style)
         self._line_wrap_width = 0
@@ -111,23 +112,23 @@ class Label (Widget):
         # Make sure the label's text and style are up-to-date before we request 
         # space.  Be careful!  This means that do_draw() can be called before 
         # the widget has self.rect or self.group, which usually cannot happen.
-        self.do_draw()
+        self.do_draw(ignore_rect=True)
 
         # Return the amount of space needed to render the label.
         return self._layout.content_width, self._layout.content_height
 
-    def do_draw(self):
+    def do_draw(self, ignore_rect=False):
         # Any time we need to draw this widget, just delete the underlying 
         # label object and make a new one.  This isn't any slower than keeping 
         # the old object, because all the vertex lists would be redrawn either 
         # way.  And this is more flexible, because it allows us to reset the 
         # batch, the group, and the wrap_lines attribute.
         if self._layout is not None:
-            self._document.remove_handlers(self._layout)
             self._layout.delete()
 
         kwargs = {
                 'multiline': True,
+                'wrap_lines': False,
                 'batch': self.batch,
                 'group': self.group
         }
@@ -144,19 +145,31 @@ class Label (Widget):
         # method needs to call do_draw() to see how much space the text will 
         # need, and that happens before self.rect is set (since it's part of 
         # the process of setting self.rect). 
-        if self.rect is not None:
+        if not ignore_rect:
             kwargs['width'] = self.rect.width
             kwargs['height'] = self.rect.height
 
-        self._layout = pyglet.text.layout.TextLayout(self._document, **kwargs)
+        # It's best to make a fresh document each time.  Previously I was 
+        # storing the document as a member variable, but I ran into corner 
+        # cases where the document would have an old style that wouldn't be 
+        # compatible with the new TextLayout (specifically 'align' != 'left' if 
+        # line wrapping is no loner enabled).
+        document = pyglet.text.decode_text(self._text)
+        self._layout = pyglet.text.layout.TextLayout(document, **kwargs)
 
         # Use begin_update() and end_update() to prevent the layout from 
         # generating new vertex lists until the styles and coordinates have 
         # been set.
         self._layout.begin_update()
 
-        self._document.set_style(0, len(self._document.text), self._style)
-        if self.rect is not None:
+        # The layout will crash if it doesn't have an explicit width and the 
+        # style specifies an alignment.  I
+        if self._layout.width is None:
+            self._layout.width = self._layout.content_width
+
+        document.set_style(0, len(self._text), self._style)
+
+        if not ignore_rect:
             self._layout.x = self.rect.bottom_left.x
             self._layout.y = self.rect.bottom_left.y
 
@@ -166,11 +179,13 @@ class Label (Widget):
         self._layout.delete()
 
     def get_text(self):
-        return self._document.text
+        return self._text
 
-    def set_text(self, text):
-        self._document = pyglet.text.decode_text(text)
-        self.repack()
+    def set_text(self, text, width=None):
+        self._text = text
+        if width is not None:
+            self._line_wrap_width = width
+        self.repack(force=True)
 
     text = late_binding_property(get_text, set_text)
 
@@ -285,16 +300,17 @@ class Label (Widget):
 
     def set_style(self, **style):
         self._style.update(style)
-        self.repack()
+        self.repack(force=True)
 
     def enable_line_wrap(self, width):
         self._line_wrap_width = width
+        self.repack(force=True)
 
     def disable_line_wrap(self):
-        self._line_wrap_width = 0
+        self.enable_line_wrap(0)
 
 
-class Image (Widget):
+class Image(Widget):
 
     def __init__(self, image=None):
         super().__init__()
@@ -327,21 +343,17 @@ class Image (Widget):
 
     def set_image(self, new_image):
         self._image = new_image
-        self.draw()
+        self.repack(force=True)
 
     image = late_binding_property(get_image, set_image)
 
 
-
-# Work in progress...
-
-class Button (Widget):
+class Clickable(Widget):
 
     def __init__(self):
         super().__init__()
         self._state = 'base'
         self._active = True
-        self._children = {}
 
     def get_state(self):
         if not self._active:
@@ -349,44 +361,42 @@ class Button (Widget):
         else:
             return self._state
 
-    def get_possible_states(self):
-        return 'base', 'over', 'down', 'inactive'
-
     def set_state(self, state):
-        if state not in self.possible_states:
-            raise UsageError("unknown state '{}'".format(state))
+        self._require_known_state(state)
 
         old_state = self.get_state()
         self._state = state
         new_state = self.get_state()
 
-        # Default to the 'base' state if the 'over' or 'down' states are not 
-        # defined.
-        if new_state not in self._children and new_state in ('over', 'down'):
-            new_state = 'base'
-
-        if new_state not in self._children:
-            raise UsageError("no widget has been set for the '{}' state".format(state))
-
-        # These could be the same if the 'over' or 'down' states were allowed 
-        # to default to the 'base state', if the button is inactive, or if the 
-        # user set the state to the same state as before.
+        # If the widget is inactive, the new state and the old state will both 
+        # be 'inactive' even if self._state itself changed.  This is how 
+        # self._state stays up-to-date for when the widget is reactivated.
         if old_state != new_state:
-            self.children[old_state].hide()
-            self.children[new_state].show()
+            self.dispatch_event('on_change_state')
 
-    state = property(get_state, set_state)
-    possible_states = property(get_possible_states)
+    state = late_binding_property(get_state, set_state)
+
+    def get_known_states(self):
+        return 'base', 'over', 'down', 'inactive'
+
+    known_states = late_binding_property(get_known_states)
+
+    def _require_known_state(self, state):
+        if state not in self.known_states:
+            raise UsageError("unknown state '{}'".format(state))
 
     def get_active(self):
         return self._active
 
     def set_active(self, on_or_off):
-        if self._active != self._active:
-            self._active = on_or_off
-            self.draw()
+        old_state = self.get_state()
+        self._active = on_or_off
+        new_state = self.get_state()
 
-    active = property(get_active, set_active)
+        if old_state != new_state:
+            self.dispatch_event('on_change_state')
+
+    active = late_binding_property(get_active, set_active)
 
     def toggle_active(self):
         self.active = not self.active
@@ -396,22 +406,6 @@ class Button (Widget):
 
     def deactivate(self):
         self.active = False
-
-    def set_widget(self, child, state):
-        self.children[state] = self._connect_child_widget(child)
-
-    def set_base_widget(self, child):
-        self.set_widget(child, 'base')
-
-    def set_over_widget(self, child):
-        self.set_widget(child, 'over')
-
-    def set_down_widget(self, child):
-        self.set_widget(child, 'down')
-
-    def set_inactive_widget(self, child):
-        self.set_widget(child, 'inactive')
-
 
     def on_mouse_press(self, x, y, button, modifiers):
         self.set_state('down')
@@ -435,102 +429,121 @@ class Button (Widget):
         self.set_state('base')
 
 
-Button.register_event_type('on_click')
-Button.register_event_type('on_transition')
+Clickable.register_event_type('on_click')
+Clickable.register_event_type('on_change_state')
 
-class ImageButton (Button):
-    """
-    A button that's just an image, like an icon.  The button can show different 
-    images depending on where the mouse is and whether or not the button is 
-    active.
-    """
+class Button(Clickable):
 
-    def __init__(self):
-        self.images = {x: Image() for x in self.possible_states}
+    def __init__(self, text=""):
+        super().__init__()
+        self._images = {}
+        self._label = Label(text)
+        self._label_placement = 'center'
+        self._background = Image()
+        self._background_placement = 'center'
+        self._attach_child(self._label)
+        self._attach_child(self._background)
 
-    def claim(self):
-        self.min_width = 0
-        self.min_height = 0
+    def do_claim(self):
+        min_width = max(self._label.min_width, self._background.min_width)
+        min_height = max(self._label.min_height, self._background.min_height)
+        return min_width, min_height
 
-        for image in self.images:
-            image.claim()
+    def do_regroup_children(self):
+        self._background.regroup(pyglet.graphics.OrderedGroup(0, self.group))
+        self._label.regroup(pyglet.graphics.OrderedGroup(1, self.group))
 
-            self.min_width = max(image.min_width, self.min_width)
-            self.min_height = max(image.min_height, self.min_height)
+    def do_resize_children(self):
+        place_child_in_box(self._label, self.rect, self._label_placement)
+        place_child_in_box(self._background, self.rect, self._background_placement)
 
-    def resize(self, rect):
-        super().resize(self, rect)
-        for image in self.images:
-            image.resize(rect)
+    def on_change_state(self):
+        self._background.image = self.image
 
-    def draw(self):
-        self.images[self.state].draw()
+    def get_state(self):
+        state = Clickable.get_state(self)
 
-    def undraw(self):
-        self.images[self.state].undraw()
+        if state not in self._images and state in ('over', 'down'):
+            state = 'base'
 
-    def on_transition(self, new_state, old_state):
-        self.images[old_state].undraw()
-        self.images[new_state].draw()
+        if state not in self._images:
+            raise ValueError("no images for '{}' state".format(state))
 
-    def set_image(self, image, state):
-        if state in self.images:
-            self._detach_child_widget(self.images[state])
-        self.images[state] = self._attach_child_widget(Image(image))
-        self.repack()
+        return state
 
-        # Have to remember to repack.  I like this.  Other miscellaneous 
-        # widgets have to be aware of when their size might change (i.e. when a 
-        # new images is given), so I don't think special support for adding or 
-        # removing children is warranted.
-        self.images[state] = self.attach_child(child)
-        self.repack()
+    def get_image(self, state=None):
+        if state is None: state = self.state
+        self._require_known_state(state)
+        return self._images.get(state)
 
-        # Can't think of a good name, would be slightly complicated to write.
-        with self.manage_children() as manager:
-            manager.attach(child)
+    image = late_binding_property(get_image)
 
-        # Really all I want to do:
-        self.images[state] = child
+    def set_image(self, state, image):
+        self._require_known_state(state)
+        self._images[state] = image
+        if state == self.state:
+            self._background.image = self.image
 
-
-        with self.children_manager as cm:
-
-            if state in self.images:
-                cm.detach(self.images[state])
-
-            self.images[state] = cm.attach(Image(image))
+    def get_base_image(self, image):
+        self.get_image('base', image)
 
     def set_base_image(self, image):
-        self.set_image(image, 'base')
+        self.set_image('base', image)
+
+    base_image = late_binding_property(get_base_image, set_base_image)
+
+    def get_over_image(self, image):
+        self.get_image('over', image)
 
     def set_over_image(self, image):
-        self.set_image(image, 'over')
+        self.set_image('over', image)
+
+    over_image = late_binding_property(get_over_image, set_over_image)
+
+    def get_down_image(self, image):
+        self.get_image('down', image)
 
     def set_down_image(self, image):
-        self.set_image(image, 'down')
+        self.set_image('down', image)
+
+    down_image = late_binding_property(get_down_image, set_down_image)
+
+    def get_inactive_image(self, image):
+        self.get_image('inactive', image)
 
     def set_inactive_image(self, image):
-        self.set_image(image, 'inactive')
+        self.set_image('inactive', image)
 
+    inactive_image = late_binding_property(get_inactive_image, set_inactive_image)
 
-class TextButton (Button):
+    def get_label(self):
+        return self._label
 
-    def set_edge_image(self, state, image, orientation='left', autopad=True):
-        self.frames[state].set_edge(image, orientation, autopad)
+    label = late_binding_property(get_label)
 
-    def set_edge_image(self, state, image, orientation='left', autopad=True):
-        self.frames[state].set_edge(image, orientation, autopad)
+    def get_text(self):
+        return self._label.text
 
-    def claim():
-        super().claim()
+    def set_text(self, text):
+        self._label.text = text
 
-    def set_text(self):
-        pass
+    text = late_binding_property(get_text, set_text)
 
-    def set_font(self):
-        pass
+    def get_label_placement(self, new_placement):
+        return self._label_placement
 
+    def set_label_placement(self, new_placement):
+        self._label_placement = new_placement
+        self.repack()
 
+    label_placement = late_binding_property(get_label_placement, set_label_placement)
 
+    def get_image_placement(self, new_placement):
+        return self._background_placement
+
+    def set_image_placement(self, new_placement):
+        self._background_placement = new_placement
+        self.repack()
+
+    image_placement = late_binding_property(get_image_placement, set_image_placement)
 
