@@ -15,7 +15,7 @@ content = glooey.Grid(5, 5, padding=50)
 menu = glooey.PlaceHolder(height=200, color=glooey.drawing.purple)
 vbox = glooey.VBox()
 
-for row, col in content.yield_cells():
+for row, col in content.indices:
     if row == col:
         style = dict(color=glooey.drawing.yellow)
         WidgetClass = glooey.EventLogger

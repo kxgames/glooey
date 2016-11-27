@@ -1,6 +1,7 @@
 import pyglet
 
 from vecrec import Vector, Rect
+from pprint import pprint
 from . import drawing
 from .widget import Widget
 from .helpers import late_binding_property
@@ -98,49 +99,161 @@ class EventLogger (PlaceHolder):
 
 class Label (Widget):
 
-    def __init__(self, text='', **style):
+    def __init__(self, text="", **style):
         super().__init__()
-        self.document = pyglet.text.document.UnformattedDocument(text)
+        self._layout = None
+        self._document = pyglet.text.decode_text(text)
+        self._style = dict(color=drawing.green.tuple)
+        self._style.update(style)
+        self._line_wrap_width = 0
 
-        # Make the text white by default, so it will show up against the black 
-        # default background.
+    def do_claim(self):
+        # Make sure the label's text and style are up-to-date before we request 
+        # space.  Be careful!  This means that do_draw() can be called before 
+        # the widget has self.rect or self.group, which usually cannot happen.
+        self.do_draw()
 
-        self.set_color('white')
-        self.set_style(**style)
-        self.layout = pyglet.text.layout.TextLayout(
-                self.document,
-                width=0, height=0, multiline=True, wrap_lines=False)
+        # Return the amount of space needed to render the label.
+        return self._layout.content_width, self._layout.content_height
+
+    def do_draw(self):
+        # Any time we need to draw this widget, just delete the underlying 
+        # label object and make a new one.  This isn't any slower than keeping 
+        # the old object, because all the vertex lists would be redrawn either 
+        # way.  And this is more flexible, because it allows us to reset the 
+        # batch, the group, and the wrap_lines attribute.
+        if self._layout is not None:
+            self._document.remove_handlers(self._layout)
+            self._layout.delete()
+
+        kwargs = {
+                'multiline': True,
+                'batch': self.batch,
+                'group': self.group
+        }
+        # Enable line wrapping, if the user requested it.  The width of the 
+        # label is set to the value given by the user when line-wrapping was 
+        # enabled.  This will be overwritten a few lines later if the widget 
+        # has been given a rectangle.
+        if self._line_wrap_width:
+            kwargs['width'] = self._line_wrap_width
+            kwargs['wrap_lines'] = True
+        
+        # Usually self.rect is guaranteed to be set by the time this method is 
+        # called, but that is not the case for this widget.  The do_claim() 
+        # method needs to call do_draw() to see how much space the text will 
+        # need, and that happens before self.rect is set (since it's part of 
+        # the process of setting self.rect). 
+        if self.rect is not None:
+            kwargs['width'] = self.rect.width
+            kwargs['height'] = self.rect.height
+
+        self._layout = pyglet.text.layout.TextLayout(self._document, **kwargs)
+
+        # Use begin_update() and end_update() to prevent the layout from 
+        # generating new vertex lists until the styles and coordinates have 
+        # been set.
+        self._layout.begin_update()
+
+        self._document.set_style(0, len(self._document.text), self._style)
+        if self.rect is not None:
+            self._layout.x = self.rect.bottom_left.x
+            self._layout.y = self.rect.bottom_left.y
+
+        self._layout.end_update()
+
+    def do_undraw(self):
+        self._layout.delete()
+
+    def get_text(self):
+        return self._document.text
 
     def set_text(self, text):
-        self.document.text = text
+        self._document = pyglet.text.decode_text(text)
+        self.repack()
+
+    text = late_binding_property(get_text, set_text)
+
+    def get_font_name(self):
+        return self.get_style('font_name')
 
     def set_font_name(self, name):
         self.set_style(font_name=name)
 
+    font_name = late_binding_property(get_font_name, set_font_name)
+
+    def get_font_size(self):
+        return self.get_style('font_size')
+
     def set_font_size(self, size):
         self.set_style(font_size=size)
+
+    font_size = late_binding_property(get_font_size, set_font_size)
+
+    def get_bold(self):
+        return self.get_style('bold')
 
     def set_bold(self, bold):
         self.set_style(bold=bold)
 
+    bold = late_binding_property(get_bold, set_bold)
+
+    def get_italic(self):
+        return self.get_style('italic')
+
     def set_italic(self, italic):
         self.set_style(italic=italic)
 
+    italic = late_binding_property(get_italic, set_italic)
+
+    def get_underline(self):
+        return self.get_style('underline')
+
     def set_underline(self, underline):
-        self.set_style(underline=underline)
+        if underline:
+            self.set_style(underline=self.color)
+        else:
+            self.set_style(underline=None)
+
+    underline = late_binding_property(get_underline, set_underline)
+
+    def get_kerning(self):
+        return self.get_style('kerning')
 
     def set_kerning(self, kerning):
         self.set_style(kerning=kerning)
 
+    kerning = late_binding_property(get_kerning, set_kerning)
+
+    def get_baseline(self):
+        return self.get_style('baseline')
+
     def set_baseline(self, baseline):
         self.set_style(baseline=baseline)
+
+    baseline = late_binding_property(get_baseline, set_baseline)
+
+    def get_color(self):
+        return self.get_style('color')
 
     def set_color(self, color):
         if isinstance(color, str):
             color = drawing.colors[color]
         if hasattr(color, 'tuple'):
             color = color.tuple
-        self.set_style(color=color)
+
+        # I want the underline attribute to behave as a boolean, but in the 
+        # TextLayout API it's a color.  So when the color changes, I have to 
+        # update the underline (if it's been set).
+        style = {'color': color}
+        if self.underline is not None:
+            style['underline'] = color
+        self.set_style(**style)
+
+    color = late_binding_property(get_color, set_color)
+
+    def get_bg_color(self):
+        return self.get_style('background_color')
 
     def set_bg_color(self, color):
         if isinstance(color, str):
@@ -149,44 +262,36 @@ class Label (Widget):
             color = color.tuple
         self.set_style(background_color=color)
 
+    bg_color = late_binding_property(get_bg_color, set_bg_color)
+
+    def get_alignment(self):
+        return self.get_style('alignment')
+
     def set_alignment(self, alignment):
         self.set_style(align=alignment)
+
+    alignment = late_binding_property(get_alignment, set_alignment)
+
+    def get_line_spacing(self):
+        return self.get_style('line_spacing')
 
     def set_line_spacing(self, spacing):
         self.set_style(line_spacing=spacing)
 
-    def enable_line_wrap(self, width):
-        self.layout._wrap_lines_flag = True
-        sellf.min_line_width = width
+    line_spacing = late_binding_property(get_line_spacing, set_line_spacing)
 
-    def disable_line_wrap(self):
-        self.layout._wrap_lines_flag = False
-        self.min_width = 0
+    def get_style(self, style):
+        return self._style.get(style)
 
     def set_style(self, **style):
-        self.document.set_style(0, len(self.document.text), style)
+        self._style.update(style)
+        self.repack()
 
-    def do_claim(self):
-        """
-        Request enough space to render the text.
-        """
-        self.layout.width = self.min_line_width
+    def enable_line_wrap(self, width):
+        self._line_wrap_width = width
 
-        min_width = max(self.min_width, self.layout.content_width)
-        min_height = max(self.min_height, self.layout.content_height)
-
-        return min_width, min_height
-
-    def do_draw(self):
-        self.layout.x = self.rect.left
-        self.layout.y = self.rect.bottom
-        self.layout.width = self.rect.width
-        self.layout.height = self.rect.height
-        self.layout.batch = self.batch
-        self.layout.group = self.group
-
-    def do_undraw(self):
-        self.layout.delete()
+    def disable_line_wrap(self):
+        self._line_wrap_width = 0
 
 
 class Image (Widget):

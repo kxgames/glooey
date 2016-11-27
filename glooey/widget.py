@@ -40,6 +40,7 @@ class Widget (pyglet.event.EventDispatcher):
         # Otherwise, stop recursing and resize the widget's children.
         else:
             self.do_resize_children()
+            self.draw()
 
     def claim(self):
         if self._is_claim_stale:
@@ -140,6 +141,33 @@ class Widget (pyglet.event.EventDispatcher):
 
     hide = undraw_all
 
+    def do_attach(self):
+        """
+        React to the widget being attached to the GUI.
+
+        Specifically, this method is called when the widget becomes connected, 
+        through any number of parent widgets, the root of the widget hierarchy.  
+        When this happens, ``self.root`` will return a widget rather than None.
+        
+        Note that this method will not necessarily be called when the widget is 
+        simply added to a parent widget.  If the parent is already attached to 
+        the GUI itself, then this method will be called right then.  Otherwise, 
+        this method will be called when that parent (or one of its parents) is 
+        attached to the GUI.
+
+        This method is mainly useful for widgets that need to take control away 
+        from the root widget for some reason.  For example, Viewport widgets 
+        override how mouse events are interpreted and Dialog widgets grab all 
+        the key and mouse events for themselves.
+        """
+        pass
+
+    def do_detach(self):
+        """
+        React to the widget being detached from the GUI.
+        """
+        pass
+
     def do_claim(self):
         pass
 
@@ -201,16 +229,9 @@ class Widget (pyglet.event.EventDispatcher):
         the draw function may or may not exist yet/anymore.  If those vertex 
         lists don't exist yet, there's nothing this function needs to do.  The 
         ``draw()`` function will be called when the widget's ready to draw, and 
-        at that point the vertex lists chould be created with the right group.
-
-        This method may also be called before the widget has been drawn or 
-        after it's been undrawn, so any vertex lists created in the draw 
-        function may or may not exist yet/anymore.  If those vertex lists don't 
-        exist yet, there's nothing this function needs to do.  The ``draw()`` 
-        function will be called when the widget's ready to draw, and at that 
-        point the vertex lists will be created with the right group.
+        at that point the vertex lists should be created with the right group.
         """
-        pass
+        self.undraw()
 
     def do_regroup_children(self):
         """
@@ -243,33 +264,6 @@ class Widget (pyglet.event.EventDispatcher):
     def do_undraw(self):
         """
         This method may be called before draw().
-        """
-        pass
-
-    def on_attach_to_gui(self):
-        """
-        React to the widget being attached to the GUI.
-
-        Specifically, this method is called when the widget becomes connected, 
-        through any number of parent widgets, the root of the widget hierarchy.  
-        When this happens, ``self.root`` will return a widget rather than None.
-        
-        Note that this method will not necessarily be called when the widget is 
-        simply added to a parent widget.  If the parent is already attached to 
-        the GUI itself, then this method will be called right then.  Otherwise, 
-        this method will be called when that parent (or one of its parents) is 
-        attached to the GUI.
-
-        This method is mainly useful for widgets that need to take control away 
-        from the root widget for some reason.  For example, Viewport widgets 
-        override how mouse events are interpreted and Dialog widgets grab all 
-        the key and mouse events for themselves.
-        """
-        pass
-
-    def on_detach_from_gui(self):
-        """
-        React to the widget being detached from the GUI.
         """
         pass
 
@@ -465,7 +459,7 @@ class Widget (pyglet.event.EventDispatcher):
 
         if self.is_attached_to_gui:
             for widget in child._yield_self_and_all_children():
-                widget.dispatch_event('on_attach_to_gui')
+                widget.do_attach()
 
         return child
 
@@ -485,7 +479,7 @@ class Widget (pyglet.event.EventDispatcher):
             raise UsageError('{} is attached to {}, cannot detach from {}.'.format(child, child._parent, self))
 
         for widget in child._yield_self_and_all_children():
-            widget.dispatch_event('on_detach_from_gui')
+            widget.do_detach()
 
         child.undraw_all()
         self.__children.discard(child)
@@ -568,8 +562,6 @@ class Widget (pyglet.event.EventDispatcher):
     _num_children = late_binding_property(_get_num_children)
 
 
-Widget.register_event_type('on_attach_to_gui')
-Widget.register_event_type('on_detach_from_gui')
 Widget.register_event_type('on_mouse_press')
 Widget.register_event_type('on_mouse_release')
 Widget.register_event_type('on_mouse_motion')

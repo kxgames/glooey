@@ -179,7 +179,7 @@ class Bin (Widget, BinMixin, PaddingMixin, PlacementMixin):
             place_child_in_box(
                     self.child,
                     self.rect.get_shrunk(self.padding),
-                    self.placement)
+                    self._get_placement(self.child))
 
 
 class Frame (Bin):
@@ -262,6 +262,15 @@ class Viewport (Widget, BinMixin):
         self.panning_group = None
         self.mask_artist = None
 
+    def do_attach(self):
+        # If this line raises a pyglet EventException, you're probably trying 
+        # to attach this widget to a GUI that doesn't support mouse pan events.  
+        # See the Viewport documentation for more information.
+        self.root.push_handlers(self.on_mouse_pan)
+
+    def do_detach(self):
+        self.window.remove_handler(self.on_mouse_pan)
+
     def do_claim(self):
         # The widget being displayed in the viewport can claim however much 
         # space it wants.  The viewport doesn't claim any space, because it can 
@@ -305,17 +314,6 @@ class Viewport (Widget, BinMixin):
     def do_undraw(self):
         if self.mask_artist is not None:
             self.mask_artist.delete()
-
-    def on_attach_to_gui(self):
-
-        # If this line raises a pyglet EventException, you're probably trying 
-        # to attach this widget to a GUI that doesn't support mouse pan events.  
-        # See the Viewport documentation for more information.
-
-        self.root.push_handlers(self.on_mouse_pan)
-
-    def on_detach_from_gui(self):
-        self.window.remove_handler(self.on_mouse_pan)
 
     def on_mouse_press(self, x, y, button, modifiers):
         x, y = self.get_child_coords(x, y)
