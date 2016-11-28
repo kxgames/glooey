@@ -342,8 +342,9 @@ class Image(Widget):
         return self._image
 
     def set_image(self, new_image):
-        self._image = new_image
-        self.repack(force=True)
+        if self._image is not new_image:
+            self._image = new_image
+            self.repack(force=True)
 
     image = late_binding_property(get_image, set_image)
 
@@ -547,3 +548,180 @@ class Button(Clickable):
 
     image_placement = late_binding_property(get_image_placement, set_image_placement)
 
+
+class Checkbox(Widget):
+
+    def __init__(self):
+        super().__init__()
+        self._image = Image()
+        self._attach_child(self._image)
+
+        # self._states is a 2D dictionary of images representing the various 
+        # states the checkbox can be in.  The first index represents whether or 
+        # not the box is check or not, and can be either True of False.  The 
+        # second index represented the state of the mouse and can be either 
+        # 'base', 'over', 'down', 'inactive'.
+        self._states = {True: {}, False: {}}
+
+        # These variables keep track of the state of the checkbox.  Whether or 
+        # not the widget is active is tracked separately from the mouse, even 
+        # though they're considered together in self._states, so that the mouse 
+        # state will be up-to-date when the widget is reactivated.
+        self._checked = False
+        self._mouse = 'base'
+        self._active = True
+
+    def toggle(self):
+        self._checked = not self._checked
+        self.dispatch_event('on_toggle', self)
+        self._update_image()
+
+    def reactivate(self):
+        self._active = True
+        self._update_image()
+
+    def deactivate(self):
+        self._active = False
+        self._update_image()
+
+    def do_claim(self):
+        return self._image.min_width, self._image.min_height
+
+    def do_resize_children(self):
+        self._image.resize(self.rect)
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        self._mouse = 'down'
+        self._update_image()
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        if self._active and self._mouse == 'down':
+            self.toggle()
+
+        self._mouse = 'over'
+        self._update_image()
+
+    def on_mouse_enter(self, x, y):
+        self._mouse = 'over'
+        self._update_image()
+
+    def on_mouse_leave(self, x, y):
+        self._mouse = 'base'
+        self._update_image()
+
+    def on_mouse_drag_enter(self, x, y):
+        pass
+
+    def on_mouse_drag_leave(self, x, y):
+        self._mouse = 'base'
+        self._update_image()
+
+    @property
+    def is_checked(self):
+        return self._checked
+
+    @property
+    def is_active(self):
+        return self._active
+
+    def get_image(self, is_checked, mouse_state):
+        return self._states[is_checked].get(mouse_state)
+
+    def set_image(self, is_checked, mouse_state, image):
+        self._states[is_checked][mouse_state] = image
+        if (is_checked, mouse_state) == self._get_state():
+            self._image.image = image
+
+    def get_base_checked_image(self):
+        return self.get_image(True, 'base')
+
+    def set_base_checked_image(self, image):
+        self.set_image(True, 'base', image)
+
+    base_checked_image = late_binding_property(
+            get_base_checked_image, set_base_checked_image)
+
+    def get_base_unchecked_image(self):
+        return self.get_image(False, 'base')
+
+    def set_base_unchecked_image(self, image):
+        self.set_image(False, 'base', image)
+
+    base_unchecked_image = late_binding_property(
+            get_base_unchecked_image, set_base_unchecked_image)
+
+    def get_over_checked_image(self):
+        return self.get_image(True, 'over')
+
+    def set_over_checked_image(self, image):
+        self.set_image(True, 'over', image)
+
+    over_checked_image = late_binding_property(
+            get_over_checked_image, set_over_checked_image)
+
+    def get_over_unchecked_image(self):
+        return self.get_image(False, 'over')
+
+    def set_over_unchecked_image(self, image):
+        self.set_image(False, 'over', image)
+
+    over_unchecked_image = late_binding_property(
+            get_over_unchecked_image, set_over_unchecked_image)
+
+    def get_down_checked_image(self):
+        return self.get_image(True, 'down')
+
+    def set_down_checked_image(self, image):
+        self.set_image(True, 'down', image)
+
+    down_checked_image = late_binding_property(
+            get_down_checked_image, set_down_checked_image)
+
+    def get_down_unchecked_image(self):
+        return self.get_image(False, 'down')
+
+    def set_down_unchecked_image(self, image):
+        self.set_image(False, 'down', image)
+
+    down_unchecked_image = late_binding_property(
+            get_down_unchecked_image, set_down_unchecked_image)
+
+    def get_inactive_checked_image(self):
+        return self.get_image(True, 'inactive')
+
+    def set_inactive_checked_image(self, image):
+        self.set_image(True, 'inactive', image)
+
+    inactive_checked_image = late_binding_property(
+            get_inactive_checked_image, set_inactive_checked_image)
+
+    def get_inactive_unchecked_image(self):
+        return self.get_image(False, 'inactive')
+
+    def set_inactive_unchecked_image(self, image):
+        self.set_image(False, 'inactive', image)
+
+    inactive_unchecked_image = late_binding_property(
+            get_inactive_unchecked_image, set_inactive_unchecked_image)
+
+    def _update_image(self):
+        checked_state, mouse_state = self._get_state()
+        self._image.image = self._states[checked_state][mouse_state]
+
+    def _get_state(self):
+        checked_state = self._checked
+        mouse_state = self._mouse
+
+        if mouse_state == 'down' and 'down' not in self._states[checked_state]:
+            mouse_state = 'over'
+
+        if mouse_state == 'over' and 'over' not in self._states[checked_state]:
+            mouse_state = 'base'
+
+        if not self._active:
+            mouse_state = 'inactive'
+
+        return checked_state, mouse_state
+        
+
+Checkbox.register_event_type('on_toggle')
