@@ -10,8 +10,10 @@ root = glooey.Gui(window, batch=batch)
 button = glooey.Checkbox()
 button.base_checked_image = pyglet.image.load('checkbox_green_checked.png')
 button.over_checked_image = pyglet.image.load('checkbox_green_checked_over.png')
+button.inactive_checked_image = pyglet.image.load('checkbox_inactive_checked.png')
 button.base_unchecked_image = pyglet.image.load('checkbox_unchecked.png')
 button.over_unchecked_image = pyglet.image.load('checkbox_green_unchecked_over.png')
+button.inactive_unchecked_image = pyglet.image.load('checkbox_inactive_unchecked.png')
 root.add(button, 'center')
 
 @button.event
