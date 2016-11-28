@@ -349,101 +349,27 @@ class Image(Widget):
     image = late_binding_property(get_image, set_image)
 
 
-class Clickable(Widget):
-
-    def __init__(self):
-        super().__init__()
-        self._state = 'base'
-        self._active = True
-
-    def get_state(self):
-        if not self._active:
-            return 'inactive'
-        else:
-            return self._state
-
-    def set_state(self, state):
-        self._require_known_state(state)
-
-        old_state = self.get_state()
-        self._state = state
-        new_state = self.get_state()
-
-        # If the widget is inactive, the new state and the old state will both 
-        # be 'inactive' even if self._state itself changed.  This is how 
-        # self._state stays up-to-date for when the widget is reactivated.
-        if old_state != new_state:
-            self.dispatch_event('on_change_state')
-
-    state = late_binding_property(get_state, set_state)
-
-    def get_known_states(self):
-        return 'base', 'over', 'down', 'inactive'
-
-    known_states = late_binding_property(get_known_states)
-
-    def _require_known_state(self, state):
-        if state not in self.known_states:
-            raise UsageError("unknown state '{}'".format(state))
-
-    def get_active(self):
-        return self._active
-
-    def set_active(self, on_or_off):
-        old_state = self.get_state()
-        self._active = on_or_off
-        new_state = self.get_state()
-
-        if old_state != new_state:
-            self.dispatch_event('on_change_state')
-
-    active = late_binding_property(get_active, set_active)
-
-    def toggle_active(self):
-        self.active = not self.active
-
-    def reactivate(self):
-        self.active = True
-
-    def deactivate(self):
-        self.active = False
-
-    def on_mouse_press(self, x, y, button, modifiers):
-        self.set_state('down')
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        if self.state == 'down':
-            self.dispatch_event('on_click', self)
-
-        self.set_state('over')
-
-    def on_mouse_enter(self, x, y):
-        self.set_state('over')
-
-    def on_mouse_leave(self, x, y):
-        self.set_state('base')
-
-    def on_mouse_drag_enter(self, x, y):
-        pass
-
-    def on_mouse_drag_leave(self, x, y):
-        self.set_state('base')
-
-
-Clickable.register_event_type('on_click')
-Clickable.register_event_type('on_change_state')
-
-class Button(Clickable):
+class Button(Widget):
 
     def __init__(self, text=""):
         super().__init__()
-        self._images = {}
+        self._states = {}
+        self._mouse = 'base'
+        self._active = True
         self._label = Label(text)
         self._label_placement = 'center'
         self._background = Image()
         self._background_placement = 'center'
         self._attach_child(self._label)
         self._attach_child(self._background)
+
+    def reactivate(self):
+        self._active = True
+        self._update_state()
+
+    def deactivate(self):
+        self._active = False
+        self._update_state()
 
     def do_claim(self):
         min_width = max(self._label.min_width, self._background.min_width)
@@ -458,32 +384,58 @@ class Button(Clickable):
         place_child_in_box(self._label, self.rect, self._label_placement)
         place_child_in_box(self._background, self.rect, self._background_placement)
 
-    def on_change_state(self):
-        self._background.image = self.image
+    def on_mouse_press(self, x, y, button, modifiers):
+        self._mouse = 'down'
+        self._update_state()
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        if self._active and self._mouse == 'down':
+            self.dispatch_event('on_click', self)
+
+        self._mouse = 'over'
+        self._update_state()
+
+    def on_mouse_enter(self, x, y):
+        self._mouse = 'over'
+        self._update_state()
+
+    def on_mouse_leave(self, x, y):
+        self._mouse = 'base'
+        self._update_state()
+
+    def on_mouse_drag_enter(self, x, y):
+        pass
+
+    def on_mouse_drag_leave(self, x, y):
+        self._mouse = 'base'
+        self._update_state()
 
     def get_state(self):
-        state = Clickable.get_state(self)
+        state = self._mouse
 
-        if state not in self._images and state in ('over', 'down'):
+        if state not in self._states and state == 'down':
+            state = 'over'
+
+        if state not in self._states and state == 'over':
             state = 'base'
 
-        if state not in self._images:
-            raise ValueError("no images for '{}' state".format(state))
+        if not self._active:
+            state = 'inactive'
 
         return state
 
+    state = late_binding_property(get_state)
+
     def get_image(self, state=None):
-        if state is None: state = self.state
-        self._require_known_state(state)
-        return self._images.get(state)
+        if state is None: state = self.get_state()
+        return self._states.get(state)
 
     image = late_binding_property(get_image)
 
     def set_image(self, state, image):
-        self._require_known_state(state)
-        self._images[state] = image
-        if state == self.state:
-            self._background.image = self.image
+        self._states[state] = image
+        if self._mouse == state:
+            self._background.image = image
 
     def get_base_image(self, image):
         self.get_image('base', image)
@@ -548,6 +500,14 @@ class Button(Clickable):
 
     image_placement = late_binding_property(get_image_placement, set_image_placement)
 
+    def _update_state(self):
+        state = self.get_state()
+        if state not in self._states:
+            raise ValueError("no images for '{}' state".format(state))
+        self._background.image = self._states[state]
+
+
+Button.register_event_type('on_click')
 
 class Checkbox(Widget):
 
@@ -582,15 +542,15 @@ class Checkbox(Widget):
     def toggle(self):
         self._checked = not self._checked
         self.dispatch_event('on_toggle', self)
-        self._update_image()
+        self._update_state()
 
     def reactivate(self):
         self._active = True
-        self._update_image()
+        self._update_state()
 
     def deactivate(self):
         self._active = False
-        self._update_image()
+        self._update_state()
 
     def do_claim(self):
         return self._image.min_width, self._image.min_height
@@ -600,29 +560,29 @@ class Checkbox(Widget):
 
     def on_mouse_press(self, x, y, button, modifiers):
         self._mouse = 'down'
-        self._update_image()
+        self._update_state()
 
     def on_mouse_release(self, x, y, button, modifiers):
         if self._active and self._mouse == 'down':
             self.toggle()
 
         self._mouse = 'over'
-        self._update_image()
+        self._update_state()
 
     def on_mouse_enter(self, x, y):
         self._mouse = 'over'
-        self._update_image()
+        self._update_state()
 
     def on_mouse_leave(self, x, y):
         self._mouse = 'base'
-        self._update_image()
+        self._update_state()
 
     def on_mouse_drag_enter(self, x, y):
         pass
 
     def on_mouse_drag_leave(self, x, y):
         self._mouse = 'base'
-        self._update_image()
+        self._update_state()
 
     @property
     def is_checked(self):
@@ -632,12 +592,33 @@ class Checkbox(Widget):
     def is_active(self):
         return self._active
 
-    def get_image(self, is_checked, mouse_state):
+    def get_state(self):
+        checked_state = self._checked
+        mouse_state = self._mouse
+
+        if mouse_state == 'down' and 'down' not in self._states[checked_state]:
+            mouse_state = 'over'
+
+        if mouse_state == 'over' and 'over' not in self._states[checked_state]:
+            mouse_state = 'base'
+
+        if not self._active:
+            mouse_state = 'inactive'
+
+        return checked_state, mouse_state
+
+    state = late_binding_property(get_state)
+        
+    def get_image(self, is_checked=None, mouse_state=None):
+        if is_checked is None and mouse_state is None:
+            is_checked, mouse_state = self.get_state()
         return self._states[is_checked].get(mouse_state)
+
+    image = late_binding_property(get_image)
 
     def set_image(self, is_checked, mouse_state, image):
         self._states[is_checked][mouse_state] = image
-        if (is_checked, mouse_state) == self._get_state():
+        if (is_checked, mouse_state) == self.get_state():
             self._image.image = image
 
     def get_base_checked_image(self):
@@ -712,25 +693,12 @@ class Checkbox(Widget):
     inactive_unchecked_image = late_binding_property(
             get_inactive_unchecked_image, set_inactive_unchecked_image)
 
-    def _update_image(self):
-        checked_state, mouse_state = self._get_state()
-        self._image.image = self._states[checked_state][mouse_state]
-
-    def _get_state(self):
-        checked_state = self._checked
-        mouse_state = self._mouse
-
-        if mouse_state == 'down' and 'down' not in self._states[checked_state]:
-            mouse_state = 'over'
-
-        if mouse_state == 'over' and 'over' not in self._states[checked_state]:
-            mouse_state = 'base'
-
-        if not self._active:
-            mouse_state = 'inactive'
-
-        return checked_state, mouse_state
-        
+    def _update_state(self):
+        checked_state, mouse_state = self.get_state()
+        if mouse_state not in self._states[checked_state]:
+            raise ValueError("no images for the '{}_{}' state".format(
+                mouse_state, 'checked' if checked_state else 'unchecked'))
+        self._image.image = self.get_image(checked_state, mouse_state)
 
 
 Checkbox.register_event_type('on_toggle')
