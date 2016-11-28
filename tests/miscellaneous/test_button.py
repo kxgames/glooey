@@ -5,14 +5,18 @@ import glooey
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
-root = glooey.Gui(window, batch=batch)
+pyglet.font.add_file('kenvector_future.ttf')
+pyglet.font.add_file('kenvector_future_thin.ttf')
 
-button = glooey.Button('Ok')
+root = glooey.Gui(window, batch=batch)
+button = glooey.Button('Start Game')
 button.label.color = 'white'
 button.label.bold = True
-button.base_image = pyglet.image.load('button_square_beige.png')
-button.down_image = pyglet.image.load('button_square_beige_pressed.png')
-button.inactive_image = pyglet.image.load('button_square_grey.png')
+button.label.font_name = 'KenVector Future'
+button.label.font_size = 12
+button.base_image = pyglet.image.load('button_green.png')
+button.down_image = pyglet.image.load('button_green_down.png')
+button.inactive_image = pyglet.image.load('button_grey.png')
 
 def label_placement(child_rect, parent_rect):   # (no fold)
     child_rect.center = parent_rect.center
