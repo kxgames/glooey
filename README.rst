@@ -24,8 +24,8 @@ Widgets:
 [x] Image
 [ ] Background
 [x] Button
-[ ] Checkbox
-[ ] RadioButton
+[x] Checkbox
+[x] RadioButton
 [ ] DropdownMenu
 [ ] ToolTip
 
