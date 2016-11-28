@@ -15,6 +15,7 @@ class Widget (pyglet.event.EventDispatcher):
         self._connector = self
         self._rect = None
         self._is_claim_stale = True
+        self._spurious_leave_event = False
         self._draw_status = 'never drawn'
         self.min_width = 0
         self.min_height = 0
@@ -290,6 +291,16 @@ class Widget (pyglet.event.EventDispatcher):
             child.dispatch_event('on_mouse_motion', x, y, dx, dy)
 
     def on_mouse_enter(self, x, y):
+        # For some reason, whenever the mouse is clicked, pyglet generates a 
+        # on_mouse_leave event followed by a on_mouse_enter event.  There's no 
+        # way to tell whether or not that happened in this handler alone, so we 
+        # check a flag that would be set in on_mouse_leave() if a spurious 
+        # event was detected.  If the event is spurious, reset the flag, ignore 
+        # the event, and stop it from propagating.
+        if self._spurious_leave_event:
+            self._spurious_leave_event = False
+            return
+
         under_mouse, previously_under_mouse = \
                 self._find_children_under_mouse(x, y)
 
@@ -299,6 +310,16 @@ class Widget (pyglet.event.EventDispatcher):
             child.dispatch_event('on_mouse_enter', x, y)
 
     def on_mouse_leave(self, x, y):
+        # For some reason, whenever the mouse is clicked, pyglet generates a 
+        # on_mouse_leave event followed by a on_mouse_enter event.  We can tell 
+        # that this is happening in this handler because the mouse coordinates 
+        # will still be under the widget.  In this case, set a flag so 
+        # on_mouse_enter() will know to ignore the spurious event to follow, 
+        # ignore the event, and stop it from propagating.
+        if self.is_under_mouse(x, y):
+            self._spurious_leave_event = True
+            return True
+
         for child in self._children_under_mouse:
             child.dispatch_event('on_mouse_leave', x, y)
 
