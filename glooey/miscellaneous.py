@@ -571,6 +571,14 @@ class Checkbox(Widget):
         self._mouse = 'base'
         self._active = True
 
+    def check(self):
+        if not self._checked:
+            self.toggle()
+
+    def uncheck(self):
+        if self._checked:
+            self.toggle()
+
     def toggle(self):
         self._checked = not self._checked
         self.dispatch_event('on_toggle', self)
@@ -724,4 +732,20 @@ class Checkbox(Widget):
         return checked_state, mouse_state
         
 
+
 Checkbox.register_event_type('on_toggle')
+
+class RadioButton(Checkbox):
+
+    def __init__(self, peers=None):
+        super().__init__()
+        if peers is not None:
+            self.peers = peers
+
+    def on_toggle(self, widget):
+        if self.is_checked:
+            for peer in self.peers:
+                if peer is not self:
+                    peer.uncheck()
+
+
