@@ -226,6 +226,7 @@ class Artist:
     @group.setter
     def group(self, new_group):
         if self._group is not new_group:
+            self._group = new_group
             self._batch.migrate(
                     self._vertex_list, self._mode, new_group, self._batch)
 
