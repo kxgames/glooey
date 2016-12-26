@@ -170,7 +170,7 @@ class Widget (pyglet.event.EventDispatcher):
         pass
 
     def do_claim(self):
-        pass
+        raise NotImplementedError
 
     def do_resize(self):
         """
