@@ -3,26 +3,31 @@
 """A 5x5 grid of placeholders should be displayed."""
 
 import pyglet
-import test_helpers
-from glooey import *
-from glooey.drawing import *
+import demo_helpers
+import glooey
+import glooey.drawing
 
 print(__doc__)
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = Gui(window, batch=batch)
-grid = Grid(5, 5, padding=5)
+root = glooey.Gui(window, batch=batch)
+grid = glooey.Grid(padding=5)
+grid.set_row_height(0, 0)
+grid.set_col_width(0, 0)
 
-for row, col in grid.indices:
-    widget = PlaceHolder(30, 30, color=rainbow_cycle[row])
-    grid.add(row, col, widget, placement=('fill' if row == col else None))
+for row in range(5):
+    for col in range(5):
+        color = glooey.drawing.rainbow_cycle[row]
+        placement = 'fill' if row == col else None
+        widget = glooey.PlaceHolder(30, 30, color=color)
+        grid.add(row, col, widget, placement=placement)
 
 root.add(grid)
 
-test_helpers.install_padding_hotkeys(window, grid)
-test_helpers.install_placement_hotkeys(window, grid)
+demo_helpers.install_padding_hotkeys(window, grid)
+demo_helpers.install_placement_hotkeys(window, grid)
 
 pyglet.app.run()
 

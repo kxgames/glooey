@@ -4,7 +4,7 @@
 
 import pyglet
 import glooey
-import test_helpers
+import demo_helpers
 
 print(__doc__)
 
@@ -18,8 +18,8 @@ widget = glooey.PlaceHolder(100, 100)
 bin.add(widget)
 root.add(bin)
 
-test_helpers.install_padding_hotkeys(window, bin)
-test_helpers.install_placement_hotkeys(window, bin)
+demo_helpers.install_padding_hotkeys(window, bin)
+demo_helpers.install_placement_hotkeys(window, bin)
 
 pyglet.app.run()
 

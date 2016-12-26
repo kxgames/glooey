@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import pyglet
-import test_helpers
+import demo_helpers
 from glooey import *
 from glooey.drawing import *
 
@@ -18,8 +18,8 @@ vbox.add_front(PlaceHolder(10, 10, color=red), expand=True)
 
 root.add(vbox)
 
-test_helpers.install_padding_hotkeys(window, vbox)
-test_helpers.install_placement_hotkeys(window, vbox)
+demo_helpers.install_padding_hotkeys(window, vbox)
+demo_helpers.install_placement_hotkeys(window, vbox)
 
 pyglet.app.run()
 

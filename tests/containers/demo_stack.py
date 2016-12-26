@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import pyglet
-import test_helpers
+import demo_helpers
 from glooey import *
 from glooey.drawing import *
 
@@ -20,8 +20,8 @@ stack.add(PlaceHolder(200, 200, color=red))
 
 root.add(stack)
 
-test_helpers.install_padding_hotkeys(window, stack)
-test_helpers.install_placement_hotkeys(window, stack)
+demo_helpers.install_padding_hotkeys(window, stack)
+demo_helpers.install_placement_hotkeys(window, stack)
 
 pyglet.app.run()
 

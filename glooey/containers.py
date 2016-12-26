@@ -416,104 +416,111 @@ class Viewport (Widget, BinMixin):
 
 Viewport.register_event_type('on_mouse_pan')
 
-class Grid (Widget, PaddingMixin, PlacementMixin):
+class Grid (Widget, PlacementMixin):
 
     def __init__(self, rows=0, cols=0, padding=0, placement='fill'):
         Widget.__init__(self)
-        PaddingMixin.__init__(self, padding)
         PlacementMixin.__init__(self, placement)
-        self._grid = dict()
-        self._num_rows = rows
-        self._num_cols = cols
-        self._row_heights = {}
-        self._col_widths = {}
-        self._default_row_heights = {}
-        self._default_col_widths = {}
+        self._children = {}
+        self._grid = drawing.Grid(
+                num_rows=rows,
+                num_cols=cols,
+                padding=padding,
+        )
 
     def __iter__(self):
-        yield from self._grid.values()
+        yield from self._children.values()
 
     def __len__(self):
-        return len(self._grid)
+        return len(self._children)
 
     def __getitem__(self, row_col):
-        return self._grid[row_col]
+        return self._children[row_col]
 
     def __setitem__(self, row_col, child):
         row, col = row_col
         self.add(row, col, child)
 
     def add(self, row, col, child, placement=None):
-        if (row, col) in self._grid:
-            self._detach_child(self._grid[row, col])
+        if (row, col) in self._children:
+            self._detach_child(self._children[row, col])
 
         self._attach_child(child)
-        self._grid[row, col] = child
+        self._children[row, col] = child
         self._set_custom_placement((row, col), placement, repack=False)
         self._resize_and_regroup_children()
 
     def remove(self, row, col):
-        self._detach_child(self._grid[row, col])
-        del self._grid[row, col]
+        self._detach_child(self._children[row, col])
+        del self._children[row, col]
         self._unset_custom_placement((row, col), placement, repack=False)
         self._resize_and_regroup_children()
 
     def do_claim(self):
-        return claim_grid(
-                cells={w.min_rect for w in self},
-                num_rows=self._num_rows,
-                num_cols=self._num_cols,
-                padding=self.padding,
-                row_heights=self._row_heights,
-                col_widths=self._col_widths,
-                default_row_height=self._default_row_height,
-                default_col_width=self._default_col_width,
-        )
+        min_cell_rects = {
+                row_col: child.min_rect
+                for row_col, child in self._children.items()
+        }
+        return self._grid.make_claim(min_cell_rects)
 
     def do_resize_children(self):
-        cell_rects = make_grid(
-                rect=self.rect,
-                cells={w.min_rect for w in self},
-                num_rows=self._num_rows,
-                num_cols=self._num_cols,
-                padding=self.padding,
-                row_heights=self._row_heights,
-                col_widths=self._col_widths,
-                default_row_height=self._default_row_height,
-                default_col_width=self._default_col_width,
-        )
-        for ij in self._grid:
-            child = self._grid[ij]
+        cell_rects = self._grid.make_cells(self.rect)
+        for ij in self._children:
+            child = self._children[ij]
             placement = self._get_placement(ij)
             place_widget_in_box(child, cell_rects[ij], placement)
 
     def get_num_rows(self):
-        return self._num_rows
+        return self._grid.num_rows
 
-    num_rows = late_binding_property(get_num_rows)
+    def set_num_rows(self, new_num):
+        self._grid.num_rows = new_num
+        self.repack()
+
+    num_rows = late_binding_property(get_num_rows, set_num_rows)
 
     def get_num_cols(self):
-        return self._num_cols
+        return self._grid.num_rows
 
-    num_cols = late_binding_property(get_num_cols)
+    def set_num_cols(self, new_num):
+        self._grid.num_cols = new_num
+        self.repack()
+
+    num_cols = late_binding_property(get_num_cols, set_num_cols)
+
+    def get_padding(self):
+        return self._grid.padding
+
+    def set_padding(self, new_padding):
+        self._grid.padding = new_padding
+        self.repack()
+
+    padding = late_binding_property(get_padding, set_padding)
+
+    def get_row_height(self, row):
+        return self._grid.row_heights[row]
 
     def set_row_height(self, row, new_height):
         """
-        Set the width of the given column.  You can provide the width as an 
+        Set the height of the given row.  You can provide the height as an 
         integer or the string 'expand'.
         
-        If you provide an integer, the column will be that many pixels wide, so 
-        long as all the cells in that column fit in that space.  If the cells 
-        don't fit, the column will be just wide enough to fit them.  For this 
-        reason, it is common to specify a width of "0" to make the column as 
-        narrow as possible.
+        If you provide an integer, the row will be that many pixels tall, so 
+        long as all the cells in that row fit in that space.  If the cells 
+        don't fit, the row will be just tall enough to fit them.  For this 
+        reason, it is common to specify a height of "0" to make the row as 
+        short as possible.
 
-        If you provide the string 'expand', the column will grow to take up any 
+        If you provide the string 'expand', the row will grow to take up any 
         extra space allocated to the grid but not used by any of the other 
-        columns.  If multiple columns are set the expand, the extra space will 
+        rows.  If multiple rows are set the expand, the extra space will 
         be divided evenly between them.
         """
-        self._row_heights[row] = new_height
+        self._grid.set_row_height(row, new_height)
+        self.repack()
+
+    def get_col_width(self, col):
+        return self._grid.col_widths[col]
 
     def set_col_width(self, col, new_width):
         """
@@ -531,37 +538,54 @@ class Grid (Widget, PaddingMixin, PlacementMixin):
         columns.  If multiple columns are set the expand, the extra space will 
         be divided evenly between them.
         """
-        self._column_widths[col] = new_width
+        self._grid.set_col_width(col, new_width)
+        self.repack()
 
     def unset_row_height(self, row):
         """
-        Unset the width of the specified column.  The default width will be 
-        used for that column instead.
+        Unset the height of the specified row.  The default height will be 
+        used for that row instead.
         """
-        del self._row_heights[row]
+        self._grid.unset_row_height(row)
+        self.repack()
 
     def unset_col_width(self, col):
         """
         Unset the width of the specified column.  The default width will be 
         used for that column instead.
         """
-        del self._column_widths[col]
+        self._grid.unset_col_width(col)
+        self.repack()
+
+    def get_default_row_height(self):
+        return self._grid.default_row_height
 
     def set_default_row_height(self, new_height):
         """
-        Set the default column width.  This width will be used for any columns 
-        that haven't been given a specific width.  The meaning of the width are 
-        the same as for set_row_height().
+        Set the default row height.  This height will be used for any rows 
+        that haven't been given a specific height.  The meaning of the height 
+        is the same as for set_row_height().
         """
-        self._default_row_height = new_height
+        self._grid.default_row_height = new_height
+        self.repack()
+
+    default_row_height = late_binding_property(
+            get_default_row_height, set_default_row_height)
+
+    def get_default_col_width(self):
+        return self._grid.default_col_width
 
     def set_default_col_width(self, new_width):
         """
         Set the default column width.  This width will be used for any columns 
-        that haven't been given a specific width.  The meaning of the width are 
-        the same as for set_column_width().
+        that haven't been given a specific width.  The meaning of the width is 
+        the same as for set_col_width().
         """
-        self._default_column_width = new_width
+        self._grid.default_col_width = new_width
+        self.repack()
+
+    default_col_width = late_binding_property(
+            get_default_col_width, set_default_col_width)
 
 
 class HVBox (Widget, PaddingMixin, PlacementMixin):
