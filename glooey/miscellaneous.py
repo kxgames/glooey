@@ -410,6 +410,10 @@ class Button(Widget):
         self._mouse = 'base'
         self._update_state()
 
+    @property
+    def is_active(self):
+        return self._active
+
     def get_state(self):
         state = self._mouse
 
