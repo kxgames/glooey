@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-"""An image of a woman walking should appear in the middle of the screen.  
-Scrolling should change the image and create an animation."""
+"""An image of a green checkmark should appear in the middle of the screen.  
+Scrolling should change the image to a green cross."""
 
 import pyglet
 import glooey

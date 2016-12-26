@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 
+"""A green rectangle should take up most of the screen."""
+
 import pyglet
 import glooey
 import vecrec
+
+print(__doc__)
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()

@@ -26,16 +26,19 @@ artist_2 = glooey.drawing.Rectangle(rect_2, color=orange, batch=batch, group=fg)
 
 @window.event
 def on_draw():
+    print('(draw)')
     window.clear()
     batch.draw()
 
 @window.event
 def on_mouse_press(self, *args):
+    print("- green in front")
     artist_1.group = fg
     artist_2.group = bg
 
 @window.event
 def on_mouse_release(self, *args):
+    print("- orange in front")
     artist_1.group = bg
     artist_2.group = fg
 
