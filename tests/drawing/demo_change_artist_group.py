@@ -26,7 +26,6 @@ artist_2 = glooey.drawing.Rectangle(rect_2, color=orange, batch=batch, group=fg)
 
 @window.event
 def on_draw():
-    print('(draw)')
     window.clear()
     batch.draw()
 
