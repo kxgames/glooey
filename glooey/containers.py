@@ -68,6 +68,150 @@ def place_child_in_box(child, box_rect, key_or_function, child_rect=None):
     child.resize(child_rect)
 
 
+def make_grid(rect, cells={}, num_rows=0, num_cols=0, padding=0,
+        row_heights={}, col_widths={}, default_row_height='expand',
+        default_col_width='expand'):
+    """
+    Return rectangles for each cell in the specified grid.  The rectangles are 
+    returned in a dictionary where the keys are (row, col) tuples.
+    """
+    num_rows, num_cols = _deduce_grid_shape(cells, num_rows, num_cols)
+    min_row_heights, min_col_widths = _find_min_grid_dimensions(
+            cells, num_rows, num_cols, row_heights, col_widths, 
+            default_row_height, default_col_width)
+
+    # Figure out which rows and columns are expanded and how big those rows and 
+    # columns need to be.
+
+    expandable_row_height = (
+            + rect.height
+            - sum(min_row_heights.fixed.values())
+            - padding * (num_rows + 1)
+            ) / len(min_row_heights.expandable)
+    expandable_col_width = (
+            + rect.width
+            - sum(min_col_widths.fixed.values())
+            - padding * (num_cols + 1)
+            ) / len(min_col_widths.expandable)
+
+    # Create the grid.
+
+    grid = {}
+    top_cursor = rect.top
+    left_cursor = rect.left
+
+    for i in range(num_rows):
+        top_cursor += padding
+        row_height = min_row_heights.fixed.get(i, expandable_row_height)
+
+        for j in range(num_cols):
+            left_cursor += padding
+            col_width = min_col_widths.fixed.get(j, expandable_col_width)
+
+            grid[i,j] = Rect.from_size(col_width, row_height)
+            grid[i,j].top_left = top_cursor, left_cursor
+
+            left_cursor += col_width
+        top_cursor += row_height
+
+    return grid
+
+def claim_grid(cells={}, num_rows=0, num_cols=0, padding=0,
+        row_heights={}, col_widths={}, default_row_height='expand',
+        default_col_width='expand'):
+    
+    num_rows, num_cols = _deduce_grid_shape(cells, num_rows, num_cols)
+    min_row_heights, min_col_widths = _find_min_grid_dimensions(
+            cells, num_rows, num_cols, row_heights, col_widths, 
+            default_row_height, default_col_width)
+
+    min_expandable_width = max(min_col_widths.expandable.values())
+    min_expandable_height = max(min_row_heights.expandable.values())
+
+    min_width = \
+            + sum(min_col_widths.fixed.values())  \
+            + min_expandable_width * len(min_col_widths.expandable) \
+            + padding * (num_cols + 1)
+    min_height = \
+            + sum(fixed_min_dims.row_heights.values())  \
+            + min_expandable_height * len(expandable_min_dims.row_heights) \
+            + padding * (num_rows + 1)
+
+    return min_width, min_height
+
+def _deduce_grid_shape(cells, num_rows, num_cols):
+    """
+    Return the number of rows and columns in the grid.  More specifically, if 
+    the given number of rows or columns is falsey, deduce the number of rows or 
+    columns from the indices in the given dictionary of cells.
+    """
+    if not num_rows:
+        for row, col in cells:
+            num_rows = max(row + 1, num_rows)
+
+    if not num_cols:
+        for row, col in cells:
+            num_cols = max(col + 1, num_cols)
+
+    return num_rows, num_cols
+
+def _find_min_grid_dimensions(cells, num_rows, num_cols,
+        row_heights, col_widths, default_row_height, default_col_width):
+    """
+    Return the minimum size needed for by each row and column, considering the 
+    widths and heights set by the user and the sizes of the cells in those rows 
+    and columns.
+    """
+    # Make sure the caller didn't forget to use _deduce_grid_shape() to deal 
+    # with falsey grid shape values.
+
+    assert num_rows, num_cols
+
+    # Find the width and height of the largest cell in each row and column.
+    
+    max_cell_heights = defaultdict(int)
+    max_cell_widths = defaultdict(int)
+
+    for i,j in cells:
+        max_cell_heights[i] = max(cells[i,j].height, max_cell_heights[i])
+        max_cell_widths[j]  = max(cells[i,j].width,  max_cell_widths[j])
+
+    # Find the smallest size each row and column can be before the cells won't 
+    # fit anymore.
+
+    @attrs # (no fold)
+    class MinDimensions:
+        fixed = attrib(default=Factory(dict))
+        expandable = attrib(default=Factory(dict))
+
+    min_row_heights = MinDimensions()
+    min_col_widths = MinDimensions()
+
+    for i in range(num_rows):
+        row_height = row_heights.get(i, default_row_height)
+        max_cell_height = max_cell_heights.get(i, 0)
+
+        if isinstance(row_height, int):
+            min_row_heights.fixed[i] = max(row_height, max_cell_height)
+        elif row_height == 'extend':
+            min_row_heights.expandable[i] = max_cell_height
+        else:
+            raise UsageError("illegal row height: {:r}".format(row_height))
+
+    for j in range(num_cols):
+        col_width = col_widths.get(j, default_col_width)
+        max_cell_width = max_cell_widths.get(j, 0)
+
+        if isinstance(col_width, int):
+            min_col_widths.fixed[j] = max(col_width, max_cell_width)
+        elif col_width == 'extend':
+            min_col_widths.expandable[j] = max_cell_width
+        else:
+            raise UsageError("illegal col width: {:r}".format(col_width))
+
+    return min_row_heights, min_col_widths
+
+
 class BinMixin:
     """
     Provide add() and clear() methods for containers that can only have one 
@@ -418,13 +562,17 @@ Viewport.register_event_type('on_mouse_pan')
 
 class Grid (Widget, PaddingMixin, PlacementMixin):
 
-    def __init__(self, rows, cols, padding=0, placement='fill'):
+    def __init__(self, rows=0, cols=0, padding=0, placement='fill'):
         Widget.__init__(self)
         PaddingMixin.__init__(self, padding)
         PlacementMixin.__init__(self, placement)
         self._grid = dict()
         self._num_rows = rows
         self._num_cols = cols
+        self._row_heights = {}
+        self._col_widths = {}
+        self._default_row_heights = {}
+        self._default_col_widths = {}
 
     def __iter__(self):
         yield from self._grid.values()
@@ -440,11 +588,6 @@ class Grid (Widget, PaddingMixin, PlacementMixin):
         self.add(row, col, child)
 
     def add(self, row, col, child, placement=None):
-        if not 0 <= row < self.num_rows:
-            raise IndexError("Row out-of-bounds: row={} num_rows=0..{}".format(row, self.num_rows))
-        if not 0 <= col < self.num_cols:
-            raise IndexError("Column out-of-bounds: col={} num_cols=0..{}".format(col, self.num_cols))
-
         if (row, col) in self._grid:
             self._detach_child(self._grid[row, col])
 
@@ -460,46 +603,33 @@ class Grid (Widget, PaddingMixin, PlacementMixin):
         self._resize_and_regroup_children()
 
     def do_claim(self):
-        min_width = self.padding * (self.num_cols + 1)
-        min_height = self.padding * (self.num_rows + 1)
-
-        for row in range(self.num_rows):
-            row_height = 0
-            for col in range(self.num_cols):
-                if (row, col) in self._grid:
-                    child = self._grid[row, col]
-                    row_height = max(child.min_height, row_height)
-            min_height += row_height
-
-        for col in range(self.num_cols):
-            col_width = 0
-            for row in range(self.num_rows):
-                if (row, col) in self._grid:
-                    child = self._grid[row, col]
-                    col_width = max(child.min_width, col_width)
-            min_width += col_width
-
-        return min_width, min_height
+        return claim_grid(
+                cells={w.min_rect for w in self},
+                num_rows=self._num_rows,
+                num_cols=self._num_cols,
+                padding=self.padding,
+                row_heights=self._row_heights,
+                col_widths=self._col_widths,
+                default_row_height=self._default_row_height,
+                default_col_width=self._default_col_width,
+        )
 
     def do_resize_children(self):
-        available_width = self.rect.width - self.padding * (self.num_cols + 1)
-        available_height = self.rect.height - self.padding * (self.num_cols + 1)
-
-        child_width = available_width / self.num_cols
-        child_height = available_height / self.num_rows
-
-        for row, col in self._grid:
-            left = self.rect.left + (child_width * col) + (
-                    self.padding * (col + 1))
-            bottom = self.rect.bottom + (child_height * (self.num_rows - row - 1)) + (
-                    self.padding * (self.num_rows - row))
-            cell_rect = Rect.from_dimensions(
-                    bottom=bottom, left=left,
-                    width=child_width, height=child_height)
-
-            child = self._grid[row, col]
-            placement = self._get_placement((row, col))
-            place_child_in_box(child, cell_rect, placement)
+        cell_rects = make_grid(
+                rect=self.rect,
+                cells={w.min_rect for w in self},
+                num_rows=self._num_rows,
+                num_cols=self._num_cols,
+                padding=self.padding,
+                row_heights=self._row_heights,
+                col_widths=self._col_widths,
+                default_row_height=self._default_row_height,
+                default_col_width=self._default_col_width,
+        )
+        for ij in self._grid:
+            child = self._grid[ij]
+            placement = self._get_placement(ij)
+            place_widget_in_box(child, cell_rects[ij], placement)
 
     def get_num_rows(self):
         return self._num_rows
@@ -511,12 +641,71 @@ class Grid (Widget, PaddingMixin, PlacementMixin):
 
     num_cols = late_binding_property(get_num_cols)
 
-    def get_indices(self):
-        for row in range(self.num_rows):
-            for col in range(self.num_cols):
-                yield row, col
+    def set_row_height(self, row, new_height):
+        """
+        Set the width of the given column.  You can provide the width as an 
+        integer or the string 'expand'.
+        
+        If you provide an integer, the column will be that many pixels wide, so 
+        long as all the cells in that column fit in that space.  If the cells 
+        don't fit, the column will be just wide enough to fit them.  For this 
+        reason, it is common to specify a width of "0" to make the column as 
+        narrow as possible.
 
-    indices = late_binding_property(get_indices)
+        If you provide the string 'expand', the column will grow to take up any 
+        extra space allocated to the grid but not used by any of the other 
+        columns.  If multiple columns are set the expand, the extra space will 
+        be divided evenly between them.
+        """
+        self._row_heights[row] = new_height
+
+    def set_col_width(self, col, new_width):
+        """
+        Set the width of the given column.  You can provide the width as an 
+        integer or the string 'expand'.
+        
+        If you provide an integer, the column will be that many pixels wide, so 
+        long as all the cells in that column fit in that space.  If the cells 
+        don't fit, the column will be just wide enough to fit them.  For this 
+        reason, it is common to specify a width of "0" to make the column as 
+        narrow as possible.
+
+        If you provide the string 'expand', the column will grow to take up any 
+        extra space allocated to the grid but not used by any of the other 
+        columns.  If multiple columns are set the expand, the extra space will 
+        be divided evenly between them.
+        """
+        self._column_widths[col] = new_width
+
+    def unset_row_height(self, row):
+        """
+        Unset the width of the specified column.  The default width will be 
+        used for that column instead.
+        """
+        del self._row_heights[row]
+
+    def unset_col_width(self, col):
+        """
+        Unset the width of the specified column.  The default width will be 
+        used for that column instead.
+        """
+        del self._column_widths[col]
+
+    def set_default_row_height(self, new_height):
+        """
+        Set the default column width.  This width will be used for any columns 
+        that haven't been given a specific width.  The meaning of the width are 
+        the same as for set_row_height().
+        """
+        self._default_row_height = new_height
+
+    def set_default_col_width(self, new_width):
+        """
+        Set the default column width.  This width will be used for any columns 
+        that haven't been given a specific width.  The meaning of the width are 
+        the same as for set_column_width().
+        """
+        self._default_column_width = new_width
 
 
 class HVBox (Widget, PaddingMixin, PlacementMixin):
