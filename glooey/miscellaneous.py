@@ -4,7 +4,7 @@ from vecrec import Vector, Rect
 from pprint import pprint
 from . import drawing
 from .widget import Widget
-from .containers import place_child_in_box
+from .containers import place_widget_in_box
 from .helpers import late_binding_property
 
 class PlaceHolder(Widget):
@@ -381,8 +381,8 @@ class Button(Widget):
         self._label.regroup(pyglet.graphics.OrderedGroup(1, self.group))
 
     def do_resize_children(self):
-        place_child_in_box(self._label, self.rect, self._label_placement)
-        place_child_in_box(self._background, self.rect, self._background_placement)
+        place_widget_in_box(self._label, self.rect, self._label_placement)
+        place_widget_in_box(self._background, self.rect, self._background_placement)
 
     def on_mouse_press(self, x, y, button, modifiers):
         self._mouse = 'down'

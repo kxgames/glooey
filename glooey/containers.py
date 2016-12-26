@@ -55,17 +55,17 @@ placement_functions = {
         'bottom_right': bottom_right,
 }
 
-def place_child_in_box(child, box_rect, key_or_function, child_rect=None):
+def place_widget_in_box(widget, box_rect, key_or_function, widget_rect=None):
     try:
         placement_function = placement_functions[key_or_function]
     except KeyError:
         placement_function = key_or_function
 
-    if child_rect is None:
-        child_rect = child.min_rect
+    if widget_rect is None:
+        widget_rect = widget.min_rect
 
-    placement_function(child_rect, box_rect)
-    child.resize(child_rect)
+    placement_function(widget_rect, box_rect)
+    widget.resize(widget_rect)
 
 
 class BinMixin:
@@ -176,7 +176,7 @@ class Bin (Widget, BinMixin, PaddingMixin, PlacementMixin):
 
     def do_resize_children(self):
         if self.child is not None:
-            place_child_in_box(
+            place_widget_in_box(
                     self.child,
                     self.rect.get_shrunk(self.padding),
                     self._get_placement(self.child))
@@ -697,7 +697,7 @@ class HVBox (Widget, PaddingMixin, PlacementMixin):
             setattr(box_rect, coordinate[0], box_coord_0)
             setattr(box_rect, coordinate[1], box_coord_1)
 
-            place_child_in_box(child, box_rect, self._get_placement(child))
+            place_widget_in_box(child, box_rect, self._get_placement(child))
 
     def _place_cursor(self, orientation):
         top = self.rect.top - self.padding
@@ -795,7 +795,7 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
 
     def do_resize_children(self):
         for child in self.children:
-            place_child_in_box(
+            place_widget_in_box(
                     child,
                     self.rect.get_shrunk(self.padding),
                     self._get_placement(child))
