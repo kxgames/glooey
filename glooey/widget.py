@@ -488,6 +488,7 @@ class Widget (pyglet.event.EventDispatcher):
             for widget in child._yield_self_and_all_children():
                 widget.do_attach()
 
+        self.dispatch_event('on_add_child', child)
         return child
 
     def _detach_child(self, child):
@@ -517,6 +518,9 @@ class Widget (pyglet.event.EventDispatcher):
         # be drawn again.
         child._group = None
         child._rect = None
+
+        # Let the user react to a child being attached.
+        self.dispatch_event('on_remove_child', child)
 
         # Derived classes are expected to call _resize_and_regroup_children() 
         # after this method.
@@ -589,6 +593,8 @@ class Widget (pyglet.event.EventDispatcher):
     _num_children = late_binding_property(_get_num_children)
 
 
+Widget.register_event_type('on_add_child')
+Widget.register_event_type('on_remove_child')
 Widget.register_event_type('on_mouse_press')
 Widget.register_event_type('on_mouse_release')
 Widget.register_event_type('on_mouse_motion')
