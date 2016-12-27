@@ -207,47 +207,57 @@ class Artist:
         self._group = group
         self._count = count
         self._mode = mode
-        self._vertex_list = batch.add(count, mode, group, *data)
+        self._vertex_list = batch.add(
+                count, mode, self._group_factory(group), *data)
 
-    @property
-    def batch(self):
+    def get_batch(self):
         return self._batch
 
-    @batch.setter
-    def batch(self, new_batch):
+    def set_batch(self, new_batch):
         if self._batch is not new_batch:
             self._batch.migrate(
                     self._vertex_list, self._mode, self._group, new_batch)
 
-    @property
-    def group(self):
+    batch = property(get_batch, set_batch)
+
+    def get_group(self):
         return self._group
 
-    @group.setter
-    def group(self, new_group):
-        if self._group is not new_group:
+    def set_group(self, new_group):
+        if self._parent_group is not new_group:
             self._group = new_group
-            self._batch.migrate(
-                    self._vertex_list, self._mode, new_group, self._batch)
+            self._update_group()
 
-    @property
-    def count(self):
+    group = property(get_group, set_group)
+
+    def get_count(self):
         return self._count
 
-    @count.setter
-    def count(self, new_count):
-        self._vertex_list.resize(new_count)
+    count = property(get_count)
 
-    @property
-    def mode(self):
+    def get_mode(self):
         return self._mode
 
-    @property
-    def vertex_list(self):
+    mode = property(get_mode)
+
+    def get_vertex_list(self):
         return self._vertex_list
+
+    vertex_list = property(get_vertex_list)
 
     def delete(self):
         self._vertex_list.delete()
+
+    def _group_factory(self, parent):
+        return parent
+
+    def _update_group(self):
+        self._batch.migrate(
+                self._vertex_list,
+                self._mode,
+                self._group_factory(self._group),
+                self._batch,
+        )
 
 
 class Rectangle(Artist):
@@ -260,12 +270,10 @@ class Rectangle(Artist):
         self.rect = rect
         self.color = color
 
-    @property
-    def rect(self):
+    def get_rect(self):
         return self._rect
 
-    @rect.setter
-    def rect(self, new_rect):
+    def set_rect(self, new_rect):
         self._rect = new_rect
         self.vertex_list.vertices = (
                 new_rect.bottom_left.tuple +
@@ -274,14 +282,149 @@ class Rectangle(Artist):
                 new_rect.top_left.tuple
         )
 
-    @property
-    def color(self):
+    rect = property(get_rect, set_rect)
+
+    def get_color(self):
         return self._color
 
-    @color.setter
-    def color(self, new_color):
+    def set_color(self, new_color):
         self._color = new_color
         self.vertex_list.colors = 4 * new_color.tuple
+
+    color = property(get_color, set_color)
+
+
+class Tile(Artist):
+
+    def __init__(self, rect, image, htile=True, vtile=True,
+            blend_src=GL_SRC_ALPHA, blend_dest=GL_ONE_MINUS_SRC_ALPHA,
+            batch=None, group=None, usage='static'):
+
+        self._rect = rect
+        self._image = image
+        self._htile = htile
+        self._vtile = vtile
+        self._blend_src = blend_src
+        self._blend_dest = blend_dest
+
+        data = 'v2f/' + usage, 't2f/' + usage
+        super().__init__(batch, group, 4, GL_QUADS, *data)
+        self._update_vertex_list()
+
+    def get_rect(self):
+        return self._rect
+
+    def set_rect(self, new_rect):
+        self._rect = new_rect
+        self._update_vertex_list()
+
+    rect = property(get_rect, set_rect)
+
+    def get_image(self):
+        return self._image
+
+    def set_image(self, new_image, htile=None, vtile=None):
+        self._image = new_image
+        if htile is not None: self._htile = htile
+        if vtile is not None: self._vtile = vtile
+        self._update_group()
+        self._update_vertex_list()
+
+    image = property(get_image, set_image)
+
+    def get_htile(self):
+        return self._htile
+
+    def set_htile(self, new_htile):
+        self._htile = new_htile
+        self._update_vertex_list()
+
+    htile = property(get_htile, set_htile)
+
+    def get_vtile(self):
+        return self._vtile
+
+    def set_vtile(self, new_vtile):
+        self._vtile = new_vtile
+        self._update_vertex_list()
+
+    vtile = property(get_vtile, set_vtile)
+
+    def get_blend_src(self):
+        return self._blend_src
+
+    def set_blend_src(self, new_blend_src):
+        self._blend_src = new_blend_src
+        self._update_group()
+
+    blend_src = property(get_blend_src, set_blend_src)
+
+    def get_blend_dest(self):
+        return self._blend_dest
+
+    def set_blend_dest(self, new_blend_dest):
+        self._blend_dest = new_blend_dest
+        self._update_group()
+
+    blend_dest = property(get_blend_dest, set_blend_dest)
+
+    def _group_factory(self, parent):
+        return pyglet.sprite.SpriteGroup(
+                self._image.get_texture(),
+                self._blend_src,
+                self._blend_dest,
+                parent=parent,
+        )
+
+    def _update_vertex_list(self):
+        texture = self._image.get_texture()
+
+        # Figure out which texture coordinates are bound to which vertices.  
+        # This is not always an intuitive mapping, because textures can be 
+        # rotated by changing which texture coordinates are bound to which 
+        # vertices.  The in-line diagram shows which vertex is represented by 
+        # each variable in the case that the image hasn't been rotated.
+
+        a = Vector(*texture.tex_coords[0:2])     #   D┌───┐C
+        b = Vector(*texture.tex_coords[3:5])     #    │   │
+        c = Vector(*texture.tex_coords[6:8])     #    │   │
+        d = Vector(*texture.tex_coords[9:11])    #   A└───┘B
+
+        # The given image must have a power-of-two size in each dimension being 
+        # tiled.  This is because OpenGL internally requires that textures have 
+        # power-of-two dimensions.  When pyglet loads an image that doesn't 
+        # have the right dimensions, it creates a properly dimensioned texture 
+        # big enough to hold the image, sets texture coordinates to indicate 
+        # where in that texture the actual image is, and uses that information 
+        # to hide the extra space.
+        #
+        # However, tiling the image requires using the whole texture in each  
+        # dimension being tiled.  If the given image doesn't have a power-of- 
+        # two size in that dimension, this extra space would be rendered.
+
+        w, h = 1, 1
+
+        if self._htile:
+            if not _is_power_of_two(self._image.width):
+                raise UsageError("image is {self._image.width} px wide; can only tile images with power-of-two dimensions")
+            w = self._rect.width / self._image.width
+        if self._vtile:
+            if not _is_power_of_two(self._image.height):
+                raise UsageError("image is {self._image.height} px tall; can only tile images with power-of-two dimensions")
+            h = self._rect.height / self._image.height
+
+        A = a
+        B = a + (b - a).get_scaled(w)
+        C = a + (c - d).get_scaled(w) + (c - b).get_scaled(h)
+        D = a                         + (d - a).get_scaled(h)
+
+        self._vertex_list.tex_coords = A.tuple + B.tuple + C.tuple + D.tuple
+        self._vertex_list.vertices = (
+                self._rect.bottom_left.tuple +
+                self._rect.bottom_right.tuple +
+                self._rect.top_right.tuple +
+                self._rect.top_left.tuple
+        )
 
 
 
@@ -741,13 +884,13 @@ def _is_power_of_two(x):
     #
     # x           = 16 = 10000
     # x - 1       = 15 = 01111
-    # x & (x - 1) =  0 = 00000
+    # x & (x - 1) =  0 = 00000 == 0
     #
     # Now consider a case where x is not a power of two, e.g. x = 17
     #
     # x           = 17 = 10001
     # x - 1       = 16 = 10000
-    # x & (x - 1) = 16 = 10000
+    # x & (x - 1) = 16 = 10000 != 0
 
     return x > 0 and x & (x - 1) == 0
 
