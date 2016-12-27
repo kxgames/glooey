@@ -3,7 +3,6 @@ from vecrec import Rect
 from pprint import pprint
 from .helpers import *
 
-
 class Widget (pyglet.event.EventDispatcher):
 
     def __init__(self):
@@ -21,7 +20,10 @@ class Widget (pyglet.event.EventDispatcher):
         self.min_height = 0
 
     def __repr__(self):
-        return '{}()'.format(self.__class__.__name__)
+        return '{}(id={})'.format(
+                self.__class__.__name__,
+                hex(id(self))[-4:],
+        )
 
     def repack(self, force=False):
         if not self.is_attached_to_gui:
