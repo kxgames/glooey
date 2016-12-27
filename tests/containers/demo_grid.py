@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 
-"""A 5x5 grid of placeholders should be displayed."""
+"""A 5x5 grid of placeholders should be displayed.  The first row and column 
+should take as little space as possible, while the remaining rows and columns 
+should fill the available space evenly.  The following hotkeys should have the 
+following effects:
+
+q,w,e,a,s,d,f,z,x,c: Change the placement algorithm.
+j,k: Change the padding
+"""
 
 import pyglet
 import demo_helpers

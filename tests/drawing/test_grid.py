@@ -556,3 +556,21 @@ def test_not_enough_cols():
                 num_cols=1,
         )
 
+def test_real_examples():
+    cells = drawing.make_grid(
+            Rect.from_size(640, 480),
+            cells={
+                (0,0): Rect(0, 0,  10, 10),
+                (0,1): Rect(0, 0, 310, 10),
+                (0,2): Rect(0, 0,  10, 10),
+                (0,3): Rect(0, 0,  10, 10),
+            },
+            col_widths={1: 0},
+    )
+    assert cells == {
+            (0,0): Rect(  0, 0, 110, 480),
+            (0,1): Rect(110, 0, 310, 480),
+            (0,2): Rect(420, 0, 110, 480),
+            (0,3): Rect(530, 0, 110, 480),
+    }
+

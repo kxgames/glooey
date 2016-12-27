@@ -878,6 +878,8 @@ class Grid:
         self._min_expandable_col_widths = {}
         self._min_height = 0
         self._min_width = 0
+        self._row_heights = {}
+        self._col_widths = {}
         self._cell_rects = {}
 
         # Attributes that manage the cache.
@@ -931,21 +933,6 @@ class Grid:
 
     bounding_rect = property(get_bounding_rect, set_bounding_rect)
 
-    def get_min_cell_rects(self):
-        return self._min_cell_rects
-
-    def set_min_cell_rects(self, new_rects):
-        if self._min_cell_rects != new_rects:
-            self._min_cell_rects = new_rects
-            self._invalidate_shape()
-
-    def unset_min_cell_rects(self):
-        if self._min_cell_rects:
-            self._min_cell_rects = {}
-            self._invalidate_shape()
-
-    min_cell_rects = property(get_min_cell_rects, set_min_cell_rects)
-
     def get_min_cell_rect(self, i, j):
         return self._min_cell_rects[i,j]
 
@@ -955,16 +942,28 @@ class Grid:
             self._min_cell_rects[i,j] = new_rect
             self._invalidate_shape()
 
+    def get_min_cell_rects(self):
+        return self._min_cell_rects
+
+    def set_min_cell_rects(self, new_rects):
+        if self._min_cell_rects != new_rects:
+            self._min_cell_rects = new_rects
+            self._invalidate_shape()
+
+    min_cell_rects = property(get_min_cell_rects, set_min_cell_rects)
+
     def unset_min_cell_rect(self, i, j):
         if (i,j) in self._min_cell_rects:
             del self._min_cell_rects[i,j]
             self._invalidate_shape()
 
+    def unset_min_cell_rects(self):
+        if self._min_cell_rects:
+            self._min_cell_rects = {}
+            self._invalidate_shape()
+
     def get_num_rows(self):
         return self._num_rows
-
-    def get_num_rows_requested(self):
-        return self._requested_num_rows
 
     def set_num_rows(self, new_num):
         self._requested_num_rows = new_num
@@ -974,9 +973,6 @@ class Grid:
 
     def get_num_cols(self):
         return self._num_cols
-
-    def get_num_cols_requested(self):
-        return self._requested_num_cols
 
     def set_num_cols(self, new_num):
         self._requested_num_cols = new_num
@@ -996,25 +992,37 @@ class Grid:
     def get_row_height(self, i):
         return self._row_heights[i]
 
-    def get_row_height_requested(self, i):
-        return self._requested_row_heights[i]
-
     def set_row_height(self, i, new_height):
         self._requested_row_heights[i] = new_height
         self._invalidate_claim()
 
-    def unset_row_height(self, i):
-        del self._requested_row_heights[i]
+    def get_row_heights(self):
+        return self._row_heights
+
+    def set_row_heights(self, new_heights):
+        self._requested_row_heights = new_heights
         self._invalidate_claim()
+
+    row_heights = property(get_row_heights, set_row_heights)
 
     def get_col_width(self, j):
         return self._col_widths[j]
 
-    def get_col_width_requested(self, j):
-        return self._requested_col_widths[j]
-
     def set_col_width(self, j, new_width):
         self._requested_col_widths[j] = new_width
+        self._invalidate_claim()
+
+    def get_col_widths(self):
+        return self._col_widths
+
+    def set_col_widths(self, new_widths):
+        self._requested_col_widths = new_widths
+        self._invalidate_claim()
+
+    col_widths = property(get_col_widths, set_col_widths)
+
+    def unset_row_height(self, i):
+        del self._requested_row_heights[i]
         self._invalidate_claim()
 
     def unset_col_width(self, j):
@@ -1040,6 +1048,32 @@ class Grid:
 
     default_col_width = property(
             get_default_col_width, set_default_col_width)
+
+    def get_requested_num_rows(self):
+        return self._requested_num_rows
+
+    requested_num_rows = property(get_requested_num_rows)
+
+    def get_requested_num_cols(self):
+        return self._requested_num_cols
+
+    requested_num_cols = property(get_requested_num_cols)
+
+    def get_requested_row_height(self, i):
+        return self._requested_row_heights[i]
+
+    def get_requested_row_heights(self):
+        return self._requested_row_heights
+
+    requested_row_heights = property(get_requested_row_heights)
+
+    def get_requested_col_width(self, i):
+        return self._requested_col_widths[i]
+
+    def get_requested_col_widths(self):
+        return self._requested_col_widths
+
+    requested_col_widths = property(get_requested_col_widths)
 
     def _invalidate_shape(self):
         self._is_shape_stale = True

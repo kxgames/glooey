@@ -8,6 +8,7 @@ import vecrec
 
 from vecrec import Vector, Rect
 from collections import defaultdict
+from pprint import pprint
 from . import drawing
 from .widget import Widget
 from .helpers import *
@@ -112,9 +113,8 @@ class PaddingMixin:
         return self._padding
 
     def set_padding(self, new_padding):
-        if new_padding is not None:
-            self._padding = new_padding
-            self.repack()
+        self._padding = new_padding
+        self.repack()
 
     padding = late_binding_property(get_padding, set_padding)
 
@@ -137,14 +137,18 @@ class PlacementMixin:
     def _get_placement(self, key):
         return self._custom_placements.get(key, self._default_placement)
 
+    def _get_custom_placement(self, key):
+        return self._custom_placements.get(key)
+
     def _set_custom_placement(self, key, new_placement, repack=True):
         if new_placement is not None:
             self._custom_placements[key] = new_placement
             if repack: self.repack()
 
     def _unset_custom_placement(self, key, repack=True):
-        self._custom_placements.pop(key, None)
-        if repack: self.repack()
+        if key in self._custom_placements:
+            del self._custom_placements[key]
+            if repack: self.repack()
 
 
 
@@ -451,7 +455,8 @@ class Grid (Widget, PlacementMixin):
         self._resize_and_regroup_children()
 
     def remove(self, row, col):
-        self._detach_child(self._children[row, col])
+        child = self._children[row, col]
+        self._detach_child(child)
         del self._children[row, col]
         self._unset_custom_placement((row, col), placement, repack=False)
         self._resize_and_regroup_children()
@@ -588,174 +593,121 @@ class Grid (Widget, PlacementMixin):
             get_default_col_width, set_default_col_width)
 
 
-class HVBox (Widget, PaddingMixin, PlacementMixin):
+class HVBox (Widget, PlacementMixin):
 
     def __init__(self, padding=0, placement='fill'):
         Widget.__init__(self)
-        PaddingMixin.__init__(self, padding)
         PlacementMixin.__init__(self, placement)
-        self._children = list()
-        self._expandable = set()
+        self._children = []
+        self._sizes = {}
+        self._grid = drawing.Grid(
+                padding=padding,
+        )
 
-    def add(self, child, expand=False, placement=None):
-        self.add_back(child, expand, placement)
+    def __iter__(self):
+        yield from self._children
 
-    def add_front(self, child, expand=False, placement=None):
-        self.insert(child, 0, expand, placement)
+    def __len__(self):
+        return len(self._children)
 
-    def add_back(self, child, expand=False, placement=None):
-        self.insert(child, len(self._children), expand, placement)
+    def add(self, child, size=None, placement=None):
+        self.add_back(child, size, placement)
 
-    def insert(self, child, index, expand=False, placement=None):
-        if expand: self._expandable.add(child)
+    def add_front(self, child, size=None, placement=None):
+        self.insert(child, 0, size, placement)
+
+    def add_back(self, child, size=None, placement=None):
+        self.insert(child, len(self._children), size, placement)
+
+    def insert(self, child, index, size=None, placement=None):
         self._attach_child(child)
         self._children.insert(index, child)
+        self._sizes[child] = size
         self._set_custom_placement(child, placement, repack=False)
         self._resize_and_regroup_children()
 
-    def replace(self, index, child):
-        self.remove(self._children[index])
-        self.insert(child, index)
+    def replace(self, old_child, new_child):
+        old_index = self._children.index(old_child)
+        old_size = self._sizes[old_child]
+        old_placement = self._get_custom_placement(old_child)
+        self.remove(old_child, repack=False)
+        self.insert(new_child, old_index, old_size, old_placement)
 
-    def remove(self, child):
-        self._expandable.discard(child)
+    def remove(self, child, repack=True):
         self._detach_child(child)
         self._children.remove(child)
+        del self._sizes[child]
         self._unset_custom_placement(child)
-        self._resize_and_regroup_children()
+        if repack: self._resize_and_regroup_children()
 
     def do_claim(self):
+        self.do_set_row_col_sizes({
+                i: self._sizes[child]
+                for i, child in enumerate(self._children)
+                if self._sizes[child] is not None
+        })
+        min_cell_rects = {
+                self.do_get_row_col(i): child.min_rect
+                for i, child in enumerate(self._children)
+        }
+        return self._grid.make_claim(min_cell_rects)
+
+    def do_resize_children(self):
+        cell_rects = self._grid.make_cells(self.rect)
+        for i, child in enumerate(self._children):
+            box = cell_rects[self.do_get_row_col(i)]
+            placement = self._get_placement(child)
+            place_widget_in_box(child, box, placement)
+
+    def do_get_row_col(self, index):
         raise NotImplementedError
 
-    def do_resize_children(self, rect):
+    def do_set_row_col_sizes(self, sizes):
         raise NotImplementedError
 
     def get_children(self):
-        return self._children
+        return self._children[:]
 
     children = late_binding_property(get_children)
 
-    def get_expandable_children(self):
-        return self._expandable
+    def get_padding(self):
+        return self._grid.padding
 
-    expandable_children = late_binding_property(get_expandable_children)
+    def set_padding(self, new_padding):
+        self._grid.padding = new_padding
+        self.repack()
 
-
-    _dimensions = {     # (fold)
-            'horizontal': ('width', 'height'),
-            'vertical':   ('height', 'width'),
-    }
-    _coordinates = {    # (fold)
-            'horizontal': ('left', 'top'),
-            'vertical':   ('top', 'left'),
-    }
-
-
-    def _help_claim(self, orientation):
-        min_width = 0
-        min_height = 0
-        
-        # Account for children
-
-        for child in self.children:
-            child.claim()
-
-            if orientation == 'horizontal':
-                min_width += child.min_width
-                min_height = max(min_height, child.min_height)
-            elif orientation == 'vertical':
-                min_height += child.min_height
-                min_width = max(min_width, child.min_width)
-            else:
-                raise ValueError("Unknown orientation: {}".format(orientation))
-
-        # Account for padding
-
-        primary_padding = self.padding * (1 + len(self.children))
-        secondary_padding = self.padding * 2
-
-        if orientation == 'horizontal':
-            min_width += primary_padding
-            min_height += secondary_padding
-        elif orientation == 'vertical':
-            min_width += secondary_padding
-            min_height += primary_padding
-        else:
-            raise ValueError("Unknown orientation: {}".format(orientation))
-
-        return min_width, min_height
-
-    def _help_resize_children(self, orientation):
-        if not self.children:
-            return
-
-        dimension = self._dimensions[orientation]
-        coordinate = self._coordinates[orientation]
-        min_dimension = tuple('min_' + x for x in dimension)
-
-        # Figure out how much space is available for expandable children.
-
-        available_space = getattr(self.rect, dimension[0]) - self.padding
-
-        for child in self.children:
-            available_space -= getattr(child, min_dimension[0]) + self.padding
-
-        # Resize each child.
-
-        cursor, anchor = self._place_cursor(orientation)
-
-        for child in self.children:
-            box_coord_0 = cursor
-            box_coord_1 = anchor
-            box_dimension_0 = getattr(child, min_dimension[0])
-            box_dimension_1 = getattr(self.rect, dimension[1]) - 2 * self.padding
-
-            if child in self.expandable_children:
-                box_dimension_0 += available_space / len(self.expandable_children)
-
-            cursor = self._update_cursor(cursor, box_dimension_0, orientation)
-
-            box_rect = Rect(0, 0, 0, 0)
-            setattr(box_rect, dimension[0], box_dimension_0)
-            setattr(box_rect, dimension[1], box_dimension_1)
-            setattr(box_rect, coordinate[0], box_coord_0)
-            setattr(box_rect, coordinate[1], box_coord_1)
-
-            place_widget_in_box(child, box_rect, self._get_placement(child))
-
-    def _place_cursor(self, orientation):
-        top = self.rect.top - self.padding
-        left = self.rect.left + self.padding
-
-        if orientation == 'horizontal': return left, top
-        elif orientation == 'vertical': return top, left
-        else: raise ValueError("Unknown orientation: {}".format(orientation))
-
-    def _update_cursor(self, cursor, child_size, orientation):
-        if orientation == 'horizontal':
-            return cursor + child_size + self.padding
-        elif orientation == 'vertical':
-            return cursor - child_size - self.padding
-        else:
-            raise ValueError("Unknown orientation: {}".format(orientation))
+    padding = late_binding_property(get_padding, set_padding)
 
 
 class HBox (HVBox):
 
-    def do_claim(self):
-        return HVBox._help_claim(self, 'horizontal')
+    def do_get_row_col(self, index):
+        return 0, index
 
-    def do_resize_children(self):
-        HVBox._help_resize_children(self, 'horizontal')
+    def do_set_row_col_sizes(self, sizes):
+        self._grid.col_widths = sizes
+
+    def get_default_size(self):
+        return self._grid.default_col_width
+
+    def set_default_size(self, size):
+        self._grid.default_col_width = size
 
 
 class VBox (HVBox):
 
-    def do_claim(self):
-        return HVBox._help_claim(self, 'vertical')
+    def do_get_row_col(self, index):
+        return index, 0
 
-    def do_resize_children(self):
-        HVBox._help_resize_children(self, 'vertical')
+    def do_set_row_col_sizes(self, sizes):
+        self._grid.row_heights = sizes
+
+    def get_default_size(self):
+        return self._grid.default_row_height
+
+    def set_default_size(self, size):
+        self._grid.default_row_height = size
 
 
 class Stack (Widget, PaddingMixin, PlacementMixin):
@@ -832,4 +784,6 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
         return self._children
 
     children = late_binding_property(get_children)
+
+
 
