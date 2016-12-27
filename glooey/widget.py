@@ -569,7 +569,7 @@ class Widget (pyglet.event.EventDispatcher):
         self._children_under_mouse = set()
 
         def yield_previous_children_then_others():
-            yield from previously_under_mouse
+            yield from self.__children & previously_under_mouse
             yield from self.__children - previously_under_mouse
 
         for child in yield_previous_children_then_others():
