@@ -425,15 +425,19 @@ class Widget (pyglet.event.EventDispatcher):
             # is the problem.
 
             def find_unattached_parent(widget, level=0):
-                if self.parent is None: return self, level
-                else: return find_unattached_parent(self.parent, level + 1)
+                if widget.parent is None: return widget, level
+                if widget.parent is self.root: return widget, level
+                else: return find_unattached_parent(widget.parent, level + 1)
 
-            unattached_parent, level = find_unattached_parent(self)
-
-            if unattached_parent is self:
-                diagnoses.append("{self} is not attached to the GUI.")
+            try:
+                unattached_parent, level = find_unattached_parent(self)
+            except RecursionError:
+                diagnoses.append("{self} seems to have an infinite number of parents.\nCheck for circular references between its parents.")
             else:
-                diagnoses.append("{unattached_parent}, a widget {level} level(s) above {self}, is not attached to the GUI.")
+                if unattached_parent is self:
+                    diagnoses.append("{self} is not attached to the GUI.")
+                else:
+                    diagnoses.append("{unattached_parent}, a widget {level} level(s) above {self}, is not attached to the GUI.")
 
         elif self._draw_status == 'draw() called':
             if self.rect is None:
