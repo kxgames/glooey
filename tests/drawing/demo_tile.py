@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """Brown floor tiles should take up most (but not all) of the screen.
 

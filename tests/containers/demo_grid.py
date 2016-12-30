@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """A 5x5 grid of placeholders should be displayed.  The first row and column 
 should take as little space as possible, while the remaining rows and columns 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """A green box with a cross should take up most of the screen.  Any interaction 
 you make with the box using the mouse (e.g. moving, clicking, dragging, etc.) 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """The screen should begin with 5 vertically stacked boxes and the following 
 hotkeys should have the following effects:

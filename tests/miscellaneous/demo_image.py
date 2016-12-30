@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """An image of a green checkmark should appear in the middle of the screen.  
 Scrolling should change the image to a green cross."""
