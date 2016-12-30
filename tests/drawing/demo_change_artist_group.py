@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-"""An orange rectangle should be displayed on top of a green one.  When you 
-click with the mouse, the green rectangle should move on top.  When you release 
-the mouse, the orange rectangle should move back to the top."""
+"""Two overlapping rectangles should appear.  The orange one should be on top.
+
+left mouse press: Move the green rectangle on top.
+left mouse release: Move the orange rectangle back on top."""
 
 import pyglet
 import glooey
@@ -31,13 +32,11 @@ def on_draw():
 
 @window.event
 def on_mouse_press(self, *args):
-    print("- green in front")
     artist_1.group = fg
     artist_2.group = bg
 
 @window.event
 def on_mouse_release(self, *args):
-    print("- orange in front")
     artist_1.group = bg
     artist_2.group = fg
 
