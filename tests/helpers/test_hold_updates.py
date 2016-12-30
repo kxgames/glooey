@@ -4,8 +4,8 @@ from glooey.helpers import *
 
 class UpdateLogger(HoldUpdatesMixin):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, hold_updates=False):
+        HoldUpdatesMixin.__init__(self, hold_updates)
         self.update_log = ''
 
     @update_function(1)
@@ -76,4 +76,28 @@ def test_no_update_needed():
         ex.update_2()
         assert ex.update_log == '121'
     assert ex.update_log == '1212'
+
+def test_apply_hold_in_ctor():
+    ex = UpdateLogger(hold_updates=True)
+    assert ex.update_log == ''
+
+    ex.update_1()
+    assert ex.update_log == ''
+
+    ex.resume_updates()
+    assert ex.update_log == '1'
+
+def test_nested_holds():
+    ex = UpdateLogger()
+    assert ex.update_log == ''
+
+    with ex.hold_updates():
+        with ex.hold_updates():
+            ex.update_1()
+            assert ex.update_log == ''
+        ex.update_2()
+        assert ex.update_log == ''
+    assert ex.update_log == '12'
+
+
 

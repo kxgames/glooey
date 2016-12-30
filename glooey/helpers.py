@@ -44,28 +44,32 @@ def late_binding_property(fget=None, fset=None, fdel=None, doc=None):
 
 class HoldUpdatesMixin:
 
-    def __init__(self):
+    def __init__(self, num_holds=0):
         super().__init__()
-        self._hold_updates = False
-        self._update_order = {}
+        self._num_holds = num_holds
         self._stale_update_functions = set()
 
-        for name, method in inspect.getmembers(self):
-            try: self._update_order[name] = method._hold_updates_exe_order
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls._update_order = {}
+        for name, method in inspect.getmembers(cls):
+            try: cls._update_order[name] = method._hold_updates_exe_order
             except AttributeError: pass
 
     @contextlib.contextmanager
     def hold_updates(self):
-        self._hold_updates = True
-        self._stale_update_functions = set()
-
+        self._num_holds += 1
         yield
+        self.resume_updates()
 
-        self._hold_updates = False
-        for name in sorted(self._stale_update_functions,
-                key=lambda x: self._update_order[x]):
-            getattr(self, name)()
-        self._stale_update_functions = set()
+    def resume_updates(self):
+        self._num_holds = max(self._num_holds - 1, 0)
+
+        if self._num_holds == 0:
+            for name in sorted(self._stale_update_functions,
+                    key=lambda x: self._update_order[x]):
+                getattr(self, name)()
+            self._stale_update_functions = set()
 
 
 class update_function:
@@ -82,7 +86,7 @@ class update_function:
 
         @functools.wraps(method)
         def wrapped_method(self, *args, **kwargs):
-            if self._hold_updates:
+            if self._num_holds > 0:
                 self._stale_update_functions.add(method.__name__)
             else:
                 method(self, *args, **kwargs)
