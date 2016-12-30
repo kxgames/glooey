@@ -5,6 +5,7 @@ import autoprop
 import vecrec
 
 from pprint import pprint
+from collections import defaultdict
 from vecrec import Vector, Rect
 from pyglet.gl import *
 from pyglet.graphics import Group, OrderedGroup
@@ -202,9 +203,10 @@ rainbow_cycle = red, orange, yellow, green, blue, purple, brown
 # Drawing utilities
 
 @autoprop
-class Artist:
+class Artist(HoldUpdatesMixin):
 
     def __init__(self, batch, group, count, mode, *data):
+        super().__init__()
         self._batch = batch
         self._group = group
         self._count = count
@@ -243,6 +245,7 @@ class Artist:
     def _group_factory(self, parent):
         return parent
 
+    @update_function(1)
     def _update_group(self):
         self._batch.migrate(
                 self._vertex_list,
@@ -268,11 +271,18 @@ class Rectangle(Artist):
 
     def set_rect(self, new_rect):
         self._rect = new_rect
+        self.update_rect()
+
+    def update_rect(self):
+        """
+        Call this method to update the tile after you've made an in-place 
+        change to its rectangle.
+        """
         self.vertex_list.vertices = (
-                new_rect.bottom_left.tuple +
-                new_rect.bottom_right.tuple +
-                new_rect.top_right.tuple +
-                new_rect.top_left.tuple
+                self._rect.bottom_left.tuple +
+                self._rect.bottom_right.tuple +
+                self._rect.top_right.tuple +
+                self._rect.top_left.tuple
         )
 
     def get_color(self):
@@ -307,7 +317,14 @@ class Tile(Artist):
     def set_rect(self, new_rect):
         if self._rect != new_rect:
             self._rect = new_rect
-            self._update_vertex_list()
+            self.update_rect()
+
+    def update_rect(self):
+        """
+        Call this method to update the tile after you've made an in-place 
+        change to its rectangle.
+        """
+        self._update_vertex_list()
 
     def get_image(self):
         return self._image
@@ -358,6 +375,7 @@ class Tile(Artist):
             self._blend_dest = new_blend_dest
             self._update_group()
 
+    @update_function(2)
     def _update_vertex_list(self):
         texture = self._image.get_texture()
 
@@ -418,30 +436,20 @@ class Tile(Artist):
 
 
 @autoprop
-class Background:
+class Background(HoldUpdatesMixin):
 
     def __init__(self, rect, *, batch, color=None, center=None,
             top=None, bottom=None, left=None, right=None, 
             top_left=None, top_right=None, bottom_left=None, bottom_right=None,
             vtile=True, htile=True, group=None, usage='static'):
 
+        super().__init__()
+
         self._rect = rect
         self._color = color
         self._color_artist = None
         self._color_group = None
-        self._tile_images = {
-                ij: img for ij, img in {
-                    (0,0): top_left,
-                    (0,1): top,
-                    (0,2): top_right,
-                    (1,0): left,
-                    (1,1): center,
-                    (1,2): right,
-                    (2,0): bottom_left,
-                    (2,1): bottom,
-                    (2,2): bottom_right,
-                }.items()
-                if img is not None}
+        self._tile_images = {}
         self._tile_artists = {}
         self._tile_group = None
         self._htile = htile
@@ -451,8 +459,19 @@ class Background:
         self._usage = usage
 
         self._update_group()
-        self._update_tiles()
+        self.set_images(
+                center=center,
+                top=top,
+                bottom=bottom,
+                left=left,
+                right=right,
+                top_left=top_left,
+                top_right=top_right,
+                bottom_left=bottom_left,
+                bottom_right=bottom_right,
+        )
 
+    @update_function(1)
     def _update_group(self):
         self._color_group = pyglet.graphics.OrderedGroup(0, self._group)
         self._tile_group = pyglet.graphics.OrderedGroup(1, self._group)
@@ -461,34 +480,15 @@ class Background:
         for artist in self._tile_artists:
             artist.group = self._tile_group
 
+    @update_function(2)
     def _update_tiles(self):
-        # Draw a colored rectangle behind everything else if the user provided 
-        # a color.
-
-        have_artist = self._color_artist is not None
-        have_color = self._color is not None
-
-        if have_color and have_artist:
-            self._color_artist.color = self._color
-
-        if have_color and not have_artist:
-            self._color_artist = Rectangle(
-                    rect=self._rect,
-                    color=self._color, 
-                    batch=self._batch,
-                    group=self._color_group,
-            )
-        if not have_color and have_artist:
-            self._color_artist.delete()
-            self._color_artist = None
-
         # Create a grid of rectangles with enough space for all the images the 
         # user gave.  Whether or not the background can tile (vertically or 
         # horizontally) affects how much space the grid takes up.
 
-        grid = make_grid(
-                rect=self._rect,
-                cells={
+        grid = Grid(
+                bounding_rect=self._rect,
+                min_cell_rects={
                     ij: Rect.from_size(img.width, img.height)
                     for ij, img in self._tile_images.items()
                 },
@@ -499,6 +499,39 @@ class Background:
                 default_row_height=0,
                 default_col_width=0,
         )
+        tile_rects = grid.make_cells()
+
+        # Draw a colored rectangle behind everything else if the user provided 
+        # a color.
+
+        have_artist = self._color_artist is not None
+        have_color = self._color is not None
+        color_rect = grid.rect if self._tile_images else self._rect
+
+        if have_color and have_artist:
+            self._color_artist.rect = color_rect
+            self._color_artist.color = self._color
+
+        if have_color and not have_artist:
+            self._color_artist = Rectangle(
+                    rect=color_rect,
+                    color=self._color, 
+                    batch=self._batch,
+                    group=self._color_group,
+            )
+        if not have_color and have_artist:
+            self._color_artist.delete()
+            self._color_artist = None
+
+        # Decide which images to tile.
+
+        vtile_flags = defaultdict(lambda: False)
+        htile_flags = defaultdict(lambda: False)
+
+        for ij in (1,0), (1,1), (1,2):
+            vtile_flags[ij] = self._vtile
+        for ij in (0,1), (1,1), (2,1):
+            htile_flags[ij] = self._htile
 
         # Draw all the images that the user provided.  The logic is a little 
         # complicated to deal with the fact the we might have to add or remove 
@@ -513,65 +546,23 @@ class Background:
 
         for ij in artists_to_add:
             self._tile_artists[ij] = Tile(
-                    rect=grid[ij],
+                    rect=tile_rects[ij],
                     image=self._tile_images[ij],
+                    vtile=vtile_flags[ij],
+                    htile=htile_flags[ij],
                     batch=self._batch,
                     group=self._tile_group,
             )
         for ij in artists_to_update:
-            self._tile_artists[ij].rect = grid[ij]
-            self._tile_artists[ij].image = self._images[ij]
-
+            self._tile_artists[ij].rect = tile_rects[ij]
+            self._tile_artists[ij].set_image(
+                    self._images[ij],
+                    vtile=vtile_flags[ij],
+                    htile=htile_flags[ij],
+            )
         for key in artists_to_remove:
             self._tile_artists[ij].delete()
             del self._tile_artists[key]
-
-        # Specify which images should tile.  This is done after the rects and 
-        # images are set just because it's easier this way.
-
-        vtile_keys = image_keys & {(1,0), (1,1), (1,2)}
-        htile_keys = image_keys & {(0,1), (1,1), (2,1)}
-
-        for ij in vtile_keys:
-            self._tile_artists[ij].vtile = self._vtile
-
-        for ij in htile_keys:
-            self._tile_artists[ij].htile = self._htile
-
-    def _make_image_accessors(row, col):
-
-        def getter(self):
-            return self._tile_images[row, col]
-
-        def setter(self, new_image):
-            self._tile_images[row, col] = new_image
-            self._update_tiles()
-
-        def deleter(self):
-            del self._tiles_images[row, col]
-
-        return getter, setter, deleter
-
-    get_top_left_image, set_top_left_image, del_top_left_image = \
-            _make_image_accessors(0, 0)
-    get_top_image, set_top_image, del_top_image = \
-            _make_image_accessors(0, 1)
-    get_top_right_image, set_top_right_image, del_top_right_image = \
-            _make_image_accessors(0, 2)
-    get_left_image, set_left_image, del_left_image = \
-            _make_image_accessors(1, 0)
-    get_center_image, set_center_image, del_center_image = \
-            _make_image_accessors(1, 1)
-    get_right_image, set_right_image, del_right_image = \
-            _make_image_accessors(1, 2)
-    get_bottom_left_image, set_bottom_left_image, del_bottom_left_image = \
-            _make_image_accessors(2, 0)
-    get_bottom_image, set_bottom_image, del_bottom_image = \
-            _make_image_accessors(2, 1)
-    get_bottom_right_image, set_bottom_right_image, del_bottom_right_image = \
-            _make_image_accessors(2, 2)
-
-    del _make_image_accessors
 
     def get_rect(self):
         return self._rect
@@ -579,7 +570,14 @@ class Background:
     def set_rect(self, new_rect):
         if self._rect != new_rect:
             self._rect = new_rect
-            self._update_tiles()
+            self.update_rect()
+
+    def update_rect(self):
+        """
+        Call this method to update the tile after you've made an in-place 
+        change to its rectangle.
+        """
+        self._update_tiles()
 
     def get_color(self):
         return self._color
@@ -592,21 +590,28 @@ class Background:
     def del_color(self):
         self.set_color(None)
 
-    def get_htile(self):
-        return self._htile
+    def set_images(self, *, center=None, top=None, bottom=None, left=None, 
+            right=None, top_left=None, top_right=None, bottom_left=None, 
+            bottom_right=None, vtile=None, htile=None):
 
-    def set_htile(self, new_htile):
-        if self._htile != new_htile:
-            self._htile = new_htile
-            self._update_tiles()
+        self._tile_images = {
+                ij: img for ij, img in {
+                    (0,0): top_left,
+                    (0,1): top,
+                    (0,2): top_right,
+                    (1,0): left,
+                    (1,1): center,
+                    (1,2): right,
+                    (2,0): bottom_left,
+                    (2,1): bottom,
+                    (2,2): bottom_right,
+                }.items()
+                if img is not None}
 
-    def get_vtile(self):
-        return self._vtile
+        if vtile is not None: self._vtile = vtile
+        if htile is not None: self._htile = htile
 
-    def set_vtile(self, new_vtile):
-        if self._vtile != new_vtile:
-            self._vtile = new_vtile
-            self._update_tiles()
+        self._update_tiles()
 
     def get_batch(self):
         return self._batch
@@ -781,6 +786,8 @@ class Grid:
         self._min_width = 0
         self._row_heights = {}
         self._col_widths = {}
+        self._width = 0
+        self._height = 0
         self._cell_rects = {}
 
         # Attributes that manage the cache.
@@ -803,6 +810,15 @@ class Grid:
         self._update_cells()
 
         return self._cell_rects
+
+    def get_width(self):
+        return self._width
+
+    def get_height(self):
+        return self._height
+
+    def get_rect(self):
+        return Rect.from_size(self._width, self._height)
 
     def get_min_width(self):
         return self._min_width
@@ -1129,6 +1145,9 @@ class Grid:
             for i in self._expandable_rows:
                 self._row_heights[i] = expandable_row_height
 
+        self._height = sum(self._row_heights.values()) \
+                + self._padding + (self._num_rows + 1)
+
     def _find_col_widths(self):
         self._col_widths = self._fixed_col_widths.copy()
 
@@ -1141,6 +1160,9 @@ class Grid:
 
             for j in self._expandable_cols:
                 self._col_widths[j] = expandable_col_width
+
+        self._width = sum(self._col_widths.values()) \
+                + self._padding + (self._num_cols + 1)
 
     def _find_cell_rects(self):
         self._cell_rects = {}

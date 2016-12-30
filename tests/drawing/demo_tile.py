@@ -22,7 +22,8 @@ images = [
         pyglet.image.load('tile_brown.png'),
         pyglet.image.load('tile_teal.png'),
 ]
-artist = glooey.drawing.Tile(rect, images[0], batch=batch)
+artist = glooey.drawing.Tile(
+        rect, images[0], vtile=True, htile=True, batch=batch)
 
 @window.event
 def on_draw():
@@ -36,7 +37,7 @@ def on_mouse_press(x, y, button, modifiers):
 
 @window.event
 def on_mouse_scroll(x, y, dx, dy):
-    artist.rect = artist.rect.grow(5*dy)
+    artist.rect = artist.rect.get_grown(5*dy)
 
 @window.event
 def on_key_press(symbol, modifier):

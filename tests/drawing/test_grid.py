@@ -387,25 +387,25 @@ def test_setters():
     grid.set_min_cell_rects({(0,0): Rect.from_size(20, 20)})
     assert grid.make_claim() == (33, 33)
 
-    grid.unset_min_cell_rects()
+    grid.del_min_cell_rects()
     assert grid.make_claim() == (23, 23)
 
     grid.set_min_cell_rect(0, 0, Rect.from_size(20, 20))
     assert grid.make_claim() == (33, 33)
 
-    grid.unset_min_cell_rect(0, 0)
+    grid.del_min_cell_rect(0, 0)
     assert grid.make_claim() == (23, 23)
 
     grid.set_row_height(0, 20)
     assert grid.make_claim() == (23, 33)
 
-    grid.unset_row_height(0)
+    grid.del_row_height(0)
     assert grid.make_claim() == (23, 23)
 
     grid.set_col_width(0, 20)
     assert grid.make_claim() == (33, 23)
 
-    grid.unset_col_width(0)
+    grid.del_col_width(0)
     assert grid.make_claim() == (23, 23)
 
 def test_negative_sizes():
