@@ -1,6 +1,7 @@
 import math
 import pyglet
 import more_itertools
+import autoprop
 import vecrec
 
 from pprint import pprint
@@ -200,6 +201,7 @@ rainbow_cycle = red, orange, yellow, green, blue, purple, brown
 
 # Drawing utilities
 
+@autoprop
 class Artist:
 
     def __init__(self, batch, group, count, mode, *data):
@@ -218,32 +220,22 @@ class Artist:
             self._batch.migrate(
                     self._vertex_list, self._mode, self._group, new_batch)
 
-    batch = property(get_batch, set_batch)
-
     def get_group(self):
         return self._group
 
     def set_group(self, new_group):
-        if self._parent_group is not new_group:
+        if self._group is not new_group:
             self._group = new_group
             self._update_group()
-
-    group = property(get_group, set_group)
 
     def get_count(self):
         return self._count
 
-    count = property(get_count)
-
     def get_mode(self):
         return self._mode
 
-    mode = property(get_mode)
-
     def get_vertex_list(self):
         return self._vertex_list
-
-    vertex_list = property(get_vertex_list)
 
     def delete(self):
         self._vertex_list.delete()
@@ -260,6 +252,7 @@ class Artist:
         )
 
 
+@autoprop
 class Rectangle(Artist):
 
     def __init__(self, rect, color=green,
@@ -282,8 +275,6 @@ class Rectangle(Artist):
                 new_rect.top_left.tuple
         )
 
-    rect = property(get_rect, set_rect)
-
     def get_color(self):
         return self._color
 
@@ -291,12 +282,11 @@ class Rectangle(Artist):
         self._color = new_color
         self.vertex_list.colors = 4 * new_color.tuple
 
-    color = property(get_color, set_color)
 
-
+@autoprop
 class Tile(Artist):
 
-    def __init__(self, rect, image, htile=True, vtile=True,
+    def __init__(self, rect, image, htile=False, vtile=False,
             blend_src=GL_SRC_ALPHA, blend_dest=GL_ONE_MINUS_SRC_ALPHA,
             batch=None, group=None, usage='static'):
 
@@ -315,66 +305,58 @@ class Tile(Artist):
         return self._rect
 
     def set_rect(self, new_rect):
-        self._rect = new_rect
-        self._update_vertex_list()
-
-    rect = property(get_rect, set_rect)
+        if self._rect != new_rect:
+            self._rect = new_rect
+            self._update_vertex_list()
 
     def get_image(self):
         return self._image
 
     def set_image(self, new_image, htile=None, vtile=None):
+        # Don't bother redrawing everything if nothing changed.
+        if self._image is new_image:
+            if htile is None or self._htile == htile:
+                if vtile is None or self._vtile == vtile:
+                    return
+
         self._image = new_image
         if htile is not None: self._htile = htile
         if vtile is not None: self._vtile = vtile
+
         self._update_group()
         self._update_vertex_list()
-
-    image = property(get_image, set_image)
 
     def get_htile(self):
         return self._htile
 
     def set_htile(self, new_htile):
-        self._htile = new_htile
-        self._update_vertex_list()
-
-    htile = property(get_htile, set_htile)
+        if self._htile != new_htile:
+            self._htile = new_htile
+            self._update_vertex_list()
 
     def get_vtile(self):
         return self._vtile
 
     def set_vtile(self, new_vtile):
-        self._vtile = new_vtile
-        self._update_vertex_list()
-
-    vtile = property(get_vtile, set_vtile)
+        if self._vtile != new_vtile:
+            self._vtile = new_vtile
+            self._update_vertex_list()
 
     def get_blend_src(self):
         return self._blend_src
 
     def set_blend_src(self, new_blend_src):
-        self._blend_src = new_blend_src
-        self._update_group()
-
-    blend_src = property(get_blend_src, set_blend_src)
+        if self._blend_src != new_blend_src:
+            self._blend_src = new_blend_src
+            self._update_group()
 
     def get_blend_dest(self):
         return self._blend_dest
 
     def set_blend_dest(self, new_blend_dest):
-        self._blend_dest = new_blend_dest
-        self._update_group()
-
-    blend_dest = property(get_blend_dest, set_blend_dest)
-
-    def _group_factory(self, parent):
-        return pyglet.sprite.SpriteGroup(
-                self._image.get_texture(),
-                self._blend_src,
-                self._blend_dest,
-                parent=parent,
-        )
+        if self._blend_dest != new_blend_dest:
+            self._blend_dest = new_blend_dest
+            self._update_group()
 
     def _update_vertex_list(self):
         texture = self._image.get_texture()
@@ -425,6 +407,244 @@ class Tile(Artist):
                 self._rect.top_right.tuple +
                 self._rect.top_left.tuple
         )
+
+    def _group_factory(self, parent):
+        return pyglet.sprite.SpriteGroup(
+                self._image.get_texture(),
+                self._blend_src,
+                self._blend_dest,
+                parent=parent,
+        )
+
+
+@autoprop
+class Background:
+
+    def __init__(self, rect, *, batch, color=None, center=None,
+            top=None, bottom=None, left=None, right=None, 
+            top_left=None, top_right=None, bottom_left=None, bottom_right=None,
+            vtile=True, htile=True, group=None, usage='static'):
+
+        self._rect = rect
+        self._color = color
+        self._color_artist = None
+        self._color_group = None
+        self._tile_images = {
+                ij: img for ij, img in {
+                    (0,0): top_left,
+                    (0,1): top,
+                    (0,2): top_right,
+                    (1,0): left,
+                    (1,1): center,
+                    (1,2): right,
+                    (2,0): bottom_left,
+                    (2,1): bottom,
+                    (2,2): bottom_right,
+                }.items()
+                if img is not None}
+        self._tile_artists = {}
+        self._tile_group = None
+        self._htile = htile
+        self._vtile = vtile
+        self._batch = batch
+        self._group = group
+        self._usage = usage
+
+        self._update_group()
+        self._update_tiles()
+
+    def _update_group(self):
+        self._color_group = pyglet.graphics.OrderedGroup(0, self._group)
+        self._tile_group = pyglet.graphics.OrderedGroup(1, self._group)
+        if self._color_artist:
+            self._color_artist.group = self._color_group
+        for artist in self._tile_artists:
+            artist.group = self._tile_group
+
+    def _update_tiles(self):
+        # Draw a colored rectangle behind everything else if the user provided 
+        # a color.
+
+        have_artist = self._color_artist is not None
+        have_color = self._color is not None
+
+        if have_color and have_artist:
+            self._color_artist.color = self._color
+
+        if have_color and not have_artist:
+            self._color_artist = Rectangle(
+                    rect=self._rect,
+                    color=self._color, 
+                    batch=self._batch,
+                    group=self._color_group,
+            )
+        if not have_color and have_artist:
+            self._color_artist.delete()
+            self._color_artist = None
+
+        # Create a grid of rectangles with enough space for all the images the 
+        # user gave.  Whether or not the background can tile (vertically or 
+        # horizontally) affects how much space the grid takes up.
+
+        grid = make_grid(
+                rect=self._rect,
+                cells={
+                    ij: Rect.from_size(img.width, img.height)
+                    for ij, img in self._tile_images.items()
+                },
+                num_rows=3,
+                num_cols=3,
+                row_heights={1: 'expand' if self._vtile else 0},
+                col_widths={1: 'expand' if self._htile else 0},
+                default_row_height=0,
+                default_col_width=0,
+        )
+
+        # Draw all the images that the user provided.  The logic is a little 
+        # complicated to deal with the fact the we might have to add or remove 
+        # tile artists.
+
+        image_keys = set(self._tile_images)
+        artist_keys = set(self._tile_artists)
+
+        artists_to_add = image_keys - artist_keys
+        artists_to_update = image_keys & artist_keys
+        artists_to_remove = artist_keys - image_keys
+
+        for ij in artists_to_add:
+            self._tile_artists[ij] = Tile(
+                    rect=grid[ij],
+                    image=self._tile_images[ij],
+                    batch=self._batch,
+                    group=self._tile_group,
+            )
+        for ij in artists_to_update:
+            self._tile_artists[ij].rect = grid[ij]
+            self._tile_artists[ij].image = self._images[ij]
+
+        for key in artists_to_remove:
+            self._tile_artists[ij].delete()
+            del self._tile_artists[key]
+
+        # Specify which images should tile.  This is done after the rects and 
+        # images are set just because it's easier this way.
+
+        vtile_keys = image_keys & {(1,0), (1,1), (1,2)}
+        htile_keys = image_keys & {(0,1), (1,1), (2,1)}
+
+        for ij in vtile_keys:
+            self._tile_artists[ij].vtile = self._vtile
+
+        for ij in htile_keys:
+            self._tile_artists[ij].htile = self._htile
+
+    def _make_image_accessors(row, col):
+
+        def getter(self):
+            return self._tile_images[row, col]
+
+        def setter(self, new_image):
+            self._tile_images[row, col] = new_image
+            self._update_tiles()
+
+        def deleter(self):
+            del self._tiles_images[row, col]
+
+        return getter, setter, deleter
+
+    get_top_left_image, set_top_left_image, del_top_left_image = \
+            _make_image_accessors(0, 0)
+    get_top_image, set_top_image, del_top_image = \
+            _make_image_accessors(0, 1)
+    get_top_right_image, set_top_right_image, del_top_right_image = \
+            _make_image_accessors(0, 2)
+    get_left_image, set_left_image, del_left_image = \
+            _make_image_accessors(1, 0)
+    get_center_image, set_center_image, del_center_image = \
+            _make_image_accessors(1, 1)
+    get_right_image, set_right_image, del_right_image = \
+            _make_image_accessors(1, 2)
+    get_bottom_left_image, set_bottom_left_image, del_bottom_left_image = \
+            _make_image_accessors(2, 0)
+    get_bottom_image, set_bottom_image, del_bottom_image = \
+            _make_image_accessors(2, 1)
+    get_bottom_right_image, set_bottom_right_image, del_bottom_right_image = \
+            _make_image_accessors(2, 2)
+
+    del _make_image_accessors
+
+    def get_rect(self):
+        return self._rect
+
+    def set_rect(self, new_rect):
+        if self._rect != new_rect:
+            self._rect = new_rect
+            self._update_tiles()
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, new_color):
+        if self._color != new_color:
+            self._color = new_color
+            self._update_tiles()
+
+    def del_color(self):
+        self.set_color(None)
+
+    def get_htile(self):
+        return self._htile
+
+    def set_htile(self, new_htile):
+        if self._htile != new_htile:
+            self._htile = new_htile
+            self._update_tiles()
+
+    def get_vtile(self):
+        return self._vtile
+
+    def set_vtile(self, new_vtile):
+        if self._vtile != new_vtile:
+            self._vtile = new_vtile
+            self._update_tiles()
+
+    def get_batch(self):
+        return self._batch
+
+    def set_batch(self, new_batch):
+        if self._batch is not new_batch:
+            self._batch = new_batch
+            if self._color_artist:
+                self._color_artist.batch = new_batch
+            for artist in self._tile_artists:
+                artist.batch = new_batch
+
+    def get_group(self):
+        return self._group
+
+    def set_group(self, new_group):
+        if self._group != new_group:
+            self._group = new_group
+            self._update_group()
+
+    def get_usage(self):
+        return self._usage
+
+    def set_usage(self, new_usage):
+        if self._usage != new_usage:
+            self._usage = new_usage
+            self._color_artist = None
+            self._tile_artists = {}
+            self._update_tiles()
+
+    def delete(self):
+        if self._color_artist:
+            self._color_artist.delete()
+        for artist in self._tile_artists:
+            artist.delete()
+
+        self._color_artist = None
+        self._tile_artists = {}
 
 
 
@@ -989,6 +1209,7 @@ class WhereStencilIsnt (OrderedGroup):
 
 # Rectangle placement utilities
 
+@autoprop
 class Grid:
 
     def __init__(self, *, bounding_rect=None, min_cell_rects={},
@@ -1049,8 +1270,6 @@ class Grid:
     def get_min_width(self):
         return self._min_width
 
-    min_width = property(get_min_width)
-
     def get_min_height(self):
         return self._min_height
 
@@ -1058,8 +1277,6 @@ class Grid:
 
     def get_min_bounding_rect(self):
         return Rect.from_size(self._min_width, self._min_height)
-
-    min_bounding_rect = property(get_min_bounding_rect)
 
     def get_cell_rects(self):
         return self._cell_rects
@@ -1074,8 +1291,6 @@ class Grid:
             self._bounding_rect = new_rect
             self._invalidate_cells()
 
-    bounding_rect = property(get_bounding_rect, set_bounding_rect)
-
     def get_min_cell_rect(self, i, j):
         return self._min_cell_rects[i,j]
 
@@ -1083,6 +1298,11 @@ class Grid:
         if (i,j) not in self._min_cell_rects or \
                 self._min_cell_rects[i,j] != new_rect:
             self._min_cell_rects[i,j] = new_rect
+            self._invalidate_shape()
+
+    def del_min_cell_rect(self, i, j):
+        if (i,j) in self._min_cell_rects:
+            del self._min_cell_rects[i,j]
             self._invalidate_shape()
 
     def get_min_cell_rects(self):
@@ -1093,14 +1313,7 @@ class Grid:
             self._min_cell_rects = new_rects
             self._invalidate_shape()
 
-    min_cell_rects = property(get_min_cell_rects, set_min_cell_rects)
-
-    def unset_min_cell_rect(self, i, j):
-        if (i,j) in self._min_cell_rects:
-            del self._min_cell_rects[i,j]
-            self._invalidate_shape()
-
-    def unset_min_cell_rects(self):
+    def del_min_cell_rects(self):
         if self._min_cell_rects:
             self._min_cell_rects = {}
             self._invalidate_shape()
@@ -1112,16 +1325,12 @@ class Grid:
         self._requested_num_rows = new_num
         self._invalidate_shape()
 
-    num_rows = property(get_num_rows, set_num_rows)
-
     def get_num_cols(self):
         return self._num_cols
 
     def set_num_cols(self, new_num):
         self._requested_num_cols = new_num
         self._invalidate_shape()
-
-    num_cols = property(get_num_cols, set_num_cols)
 
     def get_padding(self):
         return self._padding
@@ -1130,13 +1339,15 @@ class Grid:
         self._padding = new_padding
         self._invalidate_claim()
 
-    padding = property(get_padding, set_padding)
-
     def get_row_height(self, i):
         return self._row_heights[i]
 
     def set_row_height(self, i, new_height):
         self._requested_row_heights[i] = new_height
+        self._invalidate_claim()
+
+    def del_row_height(self, i):
+        del self._requested_row_heights[i]
         self._invalidate_claim()
 
     def get_row_heights(self):
@@ -1146,13 +1357,19 @@ class Grid:
         self._requested_row_heights = new_heights
         self._invalidate_claim()
 
-    row_heights = property(get_row_heights, set_row_heights)
+    def del_row_heights(self):
+        self._requested_row_heights = {}
+        self._invalidate_claim()
 
     def get_col_width(self, j):
         return self._col_widths[j]
 
     def set_col_width(self, j, new_width):
         self._requested_col_widths[j] = new_width
+        self._invalidate_claim()
+
+    def del_col_width(self, j):
+        del self._requested_col_widths[j]
         self._invalidate_claim()
 
     def get_col_widths(self):
@@ -1162,14 +1379,8 @@ class Grid:
         self._requested_col_widths = new_widths
         self._invalidate_claim()
 
-    col_widths = property(get_col_widths, set_col_widths)
-
-    def unset_row_height(self, i):
-        del self._requested_row_heights[i]
-        self._invalidate_claim()
-
-    def unset_col_width(self, j):
-        del self._requested_col_widths[j]
+    def del_col_widths(self):
+        self._requested_col_widths = {}
         self._invalidate_claim()
 
     def get_default_row_height(self):
@@ -1179,9 +1390,6 @@ class Grid:
         self._default_row_height = new_height
         self._invalidate_claim()
 
-    default_row_height = property(
-            get_default_row_height, set_default_row_height)
-
     def get_default_col_width(self):
         return self._default_col_width
 
@@ -1189,13 +1397,8 @@ class Grid:
         self._default_col_width = new_width
         self._invalidate_claim()
 
-    default_col_width = property(
-            get_default_col_width, set_default_col_width)
-
     def get_requested_num_rows(self):
         return self._requested_num_rows
-
-    requested_num_rows = property(get_requested_num_rows)
 
     def get_requested_num_cols(self):
         return self._requested_num_cols
@@ -1208,15 +1411,11 @@ class Grid:
     def get_requested_row_heights(self):
         return self._requested_row_heights
 
-    requested_row_heights = property(get_requested_row_heights)
-
     def get_requested_col_width(self, i):
         return self._requested_col_widths[i]
 
     def get_requested_col_widths(self):
         return self._requested_col_widths
-
-    requested_col_widths = property(get_requested_col_widths)
 
     def _invalidate_shape(self):
         self._is_shape_stale = True

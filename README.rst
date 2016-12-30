@@ -5,29 +5,34 @@ glooey --- An object-oriented GUI library for pyglet
 Widget Wishlist
 ===============
 Containers:
-- [X] Gui
-- [ ] Dialog
-- [X] PanningGui
-- [X] Viewport
-- [X] Frame
-- [X] Grid
-- [X] Stack
-- [X] HBoX
-- [X] VBoX
-- [ ] HScrollBoX
-- [ ] VScrollBoX
-- [ ] HVScrollBoX
+[X] Gui
+[ ] Dialog
+[X] PanningGui
+[X] Viewport
+[X] Frame
+[X] Grid
+[X] Stack
+[X] HBoX
+[X] VBoX
+[ ] HScrollBoX
+[ ] VScrollBoX
+[ ] HVScrollBoX
 
 Widgets:
-- [X] Label
-- [ ] Entry
-- [X] Image
-- [ ] Background
-- [X] Button
-- [X] CheckboX
-- [X] RadioButton
-- [ ] DropdownMenu
-- [ ] ToolTip
+[X] Label
+[ ] Entry
+[X] Image
+[ ] Background
+[X] Button
+[X] CheckboX
+[X] RadioButton
+[ ] DropdownMenu
+[ ] ToolTip
+
+Bugs
+====
+- Attaching on_mouse_press handlers that add or remove widgets to those same 
+  widgets is broken in some confusing way...
 
 Implementation thoughts
 =======================
