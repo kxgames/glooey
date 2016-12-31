@@ -1,4 +1,5 @@
 import pyglet
+import autoprop
 
 from vecrec import Vector, Rect
 from pprint import pprint
@@ -347,6 +348,70 @@ class Image(Widget):
             self.repack(force=True)
 
     image = late_binding_property(get_image, set_image)
+
+
+@autoprop
+class Background(Widget):
+
+    def __init__(self, *, color=None, center=None, top=None, bottom=None, 
+            left=None, right=None, top_left=None, top_right=None, 
+            bottom_left=None, bottom_right=None, vtile=False, htile=False):
+
+        super().__init__()
+        self._artist = drawing.Background(
+                color=color,
+                center=center,
+                top=top,
+                bottom=bottom,
+                left=left,
+                right=right,
+                top_left=top_left,
+                top_right=top_right,
+                bottom_left=bottom_left,
+                bottom_right=bottom_right,
+                vtile=vtile,
+                htile=htile,
+        )
+
+    def do_attach(self):
+        self._artist.batch = self.batch
+
+    def do_claim(self):
+        return self._artist.min_size
+
+    def do_resize(self):
+        self._artist.rect = self.rect
+
+    def do_regroup(self):
+        self._artist.group = self.group
+
+    def get_color(self):
+        return self._artist.color
+
+    def set_color(self, new_color):
+        self._artist.color = new_color
+
+    def del_color(self):
+        del self._artist.color
+
+    def set_images(self, *, center=None, top=None, bottom=None, left=None, 
+            right=None, top_left=None, top_right=None, bottom_left=None, 
+            bottom_right=None, vtile=None, htile=None):
+
+        self._artist.set_images(
+                center=center,
+                top=top,
+                bottom=bottom,
+                left=left,
+                right=right,
+                top_left=top_left,
+                top_right=top_right,
+                bottom_left=bottom_left,
+                bottom_right=bottom_right,
+                vtile=vtile,
+                htile=htile,
+        )
+        self.repack(force=True)
 
 
 class Button(Widget):

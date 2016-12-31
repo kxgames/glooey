@@ -14,25 +14,27 @@ rects = glooey.drawing.make_grid(
         padding=40,
 )
 bg1 = glooey.drawing.Background(
-        rects[0,0],
+        rect=rects[0,0],
         color=glooey.drawing.Color.from_hex('#847e87'),
         batch=batch,
 )
 bg2 = glooey.drawing.Background(
-        rects[0,1],
+        rect=rects[0,1],
         center=pyglet.image.load('frame_center.png'),
+        vtile=True,
+        htile=True,
         batch=batch,
 )
 bg3 = glooey.drawing.Background(
-        rects[1,0],
+        rect=rects[1,0],
         left=pyglet.image.load('header_left.png'),
         center=pyglet.image.load('header_center.png'),
         right=pyglet.image.load('header_right.png'),
-        vtile=False,
+        htile=True,
         batch=batch,
 )
 bg4 = glooey.drawing.Background(
-        rects[1,1],
+        rect=rects[1,1],
         center=pyglet.image.load('frame_center.png'),
         left=pyglet.image.load('frame_left.png'),
         right=pyglet.image.load('frame_right.png'),
@@ -42,6 +44,8 @@ bg4 = glooey.drawing.Background(
         top_right=pyglet.image.load('frame_top_right.png'),
         bottom_left=pyglet.image.load('frame_bottom_left.png'),
         bottom_right=pyglet.image.load('frame_bottom_right.png'),
+        vtile=True,
+        htile=True,
         batch=batch,
 )
 

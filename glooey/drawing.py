@@ -438,13 +438,19 @@ class Tile(Artist):
 @autoprop
 class Background(HoldUpdatesMixin):
 
-    def __init__(self, rect, *, batch, color=None, center=None,
-            top=None, bottom=None, left=None, right=None, 
-            top_left=None, top_right=None, bottom_left=None, bottom_right=None,
-            vtile=True, htile=True, group=None, usage='static'):
+    def __init__(self, *, rect=None, color=None, center=None, top=None, 
+            bottom=None, left=None, right=None, top_left=None, top_right=None, 
+            bottom_left=None, bottom_right=None, vtile=False, htile=False, 
+            batch=None, group=None, usage='static'):
 
         super().__init__()
 
+        self._grid = Grid(
+                num_rows=3,
+                num_cols=3,
+                default_row_height=0,
+                default_col_width=0,
+        )
         self._rect = rect
         self._color = color
         self._color_artist = None
@@ -477,36 +483,30 @@ class Background(HoldUpdatesMixin):
         self._tile_group = pyglet.graphics.OrderedGroup(1, self._group)
         if self._color_artist:
             self._color_artist.group = self._color_group
-        for artist in self._tile_artists:
+        for artist in self._tile_artists.values():
             artist.group = self._tile_group
 
     @update_function(2)
     def _update_tiles(self):
+        if self._rect is None or self._batch is None:
+            return
+
         # Create a grid of rectangles with enough space for all the images the 
         # user gave.  Whether or not the background can tile (vertically or 
         # horizontally) affects how much space the grid takes up.
 
-        grid = Grid(
-                bounding_rect=self._rect,
-                min_cell_rects={
-                    ij: Rect.from_size(img.width, img.height)
-                    for ij, img in self._tile_images.items()
-                },
-                num_rows=3,
-                num_cols=3,
-                row_heights={1: 'expand' if self._vtile else 0},
-                col_widths={1: 'expand' if self._htile else 0},
-                default_row_height=0,
-                default_col_width=0,
-        )
-        tile_rects = grid.make_cells()
+        self._grid.bounding_rect = self._rect
+        self._grid.row_heights = {1: 'expand' if self._vtile else 0}
+        self._grid.col_widths = {1: 'expand' if self._htile else 0}
+
+        tile_rects = self._grid.make_cells()
 
         # Draw a colored rectangle behind everything else if the user provided 
         # a color.
 
         have_artist = self._color_artist is not None
         have_color = self._color is not None
-        color_rect = grid.rect if self._tile_images else self._rect
+        color_rect = self._grid.rect if self._tile_images else self._rect
 
         if have_color and have_artist:
             self._color_artist.rect = color_rect
@@ -556,7 +556,7 @@ class Background(HoldUpdatesMixin):
         for ij in artists_to_update:
             self._tile_artists[ij].rect = tile_rects[ij]
             self._tile_artists[ij].set_image(
-                    self._images[ij],
+                    self._tile_images[ij],
                     vtile=vtile_flags[ij],
                     htile=htile_flags[ij],
             )
@@ -578,6 +578,10 @@ class Background(HoldUpdatesMixin):
         change to its rectangle.
         """
         self._update_tiles()
+
+    def get_min_size(self):
+        self._grid.make_claim()
+        return self._grid.min_width, self._grid.min_height
 
     def get_color(self):
         return self._color
@@ -608,6 +612,10 @@ class Background(HoldUpdatesMixin):
                 }.items()
                 if img is not None}
 
+        self._grid.min_cell_rects={
+            ij: Rect.from_size(img.width, img.height)
+            for ij, img in self._tile_images.items()}
+
         if vtile is not None: self._vtile = vtile
         if htile is not None: self._htile = htile
 
@@ -621,7 +629,7 @@ class Background(HoldUpdatesMixin):
             self._batch = new_batch
             if self._color_artist:
                 self._color_artist.batch = new_batch
-            for artist in self._tile_artists:
+            for artist in self._tile_artists.values():
                 artist.batch = new_batch
 
     def get_group(self):
@@ -645,7 +653,7 @@ class Background(HoldUpdatesMixin):
     def delete(self):
         if self._color_artist:
             self._color_artist.delete()
-        for artist in self._tile_artists:
+        for artist in self._tile_artists.values():
             artist.delete()
 
         self._color_artist = None
