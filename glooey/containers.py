@@ -185,48 +185,6 @@ class Bin (Widget, BinMixin, PaddingMixin, PlacementMixin):
                     self._get_placement(self.child))
 
 
-class Frame (Bin):
-
-    def __init__(self, padding=0, placement='fill'):
-        super().__init__(padding, placement)
-        self.edge_image = None
-        self.edge_orientation = None
-        self.corner_image = None
-        self.corner_orientation = None
-        self.vertex_lists = ()
-
-    def set_edge(self, image, orientation='left', autopad=True):
-        self.edge_image = image
-        self.edge_orientation = orientation
-
-        if autopad and orientation in ('top', 'bottom'):
-            self.padding = image.height
-        if autopad and orientation in ('left', 'right'):
-            self.padding = image.width
-
-    def set_corner(self, image, orientation='top left'):
-        if self.edge_image is None:
-            raise RuntimeError("Frame.set_corner() cannot be called until Frame.set_edge() has been.")
-
-        self.corner_image = image
-        self.corner_orientation = orientation
-
-    def do_draw(self):
-        if self.edge_image is None:
-            raise ValueError("Must call Frame.set_edge() before Frame.draw().")
-
-        self.vertex_lists = drawing.draw_frame(
-                self.rect,
-                self.edge_image, self.edge_orientation,
-                self.corner_image, self.corner_orientation,
-                batch=self.batch, group=self.group, usage='static')
-
-    def do_undraw(self):
-        for vertex_list in self.vertex_lists:
-            vertex_list.delete()
-        self.vertex_lists = ()
-
-
 @autoprop
 class Viewport (Widget, BinMixin):
 
