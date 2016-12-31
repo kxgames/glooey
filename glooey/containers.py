@@ -5,6 +5,7 @@ don't draw anything themselves, they just position children widgets.
 
 import pyglet
 import vecrec
+import autoprop
 
 from vecrec import Vector, Rect
 from collections import defaultdict
@@ -69,6 +70,7 @@ def place_widget_in_box(widget, box_rect, key_or_function, widget_rect=None):
     widget.resize(widget_rect)
 
 
+@autoprop
 class BinMixin:
     """
     Provide add() and clear() methods for containers that can only have one 
@@ -101,9 +103,8 @@ class BinMixin:
     def get_child(self):
         return self._child
 
-    child = late_binding_property(get_child)
 
-
+@autoprop
 class PaddingMixin:
 
     def __init__(self, padding=0):
@@ -116,9 +117,8 @@ class PaddingMixin:
         self._padding = new_padding
         self.repack()
 
-    padding = late_binding_property(get_padding, set_padding)
 
-
+@autoprop
 class PlacementMixin:
 
     def __init__(self, placement='fill'):
@@ -131,8 +131,6 @@ class PlacementMixin:
     def set_placement(self, new_placement):
         self._default_placement = new_placement
         self.repack()
-
-    placement = late_binding_property(get_placement, set_placement)
 
     def _get_placement(self, key):
         return self._custom_placements.get(key, self._default_placement)
@@ -152,6 +150,7 @@ class PlacementMixin:
 
 
 
+@autoprop
 class Bin (Widget, BinMixin, PaddingMixin, PlacementMixin):
 
     def __init__(self, padding=0, placement='fill'):
@@ -228,6 +227,7 @@ class Frame (Bin):
         self.vertex_lists = ()
 
 
+@autoprop
 class Viewport (Widget, BinMixin):
 
     class PanningGroup (pyglet.graphics.Group):
@@ -414,12 +414,9 @@ class Viewport (Widget, BinMixin):
             self._deferred_center_of_view = None
 
 
-    # Properties (fold)
-    panning_vector = property(get_panning_vector, set_panning_vector)
-
-
 Viewport.register_event_type('on_mouse_pan')
 
+@autoprop
 class Grid (Widget, PlacementMixin):
 
     def __init__(self, rows=0, cols=0, padding=0, placement='fill'):
@@ -482,8 +479,6 @@ class Grid (Widget, PlacementMixin):
         self._grid.num_rows = new_num
         self.repack()
 
-    num_rows = late_binding_property(get_num_rows, set_num_rows)
-
     def get_num_cols(self):
         return self._grid.num_rows
 
@@ -491,16 +486,12 @@ class Grid (Widget, PlacementMixin):
         self._grid.num_cols = new_num
         self.repack()
 
-    num_cols = late_binding_property(get_num_cols, set_num_cols)
-
     def get_padding(self):
         return self._grid.padding
 
     def set_padding(self, new_padding):
         self._grid.padding = new_padding
         self.repack()
-
-    padding = late_binding_property(get_padding, set_padding)
 
     def get_row_height(self, row):
         return self._grid.row_heights[row]
@@ -574,9 +565,6 @@ class Grid (Widget, PlacementMixin):
         self._grid.default_row_height = new_height
         self.repack()
 
-    default_row_height = late_binding_property(
-            get_default_row_height, set_default_row_height)
-
     def get_default_col_width(self):
         return self._grid.default_col_width
 
@@ -589,10 +577,8 @@ class Grid (Widget, PlacementMixin):
         self._grid.default_col_width = new_width
         self.repack()
 
-    default_col_width = late_binding_property(
-            get_default_col_width, set_default_col_width)
 
-
+@autoprop
 class HVBox (Widget, PlacementMixin):
 
     def __init__(self, padding=0, placement='fill'):
@@ -668,8 +654,6 @@ class HVBox (Widget, PlacementMixin):
     def get_children(self):
         return self._children[:]
 
-    children = late_binding_property(get_children)
-
     def get_padding(self):
         return self._grid.padding
 
@@ -677,9 +661,8 @@ class HVBox (Widget, PlacementMixin):
         self._grid.padding = new_padding
         self.repack()
 
-    padding = late_binding_property(get_padding, set_padding)
 
-
+@autoprop
 class HBox (HVBox):
 
     def do_get_row_col(self, index):
@@ -695,6 +678,7 @@ class HBox (HVBox):
         self._grid.default_col_width = size
 
 
+@autoprop
 class VBox (HVBox):
 
     def do_get_row_col(self, index):
@@ -710,6 +694,7 @@ class VBox (HVBox):
         self._grid.default_row_height = size
 
 
+@autoprop
 class Stack (Widget, PaddingMixin, PlacementMixin):
     """
     Have any number of children, claim enough space for the biggest one, and 
@@ -782,8 +767,6 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
 
     def get_children(self):
         return self._children
-
-    children = late_binding_property(get_children)
 
 
 

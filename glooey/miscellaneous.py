@@ -99,6 +99,7 @@ class EventLogger(PlaceHolder):
         print(message.format(x, y, scroll_x, scroll_y))
 
 
+@autoprop
 class Label(Widget):
 
     def __init__(self, text="", **style):
@@ -188,15 +189,11 @@ class Label(Widget):
             self._line_wrap_width = width
         self.repack(force=True)
 
-    text = late_binding_property(get_text, set_text)
-
     def get_font_name(self):
         return self.get_style('font_name')
 
     def set_font_name(self, name):
         self.set_style(font_name=name)
-
-    font_name = late_binding_property(get_font_name, set_font_name)
 
     def get_font_size(self):
         return self.get_style('font_size')
@@ -204,23 +201,17 @@ class Label(Widget):
     def set_font_size(self, size):
         self.set_style(font_size=size)
 
-    font_size = late_binding_property(get_font_size, set_font_size)
-
     def get_bold(self):
         return self.get_style('bold')
 
     def set_bold(self, bold):
         self.set_style(bold=bold)
 
-    bold = late_binding_property(get_bold, set_bold)
-
     def get_italic(self):
         return self.get_style('italic')
 
     def set_italic(self, italic):
         self.set_style(italic=italic)
-
-    italic = late_binding_property(get_italic, set_italic)
 
     def get_underline(self):
         return self.get_style('underline')
@@ -231,23 +222,17 @@ class Label(Widget):
         else:
             self.set_style(underline=None)
 
-    underline = late_binding_property(get_underline, set_underline)
-
     def get_kerning(self):
         return self.get_style('kerning')
 
     def set_kerning(self, kerning):
         self.set_style(kerning=kerning)
 
-    kerning = late_binding_property(get_kerning, set_kerning)
-
     def get_baseline(self):
         return self.get_style('baseline')
 
     def set_baseline(self, baseline):
         self.set_style(baseline=baseline)
-
-    baseline = late_binding_property(get_baseline, set_baseline)
 
     def get_color(self):
         return self.get_style('color')
@@ -266,8 +251,6 @@ class Label(Widget):
             style['underline'] = color
         self.set_style(**style)
 
-    color = late_binding_property(get_color, set_color)
-
     def get_bg_color(self):
         return self.get_style('background_color')
 
@@ -278,23 +261,17 @@ class Label(Widget):
             color = color.tuple
         self.set_style(background_color=color)
 
-    bg_color = late_binding_property(get_bg_color, set_bg_color)
-
     def get_alignment(self):
         return self.get_style('alignment')
 
     def set_alignment(self, alignment):
         self.set_style(align=alignment)
 
-    alignment = late_binding_property(get_alignment, set_alignment)
-
     def get_line_spacing(self):
         return self.get_style('line_spacing')
 
     def set_line_spacing(self, spacing):
         self.set_style(line_spacing=spacing)
-
-    line_spacing = late_binding_property(get_line_spacing, set_line_spacing)
 
     def get_style(self, style):
         return self._style.get(style)
@@ -311,6 +288,7 @@ class Label(Widget):
         self.enable_line_wrap(0)
 
 
+@autoprop
 class Image(Widget):
 
     def __init__(self, image=None):
@@ -325,6 +303,7 @@ class Image(Widget):
         if self._sprite is not None:
             self._sprite.group = group
 
+    @autoprop
     def do_draw(self):
         if self._sprite is None:
             self._sprite = pyglet.sprite.Sprite(
@@ -346,8 +325,6 @@ class Image(Widget):
         if self._image is not new_image:
             self._image = new_image
             self.repack(force=True)
-
-    image = late_binding_property(get_image, set_image)
 
 
 @autoprop
@@ -414,6 +391,7 @@ class Background(Widget):
         self.repack(force=True)
 
 
+@autoprop
 class Button(Widget):
 
     def __init__(self, text=""):
@@ -493,13 +471,9 @@ class Button(Widget):
 
         return state
 
-    state = late_binding_property(get_state)
-
     def get_image(self, state=None):
         if state is None: state = self.get_state()
         return self._states.get(state)
-
-    image = late_binding_property(get_image)
 
     def set_image(self, state, image):
         self._states[state] = image
@@ -512,15 +486,11 @@ class Button(Widget):
     def set_base_image(self, image):
         self.set_image('base', image)
 
-    base_image = late_binding_property(get_base_image, set_base_image)
-
     def get_over_image(self, image):
         self.get_image('over', image)
 
     def set_over_image(self, image):
         self.set_image('over', image)
-
-    over_image = late_binding_property(get_over_image, set_over_image)
 
     def get_down_image(self, image):
         self.get_image('down', image)
@@ -528,28 +498,20 @@ class Button(Widget):
     def set_down_image(self, image):
         self.set_image('down', image)
 
-    down_image = late_binding_property(get_down_image, set_down_image)
-
     def get_inactive_image(self, image):
         self.get_image('inactive', image)
 
     def set_inactive_image(self, image):
         self.set_image('inactive', image)
 
-    inactive_image = late_binding_property(get_inactive_image, set_inactive_image)
-
     def get_label(self):
         return self._label
-
-    label = late_binding_property(get_label)
 
     def get_text(self):
         return self._label.text
 
     def set_text(self, text):
         self._label.text = text
-
-    text = late_binding_property(get_text, set_text)
 
     def get_label_placement(self, new_placement):
         return self._label_placement
@@ -558,16 +520,12 @@ class Button(Widget):
         self._label_placement = new_placement
         self.repack()
 
-    label_placement = late_binding_property(get_label_placement, set_label_placement)
-
     def get_image_placement(self, new_placement):
         return self._background_placement
 
     def set_image_placement(self, new_placement):
         self._background_placement = new_placement
         self.repack()
-
-    image_placement = late_binding_property(get_image_placement, set_image_placement)
 
     def _update_state(self):
         state = self.get_state()
@@ -578,6 +536,7 @@ class Button(Widget):
 
 Button.register_event_type('on_click')
 
+@autoprop
 class Checkbox(Widget):
 
     def __init__(self):
@@ -676,14 +635,10 @@ class Checkbox(Widget):
 
         return checked_state, mouse_state
 
-    state = late_binding_property(get_state)
-        
     def get_image(self, is_checked=None, mouse_state=None):
         if is_checked is None and mouse_state is None:
             is_checked, mouse_state = self.get_state()
         return self._states[is_checked].get(mouse_state)
-
-    image = late_binding_property(get_image)
 
     def set_image(self, is_checked, mouse_state, image):
         self._states[is_checked][mouse_state] = image
@@ -696,17 +651,11 @@ class Checkbox(Widget):
     def set_base_checked_image(self, image):
         self.set_image(True, 'base', image)
 
-    base_checked_image = late_binding_property(
-            get_base_checked_image, set_base_checked_image)
-
     def get_base_unchecked_image(self):
         return self.get_image(False, 'base')
 
     def set_base_unchecked_image(self, image):
         self.set_image(False, 'base', image)
-
-    base_unchecked_image = late_binding_property(
-            get_base_unchecked_image, set_base_unchecked_image)
 
     def get_over_checked_image(self):
         return self.get_image(True, 'over')
@@ -714,17 +663,11 @@ class Checkbox(Widget):
     def set_over_checked_image(self, image):
         self.set_image(True, 'over', image)
 
-    over_checked_image = late_binding_property(
-            get_over_checked_image, set_over_checked_image)
-
     def get_over_unchecked_image(self):
         return self.get_image(False, 'over')
 
     def set_over_unchecked_image(self, image):
         self.set_image(False, 'over', image)
-
-    over_unchecked_image = late_binding_property(
-            get_over_unchecked_image, set_over_unchecked_image)
 
     def get_down_checked_image(self):
         return self.get_image(True, 'down')
@@ -732,17 +675,11 @@ class Checkbox(Widget):
     def set_down_checked_image(self, image):
         self.set_image(True, 'down', image)
 
-    down_checked_image = late_binding_property(
-            get_down_checked_image, set_down_checked_image)
-
     def get_down_unchecked_image(self):
         return self.get_image(False, 'down')
 
     def set_down_unchecked_image(self, image):
         self.set_image(False, 'down', image)
-
-    down_unchecked_image = late_binding_property(
-            get_down_unchecked_image, set_down_unchecked_image)
 
     def get_inactive_checked_image(self):
         return self.get_image(True, 'inactive')
@@ -750,17 +687,11 @@ class Checkbox(Widget):
     def set_inactive_checked_image(self, image):
         self.set_image(True, 'inactive', image)
 
-    inactive_checked_image = late_binding_property(
-            get_inactive_checked_image, set_inactive_checked_image)
-
     def get_inactive_unchecked_image(self):
         return self.get_image(False, 'inactive')
 
     def set_inactive_unchecked_image(self, image):
         self.set_image(False, 'inactive', image)
-
-    inactive_unchecked_image = late_binding_property(
-            get_inactive_unchecked_image, set_inactive_unchecked_image)
 
     def _update_state(self):
         checked_state, mouse_state = self.get_state()
@@ -772,6 +703,7 @@ class Checkbox(Widget):
 
 Checkbox.register_event_type('on_toggle')
 
+@autoprop
 class RadioButton(Checkbox):
 
     def __init__(self, peers=None):

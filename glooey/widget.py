@@ -1,8 +1,10 @@
 import pyglet
+import autoprop
 from vecrec import Rect
 from pprint import pprint
 from .helpers import *
 
+@autoprop
 class Widget (pyglet.event.EventDispatcher):
 
     def __init__(self):
@@ -363,37 +365,23 @@ class Widget (pyglet.event.EventDispatcher):
     def get_parent(self):
         return self._parent
 
-    parent = late_binding_property(get_parent)
-
     def get_root(self):
         return self.parent.root if self.parent is not None else None
-
-    root = late_binding_property(get_root)
 
     def get_window(self):
         return self.root.window if self.is_attached_to_gui else None
 
-    window = late_binding_property(get_window)
-
     def get_batch(self):
         return self.root.batch if self.is_attached_to_gui else None
-
-    batch = late_binding_property(get_batch)
 
     def get_group(self):
         return self._group
 
-    group = late_binding_property(get_group)
-
     def get_rect(self):
         return self._rect
 
-    rect = late_binding_property(get_rect)
-
     def get_min_rect(self):
         return Rect.from_size(self.min_width, self.min_height)
-
-    min_rect = late_binding_property(get_min_rect)
 
     @property
     def is_attached_to_gui(self):
@@ -590,7 +578,7 @@ class Widget (pyglet.event.EventDispatcher):
     def _get_num_children(self):
         return len(self.__children)
 
-    _num_children = late_binding_property(_get_num_children)
+    _num_children = property(_get_num_children)
 
 
 Widget.register_event_type('on_add_child')

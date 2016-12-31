@@ -1,10 +1,12 @@
 import pyglet
 import vecrec
+import autoprop
 
 from vecrec import Vector, Rect
 from .containers import Bin
 from .helpers import *
 
+@autoprop
 class Root (Bin):
 
     def __init__(self, rect, window, batch=None, group=None):
@@ -52,6 +54,7 @@ class Root (Bin):
         return self._group
 
 
+@autoprop
 class Gui (Root):
 
     def __init__(self, window, batch=None, group=None):
@@ -67,6 +70,7 @@ class Gui (Root):
         self.resize(rect)
 
 
+@autoprop
 class PanningGui (Gui):
     """
     A window with mouse exclusivity enabled.  This makes it possible to 
@@ -198,6 +202,7 @@ class PanningGui (Gui):
 
 PanningGui.register_event_type('on_mouse_pan')
 
+@autoprop
 class Dialog (Root):
     # Have to set size manually.
     pass
