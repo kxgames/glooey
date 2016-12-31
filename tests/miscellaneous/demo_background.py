@@ -29,7 +29,7 @@ root.add(widget)
 
 @window.event
 def on_mouse_scroll(x, y, scroll_x, scroll_y):
-    root.padding = max(root.padding + scroll_y, 0)
+    root.padding = max(root.padding - scroll_y, 0)
 
 
 pyglet.app.run()
