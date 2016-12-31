@@ -6,7 +6,6 @@ from pprint import pprint
 from . import drawing
 from .widget import Widget
 from .containers import place_widget_in_box
-from .helpers import late_binding_property
 
 class PlaceHolder(Widget):
 
