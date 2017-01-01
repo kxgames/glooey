@@ -13,13 +13,13 @@ class Widget (pyglet.event.EventDispatcher):
         self._children_under_mouse = set()
         self._children_can_overlap = True
         self._group = None
-        self._connector = self
         self._rect = None
+        self._hidden = False
         self._is_claim_stale = True
         self._spurious_leave_event = False
         self._draw_status = 'never drawn'
-        self.min_width = 0
-        self.min_height = 0
+        self._min_width = 0
+        self._min_height = 0
 
     def __repr__(self):
         return '{}(id={})'.format(
@@ -55,7 +55,7 @@ class Widget (pyglet.event.EventDispatcher):
                 child.claim()
 
             # Claim space for this widget.
-            self.min_width, self.min_height = self.do_claim()
+            self._min_width, self._min_height = self.do_claim()
 
     def resize(self, new_rect):
         """
@@ -89,9 +89,17 @@ class Widget (pyglet.event.EventDispatcher):
         # isn't ready to draw.
         self.draw()
 
+    def hide(self):
+        self._hidden = True
+        self.undraw_all()
+
+    def unhide(self):
+        self._hidden = False
+        self.draw_all()
+
     def draw(self):
         """
-        In order for a widget to be drawn, three conditions need to be met:
+        In order for a widget to be drawn, four conditions need to be met:
 
         1. The widget must be connected to the root of the widget hierarchy.  
            Widgets get their pyglet batch object from the root widget, so 
@@ -105,6 +113,8 @@ class Widget (pyglet.event.EventDispatcher):
            controls things like how the widget will be stacked or scrolled.  A 
            group is set when the widget is attached to the hierarchy and its 
            parent calls its ``regroup()`` method.
+
+        4. The widget must not be hidden.
 
         If these conditions are not met, the widget not be drawn and a debug- 
         level log message explaining why will be issued.
@@ -125,6 +135,7 @@ class Widget (pyglet.event.EventDispatcher):
         if self.root is None: return
         if self.rect is None: return
         if self.group is None: return
+        if self.is_hidden: return
 
         self.do_draw()
 
@@ -380,8 +391,22 @@ class Widget (pyglet.event.EventDispatcher):
     def get_rect(self):
         return self._rect
 
+    @property
+    def is_hidden(self):
+        return self._hidden
+
+    @property
+    def is_visible(self):
+        return not self._hidden
+
+    def get_min_width(self):
+        return self._min_width
+
+    def get_min_height(self):
+        return self._min_height
+
     def get_min_rect(self):
-        return Rect.from_size(self.min_width, self.min_height)
+        return Rect.from_size(self._min_width, self._min_height)
 
     @property
     def is_attached_to_gui(self):
@@ -433,6 +458,9 @@ class Widget (pyglet.event.EventDispatcher):
 
             if self.group is None:
                 diagnoses.append("{self} was not given a group by its parent.\nThis is probably a bug in the parent widget.")
+
+            if self.is_hidden:
+                diagnoses.append("{self} is currently hidden.\nUse the unhide() method to reveal it.")
 
             if not diagnoses:
                 diagnoses.append("{self} seems to have been drawn.\nCheck for bugs in {self.__class__.__name__}.do_draw()")
@@ -553,12 +581,13 @@ class Widget (pyglet.event.EventDispatcher):
         # z-order is important, but maybe that's something for the specific 
         # parent classes to worry about?
 
+        visible_children = {x for x in self.__children if x.is_visible}
         previously_under_mouse = self._children_under_mouse
         self._children_under_mouse = set()
 
         def yield_previous_children_then_others():
-            yield from self.__children & previously_under_mouse
-            yield from self.__children - previously_under_mouse
+            yield from visible_children & previously_under_mouse
+            yield from visible_children - previously_under_mouse
 
         for child in yield_previous_children_then_others():
             if child.is_under_mouse(x, y):
