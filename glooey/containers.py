@@ -381,6 +381,7 @@ class Grid (Widget, PlacementMixin):
         Widget.__init__(self)
         PlacementMixin.__init__(self, placement)
         self._children = {}
+        self._children_can_overlap = False
         self._grid = drawing.Grid(
                 num_rows=rows,
                 num_cols=cols,
@@ -543,6 +544,7 @@ class HVBox (Widget, PlacementMixin):
         Widget.__init__(self)
         PlacementMixin.__init__(self, placement)
         self._children = []
+        self._children_can_overlap = False
         self._sizes = {}
         self._grid = drawing.Grid(
                 padding=padding,
