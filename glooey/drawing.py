@@ -205,14 +205,18 @@ rainbow_cycle = red, orange, yellow, green, blue, purple, brown
 @autoprop
 class Artist(HoldUpdatesMixin):
 
-    def __init__(self, batch, group, count, mode, *data):
+    def __init__(self, batch, group, count, mode, data, hidden=False):
         super().__init__()
         self._batch = batch
         self._group = group
         self._count = count
         self._mode = mode
-        self._vertex_list = batch.add(
-                count, mode, self._group_factory(group), *data)
+        self._data = data
+        self._vertex_list = None
+
+        if not hidden:
+            self._create_vertex_list()
+            self._update_vertex_list()
 
     def get_batch(self):
         return self._batch
@@ -239,32 +243,50 @@ class Artist(HoldUpdatesMixin):
     def get_vertex_list(self):
         return self._vertex_list
 
-    def delete(self):
+    def hide(self):
         self._vertex_list.delete()
+        self._vertex_list = None
+
+    def unhide(self):
+        if not self._vertex_list:
+            self._create_vertex_list()
+            self._update_vertex_list()
+
+    def _create_vertex_list(self):
+        self._vertex_list = self._batch.add(
+                self._count,
+                self._mode,
+                self._group_factory(self._group),
+                *self._data)
+
+    def _update_vertex_list(self):
+        raise NotImplementedError
 
     def _group_factory(self, parent):
         return parent
 
     @update_function(1)
     def _update_group(self):
-        self._batch.migrate(
-                self._vertex_list,
-                self._mode,
-                self._group_factory(self._group),
-                self._batch,
-        )
+        if self._vertex_list is not None:
+            self._batch.migrate(
+                    self._vertex_list,
+                    self._mode,
+                    self._group_factory(self._group),
+                    self._batch,
+            )
 
 
 @autoprop
 class Rectangle(Artist):
 
-    def __init__(self, rect, color=green,
-            batch=None, group=None, usage='static'):
+    def __init__(self, rect, color=green, *,
+            batch=None, group=None, usage='static', hidden=False):
+
+        self._rect = rect
+        self._color = color
 
         data = 'v2f/' + usage, 'c4B/' + usage
-        super().__init__(batch, group, 4, GL_QUADS, *data)
-        self.rect = rect
-        self.color = color
+        super().__init__(batch, group, 4, GL_QUADS, data, hidden)
 
     def get_rect(self):
         return self._rect
@@ -278,27 +300,36 @@ class Rectangle(Artist):
         Call this method to update the tile after you've made an in-place 
         change to its rectangle.
         """
-        self.vertex_list.vertices = (
-                self._rect.bottom_left.tuple +
-                self._rect.bottom_right.tuple +
-                self._rect.top_right.tuple +
-                self._rect.top_left.tuple
-        )
+        if self.vertex_list:
+            self.vertex_list.vertices = (
+                    self._rect.bottom_left.tuple +
+                    self._rect.bottom_right.tuple +
+                    self._rect.top_right.tuple +
+                    self._rect.top_left.tuple
+            )
 
     def get_color(self):
         return self._color
 
     def set_color(self, new_color):
         self._color = new_color
-        self.vertex_list.colors = 4 * new_color.tuple
+        self.update_color()
+
+    def update_color(self):
+        if self.vertex_list:
+            self.vertex_list.colors = 4 * self._color.tuple
+
+    def _update_vertex_list(self):
+        self.update_rect()
+        self.update_color()
 
 
 @autoprop
 class Tile(Artist):
 
-    def __init__(self, rect, image, htile=False, vtile=False,
+    def __init__(self, rect, image, *, htile=False, vtile=False,
             blend_src=GL_SRC_ALPHA, blend_dest=GL_ONE_MINUS_SRC_ALPHA,
-            batch=None, group=None, usage='static'):
+            batch=None, group=None, usage='static', hidden=False):
 
         self._rect = rect
         self._image = image
@@ -308,8 +339,7 @@ class Tile(Artist):
         self._blend_dest = blend_dest
 
         data = 'v2f/' + usage, 't2f/' + usage
-        super().__init__(batch, group, 4, GL_QUADS, *data)
-        self._update_vertex_list()
+        super().__init__(batch, group, 4, GL_QUADS, data, hidden)
 
     def get_rect(self):
         return self._rect
@@ -377,6 +407,9 @@ class Tile(Artist):
 
     @update_function(2)
     def _update_vertex_list(self):
+        if self._vertex_list is None:
+            return
+
         texture = self._image.get_texture()
 
         # Figure out which texture coordinates are bound to which vertices.  
@@ -402,16 +435,19 @@ class Tile(Artist):
         # dimension being tiled.  If the given image doesn't have a power-of- 
         # two size in that dimension, this extra space would be rendered.
 
-        w, h = 1, 1
-
         if self._htile:
             if not _is_power_of_two(self._image.width):
                 raise UsageError("image is {self._image.width} px wide; can only tile images with power-of-two dimensions")
             w = self._rect.width / self._image.width
+        else:
+            w = a.get_distance(b)
+
         if self._vtile:
             if not _is_power_of_two(self._image.height):
                 raise UsageError("image is {self._image.height} px tall; can only tile images with power-of-two dimensions")
             h = self._rect.height / self._image.height
+        else:
+            h = a.get_distance(d)
 
         A = a
         B = a + (b - a).get_scaled(w)
@@ -441,7 +477,7 @@ class Background(HoldUpdatesMixin):
     def __init__(self, *, rect=None, color=None, center=None, top=None, 
             bottom=None, left=None, right=None, top_left=None, top_right=None, 
             bottom_left=None, bottom_right=None, vtile=False, htile=False, 
-            batch=None, group=None, usage='static'):
+            batch=None, group=None, usage='static', hidden=False):
 
         super().__init__()
 
@@ -452,7 +488,7 @@ class Background(HoldUpdatesMixin):
                 default_col_width=0,
         )
         self._rect = rect
-        self._color = color
+        self._color = None
         self._color_artist = None
         self._color_group = None
         self._tile_images = {}
@@ -463,9 +499,11 @@ class Background(HoldUpdatesMixin):
         self._batch = batch
         self._group = group
         self._usage = usage
+        self._hidden = hidden
 
         self._update_group()
         self.set_images(
+                color=color,
                 center=center,
                 top=top,
                 bottom=bottom,
@@ -488,7 +526,7 @@ class Background(HoldUpdatesMixin):
 
     @update_function(2)
     def _update_tiles(self):
-        if self._rect is None or self._batch is None:
+        if self._hidden or self._rect is None or self._batch is None:
             return
 
         # Create a grid of rectangles with enough space for all the images the 
@@ -520,7 +558,7 @@ class Background(HoldUpdatesMixin):
                     group=self._color_group,
             )
         if not have_color and have_artist:
-            self._color_artist.delete()
+            self._color_artist.hide()
             self._color_artist = None
 
         # Decide which images to tile.
@@ -561,7 +599,7 @@ class Background(HoldUpdatesMixin):
                     htile=htile_flags[ij],
             )
         for key in artists_to_remove:
-            self._tile_artists[ij].delete()
+            self._tile_artists[ij].hide()
             del self._tile_artists[key]
 
     def get_rect(self):
@@ -583,21 +621,18 @@ class Background(HoldUpdatesMixin):
         self._grid.make_claim()
         return self._grid.min_width, self._grid.min_height
 
-    def get_color(self):
-        return self._color
+    def get_images(self):
+        images = self._tile_images.copy()
+        images['color'] = self._color
+        images['htile'] = self._htile
+        images['vtile'] = self._vtile
+        return images
 
-    def set_color(self, new_color):
-        if self._color != new_color:
-            self._color = new_color
-            self._update_tiles()
+    def set_images(self, *, color=None, center=None, top=None, bottom=None, 
+            left=None, right=None, top_left=None, top_right=None, 
+            bottom_left=None, bottom_right=None, vtile=None, htile=None):
 
-    def del_color(self):
-        self.set_color(None)
-
-    def set_images(self, *, center=None, top=None, bottom=None, left=None, 
-            right=None, top_left=None, top_right=None, bottom_left=None, 
-            bottom_right=None, vtile=None, htile=None):
-
+        self._color = color
         self._tile_images = {
                 ij: img for ij, img in {
                     (0,0): top_left,
@@ -620,6 +655,9 @@ class Background(HoldUpdatesMixin):
         if htile is not None: self._htile = htile
 
         self._update_tiles()
+
+    def set_image(self, image):
+        self.set_images(center=image, vtile=False, htile=False)
 
     def get_batch(self):
         return self._batch
@@ -650,14 +688,24 @@ class Background(HoldUpdatesMixin):
             self._tile_artists = {}
             self._update_tiles()
 
-    def delete(self):
+    @property
+    def is_hidden(self):
+        return self._hidden
+
+    def hide(self):
         if self._color_artist:
-            self._color_artist.delete()
+            self._color_artist.hide()
         for artist in self._tile_artists.values():
-            artist.delete()
+            artist.hide()
 
         self._color_artist = None
         self._tile_artists = {}
+        self._hidden = True
+
+    def unhide(self):
+        if self._hidden:
+            self._hidden = False
+            self._update_tiles()
 
 
 

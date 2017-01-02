@@ -144,8 +144,6 @@ class Widget (pyglet.event.EventDispatcher):
         for child in self.__children:
             child.draw_all()
 
-    show = draw_all
-
     def undraw(self):
         self._draw_status = 'undraw() called'
         self.do_undraw()
@@ -154,8 +152,6 @@ class Widget (pyglet.event.EventDispatcher):
         self.undraw()
         for child in self.__children:
             child.undraw_all()
-
-    hide = undraw_all
 
     def do_attach(self):
         """
@@ -455,6 +451,9 @@ class Widget (pyglet.event.EventDispatcher):
         elif self._draw_status == 'draw() called':
             if self.rect is None:
                 diagnoses.append("{self} was not given a size by its parent.\nThis is probably a bug in the parent widget.")
+
+            if self.rect.area == 0:
+                diagnoses.append("{self} reqested (and was given) no space.\nCheck for bugs in {self.__class__.__name__}.do_claim()")
 
             if self.group is None:
                 diagnoses.append("{self} was not given a group by its parent.\nThis is probably a bug in the parent widget.")

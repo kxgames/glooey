@@ -14,9 +14,9 @@ button.label.color = 'white'
 button.label.bold = True
 button.label.font_name = 'KenVector Future'
 button.label.font_size = 12
-button.base_image = pyglet.image.load('button_green.png')
-button.down_image = pyglet.image.load('button_green_down.png')
-button.inactive_image = pyglet.image.load('button_grey.png')
+button.set_base_image(pyglet.image.load('button_green.png'))
+button.set_down_image(pyglet.image.load('button_green_down.png'))
+button.set_inactive_image(pyglet.image.load('button_grey.png'))
 
 def label_placement(child_rect, parent_rect):   # (no fold)
     child_rect.center = parent_rect.center

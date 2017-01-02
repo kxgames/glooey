@@ -177,7 +177,8 @@ class Label(Widget):
         self._layout.end_update()
 
     def do_undraw(self):
-        self._layout.delete()
+        if self._layout is not None:
+            self._layout.delete()
 
     def get_text(self):
         return self._text
@@ -296,7 +297,10 @@ class Image(Widget):
         self._sprite = None
 
     def do_claim(self):
-        return self.image.width, self.image.height
+        if self.image:
+            return self.image.width, self.image.height
+        else:
+            return 0, 0
 
     def do_regroup(self):
         if self._sprite is not None:
@@ -304,6 +308,9 @@ class Image(Widget):
 
     @autoprop
     def do_draw(self):
+        if not self.image:
+            return
+
         if self._sprite is None:
             self._sprite = pyglet.sprite.Sprite(
                     self.image, batch=self.batch, group=self.group)
@@ -347,6 +354,7 @@ class Background(Widget):
                 bottom_right=bottom_right,
                 vtile=vtile,
                 htile=htile,
+                hidden=True,
         )
 
     def do_attach(self):
@@ -361,20 +369,21 @@ class Background(Widget):
     def do_regroup(self):
         self._artist.group = self.group
 
-    def get_color(self):
-        return self._artist.color
+    def do_draw(self):
+        self._artist.unhide()
 
-    def set_color(self, new_color):
-        self._artist.color = new_color
+    def do_undraw(self):
+        self._artist.hide()
 
-    def del_color(self):
-        del self._artist.color
+    def get_images(self):
+        return self._artist.images
 
-    def set_images(self, *, center=None, top=None, bottom=None, left=None, 
-            right=None, top_left=None, top_right=None, bottom_left=None, 
-            bottom_right=None, vtile=None, htile=None):
+    def set_images(self, *, color=None, center=None, top=None, bottom=None, 
+            left=None, right=None, top_left=None, top_right=None, 
+            bottom_left=None, bottom_right=None, vtile=None, htile=None):
 
         self._artist.set_images(
+                color=color,
                 center=center,
                 top=top,
                 bottom=bottom,
@@ -389,42 +398,76 @@ class Background(Widget):
         )
         self.repack(force=True)
 
+    def set_image(self, image):
+        self._artist.set_image(image)
+        self.repack(force=True)
+
 
 @autoprop
 class Button(Widget):
 
+    LabelClass = Label
+    IconClass = Image
+    BackgroundClass = Background
+
     def __init__(self, text=""):
         super().__init__()
-        self._states = {}
         self._mouse = 'base'
         self._active = True
-        self._label = Label(text)
+        self._current_state = 'base'
+        self._previous_state = 'base'
+        self._configured_states = set()
+        self._label = self.LabelClass(text)
         self._label_placement = 'center'
-        self._background = Image()
+        self._icon = self.IconClass()
+        self._icon_placement = 'center'
+        self._backgrounds = {
+                state: self.BackgroundClass()
+                for state in self.possible_states}
         self._background_placement = 'center'
-        self._attach_child(self._label)
-        self._attach_child(self._background)
 
-    def reactivate(self):
-        self._active = True
-        self._update_state()
+        self._attach_child(self._label)
+        self._attach_child(self._icon)
+        for state, bg in self._backgrounds.items():
+            self._attach_child(bg)
+            if state != self._current_state:
+                bg.hide()
+
 
     def deactivate(self):
-        self._active = False
-        self._update_state()
+        if self._active:
+            self._active = False
+            self._update_state()
+
+    def reactivate(self):
+        if not self._active:
+            self._active = True
+            self._update_state()
 
     def do_claim(self):
-        min_width = max(self._label.min_width, self._background.min_width)
-        min_height = max(self._label.min_height, self._background.min_height)
+        min_width = max(
+                self._label.min_width,
+                self._icon.min_width,
+                *(bg.min_width for bg in self._backgrounds.values()),
+        )
+        min_height = max(
+                self._label.min_height,
+                self._icon.min_height,
+                *(bg.min_height for bg in self._backgrounds.values()),
+        )
         return min_width, min_height
 
     def do_regroup_children(self):
-        self._background.regroup(pyglet.graphics.OrderedGroup(0, self.group))
-        self._label.regroup(pyglet.graphics.OrderedGroup(1, self.group))
+        self._label.regroup(pyglet.graphics.OrderedGroup(2, self.group))
+        self._icon.regroup(pyglet.graphics.OrderedGroup(1, self.group))
+        for bg in self._backgrounds.values():
+            bg.regroup(pyglet.graphics.OrderedGroup(0, self.group))
 
     def do_resize_children(self):
         place_widget_in_box(self._label, self.rect, self._label_placement)
-        place_widget_in_box(self._background, self.rect, self._background_placement)
+        place_widget_in_box(self._icon, self.rect, self._icon_placement)
+        for bg in self._backgrounds.values():
+            place_widget_in_box(bg, self.rect, self._background_placement)
 
     def on_mouse_press(self, x, y, button, modifiers):
         self._mouse = 'down'
@@ -457,60 +500,22 @@ class Button(Widget):
         return self._active
 
     def get_state(self):
-        state = self._mouse
+        return self._current_state
 
-        if state not in self._states and state == 'down':
-            state = 'over'
+    def get_previous_state(self):
+        return self._previous_state
 
-        if state not in self._states and state == 'over':
-            state = 'base'
-
-        if not self._active:
-            state = 'inactive'
-
-        return state
-
-    def get_image(self, state=None):
-        if state is None: state = self.get_state()
-        return self._states.get(state)
-
-    def set_image(self, state, image):
-        self._states[state] = image
-        if self._mouse == state:
-            self._background.image = image
-
-    def get_base_image(self, image):
-        self.get_image('base', image)
-
-    def set_base_image(self, image):
-        self.set_image('base', image)
-
-    def get_over_image(self, image):
-        self.get_image('over', image)
-
-    def set_over_image(self, image):
-        self.set_image('over', image)
-
-    def get_down_image(self, image):
-        self.get_image('down', image)
-
-    def set_down_image(self, image):
-        self.set_image('down', image)
-
-    def get_inactive_image(self, image):
-        self.get_image('inactive', image)
-
-    def set_inactive_image(self, image):
-        self.set_image('inactive', image)
-
-    def get_label(self):
-        return self._label
+    def get_possible_states(self):
+        return 'base', 'over', 'down', 'inactive'
 
     def get_text(self):
         return self._label.text
 
     def set_text(self, text):
         self._label.text = text
+
+    def get_label(self):
+        return self._label
 
     def get_label_placement(self, new_placement):
         return self._label_placement
@@ -519,21 +524,108 @@ class Button(Widget):
         self._label_placement = new_placement
         self.repack()
 
-    def get_image_placement(self, new_placement):
+    def get_icon(self):
+        return self._icon.image
+
+    def set_icon(self, image):
+        self._icon.image = image
+        
+    def get_icon_placement(self, new_placement):
+        return self._icon_placement
+
+    def set_icon_placement(self, new_placement):
+        self._icon_placement = new_placement
+        self.repack()
+
+    def get_base_background(self):
+        return self._backgrounds['base'].get_images()
+
+    def set_base_background(self, **kwargs):
+        self._configured_states.add('base')
+        self._backgrounds['base'].set_images(**kwargs)
+
+    def set_base_image(self, image):
+        self._configured_states.add('base')
+        self._backgrounds['base'].set_image(image)
+
+    def del_base_background(self):
+        self._configured_states.discard('base')
+
+    def get_over_background(self):
+        return self._backgrounds['over'].get_images()
+
+    def set_over_background(self, **kwargs):
+        self._configured_states.add('over')
+        self._backgrounds['over'].set_images(**kwargs)
+
+    def set_over_image(self, image):
+        self._configured_states.add('over')
+        self._backgrounds['over'].set_image(image)
+
+    def del_over_background(self):
+        self._configured_states.discard('over')
+
+    def get_down_background(self):
+        return self._backgrounds['down'].get_images()
+
+    def set_down_background(self, **kwargs):
+        self._configured_states.add('down')
+        self._backgrounds['down'].set_images(**kwargs)
+
+    def set_down_image(self, image):
+        self._configured_states.add('down')
+        self._backgrounds['down'].set_image(image)
+
+    def del_down_background(self):
+        self._configured_states.discard('down')
+
+    def get_inactive_background(self):
+        return self._backgrounds['inactive'].get_images()
+
+    def set_inactive_background(self, **kwargs):
+        self._configured_states.add('inactive')
+        self._backgrounds['inactive'].set_images(**kwargs)
+
+    def set_inactive_image(self, image):
+        self._configured_states.add('inactive')
+        self._backgrounds['inactive'].set_image(image)
+
+    def del_inactive_background(self):
+        self._configured_states.discard('inactive')
+
+    def get_background_placement(self, new_placement):
         return self._background_placement
 
-    def set_image_placement(self, new_placement):
+    def set_background_placement(self, new_placement):
         self._background_placement = new_placement
         self.repack()
 
     def _update_state(self):
-        state = self.get_state()
-        if state not in self._states:
-            raise ValueError("no images for '{}' state".format(state))
-        self._background.image = self._states[state]
+        new_state = self._mouse
 
+        if new_state not in self._configured_states and new_state == 'down':
+            new_state = 'over'
+
+        if new_state not in self._configured_states and new_state == 'over':
+            new_state = 'base'
+
+        if not self._active:
+            new_state = 'inactive'
+
+        if new_state not in self._configured_states:
+            raise ValueError(f"no images for '{new_state}' state")
+
+        assert new_state in self.possible_states
+        self._previous_state = self._current_state
+        self._current_state = new_state
+
+        if self._current_state != self._previous_state:
+            self._backgrounds[self._previous_state].hide()
+            self._backgrounds[self._current_state].unhide()
+            self.repack()
 
 Button.register_event_type('on_click')
+
 
 @autoprop
 class Checkbox(Widget):
@@ -717,3 +809,46 @@ class RadioButton(Checkbox):
                     peer.uncheck()
 
 
+
+# Work in progress...
+
+@autoprop
+class Tooltip(Widget):
+
+    def __init__(self, widget, layer=10):
+        self._widget = widget
+        self._widget.push_handlers(self)
+        self._layer = layer
+
+    def get_widget(self):
+        return self._widget
+
+    def set_widget(self, new_widget):
+        self._widget.pop_handlers()
+        self._widget = widget
+        self._widget.push_handlers(self)
+
+    def get_parent(self):
+        return self._widget
+
+    def get_layer(self):
+        return self._layer
+
+    def set_layer(self, new_layer):
+        self._layer = new_layer
+        self._update_rect()
+        self._update_group()
+
+    def on_attach(self):
+        self._update_group()
+
+    def draw_background(self):
+        pass
+
+    def _update_rect(self):
+        pass
+
+    def _update_group(self):
+        if self.is_attached_to_gui:
+            group = pyglet.graphics.OrderedGroup(self.root.group, self._layer)
+            self.regroup(group)
