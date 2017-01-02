@@ -30,6 +30,7 @@ setup(
         'pyglet',
         'more_itertools',
         'vecrec', 
+        'autoprop',
     ],
     license='MIT',
     zip_safe=False,
