@@ -49,7 +49,7 @@ class update_function:
 
     def __init__(self, exe_order):
         if not isinstance(exe_order, int):
-            raise ValueError(f"Execution order must be an integer, not {exe_order}")
+            raise ValueError("Execution order must be an integer, not {}".format(exe_order))
         self.exe_order = exe_order
 
     def __call__(self, method):

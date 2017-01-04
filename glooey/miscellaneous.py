@@ -613,7 +613,7 @@ class Button(Widget):
             new_state = 'inactive'
 
         if new_state not in self._configured_states:
-            raise ValueError(f"no images for '{new_state}' state")
+            raise ValueError("no images for '{}' state".format(new_state))
 
         assert new_state in self.possible_states
         self._previous_state = self._current_state

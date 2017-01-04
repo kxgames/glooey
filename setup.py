@@ -45,7 +45,9 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Topic :: Games/Entertainment',
+        'Topic :: Software Development :: User Interfaces',
         'Topic :: Software Development :: Libraries',
     ],
 )
