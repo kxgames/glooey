@@ -265,7 +265,7 @@ class Artist(HoldUpdatesMixin):
     def _group_factory(self, parent):
         return parent
 
-    @update_function(1)
+    @update_function
     def _update_group(self):
         if self._vertex_list is not None:
             self._batch.migrate(
@@ -405,7 +405,7 @@ class Tile(Artist):
             self._blend_dest = new_blend_dest
             self._update_group()
 
-    @update_function(2)
+    @update_function
     def _update_vertex_list(self):
         if self._vertex_list is None:
             return
@@ -515,7 +515,7 @@ class Background(HoldUpdatesMixin):
                 bottom_right=bottom_right,
         )
 
-    @update_function(1)
+    @update_function
     def _update_group(self):
         self._color_group = pyglet.graphics.OrderedGroup(0, self._group)
         self._tile_group = pyglet.graphics.OrderedGroup(1, self._group)
@@ -524,7 +524,7 @@ class Background(HoldUpdatesMixin):
         for artist in self._tile_artists.values():
             artist.group = self._tile_group
 
-    @update_function(2)
+    @update_function
     def _update_tiles(self):
         if self._hidden or self._rect is None or self._batch is None:
             return

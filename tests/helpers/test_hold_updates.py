@@ -8,15 +8,19 @@ class UpdateLogger(HoldUpdatesMixin):
         HoldUpdatesMixin.__init__(self, hold_updates)
         self.update_log = ''
 
-    @update_function(1)
+    @update_function
     def update_1(self):
         self.update_log += '1'
         
-    @update_function(2)
+    @update_function
     def update_2(self):
         self.update_log += '2'
-            
 
+    @update_function
+    def update_n(self, n):
+        self.update_log += str(n)
+
+            
 
 
 def test_basic_usage():
@@ -26,32 +30,70 @@ def test_basic_usage():
     ex.update_1()
     assert ex.update_log == '1'
 
-    with ex.hold_updates():
+    with ex.update_after_block():
         ex.update_1()
         assert ex.update_log == '1'
 
     assert ex.update_log == '11'
 
-def test_update_order():
-    # This isn't a great test, because even is the order is random, there's a 
-    # reasonable chance it'll pass.
+def test_squash_multiple_updates():
     ex = UpdateLogger()
     assert ex.update_log == ''
 
     ex.update_1()
-    assert ex.update_log == '1'
+    ex.update_1()
+    assert ex.update_log == '11'
 
+    with ex.update_after_block():
+        ex.update_1()
+        ex.update_1()
+        assert ex.update_log == '11'
+
+    assert ex.update_log == '111'
+
+def test_update_with_args():
+    ex = UpdateLogger()
+    assert ex.update_log == ''
+
+    ex.update_n(3)
+    assert ex.update_log == '3'
+
+    with ex.update_after_block():
+        ex.update_n(4)
+        ex.update_n(5)
+        ex.update_n(4)
+        ex.update_n(5)
+        assert ex.update_log == '3'
+
+    assert ex.update_log == '345'
+
+def test_update_order():
+    ex = UpdateLogger()
+    assert ex.update_log == ''
+
+    ex.update_1()
     ex.update_2()
     assert ex.update_log == '12'
 
-    with ex.hold_updates():
+    with ex.update_after_block():
+        ex.update_1()
         ex.update_2()
         assert ex.update_log == '12'
-
-        ex.update_1()
-        assert ex.update_log == '12'
-
     assert ex.update_log == '1212'
+
+    with ex.update_after_block():
+        ex.update_2()
+        ex.update_1()
+        assert ex.update_log == '1212'
+    assert ex.update_log == '121221'
+
+    with ex.update_after_block():
+        ex.update_n(5)
+        ex.update_n(3)
+        ex.update_n(4)
+        ex.update_n(5)
+        assert ex.update_log == '121221'
+    assert ex.update_log == '121221345'
 
 def test_no_update_needed():
     ex = UpdateLogger()
@@ -63,16 +105,16 @@ def test_no_update_needed():
     ex.update_2()
     assert ex.update_log == '12'
 
-    with ex.hold_updates():
+    with ex.update_after_block():
         pass
     assert ex.update_log == '12'
 
-    with ex.hold_updates():
+    with ex.update_after_block():
         ex.update_1()
         assert ex.update_log == '12'
     assert ex.update_log == '121'
 
-    with ex.hold_updates():
+    with ex.update_after_block():
         ex.update_2()
         assert ex.update_log == '121'
     assert ex.update_log == '1212'
@@ -91,8 +133,8 @@ def test_nested_holds():
     ex = UpdateLogger()
     assert ex.update_log == ''
 
-    with ex.hold_updates():
-        with ex.hold_updates():
+    with ex.update_after_block():
+        with ex.update_after_block():
             ex.update_1()
             assert ex.update_log == ''
         ex.update_2()

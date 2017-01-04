@@ -20,51 +20,56 @@ class HoldUpdatesMixin:
     def __init__(self, num_holds=0):
         super().__init__()
         self._num_holds = num_holds
-        self._stale_update_functions = set()
+        self._pending_updates = []
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        cls._update_order = {}
-        for name, method in inspect.getmembers(cls):
-            try: cls._update_order[name] = method._hold_updates_exe_order
-            except AttributeError: pass
-
-    @contextlib.contextmanager
     def hold_updates(self):
         self._num_holds += 1
-        yield
-        self.resume_updates()
 
     def resume_updates(self):
         self._num_holds = max(self._num_holds - 1, 0)
-
         if self._num_holds == 0:
-            for name in sorted(self._stale_update_functions,
-                    key=lambda x: self._update_order[x]):
-                getattr(self, name)()
-            self._stale_update_functions = set()
+            for update, args, kwargs in self._filter_pending_updates():
+                update(self, *args, **kwargs)
+            self._pending_updates = []
+
+    @contextlib.contextmanager
+    def update_after_block(self):
+        self.hold_updates()
+        yield
+        self.resume_updates()
+
+    def _filter_pending_updates(self):
+        """
+        Return all the updates  that need to be applied, from a list of all the 
+        updates that were called while the hold was active.  This method is 
+        meant to be overridden by subclasses that want to customize how held 
+        updates are applied.
+
+        The self._pending_updates list contains a (method, args, kwargs) tuple 
+        for each update that was called while updates were being held.  This 
+        list is in the order that the updates were actually called, and any 
+        updates that were called more than once will appear in this list more 
+        than once.
+        
+        This method should yield or return an list of the tuples in the same 
+        format representing the updates that should be applied, in the order 
+        they should be applied.  The default implementation filters out 
+        duplicate updates without changing their order.  In cases where it 
+        matters, the last call to each update is used to determine the order.
+        """
+        from more_itertools import unique_everseen as unique
+        yield from reversed(list(unique(reversed(self._pending_updates))))
 
 
-class update_function:
+def update_function(method):
 
-    def __init__(self, exe_order):
-        if not isinstance(exe_order, int):
-            raise ValueError("Execution order must be an integer, not {}".format(exe_order))
-        self.exe_order = exe_order
+    @functools.wraps(method)
+    def wrapped_method(self, *args, **kwargs):
+        if self._num_holds > 0:
+            self._pending_updates.append((method, args, kwargs))
+        else:
+            method(self, *args, **kwargs)
 
-    def __call__(self, method):
-        args = inspect.getfullargspec(method)
-        if len(args.args) - 1 > len(args.defaults or ()):
-            raise TypeError("update functions can't take any arguments (besides self).")
-
-        @functools.wraps(method)
-        def wrapped_method(self, *args, **kwargs):
-            if self._num_holds > 0:
-                self._stale_update_functions.add(method.__name__)
-            else:
-                method(self, *args, **kwargs)
-
-        wrapped_method._hold_updates_exe_order = self.exe_order
-        return wrapped_method
+    return wrapped_method
 
 
