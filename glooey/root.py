@@ -69,6 +69,11 @@ class Gui (Root):
         rect = Rect.from_pyglet_window(self.window)
         self.resize(rect)
 
+    def set_cursor(self, image, hot_spot):
+        hx, hy = Vector.from_anything(hot_spot)
+        cursor = pyglet.window.ImageMouseCursor(image, hx, hy)
+        self.window.set_mouse_cursor(cursor)
+
 
 @autoprop
 class PanningGui (Gui):
