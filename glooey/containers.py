@@ -57,11 +57,14 @@ placement_functions = {
         'bottom_right': bottom_right,
 }
 
-def place_widget_in_box(widget, box_rect, key_or_function, widget_rect=None):
+def cast_to_placement_function(key_or_function):
     try:
-        placement_function = placement_functions[key_or_function]
+        return placement_functions[key_or_function]
     except KeyError:
-        placement_function = key_or_function
+        return key_or_function
+
+def place_widget_in_box(widget, box_rect, key_or_function, widget_rect=None):
+    placement_function = cast_to_placement_function(key_or_function)
 
     if widget_rect is None:
         widget_rect = widget.min_rect
@@ -659,45 +662,53 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
     """
     Have any number of children, claim enough space for the biggest one, and 
     just draw them all in the order they were added.
+
+    For the button, it would be more useful to specify a layer.  Stacking is 
+    still a nice default, though.
     """
 
     def __init__(self, padding=0, placement='fill'):
         Widget.__init__(self)
         PaddingMixin.__init__(self, padding)
         PlacementMixin.__init__(self, placement)
-        self._children = []
+        self._children = {} # {child: layer}
 
-    def add(self, child, placement=None):
-        self.add_back(child, placement)
+    def __iter__(self):
+        yield from sorted(
+                self._children.keys(),
+                key=lambda x: self._children[x],
+                reverse=True)
 
-    def add_front(self, child, placement=None):
-        self.insert(child, 0, placement)
+    def __len__(self):
+        return len(self._children)
 
-    def add_back(self, child, placement=None):
-        self.insert(child, len(self.children), placement)
+    def add(self, widget, placement=None):
+        self.add_top(widget, placement)
 
-    def insert(self, child, index, placement=None):
-        self._attach_child(child)
-        self._children.insert(index, child)
-        self._set_custom_placement(child, placement, repack=False)
+    def add_top(self, widget, placement=None):
+        layer = max(self.layers) + 1 if self.layers else 0
+        self.insert(widget, layer, placement)
+
+    def add_bottom(self, widget, placement=None):
+        layer = min(self.layers) - 1 if self.layers else 0
+        self.insert(widget, layer, placement)
+
+    def insert(self, widget, layer, placement=None):
+        self._attach_child(widget)
+        self._children[widget] = layer
+        self._set_custom_placement(widget, placement, repack=False)
         self._resize_and_regroup_children()
 
-    def replace(self, index, child):
-        old_child = self._children[index]
-        old_placement = self._get_placement(old_child)
-        self.remove(old_child)
-        self.insert(child, index, old_placement)
-
-    def remove(self, child):
-        self._detach_child(child)
-        self._children.remove(child)
-        self._unset_custom_placement(child, repack=False)
+    def remove(self, widget):
+        self._detach_child(widget)
+        del self._children[widget]
+        self._unset_custom_placement(widget, repack=False)
         self._resize_and_regroup_children()
 
     def clear(self):
         for child in self.children:
             self._detach_child(child)
-        self._children = []
+        self._children = {}
         self._custom_placements = {}
         self._resize_and_regroup_children()
 
@@ -722,11 +733,21 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
                     self._get_placement(child))
 
     def do_regroup_children(self):
-        for i, child in enumerate(self.children):
-            child.regroup(pyglet.graphics.OrderedGroup(i, self.group))
+        # If there's only one child, don't bother making an ordered group.  As 
+        # I understand it, it's best to use as few groups as possible because 
+        # forcing OpenGL to change states is inefficient.
+
+        if len(self) == 1:
+            only_child = next(iter(self.children))
+            only_child.regroup(self.group)
+        else:
+            for child, layer in self._children.items():
+                child.regroup(pyglet.graphics.OrderedGroup(layer, self.group))
 
     def get_children(self):
-        return self._children
+        return self._children.keys()
 
+    def get_layers(self):
+        return self._children.values()
 
 
