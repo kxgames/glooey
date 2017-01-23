@@ -759,3 +759,84 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
         return self._children.values()
 
 
+@autoprop
+class Deck(Widget):
+    """
+    Display one of a number of child widgets depending on the state specified 
+    by the user.
+    """
+
+    def __init__(self, initial_state, **states):
+        super().__init__()
+        self._current_state = initial_state
+        self._previous_state = initial_state
+        self._states = {}
+        self.add_states(**states)
+
+    def do_claim(self):
+        # Claim enough space for the biggest child, so that we won't need to 
+        # repack when we change states.  (Also, I can't think of any reason why 
+        # you'd want states of different sizes.)
+
+        min_width = 0
+        min_height = 0
+
+        for child in self._states.values():
+            min_width = max(child.min_width, min_width)
+            min_height = max(child.min_height, min_height)
+
+        return min_width, min_height
+
+    def add_state(self, state, widget):
+        self.add_states(**{state: widget})
+
+    def add_states(self, **states):
+        for state, widget in states.items():
+            if state == self.state:
+                widget.unhide()
+            else:
+                widget.hide()
+            self._states[state] = widget
+            self._attach_child(widget)
+
+        self.repack()
+
+    def remove_state(self, state):
+        self.remove_states(state)
+
+    def remove_states(self, *states):
+        for state in states:
+            self._detach_child(self._states[state])
+            self._states[state].unhide()    # Unhide the child so it'll show up 
+            del self._states[state]         # if the user tries to reattach it 
+        self.repack()                       # somewhere else.
+
+    def clear_states(self):
+        self.remove_states(self.known_states)
+
+    def get_state(self):
+        return self._current_state
+
+    def set_state(self, new_state):
+        if new_state not in self.known_states:
+            raise ValueError(f"unknown state '{new_state}'")
+
+        self._previous_state = self._current_state
+        self._current_state = new_state
+
+        if self._current_state != self._previous_state:
+            self._states[self._current_state].unhide()
+
+            # The previous state could've been removed since the state was last 
+            # changed.  In this case it will have already been hidden, so we 
+            # don't need to do anything.
+            try: self._states[self._previous_state].hide()
+            except KeyError: pass
+
+    def get_previous_state(self):
+        return self._previous_state
+
+    def get_known_states(self):
+        return self._states.keys()
+
+
