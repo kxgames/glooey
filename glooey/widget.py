@@ -459,16 +459,16 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
         elif self._draw_status == 'draw() called':
             if self.rect is None:
-                diagnoses.append("{self} was not given a size by its parent.\nThis is probably a bug in the parent widget.")
+                diagnoses.append("{self} was not given a size by its parent.\nCheck for bugs in {self.parent.__class__.__name__}.do_resize_children()")
 
-            if self.rect.area == 0:
+            elif self.rect.area == 0:
                 diagnoses.append("{self} reqested (and was given) no space.\nCheck for bugs in {self.__class__.__name__}.do_claim()")
 
             if self.group is None:
-                diagnoses.append("{self} was not given a group by its parent.\nThis is probably a bug in the parent widget.")
+                diagnoses.append("{self} was not given a group by its parent.\nCheck for bugs in {self.parent.__class__.__name__}.do_regroup_children()")
 
             if self.is_hidden:
-                diagnoses.append("{self} is currently hidden.\nUse the unhide() method to reveal it.")
+                diagnoses.append("{self} is currently hidden.\nCall {self.__class__.__name__}.unhide() to reveal it.")
 
             if not diagnoses:
                 diagnoses.append("{self} seems to have been drawn.\nCheck for bugs in {self.__class__.__name__}.do_draw()")
