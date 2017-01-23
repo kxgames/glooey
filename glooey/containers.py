@@ -630,6 +630,9 @@ class HVBox (Widget, PlacementMixin):
 @autoprop
 class HBox (HVBox):
 
+    add_left = HVBox.add_front
+    add_right = HVBox.add_back
+
     def do_get_row_col(self, index):
         return 0, index
 
@@ -645,6 +648,9 @@ class HBox (HVBox):
 
 @autoprop
 class VBox (HVBox):
+
+    add_top = HVBox.add_front
+    add_bottom = HVBox.add_back
 
     def do_get_row_col(self, index):
         return index, 0

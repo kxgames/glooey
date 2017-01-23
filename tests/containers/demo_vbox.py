@@ -45,7 +45,7 @@ def on_key_press(symbol, modifiers):
 
     if symbol == key.U:
         widget = PlaceHolder(20, 20, color=red)
-        vbox.add_front(widget, size, placement)
+        vbox.add_top(widget, size, placement)
 
     if symbol == key.I:
         i = len(vbox) // 2
@@ -54,7 +54,7 @@ def on_key_press(symbol, modifiers):
 
     if symbol == key.O:
         widget = PlaceHolder(20, 20, color=yellow)
-        vbox.add_back(widget, size, placement)
+        vbox.add_bottom(widget, size, placement)
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):

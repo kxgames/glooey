@@ -45,7 +45,7 @@ def on_key_press(symbol, modifiers):
 
     if symbol == key.U:
         widget = PlaceHolder(20, 20, color=red)
-        hbox.add_front(widget, size, placement)
+        hbox.add_left(widget, size, placement)
 
     if symbol == key.I:
         i = len(hbox) // 2
@@ -54,7 +54,7 @@ def on_key_press(symbol, modifiers):
 
     if symbol == key.O:
         widget = PlaceHolder(20, 20, color=yellow)
-        hbox.add_back(widget, size, placement)
+        hbox.add_right(widget, size, placement)
 
 @window.event
 def on_mouse_press(x, y, button, modifiers):
