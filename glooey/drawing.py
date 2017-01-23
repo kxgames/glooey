@@ -692,6 +692,10 @@ class Background(HoldUpdatesMixin):
     def is_hidden(self):
         return self._hidden
 
+    @property
+    def is_empty(self):
+        return not self._color and not self._tile_images
+
     def hide(self):
         if self._color_artist:
             self._color_artist.hide()

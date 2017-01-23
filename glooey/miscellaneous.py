@@ -219,9 +219,8 @@ class Label(Widget):
         super().__init__()
         self._layout = None
         self._text = text
-        self._style = dict(color=drawing.green.tuple)
-        self._style.update(style)
         self._line_wrap_width = 0
+        self._style = {}; self.set_style(**style)
 
     def do_claim(self):
         # Make sure the label's text and style are up-to-date before we request 
@@ -301,7 +300,7 @@ class Label(Widget):
         self._text = text
         if width is not None:
             self._line_wrap_width = width
-        self.repack(force=True)
+        self.repack()
 
     def get_font_name(self):
         return self.get_style('font_name')
@@ -328,13 +327,10 @@ class Label(Widget):
         self.set_style(italic=italic)
 
     def get_underline(self):
-        return self.get_style('underline')
+        return self.get_style('underline') is not None
 
     def set_underline(self, underline):
-        if underline:
-            self.set_style(underline=self.color)
-        else:
-            self.set_style(underline=None)
+        self.set_style(underline=underline)
 
     def get_kerning(self):
         return self.get_style('kerning')
@@ -352,27 +348,12 @@ class Label(Widget):
         return self.get_style('color')
 
     def set_color(self, color):
-        if isinstance(color, str):
-            color = drawing.colors[color]
-        if hasattr(color, 'tuple'):
-            color = color.tuple
+        self.set_style(color=color)
 
-        # I want the underline attribute to behave as a boolean, but in the 
-        # TextLayout API it's a color.  So when the color changes, I have to 
-        # update the underline (if it's been set).
-        style = {'color': color}
-        if self.underline is not None:
-            style['underline'] = color
-        self.set_style(**style)
-
-    def get_bg_color(self):
+    def get_background_color(self):
         return self.get_style('background_color')
 
-    def set_bg_color(self, color):
-        if isinstance(color, str):
-            color = drawing.colors[color]
-        if hasattr(color, 'tuple'):
-            color = color.tuple
+    def set_background_color(self, color):
         self.set_style(background_color=color)
 
     def get_alignment(self):
@@ -391,12 +372,42 @@ class Label(Widget):
         return self._style.get(style)
 
     def set_style(self, **style):
+        # I want users to be able to specify colors using strings or Color 
+        # objects, but pyglet expects tuples.  So make the conversion here.
+
+        if 'color' in style:
+            color = style['color']
+            if isinstance(color, str):
+                color = drawing.colors[color]
+            if hasattr(color, 'tuple'):
+                color = color.tuple
+            style['color'] = color
+            if self.underline:
+                style['underline'] = color
+
+        if 'background_color' in style:
+            color = style['background_color']
+            if isinstance(color, str):
+                color = drawing.colors[color]
+            if hasattr(color, 'tuple'):
+                color = color.tuple
+            style['background_color'] = color
+
+        # I want the underline attribute to behave as a boolean, but in the 
+        # TextLayout API it's a color.  So when the color changes, I have to 
+        # update the underline (if it's been set).
+
+        if 'underline' in style:
+            style['underline'] = \
+                    style.get('color', self.color) \
+                    if style['underline'] else None
+
         self._style.update(style)
-        self.repack(force=True)
+        self.repack()
 
     def enable_line_wrap(self, width):
         self._line_wrap_width = width
-        self.repack(force=True)
+        self.repack()
 
     def disable_line_wrap(self):
         self.enable_line_wrap(0)
@@ -444,7 +455,7 @@ class Image(Widget):
     def set_image(self, new_image):
         if self._image is not new_image:
             self._image = new_image
-            self.repack(force=True)
+            self.repack()
 
 
 @autoprop
@@ -510,235 +521,167 @@ class Background(Widget):
                 vtile=vtile,
                 htile=htile,
         )
-        self.repack(force=True)
+        self.repack()
 
     def set_image(self, image):
         self._artist.set_image(image)
-        self.repack(force=True)
+        self.repack()
+
+    @property
+    def is_empty(self):
+        return self._artist.is_empty
 
 
 @autoprop
-class Button(Widget):
+class Button(Clickable):
 
-    LabelClass = Label
-    IconClass = Image
-    BackgroundClass = Background
+    _background_layer = 1
+    _image_layer = 2
+    _label_layer = 3
 
-    def __init__(self, text=""):
+    def __init__(self):
         super().__init__()
-        self._mouse = 'base'
-        self._active = True
-        self._current_state = 'base'
-        self._previous_state = 'base'
-        self._configured_states = set()
-        self._label = self.LabelClass(text)
-        self._label_placement = 'center'
-        self._icon = self.IconClass()
-        self._icon_placement = 'center'
-        self._backgrounds = {
-                state: self.BackgroundClass()
-                for state in self.possible_states}
-        self._background_placement = 'center'
-
-        self._attach_child(self._label)
-        self._attach_child(self._icon)
-        for state, bg in self._backgrounds.items():
-            self._attach_child(bg)
-            if state != self._current_state:
-                bg.hide()
-
-
-    def deactivate(self):
-        if self._active:
-            self._active = False
-            self._update_state()
-
-    def reactivate(self):
-        if not self._active:
-            self._active = True
-            self._update_state()
+        self._stack = containers.Stack()
+        self._label = None
+        self._image = None
+        self._background = None
+        self._attach_child(self._stack)
 
     def do_claim(self):
-        min_width = max(
-                self._label.min_width,
-                self._icon.min_width,
-                *(bg.min_width for bg in self._backgrounds.values()),
-        )
-        min_height = max(
-                self._label.min_height,
-                self._icon.min_height,
-                *(bg.min_height for bg in self._backgrounds.values()),
-        )
-        return min_width, min_height
-
-    def do_regroup_children(self):
-        self._label.regroup(pyglet.graphics.OrderedGroup(2, self.group))
-        self._icon.regroup(pyglet.graphics.OrderedGroup(1, self.group))
-        for bg in self._backgrounds.values():
-            bg.regroup(pyglet.graphics.OrderedGroup(0, self.group))
-
-    def do_resize_children(self):
-        place_widget_in_box(self._label, self.rect, self._label_placement)
-        place_widget_in_box(self._icon, self.rect, self._icon_placement)
-        for bg in self._backgrounds.values():
-            place_widget_in_box(bg, self.rect, self._background_placement)
-
-    def on_mouse_press(self, x, y, button, modifiers):
-        self._mouse = 'down'
-        self._update_state()
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        if self._active and self._mouse == 'down':
-            self.dispatch_event('on_click', self)
-
-        self._mouse = 'over'
-        self._update_state()
-
-    def on_mouse_enter(self, x, y):
-        self._mouse = 'over'
-        self._update_state()
-
-    def on_mouse_leave(self, x, y):
-        self._mouse = 'base'
-        self._update_state()
-
-    def on_mouse_drag_enter(self, x, y):
-        pass
-
-    def on_mouse_drag_leave(self, x, y):
-        self._mouse = 'base'
-        self._update_state()
-
-    @property
-    def is_active(self):
-        return self._active
-
-    def get_state(self):
-        return self._current_state
-
-    def get_previous_state(self):
-        return self._previous_state
-
-    def get_possible_states(self):
-        return 'base', 'over', 'down', 'inactive'
+        return self._stack.min_size
 
     def get_text(self):
         return self._label.text
 
-    def set_text(self, text):
-        self._label.text = text
+    def set_text(self, text, placement=None, **style):
+        self.set_label(Label(text, **style), placement)
+
+    def unset_text(self):
+        self.unset_label()
 
     def get_label(self):
         return self._label
 
-    def get_label_placement(self, new_placement):
-        return self._label_placement
+    def set_label(self, label, placement=None):
+        if self._label is not None:
+            self._stack.remove(self._label)
 
-    def set_label_placement(self, new_placement):
-        self._label_placement = new_placement
-        self.repack()
+        self._label = label
+        self._stack.insert(self._label, self._label_layer, placement)
 
-    def get_icon(self):
-        return self._icon.image
+    def unset_label(self):
+        if self._label is not None:
+            self._stack.remove(self._label)
+            self._label = None
 
-    def set_icon(self, image):
-        self._icon.image = image
-        
-    def get_icon_placement(self, new_placement):
-        return self._icon_placement
+    def get_image(self):
+        return self._image.image
 
-    def set_icon_placement(self, new_placement):
-        self._icon_placement = new_placement
-        self.repack()
+    def set_image(self, image, placement=None):
+        if self._image is not None:
+            self._stack.remove(self._image)
 
-    def get_base_background(self):
-        return self._backgrounds['base'].get_images()
+        self._image = Image(image)
+        self._stack.insert(self._image, self._image_layer, placement)
 
-    def set_base_background(self, **kwargs):
-        self._configured_states.add('base')
-        self._backgrounds['base'].set_images(**kwargs)
+    def unset_image(self):
+        if self._image is not None:
+            self._stack.remove(self._image)
+            self._image = None
 
-    def set_base_image(self, image):
-        self._configured_states.add('base')
-        self._backgrounds['base'].set_image(image)
+    def set_background_images(self, *, 
+            base=None,              over=None,              down=None,              off=None,
+            base_color=None,        over_color=None,        down_color=None,        off_color=None,
+            base_center=None,       over_center=None,       down_center=None,       off_center=None,
+            base_top=None,          over_top=None,          down_top=None,          off_top=None, 
+            base_bottom=None,       over_bottom=None,       down_bottom=None,       off_bottom=None, 
+            base_left=None,         over_left=None,         down_left=None,         off_left=None,
+            base_right=None,        over_right=None,        down_right=None,        off_right=None,
+            base_top_left=None,     over_top_left=None,     down_top_left=None,     off_top_left=None,
+            base_top_right=None,    over_top_right=None,    down_top_right=None,    off_top_right=None,
+            base_bottom_left=None,  over_bottom_left=None,  down_bottom_left=None,  off_bottom_left=None,
+            base_bottom_right=None, over_bottom_right=None, down_bottom_right=None, off_bottom_right=None,
+            vtile=None, htile=None, placement=None):
 
-    def del_base_background(self):
-        self._configured_states.discard('base')
+        base_center = base_center or base
+        over_center = over_center or over
+        down_center = down_center or down
+        off_center  = off_center  or off
 
-    def get_over_background(self):
-        return self._backgrounds['over'].get_images()
+        if self._background is not None:
+            self._stack.remove(self._background)
 
-    def set_over_background(self, **kwargs):
-        self._configured_states.add('over')
-        self._backgrounds['over'].set_images(**kwargs)
+        backgrounds = dict(
+                base=Background(
+                    color        = base_color,
+                    center       = base_center,
+                    top          = base_top,         
+                    bottom       = base_bottom,      
+                    left         = base_left,        
+                    right        = base_right,       
+                    top_left     = base_top_left,    
+                    top_right    = base_top_right,   
+                    bottom_left  = base_bottom_left, 
+                    bottom_right = base_bottom_right,
+                    vtile        = vtile,
+                    htile        = htile,
+                ),
+                over=Background(
+                    color        = over_color,
+                    center       = over_center,
+                    top          = over_top,         
+                    bottom       = over_bottom,      
+                    left         = over_left,        
+                    right        = over_right,       
+                    top_left     = over_top_left,    
+                    top_right    = over_top_right,   
+                    bottom_left  = over_bottom_left, 
+                    bottom_right = over_bottom_right,
+                    vtile        = vtile,
+                    htile        = htile,
+                ),
+                down=Background(
+                    color        = down_color,
+                    center       = down_center,
+                    top          = down_top,         
+                    bottom       = down_bottom,      
+                    left         = down_left,        
+                    right        = down_right,       
+                    top_left     = down_top_left,    
+                    top_right    = down_top_right,   
+                    bottom_left  = down_bottom_left, 
+                    bottom_right = down_bottom_right,
+                    vtile        = vtile,
+                    htile        = htile,
+                ),
+                off=Background(
+                    color        = off_color,
+                    center       = off_center,
+                    top          = off_top,         
+                    bottom       = off_bottom,      
+                    left         = off_left,        
+                    right        = off_right,       
+                    top_left     = off_top_left,    
+                    top_right    = off_top_right,   
+                    bottom_left  = off_bottom_left, 
+                    bottom_right = off_bottom_right,
+                    vtile        = vtile,
+                    htile        = htile,
+                ),
+        )
+        nonempty_backgrounds = {
+                k: w for k, w in backgrounds.items()
+                if not w.is_empty
+        }
 
-    def set_over_image(self, image):
-        self._configured_states.add('over')
-        self._backgrounds['over'].set_image(image)
+        self._background = Rollover(self, 'base')
+        self._background.add_states(**nonempty_backgrounds)
+        self._stack.insert(self._background, self._background_layer, placement)
 
-    def del_over_background(self):
-        self._configured_states.discard('over')
-
-    def get_down_background(self):
-        return self._backgrounds['down'].get_images()
-
-    def set_down_background(self, **kwargs):
-        self._configured_states.add('down')
-        self._backgrounds['down'].set_images(**kwargs)
-
-    def set_down_image(self, image):
-        self._configured_states.add('down')
-        self._backgrounds['down'].set_image(image)
-
-    def del_down_background(self):
-        self._configured_states.discard('down')
-
-    def get_inactive_background(self):
-        return self._backgrounds['inactive'].get_images()
-
-    def set_inactive_background(self, **kwargs):
-        self._configured_states.add('inactive')
-        self._backgrounds['inactive'].set_images(**kwargs)
-
-    def set_inactive_image(self, image):
-        self._configured_states.add('inactive')
-        self._backgrounds['inactive'].set_image(image)
-
-    def del_inactive_background(self):
-        self._configured_states.discard('inactive')
-
-    def get_background_placement(self, new_placement):
-        return self._background_placement
-
-    def set_background_placement(self, new_placement):
-        self._background_placement = new_placement
-        self.repack()
-
-    def _update_state(self):
-        new_state = self._mouse
-
-        if new_state not in self._configured_states and new_state == 'down':
-            new_state = 'over'
-
-        if new_state not in self._configured_states and new_state == 'over':
-            new_state = 'base'
-
-        if not self._active:
-            new_state = 'inactive'
-
-        if new_state not in self._configured_states:
-            raise ValueError("no images for '{}' state".format(new_state))
-
-        assert new_state in self.possible_states
-        self._previous_state = self._current_state
-        self._current_state = new_state
-
-        if self._current_state != self._previous_state:
-            self._backgrounds[self._previous_state].hide()
-            self._backgrounds[self._current_state].unhide()
-            self.repack()
-
-Button.register_event_type('on_click')
+    def unset_background_images(self):
+        if self._background is not None:
+            self._stack.remove(self._background)
+            self._background = None
 
 
 @autoprop
