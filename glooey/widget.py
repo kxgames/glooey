@@ -32,17 +32,15 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         )
 
     @update_function
-    def repack(self, force=False):
+    def repack(self):
         if not self.is_attached_to_gui:
             return
 
         self.claim()
 
-        too_narrow = self.rect.width < self.min_width
-        too_short = self.rect.height < self.min_height
-
-        # If the widget is too small, repack its parent to make more space.
-        if too_narrow or too_short or force:
+        # If the widget is either too big or too small, repack its parent to 
+        # make more space.
+        if self.rect.size != self.min_size:
             self._is_claim_stale = False
             self.parent.repack()
             self._is_claim_stale = True
@@ -72,9 +70,12 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         """
         if self._rect is None or self._rect != new_rect:
             self._rect = new_rect
-
             self.do_resize()
-            self.do_resize_children()
+
+        # Even if this widget didn't change size, it may be that the children 
+        # need to move or be rearranged.  This came up for me with a custom 
+        # placement function, but I can imagine other scenarios as well.
+        self.do_resize_children()
 
         # Try to redraw the widget.  This won't do anything if the widget isn't 
         # ready to draw.
@@ -216,7 +217,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         implementation would iterate through all the children attached to the 
         widget and call ``resize()`` on each one.
         """
-        pass
+        for child in self.__children:
+            child.resize(self.rect)
 
     def do_regroup(self):
         """
@@ -315,11 +317,10 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # the event, and stop it from propagating.
         if self._spurious_leave_event:
             self._spurious_leave_event = False
-            return
+            return True
 
         under_mouse, previously_under_mouse = \
                 self._find_children_under_mouse(x, y)
-
         assert not previously_under_mouse
 
         for child in under_mouse:
@@ -405,6 +406,9 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     def get_min_height(self):
         return self._min_height
+
+    def get_min_size(self):
+        return self._min_width, self._min_height
 
     def get_min_rect(self):
         return Rect.from_size(self._min_width, self._min_height)
