@@ -5,10 +5,14 @@ from pprint import pprint
 from .helpers import *
 
 @autoprop
-class Widget (pyglet.event.EventDispatcher):
+class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     def __init__(self):
+        pyglet.event.EventDispatcher.__init__(self)
+        HoldUpdatesMixin.__init__(self)
         self._parent = None
+        # Use a double-underscore to avoid name conflicts; `_children` is a 
+        # useful name for subclasses, so I don't want it to cause conflicts.
         self.__children = set()
         self._children_under_mouse = set()
         self._children_can_overlap = True
@@ -27,6 +31,7 @@ class Widget (pyglet.event.EventDispatcher):
                 hex(id(self))[-4:],
         )
 
+    @update_function
     def repack(self, force=False):
         if not self.is_attached_to_gui:
             return

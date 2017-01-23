@@ -22,7 +22,7 @@ class HoldUpdatesMixin:
         self._num_holds = num_holds
         self._pending_updates = []
 
-    def hold_updates(self):
+    def stop_updates(self):
         self._num_holds += 1
 
     def resume_updates(self):
@@ -33,8 +33,8 @@ class HoldUpdatesMixin:
             self._pending_updates = []
 
     @contextlib.contextmanager
-    def update_after_block(self):
-        self.hold_updates()
+    def hold_updates(self):
+        self.stop_updates()
         yield
         self.resume_updates()
 
