@@ -3,14 +3,119 @@ import autoprop
 
 from vecrec import Vector, Rect
 from pprint import pprint
-from . import drawing
+from . import drawing, containers
 from .widget import Widget
-from .containers import place_widget_in_box
+from .containers import Deck, place_widget_in_box
 
-class PlaceHolder(Widget):
+@autoprop
+class Clickable(Widget):
+
+    def __init__(self):
+        super().__init__()
+        self._last_rollover_event = 'base'
+        self._mouse_state = 'base'
+        self._active_state = True
+        self._double_click_timer = 0
+        self._repack_on_rollover = False
+
+    def deactivate(self):
+        self._active_state = False
+        self._dispatch_rollover_event()
+
+    def reactivate(self):
+        self._active_state = True
+        self._dispatch_rollover_event()
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        super().on_mouse_press(x, y, button, modifiers)
+        self._mouse_state = 'down'
+        self._dispatch_rollover_event()
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        import time
+        super().on_mouse_release(x, y, button, modifiers)
+
+        if self._active_state and self._mouse_state == 'down':
+            # Two clicks within 500 ms triggers a double-click.
+            if time.perf_counter() - self._double_click_timer < 0.5:
+                self.dispatch_event('on_double_click', self)
+                self._double_click_timer = 0
+            else:
+                self.dispatch_event('on_click', self)
+                self._double_click_timer = time.perf_counter()
+
+        self._mouse_state = 'over'
+        self._dispatch_rollover_event()
+
+    def on_mouse_enter(self, x, y):
+        super().on_mouse_enter(x, y)
+        self._mouse_state = 'over'
+        self._dispatch_rollover_event()
+
+    def on_mouse_leave(self, x, y):
+        super().on_mouse_leave(x, y)
+        self._mouse_state = 'base'
+        self._dispatch_rollover_event()
+
+    def on_mouse_drag_leave(self, x, y):
+        super().on_mouse_drag_leave(x, y)
+        self._mouse = 'base'
+        self._dispatch_rollover_event()
+    
+    def is_active(self):
+        return self._active_state
+
+    def get_rollover(self):
+        return self._last_rollover_event
+
+    def get_repack_on_rollover(self):
+        return self._repack_on_rollover
+
+    def set_repack_on_rollover(self, repack):
+        """
+        Repack the widget every time it's rollover state changes.  This is 
+        unnecessary for most widgets, but useful if you're trying to react to 
+        rollovers in unusual ways.
+        """
+        self._repack_on_rollover = repack
+
+    def _dispatch_rollover_event(self):
+        rollover_event = self._mouse_state if self._active_state else 'off'
+
+        if rollover_event != self._last_rollover_event:
+            self.dispatch_event('on_rollover', rollover_event)
+            self._last_rollover_event = rollover_event
+
+            if self._repack_on_rollover:
+                self.repack()
+
+
+Clickable.register_event_type('on_click')
+Clickable.register_event_type('on_double_click')
+Clickable.register_event_type('on_rollover')
+
+@autoprop
+class Rollover(Deck):
+
+    def __init__(self, clickable, initial_state, **widgets):
+        super().__init__(initial_state, **widgets)
+        clickable.push_handlers(self.on_rollover)
+
+    def on_rollover(self, new_state):
+        if new_state not in self.known_states and new_state == 'down':
+            new_state = 'over'
+
+        if new_state not in self.known_states and new_state == 'over':
+            new_state = 'base'
+
+        self.set_state(new_state)
+
+
+
+class PlaceHolder(Clickable):
 
     def __init__(self, width=0, height=0, color=drawing.green):
-        Widget.__init__(self)
+        super().__init__()
         self.color = color
         self.width = width
         self.height = height
@@ -61,41 +166,50 @@ class PlaceHolder(Widget):
 
 class EventLogger(PlaceHolder):
 
+    def on_click(self, widget):
+        print(f'on_click(widget={widget})')
+
+    def on_double_click(self, widget):
+        print(f'on_double_click(widget={widget})')
+
+    def on_rollover(self, state):
+        print(f'on_rollover({state})')
+
     def on_mouse_press(self, x, y, button, modifiers):
-        message = 'on_mouse_press(x={}, y={}, button={}, modifiers={})'
-        print(message.format(x, y, button, modifiers))
+        super().on_mouse_press(x, y, button, modifiers)
+        print(f'on_mouse_press(x={x}, y={y}, button={button}, modifiers={modifiers})')
 
     def on_mouse_release(self, x, y, button, modifiers):
-        message = 'on_mouse_release(x={}, y={}, button={}, modifiers={})'
-        print(message.format(x, y, button, modifiers))
+        super().on_mouse_release(x, y, button, modifiers)
+        print(f'on_mouse_release(x={x}, y={y}, button={button}, modifiers={modifiers})')
 
     def on_mouse_motion(self, x, y, dx, dy):
-        message = 'on_mouse_motion(x={}, y={}, dx={}, dy={})'
-        print(message.format(x, y, dx, dy))
+        super().on_mouse_motion(x, y, dx, dy)
+        print(f'on_mouse_motion(x={x}, y={y}, dx={dx}, dy={dy})')
 
     def on_mouse_enter(self, x, y):
-        message = 'on_mouse_enter(x={}, y={})'
-        print(message.format(x, y))
+        super().on_mouse_enter(x, y)
+        print(f'on_mouse_enter(x={x}, y={y})')
 
     def on_mouse_leave(self, x, y):
-        message = 'on_mouse_leave(x={}, y={})'
-        print(message.format(x, y))
+        super().on_mouse_leave(x, y)
+        print(f'on_mouse_leave(x={x}, y={y})')
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        message = 'on_mouse_drag(x={}, y={}, dx={}, dy={}, button={}, modifiers={})'
-        print(message.format(x, y, dx, dy, buttons, modifiers))
+        super().on_mouse_drag(x, y, dx, dy, buttons, modifiers)
+        print(f'on_mouse_drag(x={x}, y={y}, dx={dx}, dy={dy}, buttons={buttons}, modifiers={modifiers})')
 
     def on_mouse_drag_enter(self, x, y):
-        message = 'on_mouse_drag_enter(x={}, y={})'
-        print(message.format(x, y))
+        super().on_mouse_drag_enter(x, y)
+        print(f'on_mouse_drag_enter(x={x}, y={y})')
 
     def on_mouse_drag_leave(self, x, y):
-        message = 'on_mouse_drag_leave(x={}, y={})'
-        print(message.format(x, y))
+        super().on_mouse_drag_leave(x, y)
+        print(f'on_mouse_drag_leave(x={x}, y={y})')
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        message = 'on_mouse_scroll(x={}, y={}, scroll_x={}, scroll_y={})'
-        print(message.format(x, y, scroll_x, scroll_y))
+        super().on_mouse_scroll(x, y, scroll_x, scroll_y)
+        print(f'on_mouse_scroll(x={x}, y={y}, scroll_x={scroll_x}, scroll_y={scroll_y})')
 
 
 @autoprop
