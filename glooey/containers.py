@@ -116,9 +116,10 @@ class PaddingMixin:
     def get_padding(self):
         return self._padding
 
-    def set_padding(self, new_padding):
-        self._padding = new_padding
-        self.repack()
+    def set_padding(self, new_padding, repack=True):
+        if new_padding is not None:
+            self._padding = new_padding
+            if repack: self.repack()
 
 
 @autoprop
@@ -162,8 +163,9 @@ class Bin (Widget, BinMixin, PaddingMixin, PlacementMixin):
         PaddingMixin.__init__(self, padding)
         PlacementMixin.__init__(self, placement)
 
-    def add(self, child, placement=None):
+    def add(self, child, placement=None, padding=None):
         self._set_custom_placement(child, placement, repack=False)
+        self.set_padding(padding, repack=False)
         BinMixin.add(self, child)
 
     def clear(self):
