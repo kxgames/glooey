@@ -99,9 +99,9 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
             self.undraw_all()
         self._hidden = True
 
-    def unhide(self):
+    def unhide(self, draw=True):
         self._hidden = False
-        if self.is_visible:
+        if self.is_visible and draw:
             self.draw_all()
 
     def draw(self):

@@ -825,7 +825,7 @@ class Deck(Widget):
             self._detach_child(self._states[state])
             # Unhide the child so it'll show up if the user tries to reattach 
             # it somewhere else.
-            self._states[state].unhide()
+            self._states[state].unhide(draw=False)
             del self._states[state]
 
     def get_state(self):

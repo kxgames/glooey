@@ -430,7 +430,7 @@ class Image(Widget):
 
     def do_regroup(self):
         if self._sprite is not None:
-            self._sprite.group = group
+            self._sprite.group = self.group
 
     @autoprop
     def do_draw(self):
@@ -538,14 +538,14 @@ class Background(Widget):
 class Button(Clickable):
 
     _background_layer = 1
-    _image_layer = 2
+    _foreground_layer = 2
     _label_layer = 3
 
     def __init__(self):
         super().__init__()
         self._stack = containers.Stack()
         self._label = None
-        self._image = None
+        self._foreground = None
         self._background = None
         self._attach_child(self._stack)
 
@@ -576,20 +576,20 @@ class Button(Clickable):
             self._stack.remove(self._label)
             self._label = None
 
-    def get_image(self):
-        return self._image.image
+    def get_foreground(self):
+        return self._foreground.image
 
-    def set_image(self, image, placement=None):
-        if self._image is not None:
-            self._stack.remove(self._image)
+    def set_foreground(self, image, placement=None):
+        if self._foreground is not None:
+            self._stack.remove(self._foreground)
 
-        self._image = Image(image)
-        self._stack.insert(self._image, self._image_layer, placement)
+        self._foreground = Image(image)
+        self._stack.insert(self._foreground, self._foreground_layer, placement)
 
-    def unset_image(self):
-        if self._image is not None:
-            self._stack.remove(self._image)
-            self._image = None
+    def unset_foreground(self):
+        if self._foreground is not None:
+            self._stack.remove(self._foreground)
+            self._foreground = None
 
     def set_backgrounds(self, *, 
             base=None,              over=None,              down=None,              off=None,
