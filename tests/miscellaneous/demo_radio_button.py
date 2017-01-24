@@ -9,20 +9,20 @@ batch = pyglet.graphics.Batch()
 root = glooey.Gui(window, batch=batch)
 hbox = glooey.HBox(padding=5, placement='center')
 
+images = dict(
+        checked_base=pyglet.image.load('checkbox_green_checked.png'),
+        checked_over=pyglet.image.load('checkbox_green_checked_over.png'),
+        unchecked_base=pyglet.image.load('checkbox_unchecked.png'),
+        unchecked_over=pyglet.image.load('checkbox_green_unchecked_over.png'),
+)
+def on_toggle(widget):
+    print(f"{widget}: {widget.is_checked}")
+
 buttons = []
 for i in range(3):
-    button = glooey.RadioButton(buttons)
+    button = glooey.RadioButton(buttons, **images)
+    button.push_handlers(on_toggle=on_toggle)
     hbox.add(button)
-
-    button.i = i
-    button.base_checked_image = pyglet.image.load('checkbox_green_checked.png')
-    button.over_checked_image = pyglet.image.load('checkbox_green_checked_over.png')
-    button.base_unchecked_image = pyglet.image.load('checkbox_unchecked.png')
-    button.over_unchecked_image = pyglet.image.load('checkbox_green_unchecked_over.png')
-    button.push_handlers(on_toggle=lambda widget: print(
-        "RadioButton #{} is {}".format(widget.i, widget.is_checked)))
-
-    buttons.append(button)
 
 root.add(hbox, 'center')
 

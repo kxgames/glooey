@@ -7,24 +7,24 @@ window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
 root = glooey.Gui(window, batch=batch)
-button = glooey.Checkbox()
-button.base_checked_image = pyglet.image.load('checkbox_green_checked.png')
-button.over_checked_image = pyglet.image.load('checkbox_green_checked_over.png')
-button.inactive_checked_image = pyglet.image.load('checkbox_inactive_checked.png')
-button.base_unchecked_image = pyglet.image.load('checkbox_unchecked.png')
-button.over_unchecked_image = pyglet.image.load('checkbox_green_unchecked_over.png')
-button.inactive_unchecked_image = pyglet.image.load('checkbox_inactive_unchecked.png')
+button = glooey.Checkbox(
+        checked_base=pyglet.image.load('checkbox_green_checked.png'),
+        checked_over=pyglet.image.load('checkbox_green_checked_over.png'),
+        checked_off=pyglet.image.load('checkbox_inactive_checked.png'),
+        unchecked_base=pyglet.image.load('checkbox_unchecked.png'),
+        unchecked_over=pyglet.image.load('checkbox_green_unchecked_over.png'),
+        unchecked_off=pyglet.image.load('checkbox_inactive_unchecked.png'),
+)
 root.add(button, 'center')
 
 @button.event
 def on_toggle(widget):
-    print("{} is {}!".format(widget, "on" if widget.is_checked else "off"))
+    print(f"{widget} is {'checked' if widget.is_checked else 'unchecked'}!")
 
 @window.event
 def on_key_press(symbol, modifier):
     if symbol == pyglet.window.key.SPACE:
         button.deactivate() if button.is_active else button.reactivate()
-
 
 pyglet.app.run()
 

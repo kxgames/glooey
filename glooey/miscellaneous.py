@@ -36,12 +36,13 @@ class Clickable(Widget):
         super().on_mouse_release(x, y, button, modifiers)
 
         if self._active_state and self._mouse_state == 'down':
+            self.dispatch_event('on_click', self)
+
             # Two clicks within 500 ms triggers a double-click.
             if time.perf_counter() - self._double_click_timer < 0.5:
                 self.dispatch_event('on_double_click', self)
                 self._double_click_timer = 0
             else:
-                self.dispatch_event('on_click', self)
                 self._double_click_timer = time.perf_counter()
 
         self._mouse_state = 'over'
@@ -109,7 +110,6 @@ class Rollover(Deck):
             new_state = 'base'
 
         self.set_state(new_state)
-
 
 
 class PlaceHolder(Clickable):
@@ -210,6 +210,7 @@ class EventLogger(PlaceHolder):
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         super().on_mouse_scroll(x, y, scroll_x, scroll_y)
         print(f'on_mouse_scroll(x={x}, y={y}, scroll_x={scroll_x}, scroll_y={scroll_y})')
+
 
 
 @autoprop
@@ -433,7 +434,7 @@ class Image(Widget):
 
     @autoprop
     def do_draw(self):
-        if not self.image:
+        if self.image is None:
             return
 
         if self._sprite is None:
@@ -448,6 +449,7 @@ class Image(Widget):
     def do_undraw(self):
         if self._sprite is not None:
             self._sprite.delete()
+            self._sprite = None
 
     def get_image(self):
         return self._image
@@ -589,7 +591,7 @@ class Button(Clickable):
             self._stack.remove(self._image)
             self._image = None
 
-    def set_background_images(self, *, 
+    def set_backgrounds(self, *, 
             base=None,              over=None,              down=None,              off=None,
             base_color=None,        over_color=None,        down_color=None,        off_color=None,
             base_center=None,       over_center=None,       down_center=None,       off_center=None,
@@ -611,7 +613,9 @@ class Button(Clickable):
         if self._background is not None:
             self._stack.remove(self._background)
 
-        backgrounds = dict(
+        self._background = Rollover(self, 'base')
+        self._background.add_states_if(
+                lambda w: not w.is_empty,
                 base=Background(
                     color        = base_color,
                     center       = base_center,
@@ -669,184 +673,73 @@ class Button(Clickable):
                     htile        = htile,
                 ),
         )
-        nonempty_backgrounds = {
-                k: w for k, w in backgrounds.items()
-                if not w.is_empty
-        }
-
-        self._background = Rollover(self, 'base')
-        self._background.add_states(**nonempty_backgrounds)
         self._stack.insert(self._background, self._background_layer, placement)
 
-    def unset_background_images(self):
+    def unset_backgrounds(self):
         if self._background is not None:
             self._stack.remove(self._background)
             self._background = None
 
 
 @autoprop
-class Checkbox(Widget):
+class Checkbox(Clickable):
 
-    def __init__(self):
+    def __init__(self, *, is_checked=False, **images):
         super().__init__()
-        self._image = Image()
-        self._attach_child(self._image)
+        self._deck = Deck(is_checked)
+        self._attach_child(self._deck)
+        self.set_images(**images)
 
-        # self._states is a 2D dictionary of images representing the various 
-        # states the checkbox can be in.  The first index represents whether or 
-        # not the box is check or not, and can be either True of False.  The 
-        # second index represented the state of the mouse and can be either 
-        # 'base', 'over', 'down', 'inactive'.
-        self._states = {True: {}, False: {}}
+    def do_claim(self):
+        return self._deck.min_size
 
-        # These variables keep track of the state of the checkbox.  Whether or 
-        # not the widget is active is tracked separately from the mouse, even 
-        # though they're considered together in self._states, so that the mouse 
-        # state will be up-to-date when the widget is reactivated.
-        self._checked = False
-        self._mouse = 'base'
-        self._active = True
+    def on_click(self, widget):
+        self.toggle()
+
+    def toggle(self):
+        self._deck.state = not self._deck.state
+        self.dispatch_event('on_toggle', self)
 
     def check(self):
-        if not self._checked:
+        if not self.is_checked:
             self.toggle()
 
     def uncheck(self):
-        if self._checked:
+        if self.is_checked:
             self.toggle()
-
-    def toggle(self):
-        self._checked = not self._checked
-        self.dispatch_event('on_toggle', self)
-        self._update_state()
-
-    def reactivate(self):
-        self._active = True
-        self._update_state()
-
-    def deactivate(self):
-        self._active = False
-        self._update_state()
-
-    def do_claim(self):
-        return self._image.min_width, self._image.min_height
-
-    def do_resize_children(self):
-        self._image.resize(self.rect)
-
-    def on_mouse_press(self, x, y, button, modifiers):
-        self._mouse = 'down'
-        self._update_state()
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        if self._active and self._mouse == 'down':
-            self.toggle()
-
-        self._mouse = 'over'
-        self._update_state()
-
-    def on_mouse_enter(self, x, y):
-        self._mouse = 'over'
-        self._update_state()
-
-    def on_mouse_leave(self, x, y):
-        self._mouse = 'base'
-        self._update_state()
-
-    def on_mouse_drag_enter(self, x, y):
-        pass
-
-    def on_mouse_drag_leave(self, x, y):
-        self._mouse = 'base'
-        self._update_state()
 
     @property
     def is_checked(self):
-        return self._checked
+        return self._deck.state
 
-    @property
-    def is_active(self):
-        return self._active
+    def set_images(self, *,
+            checked_base=None, unchecked_base=None,
+            checked_over=None, unchecked_over=None,
+            checked_down=None, unchecked_down=None,
+            checked_off=None,  unchecked_off=None):
 
-    def get_state(self):
-        checked_state = self._checked
-        mouse_state = self._mouse
+        checked = Rollover(self, 'base')
+        checked.add_states_if(
+                lambda w: w.image is not None,
+                base=Image(checked_base),
+                over=Image(checked_over),
+                down=Image(checked_down),
+                off=Image(checked_off),
+        )
+        unchecked = Rollover(self, 'base')
+        unchecked.add_states_if(
+                lambda w: w.image is not None,
+                base=Image(unchecked_base),
+                over=Image(unchecked_over),
+                down=Image(unchecked_down),
+                off=Image(unchecked_off),
+        )
+        with self._deck.hold_updates():
+            self._deck.add_state(True, checked)
+            self._deck.add_state(False, unchecked)
 
-        if mouse_state == 'down' and 'down' not in self._states[checked_state]:
-            mouse_state = 'over'
-
-        if mouse_state == 'over' and 'over' not in self._states[checked_state]:
-            mouse_state = 'base'
-
-        if not self._active:
-            mouse_state = 'inactive'
-
-        return checked_state, mouse_state
-
-    def get_image(self, is_checked=None, mouse_state=None):
-        if is_checked is None and mouse_state is None:
-            is_checked, mouse_state = self.get_state()
-        return self._states[is_checked].get(mouse_state)
-
-    def set_image(self, is_checked, mouse_state, image):
-        self._states[is_checked][mouse_state] = image
-        if (is_checked, mouse_state) == self.get_state():
-            self._image.image = image
-
-    def get_base_checked_image(self):
-        return self.get_image(True, 'base')
-
-    def set_base_checked_image(self, image):
-        self.set_image(True, 'base', image)
-
-    def get_base_unchecked_image(self):
-        return self.get_image(False, 'base')
-
-    def set_base_unchecked_image(self, image):
-        self.set_image(False, 'base', image)
-
-    def get_over_checked_image(self):
-        return self.get_image(True, 'over')
-
-    def set_over_checked_image(self, image):
-        self.set_image(True, 'over', image)
-
-    def get_over_unchecked_image(self):
-        return self.get_image(False, 'over')
-
-    def set_over_unchecked_image(self, image):
-        self.set_image(False, 'over', image)
-
-    def get_down_checked_image(self):
-        return self.get_image(True, 'down')
-
-    def set_down_checked_image(self, image):
-        self.set_image(True, 'down', image)
-
-    def get_down_unchecked_image(self):
-        return self.get_image(False, 'down')
-
-    def set_down_unchecked_image(self, image):
-        self.set_image(False, 'down', image)
-
-    def get_inactive_checked_image(self):
-        return self.get_image(True, 'inactive')
-
-    def set_inactive_checked_image(self, image):
-        self.set_image(True, 'inactive', image)
-
-    def get_inactive_unchecked_image(self):
-        return self.get_image(False, 'inactive')
-
-    def set_inactive_unchecked_image(self, image):
-        self.set_image(False, 'inactive', image)
-
-    def _update_state(self):
-        checked_state, mouse_state = self.get_state()
-        if mouse_state not in self._states[checked_state]:
-            raise ValueError("no images for the '{}_{}' state".format(
-                mouse_state, 'checked' if checked_state else 'unchecked'))
-        self._image.image = self.get_image(checked_state, mouse_state)
+    def unset_images(self):
+        self._deck.clear_states()
 
 
 Checkbox.register_event_type('on_toggle')
@@ -854,16 +747,23 @@ Checkbox.register_event_type('on_toggle')
 @autoprop
 class RadioButton(Checkbox):
 
-    def __init__(self, peers=None):
-        super().__init__()
-        if peers is not None:
-            self.peers = peers
+    def __init__(self, peers=None, *, is_checked=False, **images):
+        super().__init__(is_checked=is_checked, **images)
+        self.peers = peers if peers is not None else []
 
     def on_toggle(self, widget):
         if self.is_checked:
             for peer in self.peers:
                 if peer is not self:
                     peer.uncheck()
+
+    def get_peers(self):
+        return self._peers
+
+    def set_peers(self, peers):
+        if self not in peers:
+            peers.append(self)
+        self._peers = peers
 
 
 

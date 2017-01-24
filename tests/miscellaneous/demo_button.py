@@ -25,7 +25,7 @@ button.set_text(
         font_size = 12,
         placement=label_placement,
 )
-button.set_background_images(
+button.set_backgrounds(
         base=pyglet.image.load('button_green.png'),
         down=pyglet.image.load('button_green_down.png'),
         off=pyglet.image.load('button_grey.png'),
