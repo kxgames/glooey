@@ -788,31 +788,45 @@ class Deck(Widget):
         return min_width, min_height
 
     def add_state(self, state, widget):
-        self.add_states(**{state: widget})
+        self._add_state(state, widget)
+        self.repack()
 
     def add_states(self, **states):
         for state, widget in states.items():
-            if state == self.state:
-                widget.unhide()
-            else:
-                widget.hide()
-            self._states[state] = widget
-            self._attach_child(widget)
-
+            self._remove_state(state)
+            self._add_state(state, widget)
         self.repack()
+
+    def add_states_if(self, predicate, **states):
+        filtered_states = {
+                k: w for k,w in states.items()
+                if predicate(w)
+        }
+        self.add_states(**filtered_states)
 
     def remove_state(self, state):
         self.remove_states(state)
 
     def remove_states(self, *states):
         for state in states:
-            self._detach_child(self._states[state])
-            self._states[state].unhide()    # Unhide the child so it'll show up 
-            del self._states[state]         # if the user tries to reattach it 
-        self.repack()                       # somewhere else.
+            self._remove_state(state)
+        self.repack()
 
     def clear_states(self):
         self.remove_states(self.known_states)
+
+    def _add_state(self, state, widget):
+        widget.unhide() if state == self.state else widget.hide()
+        self._states[state] = widget
+        self._attach_child(widget)
+
+    def _remove_state(self, state):
+        if state in self._states:
+            self._detach_child(self._states[state])
+            # Unhide the child so it'll show up if the user tries to reattach 
+            # it somewhere else.
+            self._states[state].unhide()
+            del self._states[state]
 
     def get_state(self):
         return self._current_state
