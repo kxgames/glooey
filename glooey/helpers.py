@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+import pyglet
 import inspect
 import functools
 import contextlib
+from pathlib import Path
 from pprint import pprint
 
 class UsageError (Exception):
@@ -73,3 +75,21 @@ def update_function(method):
     return wrapped_method
 
 
+
+class ResourceLoader(pyglet.resource.Loader):
+
+    def __init__(self, paths=None):
+        super().__init__(paths, Path(__file__).parents[1] / 'resources')
+
+    def reindex(self):
+        self._cached_yaml = {}
+        super().reindex()
+
+    def yaml(self, name):
+        import yaml
+
+        self._require_index()
+        if name not in self._cached_yaml:
+            self._cached_yaml[name] = yaml.load(self.file(name))
+
+        return self._cached_yaml[name]

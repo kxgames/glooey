@@ -30,7 +30,7 @@ def test_basic_usage():
     ex.update_1()
     assert ex.update_log == '1'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         ex.update_1()
         assert ex.update_log == '1'
 
@@ -44,7 +44,7 @@ def test_squash_multiple_updates():
     ex.update_1()
     assert ex.update_log == '11'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         ex.update_1()
         ex.update_1()
         assert ex.update_log == '11'
@@ -58,7 +58,7 @@ def test_update_with_args():
     ex.update_n(3)
     assert ex.update_log == '3'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         ex.update_n(4)
         ex.update_n(5)
         ex.update_n(4)
@@ -75,19 +75,19 @@ def test_update_order():
     ex.update_2()
     assert ex.update_log == '12'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         ex.update_1()
         ex.update_2()
         assert ex.update_log == '12'
     assert ex.update_log == '1212'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         ex.update_2()
         ex.update_1()
         assert ex.update_log == '1212'
     assert ex.update_log == '121221'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         ex.update_n(5)
         ex.update_n(3)
         ex.update_n(4)
@@ -105,16 +105,16 @@ def test_no_update_needed():
     ex.update_2()
     assert ex.update_log == '12'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         pass
     assert ex.update_log == '12'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         ex.update_1()
         assert ex.update_log == '12'
     assert ex.update_log == '121'
 
-    with ex.update_after_block():
+    with ex.hold_updates():
         ex.update_2()
         assert ex.update_log == '121'
     assert ex.update_log == '1212'
@@ -133,8 +133,8 @@ def test_nested_holds():
     ex = UpdateLogger()
     assert ex.update_log == ''
 
-    with ex.update_after_block():
-        with ex.update_after_block():
+    with ex.hold_updates():
+        with ex.hold_updates():
             ex.update_1()
             assert ex.update_log == ''
         ex.update_2()
