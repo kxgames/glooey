@@ -53,6 +53,10 @@ class Root (Bin):
     def get_group(self):
         return self._group
 
+    @property
+    def is_hidden(self):
+        return self._hidden
+
 
 @autoprop
 class Gui (Root):

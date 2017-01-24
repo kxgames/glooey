@@ -21,7 +21,6 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._hidden = False
         self._is_claim_stale = True
         self._spurious_leave_event = False
-        self._draw_status = 'never drawn'
         self._min_width = 0
         self._min_height = 0
 
@@ -96,12 +95,14 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self.draw()
 
     def hide(self):
+        if self.is_visible:
+            self.undraw_all()
         self._hidden = True
-        self.undraw_all()
 
     def unhide(self):
         self._hidden = False
-        self.draw_all()
+        if self.is_visible:
+            self.draw_all()
 
     def draw(self):
         """
@@ -121,23 +122,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
            parent calls its ``regroup()`` method.
 
         4. The widget must not be hidden.
-
-        If these conditions are not met, the widget not be drawn and a debug- 
-        level log message explaining why will be issued.
         """
-
-        # If the widget can't be rendered for some reason, log a debug-level 
-        # message describing why.  It can be really hard to figure out why 
-        # something isn't showing up on the screen at all, and this will help 
-        # if the user thinks to turn on logging.
-        #
-        # The reason I'm issuing debug messages instead of errors is that these 
-        # checks are expected to fail during routine operations.  For example, 
-        # if a parent calls resize() and then regroup() on a child, both calls 
-        # will attempt to redraw the widget but the first will fail.
-
-        self._draw_status = 'draw() called'
-
         if self.root is None: return
         if self.rect is None: return
         if self.group is None: return
@@ -151,7 +136,6 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
             child.draw_all()
 
     def undraw(self):
-        self._draw_status = 'undraw() called'
         self.do_undraw()
 
     def undraw_all(self):
@@ -395,11 +379,14 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     @property
     def is_hidden(self):
-        return self._hidden
+        if self.parent is None:
+            return self._hidden
+        else:
+            return self._hidden or self.parent.is_hidden
 
     @property
     def is_visible(self):
-        return not self._hidden
+        return not self.is_hidden
 
     def get_min_width(self):
         return self._min_width
@@ -457,7 +444,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
                 else:
                     diagnoses.append("{unattached_parent}, a widget {level} level(s) above {self}, is not attached to the GUI.")
 
-        elif self._draw_status == 'draw() called':
+        else:
             if self.rect is None:
                 diagnoses.append("{self} was not given a size by its parent.\nCheck for bugs in {self.parent.__class__.__name__}.do_resize_children()")
 
@@ -468,13 +455,20 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
                 diagnoses.append("{self} was not given a group by its parent.\nCheck for bugs in {self.parent.__class__.__name__}.do_regroup_children()")
 
             if self.is_hidden:
-                diagnoses.append("{self} is currently hidden.\nCall {self.__class__.__name__}.unhide() to reveal it.")
 
-            if not diagnoses:
-                diagnoses.append("{self} seems to have been drawn.\nCheck for bugs in {self.__class__.__name__}.do_draw()")
+                def find_hidden_parent(widget, level=0):
+                    if widget._hidden: return widget, level
+                    else: return find_hidden_parent(widget.parent, level + 1)
 
-        elif self._draw_status == 'undraw() called':
-            diagnoses.append("{self} has not been drawn since it was last undrawn.")
+                hidden_parent, level = find_hidden_parent(self)
+
+                if hidden_parent is self:
+                    diagnoses.append("{self} is hidden.\nCall {self.__class__.__name__}.unhide() to reveal it.")
+                else:
+                    diagnoses.append("{hidden_parent}, a widget {level} level(s) above {self}, is hidden.\nCall {hidden_parent.__class__.__name__}.unhide() to reveal it and its children.")
+
+        if not diagnoses:
+            diagnoses.append("{self} seems to have been drawn.\nCheck for bugs in {self.__class__.__name__}.do_draw()")
 
         # Print out the diagnoses.
 
