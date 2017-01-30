@@ -6,33 +6,27 @@ from pprint import pprint
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
-pyglet.font.add_file('kenvector_future.ttf')
-pyglet.font.add_file('kenvector_future_thin.ttf')
+theme = glooey.themes.ResourceLoader('wesnoth')
+theme.add_font('fonts/Lato-Regular.ttf')
+
+class WesnothButton(glooey.Button):
+
+    class Label(glooey.Label): #
+        default_color = '#b9ad86'
+        default_font_name = 'Lato Regular'
+        default_font_size = 10
+
+    default_base = theme.image('buttons/button_normal/button_H22.png')
+    default_over = theme.image('buttons/button_normal/button_H22-active.png')
+    default_down = theme.image('buttons/button_normal/button_H22-pressed.png')
+    default_label_placement = 'center'
+
 
 root = glooey.Gui(window, batch=batch)
-button = glooey.Button()
-
-def label_placement(child_rect, parent_rect):   # (no fold)
-    child_rect.center = parent_rect.center
-    if button.rollover == 'down':
-        child_rect.bottom -= 4
-
-button.set_text(
-        text='Start Game!',
-        color='white',
-        bold='True',
-        font_name = 'KenVector Future',
-        font_size = 12,
-        placement=label_placement,
-)
-button.set_backgrounds(
-        base=pyglet.image.load('button_green.png'),
-        down=pyglet.image.load('button_green_down.png'),
-        off=pyglet.image.load('button_grey.png'),
-)
-button.repack_on_rollover = True
-
-root.add(button, 'center')
+vbox = glooey.VBox()
+button = WesnothButton('Tutorial')
+vbox.add(button, placement='center')
+root.add(vbox)
 
 @button.event
 def on_click(widget):
@@ -46,9 +40,13 @@ def on_double_click(widget):
 def on_key_press(symbol, modifier):
     if symbol == pyglet.window.key.SPACE:
         if button.is_active:
+            print('deactivate')
             button.deactivate()
         else:
+            print('reactivate')
             button.reactivate()
+        print(button.is_active)
+        print()
 
 
 pyglet.app.run()

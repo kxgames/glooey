@@ -731,6 +731,9 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
             for child, layer in self._children.items():
                 child.regroup(pyglet.graphics.OrderedGroup(layer, self.group))
 
+    def set_placement_for(self, widget, placement):
+        self._set_custom_placement(widget, placement)
+
     def get_children(self):
         return self._children.keys()
 
@@ -777,6 +780,20 @@ class Deck(Widget):
         self.repack()
 
     def add_states_if(self, predicate, **states):
+        filtered_states = {
+                k: w for k,w in states.items()
+                if predicate(w)
+        }
+        self.add_states(**filtered_states)
+
+    def reset_states(self, **states):
+        for state in self.known_states:
+            self._remove_state(state)
+        for state, widget in states.items():
+            self._add_state(state, widget)
+        self.repack()
+
+    def reset_states_if(self, predicate, **states):
         filtered_states = {
                 k: w for k,w in states.items()
                 if predicate(w)

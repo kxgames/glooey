@@ -16,7 +16,6 @@ class Clickable(Widget):
         self._mouse_state = 'base'
         self._active_state = True
         self._double_click_timer = 0
-        self._repack_on_rollover = False
 
     def deactivate(self):
         self._active_state = False
@@ -63,32 +62,18 @@ class Clickable(Widget):
         self._mouse = 'base'
         self._dispatch_rollover_event()
     
+    @property
     def is_active(self):
         return self._active_state
 
     def get_rollover(self):
         return self._last_rollover_event
 
-    def get_repack_on_rollover(self):
-        return self._repack_on_rollover
-
-    def set_repack_on_rollover(self, repack):
-        """
-        Repack the widget every time it's rollover state changes.  This is 
-        unnecessary for most widgets, but useful if you're trying to react to 
-        rollovers in unusual ways.
-        """
-        self._repack_on_rollover = repack
-
     def _dispatch_rollover_event(self):
         rollover_event = self._mouse_state if self._active_state else 'off'
-
         if rollover_event != self._last_rollover_event:
-            self.dispatch_event('on_rollover', rollover_event)
+            self.dispatch_event('on_rollover', rollover_event, self._last_rollover_event)
             self._last_rollover_event = rollover_event
-
-            if self._repack_on_rollover:
-                self.repack()
 
 
 Clickable.register_event_type('on_click')
@@ -102,7 +87,7 @@ class Rollover(Deck):
         super().__init__(initial_state, **widgets)
         clickable.push_handlers(self.on_rollover)
 
-    def on_rollover(self, new_state):
+    def on_rollover(self, new_state, old_state):
         if new_state not in self.known_states and new_state == 'down':
             new_state = 'over'
 
@@ -172,8 +157,8 @@ class EventLogger(PlaceHolder):
     def on_double_click(self, widget):
         print(f'on_double_click(widget={widget})')
 
-    def on_rollover(self, state):
-        print(f'on_rollover({state})')
+    def on_rollover(self, new_state, old_state):
+        print(f'on_rollover({new_state} {old_state})')
 
     def on_mouse_press(self, x, y, button, modifiers):
         super().on_mouse_press(x, y, button, modifiers)
@@ -215,13 +200,38 @@ class EventLogger(PlaceHolder):
 
 @autoprop
 class Label(Widget):
+    default_font_name = None
+    default_font_size = None
+    default_bold = None
+    default_italic = None
+    default_underline = None
+    default_kerning = None
+    default_baseline = None
+    default_color = 'green'
+    default_background_color = None
+    default_alignment = None
+    default_line_spacing = None
 
     def __init__(self, text="", **style):
         super().__init__()
         self._layout = None
         self._text = text
         self._line_wrap_width = 0
-        self._style = {}; self.set_style(**style)
+        self._style = {}
+        self.set_style(
+                font_name=self.default_font_name,
+                font_size=self.default_font_size,
+                bold=self.default_bold,
+                italic=self.default_italic,
+                underline=self.default_underline,
+                kerning=self.default_kerning,
+                baseline=self.default_baseline,
+                color=self.default_color,
+                background_color=self.default_background_color,
+                alignment=self.default_alignment,
+                line_spacing=self.default_line_spacing,
+        )
+        self.set_style(**style)
 
     def do_claim(self):
         # Make sure the label's text and style are up-to-date before we request 
@@ -297,11 +307,15 @@ class Label(Widget):
     def get_text(self):
         return self._text
 
-    def set_text(self, text, width=None):
+    def set_text(self, text, width=None, **style):
         self._text = text
         if width is not None:
             self._line_wrap_width = width
-        self.repack()
+        # This will repack.
+        self.set_style(**style)
+
+    def unset_text(self):
+        self.set_text("")
 
     def get_font_name(self):
         return self.get_style('font_name')
@@ -373,13 +387,16 @@ class Label(Widget):
         return self._style.get(style)
 
     def set_style(self, **style):
+        # Remove null entries from the style.
+        style = {k:v for k,v in style.items() if v is not None}
+
         # I want users to be able to specify colors using strings or Color 
-        # objects, but pyglet expects tuples.  So make the conversion here.
+        # objects, but pyglet expects tuples, so make the conversion here.
 
         if 'color' in style:
             color = style['color']
             if isinstance(color, str):
-                color = drawing.colors[color]
+                color = drawing.str_to_color(color)
             if hasattr(color, 'tuple'):
                 color = color.tuple
             style['color'] = color
@@ -389,7 +406,7 @@ class Label(Widget):
         if 'background_color' in style:
             color = style['background_color']
             if isinstance(color, str):
-                color = drawing.colors[color]
+                color = drawing.str_to_color(color)
             if hasattr(color, 'tuple'):
                 color = color.tuple
             style['background_color'] = color
@@ -423,7 +440,7 @@ class Image(Widget):
         self._sprite = None
 
     def do_claim(self):
-        if self.image:
+        if self.image is not None:
             return self.image.width, self.image.height
         else:
             return 0, 0
@@ -432,9 +449,9 @@ class Image(Widget):
         if self._sprite is not None:
             self._sprite.group = self.group
 
-    @autoprop
     def do_draw(self):
         if self.image is None:
+            self.do_undraw()
             return
 
         if self._sprite is None:
@@ -458,6 +475,9 @@ class Image(Widget):
         if self._image is not new_image:
             self._image = new_image
             self.repack()
+
+    def unset_image(self):
+        self.set_image(None)
 
 
 @autoprop
@@ -536,18 +556,79 @@ class Background(Widget):
 
 @autoprop
 class Button(Clickable):
+    Label = Label
+    Image = Image
+    Rollover = Rollover
 
-    _background_layer = 1
-    _foreground_layer = 2
-    _label_layer = 3
+    default_text = ""
+    default_text_style = {}
+    default_label_placement = None
+    default_label_layer = 3
+    default_image = None
+    default_image_placement = None
+    default_image_layer = 2
+    default_base = None;              default_over = None;              default_down = None;              default_off = None;
+    default_base_color = None;        default_over_color = None;        default_down_color = None;        default_off_color = None;
+    default_base_center = None;       default_over_center = None;       default_down_center = None;       default_off_center = None;
+    default_base_top = None;          default_over_top = None;          default_down_top = None;          default_off_top = None; 
+    default_base_bottom = None;       default_over_bottom = None;       default_down_bottom = None;       default_off_bottom = None; 
+    default_base_left = None;         default_over_left = None;         default_down_left = None;         default_off_left = None;
+    default_base_right = None;        default_over_right = None;        default_down_right = None;        default_off_right = None;
+    default_base_top_left = None;     default_over_top_left = None;     default_down_top_left = None;     default_off_top_left = None;
+    default_base_top_right = None;    default_over_top_right = None;    default_down_top_right = None;    default_off_top_right = None;
+    default_base_bottom_left = None;  default_over_bottom_left = None;  default_down_bottom_left = None;  default_off_bottom_left = None;
+    default_base_bottom_right = None; default_over_bottom_right = None; default_down_bottom_right = None; default_off_bottom_right = None;
+    default_vtile = None
+    default_htile = None
+    default_background_layer = 1
+    default_background_placement = 'fill'
+    default_placement = 'center'
 
-    def __init__(self):
+    def __init__(self, text=None, image=None):
         super().__init__()
         self._stack = containers.Stack()
-        self._label = None
-        self._foreground = None
-        self._background = None
+        self._label = self.Label()
+        self._image = self.Image()
+        self._background = self.Rollover(self, 'base')
+
+        self.set_text(
+                text or self.default_text,
+                **self.default_text_style,
+        )
+        self.set_image(
+                image or self.default_image,
+        )
+        self.set_background(
+                base=self.default_base,                           over=self.default_over,                           down=self.default_down,                           off=self.default_off,                      
+                base_color=self.default_base_color,               over_color=self.default_over_color,               down_color=self.default_down_color,               off_color=self.default_off_color,                     
+                base_center=self.default_base_center,             over_center=self.default_over_center,             down_center=self.default_down_center,             off_center=self.default_off_center,                     
+                base_top=self.default_base_top,                   over_top=self.default_over_top,                   down_top=self.default_down_top,                   off_top=self.default_off_top,                      
+                base_bottom=self.default_base_bottom,             over_bottom=self.default_over_bottom,             down_bottom=self.default_down_bottom,             off_bottom=self.default_off_bottom,                      
+                base_left=self.default_base_left,                 over_left=self.default_over_left,                 down_left=self.default_down_left,                 off_left=self.default_off_left,                     
+                base_right=self.default_base_right,               over_right=self.default_over_right,               down_right=self.default_down_right,               off_right=self.default_off_right,                     
+                base_top_left=self.default_base_top_left,         over_top_left=self.default_over_top_left,         down_top_left=self.default_down_top_left,         off_top_left=self.default_off_top_left,                     
+                base_top_right=self.default_base_top_right,       over_top_right=self.default_over_top_right,       down_top_right=self.default_down_top_right,       off_top_right=self.default_off_top_right,                     
+                base_bottom_left=self.default_base_bottom_left,   over_bottom_left=self.default_over_bottom_left,   down_bottom_left=self.default_down_bottom_left,   off_bottom_left=self.default_off_bottom_left,                     
+                base_bottom_right=self.default_base_bottom_right, over_bottom_right=self.default_over_bottom_right, down_bottom_right=self.default_down_bottom_right, off_bottom_right=self.default_off_bottom_right,                     
+                vtile=self.default_vtile,
+                htile=self.default_htile,
+        )
+
         self._attach_child(self._stack)
+        self._stack.set_placement(
+                self.default_placement)
+        self._stack.insert(
+                self._label,
+                self.default_label_layer,
+                self.default_label_placement)
+        self._stack.insert(
+                self._image,
+                self.default_image_layer,
+                self.default_image_placement)
+        self._stack.insert(
+                self._background,
+                self.default_background_layer,
+                self.default_background_placement)
 
     def do_claim(self):
         return self._stack.min_size
@@ -555,43 +636,40 @@ class Button(Clickable):
     def get_text(self):
         return self._label.text
 
-    def set_text(self, text, placement=None, **style):
-        self.set_label(Label(text, **style), placement)
+    def set_text(self, text, **style):
+        self._label.set_text(text, **style)
 
     def unset_text(self):
-        self.unset_label()
+        del self._label.text
 
     def get_label(self):
         return self._label
 
     def set_label(self, label, placement=None):
-        if self._label is not None:
-            self._stack.remove(self._label)
-
+        self._stack.remove(self._label)
         self._label = label
-        self._stack.insert(self._label, self._label_layer, placement)
+        self._stack.insert(
+                self._label,
+                self.default_label_layer,
+                placement or self.default_label_placement,
+        )
 
-    def unset_label(self):
-        if self._label is not None:
-            self._stack.remove(self._label)
-            self._label = None
+    def set_label_placement(self, placement):
+        self._stack.set_placement_for(self._label, placement)
 
-    def get_foreground(self):
-        return self._foreground.image
+    def get_image(self):
+        return self._image.image
 
-    def set_foreground(self, image, placement=None):
-        if self._foreground is not None:
-            self._stack.remove(self._foreground)
+    def set_image(self, image):
+        self._image.set_image(image)
 
-        self._foreground = Image(image)
-        self._stack.insert(self._foreground, self._foreground_layer, placement)
+    def set_image_placement(self, placement):
+        self._stack.set_placement_for(self._image, placement)
 
-    def unset_foreground(self):
-        if self._foreground is not None:
-            self._stack.remove(self._foreground)
-            self._foreground = None
+    def unset_image(self):
+        del self._image.image
 
-    def set_backgrounds(self, *, 
+    def set_background(self, *, 
             base=None,              over=None,              down=None,              off=None,
             base_color=None,        over_color=None,        down_color=None,        off_color=None,
             base_center=None,       over_center=None,       down_center=None,       off_center=None,
@@ -610,11 +688,7 @@ class Button(Clickable):
         down_center = down_center or down
         off_center  = off_center  or off
 
-        if self._background is not None:
-            self._stack.remove(self._background)
-
-        self._background = Rollover(self, 'base')
-        self._background.add_states_if(
+        self._background.reset_states_if(
                 lambda w: not w.is_empty,
                 base=Background(
                     color        = base_color,
@@ -673,22 +747,33 @@ class Button(Clickable):
                     htile        = htile,
                 ),
         )
-        self._stack.insert(self._background, self._background_layer, placement)
 
-    def unset_backgrounds(self):
-        if self._background is not None:
-            self._stack.remove(self._background)
-            self._background = None
+    def unset_background(self):
+        self.set_background()
 
 
 @autoprop
 class Checkbox(Clickable):
 
-    def __init__(self, *, is_checked=False, **images):
+    default_checked_base = None; default_unchecked_base = None
+    default_checked_over = None; default_unchecked_over = None
+    default_checked_down = None; default_unchecked_down = None
+    default_checked_off  = None; default_unchecked_off  = None
+
+    def __init__(self, is_checked=False):
         super().__init__()
         self._deck = Deck(is_checked)
         self._attach_child(self._deck)
-        self.set_images(**images)
+        self.set_images(
+                checked_base=self.default_checked_base,
+                checked_over=self.default_checked_over,
+                checked_down=self.default_checked_down,
+                checked_off=self.default_checked_off,
+                unchecked_base=self.default_unchecked_base,
+                unchecked_over=self.default_unchecked_over,
+                unchecked_down=self.default_unchecked_down,
+                unchecked_off=self.default_unchecked_off,
+        )
 
     def do_claim(self):
         return self._deck.min_size

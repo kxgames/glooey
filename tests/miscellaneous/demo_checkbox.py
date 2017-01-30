@@ -5,26 +5,23 @@ import glooey
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
+theme = glooey.themes.ResourceLoader('wesnoth')
+
+class WesnothCheckbox(glooey.Checkbox):
+    default_unchecked_base = theme.image('buttons/checkbox.png')
+    default_unchecked_over = theme.image('buttons/checkbox-active.png')
+    default_unchecked_down = theme.image('buttons/checkbox-touched.png')
+    default_checked_base = theme.image('buttons/checkbox-pressed.png')
+    default_checked_over = theme.image('buttons/checkbox-active-pressed.png')
+    default_checked_down = theme.image('buttons/checkbox-touched.png')
 
 root = glooey.Gui(window, batch=batch)
-button = glooey.Checkbox(
-        checked_base=pyglet.image.load('checkbox_green_checked.png'),
-        checked_over=pyglet.image.load('checkbox_green_checked_over.png'),
-        checked_off=pyglet.image.load('checkbox_inactive_checked.png'),
-        unchecked_base=pyglet.image.load('checkbox_unchecked.png'),
-        unchecked_over=pyglet.image.load('checkbox_green_unchecked_over.png'),
-        unchecked_off=pyglet.image.load('checkbox_inactive_unchecked.png'),
-)
+button = WesnothCheckbox()
 root.add(button, 'center')
 
 @button.event
 def on_toggle(widget):
     print(f"{widget} is {'checked' if widget.is_checked else 'unchecked'}!")
-
-@window.event
-def on_key_press(symbol, modifier):
-    if symbol == pyglet.window.key.SPACE:
-        button.deactivate() if button.is_active else button.reactivate()
 
 pyglet.app.run()
 

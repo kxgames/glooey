@@ -171,6 +171,14 @@ def hex_to_float(hex):
 def hex_to_int(hex):
     return Color.from_hex(hex).tuple
 
+def str_to_color(color):
+    # If the given string is to the name of a known color, return that color.
+    # Otherwise, treat the string as a hex code.
+    if color in colors:
+        return colors[color]
+    else:
+        return Color.from_hex(color)
+
 # Colors (fold)
 red = Color(164, 0, 0)
 brown = Color(143, 89, 2)
@@ -437,7 +445,7 @@ class Tile(Artist):
 
         if self._htile:
             if not _is_power_of_two(self._image.width):
-                raise UsageError("image is {self._image.width} px wide; can only tile images with power-of-two dimensions")
+                raise UsageError(f"image is {self._image.width} px wide; can only tile images with power-of-two dimensions")
             w = self._rect.width / self._image.width
         else:
             w = a.get_distance(b)

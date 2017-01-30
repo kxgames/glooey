@@ -44,8 +44,10 @@ def on_key_press(symbol, modifiers):
     placement = 'fill' if size is not None else None
 
     if symbol == key.U:
+        print('u')
         widget = PlaceHolder(20, 20, color=red)
         vbox.add_top(widget, size, placement)
+        widget.diagnose_drawing_problems()
 
     if symbol == key.I:
         i = len(vbox) // 2

@@ -10,22 +10,23 @@ print(__doc__)
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
+assets = glooey.themes.ResourceLoader('test')
 
 root = glooey.Gui(window, batch=batch)
 widget = glooey.Background(
-        center=pyglet.image.load('frame_center.png'),
-        left=pyglet.image.load('frame_left.png'),
-        right=pyglet.image.load('frame_right.png'),
-        top=pyglet.image.load('frame_top.png'),
-        bottom=pyglet.image.load('frame_bottom.png'),
-        top_left=pyglet.image.load('frame_top_left.png'),
-        top_right=pyglet.image.load('frame_top_right.png'),
-        bottom_left=pyglet.image.load('frame_bottom_left.png'),
-        bottom_right=pyglet.image.load('frame_bottom_right.png'),
+        center=pyglet.image.load('assets/frame/center.png'),
+        left=pyglet.image.load('assets/frame/left.png'),
+        right=pyglet.image.load('assets/frame/right.png'),
+        top=pyglet.image.load('assets/frame/top.png'),
+        bottom=pyglet.image.load('assets/frame/bottom.png'),
+        top_left=pyglet.image.load('assets/frame/top_left.png'),
+        top_right=pyglet.image.load('assets/frame/top_right.png'),
+        bottom_left=pyglet.image.load('assets/frame/bottom_left.png'),
+        bottom_right=pyglet.image.load('assets/frame/bottom_right.png'),
         vtile=True,
         htile=True,
 )
-root.add(widget)
+root.add(widget, padding=100)
 
 @window.event
 def on_mouse_scroll(x, y, scroll_x, scroll_y):
