@@ -393,12 +393,6 @@ class Grid (Widget, PlacementMixin):
                 padding=padding,
         )
 
-    def __iter__(self):
-        yield from self._children.values()
-
-    def __len__(self):
-        return len(self._children)
-
     def __getitem__(self, row_col):
         return self._children[row_col]
 
@@ -555,12 +549,6 @@ class HVBox (Widget, PlacementMixin):
                 padding=padding,
         )
 
-    def __iter__(self):
-        yield from self._children
-
-    def __len__(self):
-        return len(self._children)
-
     def add(self, child, size=None, placement=None):
         self.add_back(child, size, placement)
 
@@ -680,15 +668,6 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
         PaddingMixin.__init__(self, padding)
         PlacementMixin.__init__(self, placement)
         self._children = {} # {child: layer}
-
-    def __iter__(self):
-        yield from sorted(
-                self._children.keys(),
-                key=lambda x: self._children[x],
-                reverse=True)
-
-    def __len__(self):
-        return len(self._children)
 
     def add(self, widget, placement=None):
         self.add_top(widget, placement)

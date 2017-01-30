@@ -30,6 +30,15 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
                 hex(id(self))[-4:],
         )
 
+    def __iter__(self):
+        yield from self.__children
+
+    def __len__(self):
+        return len(self.__children)
+
+    def __contains__(self, child):
+        return child in self.__children
+
     @update_function
     def repack(self):
         if not self.is_attached_to_gui:
