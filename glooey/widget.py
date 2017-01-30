@@ -1,7 +1,7 @@
 import pyglet
 import autoprop
 from vecrec import Rect
-from pprint import pprint
+from debugtools import pprint, debug
 from .helpers import *
 
 @autoprop

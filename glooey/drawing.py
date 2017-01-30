@@ -4,9 +4,9 @@ import more_itertools
 import autoprop
 import vecrec
 
-from pprint import pprint
 from collections import defaultdict
 from vecrec import Vector, Rect
+from debugtools import pprint, debug
 from pyglet.gl import *
 from pyglet.graphics import Group, OrderedGroup
 from .helpers import *

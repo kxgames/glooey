@@ -2,7 +2,7 @@
 
 import functools
 import contextlib
-from pprint import pprint
+from debugtools import pprint, debug
 
 class UsageError (Exception):
     pass

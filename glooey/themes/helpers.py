@@ -6,7 +6,7 @@ import contextlib
 import yaml
 
 from pathlib import Path
-from pprint import pprint
+from debugtools import pprint, debug
 
 class ResourceLoader(pyglet.resource.Loader):
 

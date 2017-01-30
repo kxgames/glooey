@@ -9,7 +9,7 @@ import autoprop
 
 from vecrec import Vector, Rect
 from collections import defaultdict
-from pprint import pprint
+from debugtools import pprint, debug
 from . import drawing
 from .widget import Widget
 from .helpers import *
