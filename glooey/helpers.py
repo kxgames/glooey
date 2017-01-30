@@ -21,7 +21,7 @@ class HoldUpdatesMixin:
         self._num_holds = num_holds
         self._pending_updates = []
 
-    def stop_updates(self):
+    def pause_updates(self):
         self._num_holds += 1
 
     def resume_updates(self):
@@ -31,11 +31,22 @@ class HoldUpdatesMixin:
                 update(self, *args, **kwargs)
             self._pending_updates = []
 
+    def discard_updates(self):
+        self._num_holds = max(self._num_holds - 1, 0)
+        if self._num_holds == 0:
+            self._pending_updates = []
+
     @contextlib.contextmanager
     def hold_updates(self):
-        self.stop_updates()
+        self.pause_updates()
         yield
         self.resume_updates()
+
+    @contextlib.contextmanager
+    def suppress_updates(self):
+        self.pause_updates()
+        yield
+        self.discard_updates()
 
     def _filter_pending_updates(self):
         """
