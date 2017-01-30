@@ -76,13 +76,18 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         widget hierarchy to make space for the widgets that need it, then calls 
         resize() on any widget that need to adapt to the new space allocation.
         """
+        # Guarantee that do_resize() is only called if the size of the widget 
+        # actually changed.  This is probably doesn't have a significant effect 
+        # on performance, but hopefully it gives people reimplementing 
+        # do_resize() less to worry about.
         if self._rect is None or self._rect != new_rect:
             self._rect = new_rect
             self.do_resize()
 
-        # Even if this widget didn't change size, it may be that the children 
-        # need to move or be rearranged.  This came up for me with a custom 
-        # placement function, but I can imagine other scenarios as well.
+        # The children may need to be resized even if this widget doesn't.  For 
+        # example, consider a container that takes up the whole window.  It's 
+        # size won't change when a widget is added or removed from it, but it's 
+        # children will still need to be resized.
         self.do_resize_children()
 
         # Try to redraw the widget.  This won't do anything if the widget isn't 
@@ -93,9 +98,12 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         """
         Change the pyglet graphics group associated with this widget.
         """
+        # Changing the group is often an expensive operation, so don't do 
+        # anything unless we have to.  It is assumed that do_regroup_children() 
+        # depends only of self._group, so if self._group doesn't change, 
+        # self.do_regroup_children() doesn't need to be called.
         if self._group is None or self._group != new_group:
             self._group = new_group
-
             self.do_regroup()
             self.do_regroup_children()
 
