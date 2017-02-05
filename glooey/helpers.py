@@ -2,6 +2,7 @@
 
 import functools
 import contextlib
+import more_itertools
 from debugtools import pprint, debug
 
 class UsageError (Exception):
@@ -83,4 +84,7 @@ def update_function(method):
     return wrapped_method
 
 
+
+def first_not_none(iterable):
+    return more_itertools.first_true(iterable, pred=lambda x: x is not None)
 

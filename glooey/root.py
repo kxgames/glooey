@@ -23,17 +23,17 @@ class Root (Bin):
     def repack(self):
         self.claim()
 
-        too_narrow = self.rect.width < self.min_width
-        too_short = self.rect.height < self.min_height
+        too_narrow = self.rect.width < self.claimed_width
+        too_short = self.rect.height < self.claimed_height
 
         # Complain if the GUI needs more space than is available in the window.
         if too_narrow or too_short:
-            message = "The {} is only {}x{}, but its children are {}x{}."
+            message = "{} is only {}x{}, but its children are {}x{}."
             raise RuntimeError(
                     message.format(
-                        self.__class__.__name__,
+                        self,
                         self.rect.width, self.rect.height,
-                        self.min_width, self.min_height,
+                        self.claimed_width, self.claimed_height,
             ))
 
         self.do_resize_children()
@@ -55,7 +55,7 @@ class Root (Bin):
 
     @property
     def is_hidden(self):
-        return self._hidden
+        return self._is_hidden
 
 
 @autoprop

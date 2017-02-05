@@ -18,11 +18,16 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._children_can_overlap = True
         self._group = None
         self._rect = None
-        self._hidden = False
+        self._claimed_width = 0
+        self._claimed_height = 0
+        self._assigned_rect = None
+        self._padding_left = 0
+        self._padding_right = 0
+        self._padding_top = 0
+        self._padding_bottom = 0
+        self._is_hidden = False
         self._is_claim_stale = True
         self._spurious_leave_event = False
-        self._min_width = 0
-        self._min_height = 0
 
     def __repr__(self):
         return '{}(id={})'.format(
@@ -44,29 +49,40 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         if not self.is_attached_to_gui:
             return
 
-        self.claim()
+        has_claim_changed = self.claim()
 
-        # If the widget is either too big or too small, repack its parent to 
-        # make more space.
-        if self.rect.size != self.min_size:
+        # If the widget is a different size than it used to be, give its parent 
+        # a chance to repack it.
+        if has_claim_changed:
             self._is_claim_stale = False
             self.parent.repack()
             self._is_claim_stale = True
 
         # Otherwise, stop recursing and resize the widget's children.
         else:
-            self.do_resize_children()
-            self.draw()
+            self.realign()
 
     def claim(self):
-        if self._is_claim_stale:
-            # Have each child widget claim space for itself, so this widget can 
-            # take those space requirements into account.
-            for child in self.__children:
-                child.claim()
+        if not self._is_claim_stale:
+            return False
 
-            # Claim space for this widget.
-            self._min_width, self._min_height = self.do_claim()
+        # Have each child widget claim space for itself, so this widget can 
+        # take those space requirements into account.
+        for child in self.__children:
+            child.claim()
+
+        # Make note of the previous claim, so we can say whether or not it has 
+        # changed.
+        previous_claim = self._claimed_width, self._claimed_height
+
+        # Claim space for this widget.
+        self._claimed_width, self._claimed_height = self.do_claim()
+        self._claimed_width += self._padding_left + self._padding_right
+        self._claimed_height += self._padding_top + self._padding_bottom
+
+        # Return whether or not the claim has changed since the last repack.  
+        # This determines whether the widget's parent needs to be repacked.
+        return previous_claim != (self._claimed_width, self._claimed_height)
 
     def resize(self, new_rect):
         """
@@ -76,12 +92,24 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         widget hierarchy to make space for the widgets that need it, then calls 
         resize() on any widget that need to adapt to the new space allocation.
         """
+        self._assigned_rect = new_rect
+        self.realign()
+
+    def realign(self):
+        # Subtract padding from the full amount of space assigned to this 
+        # widget.
+        padded_rect = self._assigned_rect.copy()
+        padded_rect.left += self._padding_left
+        padded_rect.bottom += self._padding_bottom
+        padded_rect.width -= self._padding_left + self._padding_right
+        padded_rect.height -= self._padding_top + self._padding_bottom
+
         # Guarantee that do_resize() is only called if the size of the widget 
         # actually changed.  This is probably doesn't have a significant effect 
         # on performance, but hopefully it gives people reimplementing 
         # do_resize() less to worry about.
-        if self._rect is None or self._rect != new_rect:
-            self._rect = new_rect
+        if self._rect is None or self._rect != padded_rect:
+            self._rect = padded_rect
             self.do_resize()
 
         # The children may need to be resized even if this widget doesn't.  For 
@@ -114,10 +142,10 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
     def hide(self):
         if self.is_visible:
             self.undraw_all()
-        self._hidden = True
+        self._is_hidden = True
 
     def unhide(self, draw=True):
-        self._hidden = False
+        self._is_hidden = False
         if self.is_visible and draw:
             self.draw_all()
 
@@ -394,28 +422,86 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
     def get_rect(self):
         return self._rect
 
+    def get_claimed_rect(self):
+        return Rect.from_size(self._claimed_width, self._claimed_height)
+
+    def get_claimed_size(self):
+        return self._claimed_width, self._claimed_height
+
+    def get_claimed_width(self):
+        return self._claimed_width
+
+    def get_claimed_height(self):
+        return self._claimed_height
+
+    def get_padding(self):
+        return (self._padding_left, self._padding_right,
+                self._padding_top, self._padding_bottom)
+
+    def set_padding(self, all=None, *, horz=None, vert=None,
+            left=None, right=None, top=None, bottom=None):
+        self._padding_left = first_not_none((left, horz, all, 0))
+        self._padding_right = first_not_none((right, horz, all, 0))
+        self._padding_top = first_not_none((top, vert, all, 0))
+        self._padding_bottom = first_not_none((bottom, vert, all, 0))
+        self.repack()
+
+    padding = property(get_padding, set_padding)
+
+    def get_padding_horz(self):
+        return self._padding_left, self._padding_right
+
+    def set_padding_horz(self, new_padding):
+        self._padding_left = new_padding
+        self._padding_right = new_padding
+        self.repack()
+
+    def get_padding_vert(self):
+        return self._padding_top, self._padding_bottom
+
+    def set_padding_vert(self, new_padding):
+        self._padding_top = new_padding
+        self._padding_bottom = new_padding
+        self.repack()
+
+    def get_padding_left(self):
+        return self._padding_left
+
+    def set_padding_left(self, new_padding):
+        self._padding_left = new_padding
+        self.repack()
+
+    def get_padding_right(self):
+        return self._padding_right
+
+    def set_padding_right(self, new_padding):
+        self._padding_right = new_padding
+        self.repack()
+
+    def get_padding_top(self):
+        return self._padding_top
+
+    def set_padding_top(self, new_padding):
+        self._padding_top = new_padding
+        self.repack()
+
+    def get_padding_bottom(self):
+        return self._padding_bottom
+
+    def set_padding_bottom(self, new_padding):
+        self._padding_bottom = new_padding
+        self.repack()
+
     @property
     def is_hidden(self):
         if self.parent is None:
-            return self._hidden
+            return self._is_hidden
         else:
-            return self._hidden or self.parent.is_hidden
+            return self._is_hidden or self.parent.is_hidden
 
     @property
     def is_visible(self):
         return not self.is_hidden
-
-    def get_min_width(self):
-        return self._min_width
-
-    def get_min_height(self):
-        return self._min_height
-
-    def get_min_size(self):
-        return self._min_width, self._min_height
-
-    def get_min_rect(self):
-        return Rect.from_size(self._min_width, self._min_height)
 
     @property
     def is_attached_to_gui(self):

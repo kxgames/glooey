@@ -67,7 +67,7 @@ def place_widget_in_box(widget, box_rect, key_or_function, widget_rect=None):
     placement_function = cast_to_placement_function(key_or_function)
 
     if widget_rect is None:
-        widget_rect = widget.min_rect
+        widget_rect = widget.claimed_rect
 
     placement_function(widget_rect, box_rect)
     widget.resize(widget_rect)
@@ -82,8 +82,7 @@ class BinMixin:
 
     This mixin is intended for classes that are like Bins in the sense that 
     they can only have one child, but don't want to inherit the rest of the 
-    actual Bin class's interface, namely support for padding and custom child 
-    placement.
+    actual Bin class's interface, namely support for custom child placement.
     """
 
     def __init__(self):
@@ -99,27 +98,12 @@ class BinMixin:
 
     def clear(self):
         self._detach_child(self.child)
-        self.child = None
+        self._child = None
         assert self._num_children == 0
         self._resize_and_regroup_children()
 
     def get_child(self):
         return self._child
-
-
-@autoprop
-class PaddingMixin:
-
-    def __init__(self, padding=0):
-        self._padding = padding
-
-    def get_padding(self):
-        return self._padding
-
-    def set_padding(self, new_padding, repack=True):
-        if new_padding is not None:
-            self._padding = new_padding
-            if repack: self.repack()
 
 
 @autoprop
@@ -147,7 +131,7 @@ class PlacementMixin:
             self._custom_placements[key] = new_placement
             if repack: self.repack()
 
-    def _unset_custom_placement(self, key, repack=True):
+    def _del_custom_placement(self, key, repack=True):
         if key in self._custom_placements:
             del self._custom_placements[key]
             if repack: self.repack()
@@ -155,38 +139,35 @@ class PlacementMixin:
 
 
 @autoprop
-class Bin (Widget, BinMixin, PaddingMixin, PlacementMixin):
+class Bin (Widget, BinMixin, PlacementMixin):
 
-    def __init__(self, padding=0, placement='fill'):
+    def __init__(self, placement='fill'):
         Widget.__init__(self)
         BinMixin.__init__(self)
-        PaddingMixin.__init__(self, padding)
         PlacementMixin.__init__(self, placement)
 
-    def add(self, child, placement=None, padding=None):
+    def add(self, child, placement=None):
         self._set_custom_placement(child, placement, repack=False)
-        self.set_padding(padding, repack=False)
         BinMixin.add(self, child)
 
     def clear(self):
-        self._unset_custom_placement(child, placement, repack=False)
+        self._del_custom_placement(self.child, repack=False)
         BinMixin.clear(self)
 
     def do_claim(self):
-        min_width = 2 * self.padding
-        min_height = 2 * self.padding
+        min_width = 0
+        min_height = 0
 
         if self.child is not None:
-            min_width += self.child.min_width
-            min_height += self.child.min_height
+            min_width += self.child.claimed_width
+            min_height += self.child.claimed_height
 
         return min_width, min_height
 
     def do_resize_children(self):
         if self.child is not None:
             place_widget_in_box(
-                    self.child,
-                    self.rect.get_shrunk(self.padding),
+                    self.child, self.rect,
                     self._get_placement(self.child))
 
 
@@ -204,7 +185,7 @@ class Viewport (Widget, BinMixin):
             pyglet.gl.glPushMatrix()
             pyglet.gl.glTranslatef(translation.x, translation.y, 0)
 
-        def unset_state(self):
+        def del_state(self):
             pyglet.gl.glPopMatrix()
 
     def __init__(self, sensitivity=3):
@@ -255,7 +236,7 @@ class Viewport (Widget, BinMixin):
     def do_resize_children(self):
         # Make the child whatever size it wants to be.
         if self.child is not None:
-            self.child.resize(self.child.min_rect)
+            self.child.resize(self.child.claimed_rect)
 
     def do_regroup(self):
         self.stencil_group = drawing.StencilGroup(self.group)
@@ -413,12 +394,12 @@ class Grid (Widget, PlacementMixin):
         child = self._children[row, col]
         self._detach_child(child)
         del self._children[row, col]
-        self._unset_custom_placement((row, col), placement, repack=False)
+        self._del_custom_placement((row, col), placement, repack=False)
         self._resize_and_regroup_children()
 
     def do_claim(self):
         min_cell_rects = {
-                row_col: child.min_rect
+                row_col: child.claimed_rect
                 for row_col, child in self._children.items()
         }
         return self._grid.make_claim(min_cell_rects)
@@ -448,6 +429,7 @@ class Grid (Widget, PlacementMixin):
         return self._grid.padding
 
     def set_padding(self, new_padding):
+        super().set_padding(0)
         self._grid.padding = new_padding
         self.repack()
 
@@ -495,20 +477,20 @@ class Grid (Widget, PlacementMixin):
         self._grid.set_col_width(col, new_width)
         self.repack()
 
-    def unset_row_height(self, row):
+    def del_row_height(self, row):
         """
         Unset the height of the specified row.  The default height will be 
         used for that row instead.
         """
-        self._grid.unset_row_height(row)
+        self._grid.del_row_height(row)
         self.repack()
 
-    def unset_col_width(self, col):
+    def del_col_width(self, col):
         """
         Unset the width of the specified column.  The default width will be 
         used for that column instead.
         """
-        self._grid.unset_col_width(col)
+        self._grid.del_col_width(col)
         self.repack()
 
     def get_default_row_height(self):
@@ -576,7 +558,7 @@ class HVBox (Widget, PlacementMixin):
         self._detach_child(child)
         self._children.remove(child)
         del self._sizes[child]
-        self._unset_custom_placement(child)
+        self._del_custom_placement(child)
         if repack: self._resize_and_regroup_children()
 
     def do_claim(self):
@@ -586,7 +568,7 @@ class HVBox (Widget, PlacementMixin):
                 if self._sizes[child] is not None
         })
         min_cell_rects = {
-                self.do_get_row_col(i): child.min_rect
+                self.do_get_row_col(i): child.claimed_rect
                 for i, child in enumerate(self._children)
         }
         return self._grid.make_claim(min_cell_rects)
@@ -611,6 +593,7 @@ class HVBox (Widget, PlacementMixin):
         return self._grid.padding
 
     def set_padding(self, new_padding):
+        super().set_padding(0)
         self._grid.padding = new_padding
         self.repack()
 
@@ -654,7 +637,7 @@ class VBox (HVBox):
 
 
 @autoprop
-class Stack (Widget, PaddingMixin, PlacementMixin):
+class Stack (Widget, PlacementMixin):
     """
     Have any number of children, claim enough space for the biggest one, and 
     just draw them all in the order they were added.
@@ -663,9 +646,8 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
     still a nice default, though.
     """
 
-    def __init__(self, padding=0, placement='fill'):
+    def __init__(self, placement='fill'):
         Widget.__init__(self)
-        PaddingMixin.__init__(self, padding)
         PlacementMixin.__init__(self, placement)
         self._children = {} # {child: layer}
 
@@ -689,7 +671,7 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
     def remove(self, widget):
         self._detach_child(widget)
         del self._children[widget]
-        self._unset_custom_placement(widget, repack=False)
+        self._del_custom_placement(widget, repack=False)
         self._resize_and_regroup_children()
 
     def clear(self):
@@ -704,11 +686,11 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
         max_child_height = 0
 
         for child in self.children:
-            max_child_width = max(max_child_height, child.min_width)
-            max_child_height = max(max_child_height, child.min_height)
+            max_child_width = max(max_child_width, child.claimed_width)
+            max_child_height = max(max_child_height, child.claimed_height)
 
-        min_width = max_child_width + 2 * self.padding
-        min_height = max_child_height + 2 * self.padding
+        min_width = max_child_width
+        min_height = max_child_height
 
         return min_width, min_height
 
@@ -716,7 +698,7 @@ class Stack (Widget, PaddingMixin, PlacementMixin):
         for child in self.children:
             place_widget_in_box(
                     child,
-                    self.rect.get_shrunk(self.padding),
+                    self.rect,
                     self._get_placement(child))
 
     def do_regroup_children(self):
@@ -764,8 +746,8 @@ class Deck(Widget):
         min_height = 0
 
         for child in self._states.values():
-            min_width = max(child.min_width, min_width)
-            min_height = max(child.min_height, min_height)
+            min_width = max(child.claimed_width, min_width)
+            min_height = max(child.claimed_height, min_height)
 
         return min_width, min_height
 

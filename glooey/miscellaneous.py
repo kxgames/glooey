@@ -562,11 +562,27 @@ class Button(Clickable):
 
     default_text = ""
     default_text_style = {}
-    default_label_placement = None
+    default_label_padding = None
+    default_label_padding_horz = None
+    default_label_padding_vert = None
+    default_label_padding_left = None
+    default_label_padding_right = None
+    default_label_padding_top = None
+    default_label_padding_bottom = None
+    default_label_placement = 'center'
     default_label_layer = 3
+
     default_image = None
-    default_image_placement = None
+    default_image_padding = None
+    default_image_padding_horz = None
+    default_image_padding_vert = None
+    default_image_padding_left = None
+    default_image_padding_right = None
+    default_image_padding_top = None
+    default_image_padding_bottom = None
+    default_image_placement = 'center'
     default_image_layer = 2
+
     default_base = None;              default_over = None;              default_down = None;              default_off = None;
     default_base_color = None;        default_over_color = None;        default_down_color = None;        default_off_color = None;
     default_base_center = None;       default_over_center = None;       default_down_center = None;       default_off_center = None;
@@ -578,11 +594,10 @@ class Button(Clickable):
     default_base_top_right = None;    default_over_top_right = None;    default_down_top_right = None;    default_off_top_right = None;
     default_base_bottom_left = None;  default_over_bottom_left = None;  default_down_bottom_left = None;  default_off_bottom_left = None;
     default_base_bottom_right = None; default_over_bottom_right = None; default_down_bottom_right = None; default_off_bottom_right = None;
-    default_vtile = None
-    default_htile = None
+    default_vtile = False
+    default_htile = False
     default_background_layer = 1
     default_background_placement = 'fill'
-    default_placement = 'center'
 
     def __init__(self, text=None, image=None):
         super().__init__()
@@ -614,9 +629,26 @@ class Button(Clickable):
                 htile=self.default_htile,
         )
 
+        self._label.set_padding(
+                all=self.default_label_padding,
+                horz=self.default_label_padding_horz,
+                vert=self.default_label_padding_vert,
+                left=self.default_label_padding_left,
+                right=self.default_label_padding_right,
+                top=self.default_label_padding_top,
+                bottom=self.default_label_padding_bottom,
+        )
+        self._image.set_padding(
+                all=self.default_image_padding,
+                horz=self.default_image_padding_horz,
+                vert=self.default_image_padding_vert,
+                left=self.default_image_padding_left,
+                right=self.default_image_padding_right,
+                top=self.default_image_padding_top,
+                bottom=self.default_image_padding_bottom,
+        )
+
         self._attach_child(self._stack)
-        self._stack.set_placement(
-                self.default_placement)
         self._stack.insert(
                 self._label,
                 self.default_label_layer,
@@ -631,7 +663,7 @@ class Button(Clickable):
                 self.default_background_placement)
 
     def do_claim(self):
-        return self._stack.min_size
+        return self._stack.claimed_size
 
     def get_text(self):
         return self._label.text
@@ -776,7 +808,7 @@ class Checkbox(Clickable):
         )
 
     def do_claim(self):
-        return self._deck.min_size
+        return self._deck.claimed_size
 
     def on_click(self, widget):
         self.toggle()
