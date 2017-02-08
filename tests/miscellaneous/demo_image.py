@@ -5,28 +5,24 @@ Scrolling should change the image to a green cross."""
 
 import pyglet
 import glooey
+import demo_helpers
 
 print(__doc__)
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-i = 0
-images = [
-        pyglet.image.load('green_checkmark.png'),
-        pyglet.image.load('green_cross.png'),
-]
-
 root = glooey.Gui(window, batch=batch)
-widget = glooey.Image(images[i])
-root.add(widget, 'center')
+widget = glooey.Image()
+root.add(widget)
 
-@window.event
-def on_mouse_scroll(x, y, scroll_x, scroll_y):
-    global i
-    i = (i - scroll_y) % len(images)
-    widget.image = images[i]
+@demo_helpers.interactive_tests(window, batch) #
+def test_image():
+    widget.image = pyglet.image.load('green_checkmark.png')
+    yield "Show a green checkmark."
 
+    widget.image = pyglet.image.load('green_cross.png')
+    yield "Show a green cross."
 
 pyglet.app.run()
 

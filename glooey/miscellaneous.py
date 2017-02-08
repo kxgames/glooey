@@ -5,7 +5,7 @@ from vecrec import Vector, Rect
 from debugtools import pprint, debug
 from . import drawing, containers
 from .widget import Widget
-from .containers import Deck, place_widget_in_box
+from .containers import Deck
 
 @autoprop
 class Clickable(Widget):
@@ -99,12 +99,13 @@ class Rollover(Deck):
 
 class PlaceHolder(Clickable):
 
-    def __init__(self, width=0, height=0, color=drawing.green):
+    def __init__(self, width=0, height=0, color=drawing.green, align='fill'):
         super().__init__()
         self.color = color
         self.width = width
         self.height = height
         self.vertex_list = None
+        self.alignment = align
 
     def do_claim(self):
         return self.width, self.height
@@ -209,7 +210,7 @@ class Label(Widget):
     default_baseline = None
     default_color = 'green'
     default_background_color = None
-    default_alignment = None
+    default_text_alignment = None
     default_line_spacing = None
 
     def __init__(self, text="", **style):
@@ -228,7 +229,7 @@ class Label(Widget):
                 baseline=self.default_baseline,
                 color=self.default_color,
                 background_color=self.default_background_color,
-                alignment=self.default_alignment,
+                align=self.default_text_alignment,
                 line_spacing=self.default_line_spacing,
         )
         self.set_style(**style)
@@ -314,7 +315,7 @@ class Label(Widget):
         # This will repack.
         self.set_style(**style)
 
-    def unset_text(self):
+    def del_text(self):
         self.set_text("")
 
     def get_font_name(self):
@@ -323,11 +324,17 @@ class Label(Widget):
     def set_font_name(self, name):
         self.set_style(font_name=name)
 
+    def del_font_name(self):
+        return self.del_style('font_name')
+
     def get_font_size(self):
         return self.get_style('font_size')
 
     def set_font_size(self, size):
         self.set_style(font_size=size)
+
+    def del_font_size(self):
+        return self.del_style('font_size')
 
     def get_bold(self):
         return self.get_style('bold')
@@ -335,11 +342,17 @@ class Label(Widget):
     def set_bold(self, bold):
         self.set_style(bold=bold)
 
+    def del_bold(self):
+        return self.del_style('bold')
+
     def get_italic(self):
         return self.get_style('italic')
 
     def set_italic(self, italic):
         self.set_style(italic=italic)
+
+    def del_italic(self):
+        return self.del_style('italic')
 
     def get_underline(self):
         return self.get_style('underline') is not None
@@ -347,11 +360,17 @@ class Label(Widget):
     def set_underline(self, underline):
         self.set_style(underline=underline)
 
+    def del_underline(self):
+        return self.del_style('underline') is not None
+
     def get_kerning(self):
         return self.get_style('kerning')
 
     def set_kerning(self, kerning):
         self.set_style(kerning=kerning)
+
+    def del_kerning(self):
+        return self.del_style('kerning')
 
     def get_baseline(self):
         return self.get_style('baseline')
@@ -359,11 +378,17 @@ class Label(Widget):
     def set_baseline(self, baseline):
         self.set_style(baseline=baseline)
 
+    def del_baseline(self):
+        return self.del_style('baseline')
+
     def get_color(self):
         return self.get_style('color')
 
     def set_color(self, color):
         self.set_style(color=color)
+
+    def del_color(self):
+        return self.del_style('color')
 
     def get_background_color(self):
         return self.get_style('background_color')
@@ -371,11 +396,17 @@ class Label(Widget):
     def set_background_color(self, color):
         self.set_style(background_color=color)
 
-    def get_alignment(self):
-        return self.get_style('alignment')
+    def del_background_color(self):
+        return self.del_style('background_color')
 
-    def set_alignment(self, alignment):
+    def get_text_alignment(self):
+        return self.get_style('align')
+
+    def set_text_alignment(self, alignment):
         self.set_style(align=alignment)
+
+    def del_text_alignment(self):
+        return self.del_style('align')
 
     def get_line_spacing(self):
         return self.get_style('line_spacing')
@@ -383,45 +414,8 @@ class Label(Widget):
     def set_line_spacing(self, spacing):
         self.set_style(line_spacing=spacing)
 
-    def get_style(self, style):
-        return self._style.get(style)
-
-    def set_style(self, **style):
-        # Remove null entries from the style.
-        style = {k:v for k,v in style.items() if v is not None}
-
-        # I want users to be able to specify colors using strings or Color 
-        # objects, but pyglet expects tuples, so make the conversion here.
-
-        if 'color' in style:
-            color = style['color']
-            if isinstance(color, str):
-                color = drawing.str_to_color(color)
-            if hasattr(color, 'tuple'):
-                color = color.tuple
-            style['color'] = color
-            if self.underline:
-                style['underline'] = color
-
-        if 'background_color' in style:
-            color = style['background_color']
-            if isinstance(color, str):
-                color = drawing.str_to_color(color)
-            if hasattr(color, 'tuple'):
-                color = color.tuple
-            style['background_color'] = color
-
-        # I want the underline attribute to behave as a boolean, but in the 
-        # TextLayout API it's a color.  So when the color changes, I have to 
-        # update the underline (if it's been set).
-
-        if 'underline' in style:
-            style['underline'] = \
-                    style.get('color', self.color) \
-                    if style['underline'] else None
-
-        self._style.update(style)
-        self.repack()
+    def del_line_spacing(self):
+        self.del_style('line_spacing')
 
     def enable_line_wrap(self, width):
         self._line_wrap_width = width
@@ -430,9 +424,46 @@ class Label(Widget):
     def disable_line_wrap(self):
         self.enable_line_wrap(0)
 
+    def get_style(self, style):
+        return self._style.get(style)
+
+    def set_style(self, **style):
+        self._style.update({k:v for k,v in style.items() if v is not None})
+        self._update_style()
+
+    def del_style(self, style):
+        del self._style[style]
+        self._update_style()
+
+    def _update_style(self):
+        # I want users to be able to specify colors using strings or Color 
+        # objects, but pyglet expects tuples, so make the conversion here.
+
+        if 'color' in self._style:
+            self._style['color'] = drawing.Color.from_anything(
+                    self._style['color']).tuple
+
+        if 'background_color' in self._style:
+            self._style['background_color'] = drawing.Color.from_anything(
+                    self._style['background_color']).tuple
+
+        # I want the underline attribute to behave as a boolean, but in the 
+        # TextLayout API it's a color.  So when it's set to either True or 
+        # False, I need to translate that to either being a color or not being 
+        # in the style dictionary.
+
+        if 'underline' in self._style:
+            if not self._style['underline']:
+                del self._style['underline']
+            else:
+                self._style['underline'] = self.color
+
+        self.repack()
+
 
 @autoprop
 class Image(Widget):
+    default_alignment = 'center'
 
     def __init__(self, image=None):
         super().__init__()
@@ -562,27 +593,9 @@ class Button(Clickable):
 
     default_text = ""
     default_text_style = {}
-    default_label_padding = None
-    default_label_padding_horz = None
-    default_label_padding_vert = None
-    default_label_padding_left = None
-    default_label_padding_right = None
-    default_label_padding_top = None
-    default_label_padding_bottom = None
-    default_label_placement = 'center'
     default_label_layer = 3
-
     default_image = None
-    default_image_padding = None
-    default_image_padding_horz = None
-    default_image_padding_vert = None
-    default_image_padding_left = None
-    default_image_padding_right = None
-    default_image_padding_top = None
-    default_image_padding_bottom = None
-    default_image_placement = 'center'
     default_image_layer = 2
-
     default_base = None;              default_over = None;              default_down = None;              default_off = None;
     default_base_color = None;        default_over_color = None;        default_down_color = None;        default_off_color = None;
     default_base_center = None;       default_over_center = None;       default_down_center = None;       default_off_center = None;
@@ -597,7 +610,7 @@ class Button(Clickable):
     default_vtile = False
     default_htile = False
     default_background_layer = 1
-    default_background_placement = 'fill'
+    default_alignment = 'center'
 
     def __init__(self, text=None, image=None):
         super().__init__()
@@ -629,38 +642,10 @@ class Button(Clickable):
                 htile=self.default_htile,
         )
 
-        self._label.set_padding(
-                all=self.default_label_padding,
-                horz=self.default_label_padding_horz,
-                vert=self.default_label_padding_vert,
-                left=self.default_label_padding_left,
-                right=self.default_label_padding_right,
-                top=self.default_label_padding_top,
-                bottom=self.default_label_padding_bottom,
-        )
-        self._image.set_padding(
-                all=self.default_image_padding,
-                horz=self.default_image_padding_horz,
-                vert=self.default_image_padding_vert,
-                left=self.default_image_padding_left,
-                right=self.default_image_padding_right,
-                top=self.default_image_padding_top,
-                bottom=self.default_image_padding_bottom,
-        )
-
         self._attach_child(self._stack)
-        self._stack.insert(
-                self._label,
-                self.default_label_layer,
-                self.default_label_placement)
-        self._stack.insert(
-                self._image,
-                self.default_image_layer,
-                self.default_image_placement)
-        self._stack.insert(
-                self._background,
-                self.default_background_layer,
-                self.default_background_placement)
+        self._stack.insert(self._label, self.default_label_layer)
+        self._stack.insert(self._image, self.default_image_layer)
+        self._stack.insert(self._background, self.default_background_layer)
 
     def do_claim(self):
         return self._stack.claimed_size
@@ -791,6 +776,7 @@ class Checkbox(Clickable):
     default_checked_over = None; default_unchecked_over = None
     default_checked_down = None; default_unchecked_down = None
     default_checked_off  = None; default_unchecked_off  = None
+    default_alignment = 'center'
 
     def __init__(self, is_checked=False):
         super().__init__()

@@ -5,6 +5,7 @@ of the frame and the box."""
 
 import pyglet
 import glooey
+import demo_helpers
 
 print(__doc__)
 
@@ -13,7 +14,7 @@ batch = pyglet.graphics.Batch()
 assets = glooey.themes.ResourceLoader('test')
 
 root = glooey.Gui(window, batch=batch)
-widget = glooey.Background(
+bg = glooey.Background(
         center=pyglet.image.load('assets/frame/center.png'),
         left=pyglet.image.load('assets/frame/left.png'),
         right=pyglet.image.load('assets/frame/right.png'),
@@ -26,7 +27,31 @@ widget = glooey.Background(
         vtile=True,
         htile=True,
 )
-root.add(widget, padding=100)
+root.add(bg)
+
+@demo_helpers.interactive_tests(window, batch)
+def test_background():
+    #bg.set_images(color=glooey.drawing.colors['red'])
+    #yield "Make the background red."
+
+    bg.padding = 100
+    yield
+
+    bg.padding = 200
+    yield "padding = 200"
+
+    bg.padding = 100
+    yield "padding = 100"
+
+    # Not right...
+    bg.alignment = 'center'
+    print(bg.claimed_rect)
+    yield "alignment = 'center'"
+
+    bg.alignment = 'fill'
+    yield "alignment = 'fill'"
+
+
 
 @window.event
 def on_mouse_scroll(x, y, scroll_x, scroll_y):

@@ -2,14 +2,25 @@ import pyglet
 import autoprop
 from vecrec import Rect
 from debugtools import pprint, debug
+from . import drawing
 from .helpers import *
 
 @autoprop
 class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
+    default_padding = None
+    default_padding_horz = None
+    default_padding_vert = None
+    default_padding_left = None
+    default_padding_right = None
+    default_padding_top = None
+    default_padding_bottom = None
+    default_alignment = 'fill'
+
     def __init__(self):
         pyglet.event.EventDispatcher.__init__(self)
         HoldUpdatesMixin.__init__(self)
+
         self._parent = None
         # Use a double-underscore to avoid name conflicts; `_children` is a 
         # useful name for subclasses, so I don't want it to cause conflicts.
@@ -25,9 +36,23 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._padding_right = 0
         self._padding_top = 0
         self._padding_bottom = 0
+        self._alignment_func = None
         self._is_hidden = False
         self._is_claim_stale = True
         self._spurious_leave_event = False
+
+        self.set_padding(
+                all=self.default_padding,
+                horz=self.default_padding_horz,
+                vert=self.default_padding_vert,
+                left=self.default_padding_left,
+                right=self.default_padding_right,
+                top=self.default_padding_top,
+                bottom=self.default_padding_bottom,
+        )
+        self.set_alignment(
+                self.default_alignment,
+        )
 
     def __repr__(self):
         return '{}(id={})'.format(
@@ -104,12 +129,17 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         padded_rect.width -= self._padding_left + self._padding_right
         padded_rect.height -= self._padding_top + self._padding_bottom
 
+        # Align this widget within the space available to it (i.e. the assigned 
+        # space minus the padding).
+        content_rect = self.claimed_rect.copy()
+        self._alignment_func(content_rect, padded_rect)
+
         # Guarantee that do_resize() is only called if the size of the widget 
         # actually changed.  This is probably doesn't have a significant effect 
         # on performance, but hopefully it gives people reimplementing 
         # do_resize() less to worry about.
-        if self._rect is None or self._rect != padded_rect:
-            self._rect = padded_rect
+        if self._rect is None or self._rect != content_rect:
+            self._rect = content_rect
             self.do_resize()
 
         # The children may need to be resized even if this widget doesn't.  For 
@@ -223,7 +253,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         React to a change in the widget's size.
 
         Only widgets that actually draw things need to implement this method.  
-        If the widget has children widgets that it may needs to redistribute 
+        If the widget has children widgets that it may need to redistribute 
         space between, it should do that is do_resize_children().
 
         However, keep in mind that this method is called before the widget is 
@@ -440,6 +470,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     def set_padding(self, all=None, *, horz=None, vert=None,
             left=None, right=None, top=None, bottom=None):
+
         self._padding_left = first_not_none((left, horz, all, 0))
         self._padding_right = first_not_none((right, horz, all, 0))
         self._padding_top = first_not_none((top, vert, all, 0))
@@ -492,6 +523,13 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._padding_bottom = new_padding
         self.repack()
 
+    def get_alignment(self):
+        return self._alignment_func
+
+    def set_alignment(self, new_alignment):
+        self._alignment_func = drawing.cast_to_alignment(new_alignment)
+        self.repack()
+
     @property
     def is_hidden(self):
         if self.parent is None:
@@ -519,18 +557,13 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         It can be hard to debug problems when nothing is showing up on the 
         screen, so this method is meant to help look for common reasons why 
         that might be the case.
-
-        The most common reason for a widget not being drawn is not being 
-        attached to the root of the widget hierarchy (i.e. the GUI).  However, 
-        there are also a number of ways to get bugs like this is you're writing 
-        your own container widgets.
         """
         diagnoses = []
 
-        if not self.is_attached_to_gui:
+        # If the widget isn't attached to the GUI, figure out which parent is 
+        # the problem.
 
-            # If the widget isn't attached to the GUI, figure out which parent 
-            # is the problem.
+        if not self.is_attached_to_gui:
 
             def find_unattached_parent(widget, level=0):
                 if widget.parent is None: return widget, level
@@ -546,6 +579,9 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
                     diagnoses.append("{self} is not attached to the GUI.")
                 else:
                     diagnoses.append("{unattached_parent}, a widget {level} level(s) above {self}, is not attached to the GUI.")
+
+        # If the widget is attached to the GUI, make sure the widget is fully 
+        # configured (i.e. rect and group are set) and not hidden.
 
         else:
             if self.rect is None:
@@ -569,6 +605,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
                     diagnoses.append("{self} is hidden.\nCall {self.__class__.__name__}.unhide() to reveal it.")
                 else:
                     diagnoses.append("{hidden_parent}, a widget {level} level(s) above {self}, is hidden.\nCall {hidden_parent.__class__.__name__}.unhide() to reveal it and its children.")
+
+        # If no problems were found, say so.
 
         if not diagnoses:
             diagnoses.append("{self} seems to have been drawn.\nCheck for bugs in {self.__class__.__name__}.do_draw()")

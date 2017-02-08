@@ -10,6 +10,7 @@ from .helpers import *
 class Root (Bin):
 
     def __init__(self, rect, window, batch=None, group=None):
+        self._repack_holds = 1
         super().__init__()
 
         self._parent = self
@@ -17,10 +18,19 @@ class Root (Bin):
         self._window = window
         self._batch = batch or pyglet.graphics.Batch()
         self._group = group or pyglet.graphics.Group()
+        self._repack_holds -= 1
 
         window.push_handlers(self)
 
+    @update_function
     def repack(self):
+        # It's possible for repack() to be triggered during initialization.  
+        # This isn't a problem for most widgets, because repack() bails out 
+        # immediately if the widget isn't attached to the GUI.  But this is a 
+        # problem for root widgets, which are always attached to the GUI.  
+        if self._repack_holds:
+            return
+
         self.claim()
 
         too_narrow = self.rect.width < self.claimed_width
@@ -56,7 +66,6 @@ class Root (Bin):
     @property
     def is_hidden(self):
         return self._is_hidden
-
 
 @autoprop
 class Gui (Root):

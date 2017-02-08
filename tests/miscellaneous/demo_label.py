@@ -2,66 +2,73 @@
 
 import pyglet
 import glooey
+import demo_helpers
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-lorem_ipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam justo sem, malesuada ut ultricies ac, bibendum eu neque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean at tellus ut velit dignissim tincidunt. Curabitur euismod laoreet orci semper dignissim. Suspendisse potenti. Vivamus sed enim quis dui pulvinar pharetra. Duis condimentum ultricies ipsum, sed ornare leo vestibulum vitae. Sed ut justo massa, varius molestie diam. Sed lacus quam, tempor in dictum sed, posuere et diam. Maecenas tincidunt enim elementum turpis blandit tempus. Nam lectus justo, adipiscing vitae ultricies egestas, porta nec diam. Aenean ac neque tortor. Cras tempus lacus nec leo ultrices suscipit. Etiam sed aliquam tortor. Duis lacus metus, euismod ut viverra sit amet, pulvinar sed urna.'
+lorem_ipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam justo sem, malesuada ut ultricies ac, bibendum eu neque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean at tellus ut velit dignissim tincidunt. Curabitur euismod laoreet orci semper dignissim. Suspendisse potenti. Vivamus sed enim quis dui pulvinar pharetra. Duis condimentum ultricies ipsum, sed ornare leo vestibulum vitae. Sed ut justo massa, varius molestie diam. Sed lacus quam, tempor in dictum sed, posuere et diam.'
 root = glooey.Gui(window, batch=batch)
-label = glooey.Label(lorem_ipsum)
-label.font_size = 12
-label.enable_line_wrap(400)
-root.add(label, 'center')
+label = glooey.Label()
+label.alignment = 'center'
+root.add(label)
 
-@window.event
-def on_key_press(symbol, modifier):
-    if symbol == pyglet.window.key.Q:
-        label.bold = not label.bold
+@demo_helpers.interactive_tests(window, batch) #
+def test_label():
+    label.set_text('Lorem ipsum', 0)
+    yield "Display \"lorem ipsum\"."
+    
+    label.text = ''
+    yield "Clear the label."
 
-    if symbol == pyglet.window.key.W:
-        label.italic = not label.italic
+    label.set_text(lorem_ipsum, 400)
+    yield "Display wrapped text."
 
-    if symbol == pyglet.window.key.E:
-        label.underline = not label.underline
+    label.font_name = 'serif'
+    yield "Use a serif font."
+    del label.font_name
 
-    if symbol == pyglet.window.key.A:
-        label.color = 'yellow'
+    label.font_size = 8
+    yield "Decrease the font size to 8."
+    del label.font_size
 
-    if symbol == pyglet.window.key.S:
-        label.color = 'green'
+    label.bold = True
+    yield "Make the text bold."
+    del label.bold
 
-    if symbol == pyglet.window.key.D:
-        label.bg_color = 'white'
+    label.italic = True
+    yield "Make the text italic."
+    del label.italic
 
-    if symbol == pyglet.window.key.F:
-        label.bg_color = 'black'
+    label.underline = True
+    yield "Underline the text."
+    # Explicitly set underline to False (rather than using ``del``) because the 
+    # underline machinery handles True and False specially, so I want to make 
+    # sure it works with both.
+    label.underline = False
 
-    if symbol == pyglet.window.key.Z:
-        label.alignment = 'left'
+    label.color = 'yellow'
+    yield "Make the text yellow."
+    label.color = 'green'
 
-    if symbol == pyglet.window.key.X:
-        label.alignment = 'center'
+    label.background_color = 'gray'
+    yield "Make the background gray."
+    del label.background_color
 
-    if symbol == pyglet.window.key.C:
-        label.alignment = 'right'
+    label.text_alignment = 'center'
+    yield "Center-align the text."
 
-    if symbol == pyglet.window.key.J:
-        label.line_spacing = 30
+    label.text_alignment = 'right'
+    yield "Right-align the text."
+    del label.text_alignment
 
-    if symbol == pyglet.window.key.K:
-        label.line_spacing = 15
+    label.line_spacing = 30
+    yield "Increase the line-spacing to 30px."
+    del label.line_spacing
 
-    if symbol == pyglet.window.key.SPACE:
-        if label.text == lorem_ipsum:
-            label.set_text('Lorem ipsum', 0)
-        elif label.text == 'Lorem ipsum':
-            label.set_text('')
-        else:
-            label.set_text(lorem_ipsum, 400)
-
-@window.event
-def on_mouse_scroll(x, y, scroll_x, scroll_y):
-    label.font_size += scroll_y
+    label.kerning = 2
+    yield "Increase the kerning to 2px."
+    del label.kerning
 
 pyglet.app.run()
 

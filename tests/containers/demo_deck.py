@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """\
-There a re 5 place-holders, each of a different color, but only one should be 
+There are 5 place-holders, each of a different color, but only one should be 
 visible at a time.  Make sure there are no errors if all the place-holders are 
 deleted.
 
@@ -22,10 +22,6 @@ next_state = 0
 
 root = Gui(window, batch=batch)
 deck = Deck(states[next_state])
-
-for state in states:
-    deck.add_state(state, PlaceHolder(50, 50, color=colors[state]))
-
 root.add(deck)
 
 @window.event

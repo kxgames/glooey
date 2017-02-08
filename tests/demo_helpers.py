@@ -9,7 +9,7 @@ class interactive_tests:
         self.window = window
         self.batch = batch
         self.label = pyglet.text.Label('',
-                color=glooey.drawing.orange.tuple,
+                color=glooey.drawing.white.tuple,
                 x=window.width - 5, y=5,
                 anchor_x='right', anchor_y='bottom',
                 batch=batch,

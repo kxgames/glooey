@@ -14,10 +14,11 @@ class WesnothCheckbox(glooey.Checkbox):
     default_checked_base = theme.image('buttons/checkbox-pressed.png')
     default_checked_over = theme.image('buttons/checkbox-active-pressed.png')
     default_checked_down = theme.image('buttons/checkbox-touched.png')
+    default_alignment = 'center'
 
 root = glooey.Gui(window, batch=batch)
 button = WesnothCheckbox()
-root.add(button, 'center')
+root.add(button)
 
 @button.event
 def on_toggle(widget):

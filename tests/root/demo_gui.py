@@ -1,31 +1,24 @@
 #!/usr/bin/env python3
 
-"""\
-The window should just be black, but the cursor should be a gold triangle.
-"""
-
 import pyglet
 import glooey
-
-print(__doc__)
+import demo_helpers
 
 window = pyglet.window.Window()
-root = glooey.Gui(window)
-root.add(glooey.EventLogger(), padding=100)
+batch = pyglet.graphics.Batch()
 
-cursor = 0
-cursors = [
-        (pyglet.image.load('cursor_nw.png'), (0, 16)),
-        (pyglet.image.load('cursor_se.png'), (16, 0)),
-]
+root = glooey.Gui(window, batch=batch)
+logger = glooey.EventLogger()
+logger.padding = 100
+root.add(logger)
 
-root.set_cursor(*cursors[cursor])
+@demo_helpers.interactive_tests(window, batch) #
+def test_root():
+    root.set_cursor(pyglet.image.load('cursor_nw.png'), (0, 16))
+    yield "Use a cursor with a top-left hotspot."
 
-@window.event
-def on_mouse_release(*args):
-    global cursor
-    cursor = (cursor + 1) % len(cursors)
-    root.set_cursor(*cursors[cursor])
+    root.set_cursor(pyglet.image.load('cursor_se.png'), (16, 0))
+    yield "Use a cursor with a bottom-right hotspot."
 
 pyglet.app.run()
 

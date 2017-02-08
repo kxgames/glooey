@@ -14,78 +14,21 @@ from . import drawing
 from .widget import Widget
 from .helpers import *
 
-def fill(child_rect, parent_rect):
-    child_rect.set(parent_rect)
-
-def top_left(child_rect, parent_rect):
-    child_rect.top_left = parent_rect.top_left
-
-def top_center(child_rect, parent_rect):
-    child_rect.top_center = parent_rect.top_center
-
-def top_right(child_rect, parent_rect):
-    child_rect.top_right = parent_rect.top_right
-
-def center_left(child_rect, parent_rect):
-    child_rect.center_left = parent_rect.center_left
-
-def center(child_rect, parent_rect):
-    child_rect.center = parent_rect.center
-
-def center_right(child_rect, parent_rect):
-    child_rect.center_right = parent_rect.center_right
-
-def bottom_left(child_rect, parent_rect):
-    child_rect.bottom_left = parent_rect.bottom_left
-
-def bottom_center(child_rect, parent_rect):
-    child_rect.bottom_center = parent_rect.bottom_center
-
-def bottom_right(child_rect, parent_rect):
-    child_rect.bottom_right = parent_rect.bottom_right
-
-placement_functions = {
-        'fill': fill,
-        'top_left': top_left,
-        'top_center': top_center,
-        'top_right': top_right,
-        'center_left': center_left,
-        'center': center,
-        'center_right': center_right,
-        'bottom_left': bottom_left,
-        'bottom_center': bottom_center,
-        'bottom_right': bottom_right,
-}
-
-def cast_to_placement_function(key_or_function):
-    try:
-        return placement_functions[key_or_function]
-    except KeyError:
-        return key_or_function
-
-def place_widget_in_box(widget, box_rect, key_or_function, widget_rect=None):
-    placement_function = cast_to_placement_function(key_or_function)
+def align_widget_in_box(widget, box_rect, key_or_func='fill', widget_rect=None):
+    alignment_func = drawing.cast_to_alignment(key_or_func)
 
     if widget_rect is None:
         widget_rect = widget.claimed_rect
 
-    placement_function(widget_rect, box_rect)
+    alignment_func(widget_rect, box_rect)
     widget.resize(widget_rect)
 
 
 @autoprop
-class BinMixin:
-    """
-    Provide add() and clear() methods for containers that can only have one 
-    child widget at a time.  The add() method will automatically remove the 
-    existing child if necessary.
-
-    This mixin is intended for classes that are like Bins in the sense that 
-    they can only have one child, but don't want to inherit the rest of the 
-    actual Bin class's interface, namely support for custom child placement.
-    """
+class Bin (Widget):
 
     def __init__(self):
+        super().__init__()
         self._child = None
 
     def add(self, child):
@@ -93,66 +36,15 @@ class BinMixin:
             self._detach_child(self._child)
 
         self._child = self._attach_child(child)
-        assert self._num_children == 1
+        assert len(self) == 1
         self._resize_and_regroup_children()
 
     def clear(self):
-        self._detach_child(self.child)
+        if self._child is not None:
+            self._detach_child(self._child)
         self._child = None
-        assert self._num_children == 0
+        assert len(self) == 0
         self._resize_and_regroup_children()
-
-    def get_child(self):
-        return self._child
-
-
-@autoprop
-class PlacementMixin:
-
-    def __init__(self, placement='fill'):
-        self._default_placement = placement
-        self._custom_placements = {}
-
-    def get_placement(self):
-        return self._default_placement
-
-    def set_placement(self, new_placement):
-        self._default_placement = new_placement
-        self.repack()
-
-    def _get_placement(self, key):
-        return self._custom_placements.get(key, self._default_placement)
-
-    def _get_custom_placement(self, key):
-        return self._custom_placements.get(key)
-
-    def _set_custom_placement(self, key, new_placement, repack=True):
-        if new_placement is not None:
-            self._custom_placements[key] = new_placement
-            if repack: self.repack()
-
-    def _del_custom_placement(self, key, repack=True):
-        if key in self._custom_placements:
-            del self._custom_placements[key]
-            if repack: self.repack()
-
-
-
-@autoprop
-class Bin (Widget, BinMixin, PlacementMixin):
-
-    def __init__(self, placement='fill'):
-        Widget.__init__(self)
-        BinMixin.__init__(self)
-        PlacementMixin.__init__(self, placement)
-
-    def add(self, child, placement=None):
-        self._set_custom_placement(child, placement, repack=False)
-        BinMixin.add(self, child)
-
-    def clear(self):
-        self._del_custom_placement(self.child, repack=False)
-        BinMixin.clear(self)
 
     def do_claim(self):
         min_width = 0
@@ -166,13 +58,14 @@ class Bin (Widget, BinMixin, PlacementMixin):
 
     def do_resize_children(self):
         if self.child is not None:
-            place_widget_in_box(
-                    self.child, self.rect,
-                    self._get_placement(self.child))
+            align_widget_in_box(self.child, self.rect)
+
+    def get_child(self):
+        return self._child
 
 
 @autoprop
-class Viewport (Widget, BinMixin):
+class Viewport (Bin):
 
     class PanningGroup (pyglet.graphics.Group):
 
@@ -189,8 +82,7 @@ class Viewport (Widget, BinMixin):
             pyglet.gl.glPopMatrix()
 
     def __init__(self, sensitivity=3):
-        Widget.__init__(self)
-        BinMixin.__init__(self)
+        super().__init__()
 
         # The panning_vector is the displacement between the bottom-left corner 
         # of this widget and the bottom-left corner of the child widget.
@@ -361,17 +253,16 @@ class Viewport (Widget, BinMixin):
 Viewport.register_event_type('on_mouse_pan')
 
 @autoprop
-class Grid (Widget, PlacementMixin):
+class Grid (Widget):
 
-    def __init__(self, rows=0, cols=0, padding=0, placement='fill'):
+    def __init__(self, rows=0, cols=0):
         Widget.__init__(self)
-        PlacementMixin.__init__(self, placement)
         self._children = {}
         self._children_can_overlap = False
+        self._cell_alignment_func = drawing.fill
         self._grid = drawing.Grid(
                 num_rows=rows,
                 num_cols=cols,
-                padding=padding,
         )
 
     def __getitem__(self, row_col):
@@ -381,20 +272,24 @@ class Grid (Widget, PlacementMixin):
         row, col = row_col
         self.add(row, col, child)
 
-    def add(self, row, col, child, placement=None):
+    def add(self, row, col, child):
         if (row, col) in self._children:
             self._detach_child(self._children[row, col])
 
         self._attach_child(child)
         self._children[row, col] = child
-        self._set_custom_placement((row, col), placement, repack=False)
         self._resize_and_regroup_children()
 
     def remove(self, row, col):
         child = self._children[row, col]
         self._detach_child(child)
         del self._children[row, col]
-        self._del_custom_placement((row, col), placement, repack=False)
+        self._resize_and_regroup_children()
+
+    def clear(self):
+        for child in self._children.values():
+            self._detach_child(child)
+        self._children = {}
         self._resize_and_regroup_children()
 
     def do_claim(self):
@@ -407,9 +302,10 @@ class Grid (Widget, PlacementMixin):
     def do_resize_children(self):
         cell_rects = self._grid.make_cells(self.rect)
         for ij in self._children:
-            child = self._children[ij]
-            placement = self._get_placement(ij)
-            place_widget_in_box(child, cell_rects[ij], placement)
+            align_widget_in_box(
+                    self._children[ij],
+                    cell_rects[ij],
+                    self._cell_alignment_func)
 
     def get_num_rows(self):
         return self._grid.num_rows
@@ -419,18 +315,26 @@ class Grid (Widget, PlacementMixin):
         self.repack()
 
     def get_num_cols(self):
-        return self._grid.num_rows
+        return self._grid.num_cols
 
     def set_num_cols(self, new_num):
         self._grid.num_cols = new_num
         self.repack()
 
-    def get_padding(self):
-        return self._grid.padding
 
-    def set_padding(self, new_padding):
-        super().set_padding(0)
-        self._grid.padding = new_padding
+    #def get_padding(self):
+    #    return self._grid.padding
+
+    #def set_padding(self, new_padding):
+    #    super().set_padding(0)
+    #    self._grid.padding = new_padding
+    #    self.repack()
+
+    def get_cell_alignment(self):
+        return self._cell_alignment_func
+
+    def set_cell_alignment(self, new_alignment):
+        self._cell_alignment_func = drawing.cast_to_alignment(new_alignment)
         self.repack()
 
     def get_row_height(self, row):
@@ -455,6 +359,14 @@ class Grid (Widget, PlacementMixin):
         self._grid.set_row_height(row, new_height)
         self.repack()
 
+    def del_row_height(self, row):
+        """
+        Unset the height of the specified row.  The default height will be 
+        used for that row instead.
+        """
+        self._grid.del_row_height(row)
+        self.repack()
+
     def get_col_width(self, col):
         return self._grid.col_widths[col]
 
@@ -475,14 +387,6 @@ class Grid (Widget, PlacementMixin):
         be divided evenly between them.
         """
         self._grid.set_col_width(col, new_width)
-        self.repack()
-
-    def del_row_height(self, row):
-        """
-        Unset the height of the specified row.  The default height will be 
-        used for that row instead.
-        """
-        self._grid.del_row_height(row)
         self.repack()
 
     def del_col_width(self, col):
@@ -519,47 +423,50 @@ class Grid (Widget, PlacementMixin):
 
 
 @autoprop
-class HVBox (Widget, PlacementMixin):
+class HVBox (Widget):
 
-    def __init__(self, padding=0, placement='fill'):
-        Widget.__init__(self)
-        PlacementMixin.__init__(self, placement)
+    def __init__(self):
+        super().__init__()
         self._children = []
         self._children_can_overlap = False
+        self._cell_alignment_func = drawing.fill
         self._sizes = {}
-        self._grid = drawing.Grid(
-                padding=padding,
-        )
+        self._grid = drawing.Grid()
 
-    def add(self, child, size=None, placement=None):
-        self.add_back(child, size, placement)
+    def add(self, child, size=None):
+        self.add_back(child, size)
 
-    def add_front(self, child, size=None, placement=None):
-        self.insert(child, 0, size, placement)
+    def add_front(self, child, size=None):
+        self.insert(child, 0, size)
 
-    def add_back(self, child, size=None, placement=None):
-        self.insert(child, len(self._children), size, placement)
+    def add_back(self, child, size=None):
+        self.insert(child, len(self._children), size)
 
-    def insert(self, child, index, size=None, placement=None):
+    def insert(self, child, index, size=None):
         self._attach_child(child)
         self._children.insert(index, child)
         self._sizes[child] = size
-        self._set_custom_placement(child, placement, repack=False)
         self._resize_and_regroup_children()
 
     def replace(self, old_child, new_child):
         old_index = self._children.index(old_child)
         old_size = self._sizes[old_child]
-        old_placement = self._get_custom_placement(old_child)
-        self.remove(old_child, repack=False)
-        self.insert(new_child, old_index, old_size, old_placement)
+        with self.hold_updates():
+            self.remove(old_child)
+            self.insert(new_child, old_index, old_size)
 
-    def remove(self, child, repack=True):
+    def remove(self, child):
         self._detach_child(child)
         self._children.remove(child)
         del self._sizes[child]
-        self._del_custom_placement(child)
-        if repack: self._resize_and_regroup_children()
+        self._resize_and_regroup_children()
+
+    def clear(self):
+        for child in self._children:
+            self._detach_child(child)
+        self._children = []
+        self._sizes = {}
+        self._resize_and_regroup_children()
 
     def do_claim(self):
         self.do_set_row_col_sizes({
@@ -577,8 +484,7 @@ class HVBox (Widget, PlacementMixin):
         cell_rects = self._grid.make_cells(self.rect)
         for i, child in enumerate(self._children):
             box = cell_rects[self.do_get_row_col(i)]
-            placement = self._get_placement(child)
-            place_widget_in_box(child, box, placement)
+            align_widget_in_box(child, box, self._cell_alignment_func)
 
     def do_get_row_col(self, index):
         raise NotImplementedError
@@ -587,14 +493,25 @@ class HVBox (Widget, PlacementMixin):
         raise NotImplementedError
 
     def get_children(self):
-        return self._children[:]
+        # Return a tuple so the list of children won't be mutable, and so the 
+        # caller can't somehow inadvertently change the list of children held 
+        # by the HVBox.
+        return tuple(self._children)
 
-    def get_padding(self):
-        return self._grid.padding
 
-    def set_padding(self, new_padding):
-        super().set_padding(0)
-        self._grid.padding = new_padding
+    #def get_padding(self):
+    #    return self._grid.padding
+
+    #def set_padding(self, new_padding):
+    #    super().set_padding(0)
+    #    self._grid.padding = new_padding
+    #    self.repack()
+
+    def get_cell_alignment(self):
+        return self._cell_alignment_func
+
+    def set_cell_alignment(self, new_alignment):
+        self._cell_alignment_func = drawing.cast_to_alignment(new_alignment)
         self.repack()
 
 
@@ -637,48 +554,41 @@ class VBox (HVBox):
 
 
 @autoprop
-class Stack (Widget, PlacementMixin):
+class Stack (Widget):
     """
     Have any number of children, claim enough space for the biggest one, and 
-    just draw them all in the order they were added.
-
-    For the button, it would be more useful to specify a layer.  Stacking is 
-    still a nice default, though.
+    just draw them all in layers.
     """
 
-    def __init__(self, placement='fill'):
+    def __init__(self):
         Widget.__init__(self)
-        PlacementMixin.__init__(self, placement)
         self._children = {} # {child: layer}
 
-    def add(self, widget, placement=None):
-        self.add_top(widget, placement)
+    def add(self, widget):
+        self.add_front(widget)
 
-    def add_top(self, widget, placement=None):
+    def add_front(self, widget):
         layer = max(self.layers) + 1 if self.layers else 0
-        self.insert(widget, layer, placement)
+        self.insert(widget, layer)
 
-    def add_bottom(self, widget, placement=None):
+    def add_back(self, widget):
         layer = min(self.layers) - 1 if self.layers else 0
-        self.insert(widget, layer, placement)
+        self.insert(widget, layer)
 
-    def insert(self, widget, layer, placement=None):
+    def insert(self, widget, layer):
         self._attach_child(widget)
         self._children[widget] = layer
-        self._set_custom_placement(widget, placement, repack=False)
         self._resize_and_regroup_children()
 
     def remove(self, widget):
         self._detach_child(widget)
         del self._children[widget]
-        self._del_custom_placement(widget, repack=False)
         self._resize_and_regroup_children()
 
     def clear(self):
         for child in self.children:
             self._detach_child(child)
         self._children = {}
-        self._custom_placements = {}
         self._resize_and_regroup_children()
 
     def do_claim(self):
@@ -696,10 +606,7 @@ class Stack (Widget, PlacementMixin):
 
     def do_resize_children(self):
         for child in self.children:
-            place_widget_in_box(
-                    child,
-                    self.rect,
-                    self._get_placement(child))
+            align_widget_in_box(child, self.rect)
 
     def do_regroup_children(self):
         # If there's only one child, don't bother making an ordered group.  As 
@@ -707,20 +614,24 @@ class Stack (Widget, PlacementMixin):
         # forcing OpenGL to change states is inefficient.
 
         if len(self) == 1:
-            only_child = next(iter(self.children))
-            only_child.regroup(self.group)
+            child = next(iter(self.children))
+            child.regroup(self.group)
         else:
             for child, layer in self._children.items():
                 child.regroup(pyglet.graphics.OrderedGroup(layer, self.group))
 
-    def set_placement_for(self, widget, placement):
-        self._set_custom_placement(widget, placement)
-
     def get_children(self):
-        return self._children.keys()
+        """
+        Return a list of the children making up this stack.  The list is sorted 
+        such that the widgets in the foreground come first.
+        """
+        # Cast to a tuple so that basic indexing operations are supported and 
+        # so that the list is immutable.
+        return sorted(self._children.keys(),
+                key=lambda x: self._children[x], reverse=True)
 
     def get_layers(self):
-        return self._children.values()
+        return sorted(self._children.values(), reverse=True)
 
 
 @autoprop

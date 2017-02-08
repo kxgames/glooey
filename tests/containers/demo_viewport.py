@@ -11,7 +11,7 @@ hotspot = 4, 24
 
 root = glooey.PanningGui(window, cursor, hotspot, batch=batch)
 viewport = glooey.Viewport()
-content = glooey.Grid(padding=50)
+content = glooey.Grid()
 menu = glooey.PlaceHolder(height=200, color=glooey.drawing.purple)
 vbox = glooey.VBox()
 

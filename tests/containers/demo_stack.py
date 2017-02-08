@@ -1,60 +1,48 @@
 #!/usr/bin/env python3
 
-"""\
-There should be 5 place-holders, of decreasing size and sorted in the order of 
-the rainbow.  The test is to make sure that the place-holders are properly 
-sorted along the z-axis.
-
-right click: Remove the widget under the mouse.
-q,w,e,a,s,d,f,z,x,c: Change the placement algorithm.
-j,k: Change the padding"""
-
 import pyglet
+import glooey
 import demo_helpers
-from glooey import *
-from glooey.drawing import *
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = Gui(window, batch=batch)
-stack = Stack()
-stack.placement = 'center'
-
-def percent(percent):
-    def placement(child_rect, parent_rect):
-        child_rect.width = percent * parent_rect.width / 100
-        child_rect.height = percent * parent_rect.height / 100
-        cast_to_placement_function(stack.placement)(child_rect, parent_rect)
-    return placement
-
-stack.add(PlaceHolder(0, 0, color=blue), placement=percent(100))
-stack.add(PlaceHolder(0, 0, color=green), placement=percent(80))
-stack.add(PlaceHolder(0, 0, color=yellow), placement=percent(60))
-stack.add(PlaceHolder(0, 0, color=orange), placement=percent(40))
-stack.add(PlaceHolder(0, 0, color=red), placement=percent(20))
-
+root = glooey.Gui(window, batch=batch)
+stack = glooey.Stack()
 root.add(stack)
 
-@window.event
-def on_mouse_press(x, y, button, modifiers):
-    from pyglet.window import key
+@demo_helpers.interactive_tests(window, batch) #
+def test_stack():
 
-    if button == pyglet.window.mouse.RIGHT:
-        # Need to use for-else because it's a run-time error to change the size 
-        # of a container (Widget.__children here) while iterating over it.
-        for widget in stack:
-            if widget.is_under_mouse(x, y):
-                break
-        else:
-            return
+    def layer(size, color='green'): #
+        size = size * (window.height - 20)
+        color = glooey.drawing.str_to_color(color)
+        return glooey.PlaceHolder(size, size, color, align='center')
 
-        stack.remove(widget)
+    stack.add(layer(0.8, 'green'))
+    stack.add(layer(0.4, 'orange'))
+    assert stack.layers == [1, 0]
+    yield "Make a stack with two layers."
 
+    stack.add_front(layer(0.2, 'red'))
+    assert stack.layers == [2, 1, 0]
+    yield "Add a red layer in front."
 
-demo_helpers.install_placement_hotkeys(window, stack)
+    stack.add_back(layer(1.0, 'blue'))
+    assert stack.layers == [2, 1, 0, -1]
+    yield "Add a blue layer in back."
 
-print(__doc__)
+    stack.insert(layer(0.6, 'yellow'), 0.5)
+    yield "Add a yellow layer in the middle."
+
+    stack.remove(stack.children[0])
+    yield "Remove the front layer."
+
+    stack.remove(stack.children[0])
+    yield "Remove the front layer again."
+
+    stack.clear()
+    yield "Clear the stack."
 
 pyglet.app.run()
 

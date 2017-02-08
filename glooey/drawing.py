@@ -14,12 +14,34 @@ from .helpers import *
 # Color utilities
 
 class Color (object):
-
     # Right now, the color class's internal representation is integers.  I 
     # don't know if this is a good thing, because integers aren't as expressive 
     # as floats.  This surprised me when I tried to use __truediv__ to 
     # implement get_float().  It didn't work because the RGBA values got 
     # converted to ints before being returned.
+
+    @staticmethod
+    def from_anything(color):
+        if isinstance(color, Color):
+            return color
+
+        if isinstance(color, str):
+            return Color.from_str(color)
+
+        if isinstance(color, tuple):
+            if all(0 <= x <= 1 and isinstance(x, float) for x in color):
+                return Color.from_float_tuple(color)
+            else:
+                return Color.from_int_tuple(color)
+
+    @staticmethod
+    def from_str(str):
+        # If the given string is to the name of a known color, return that 
+        # color.  Otherwise, treat the string as a hex code.
+        if str in colors:
+            return colors[str]
+        else:
+            return Color.from_hex(str)
 
     @staticmethod
     def from_hex(hex):
@@ -171,15 +193,7 @@ def hex_to_float(hex):
 def hex_to_int(hex):
     return Color.from_hex(hex).tuple
 
-def str_to_color(color):
-    # If the given string is to the name of a known color, return that color.
-    # Otherwise, treat the string as a hex code.
-    if color in colors:
-        return colors[color]
-    else:
-        return Color.from_hex(color)
-
-# Colors (fold)
+## Colors
 red = Color(164, 0, 0)
 brown = Color(143, 89, 2)
 orange = Color(206, 92, 0)
@@ -193,7 +207,7 @@ gray = Color(85, 87, 83)
 light = Color(255, 250, 240)
 white = Color(255, 255, 255)
 
-colors = {  # (no fold)
+colors = { #
         'red': red,
         'brown': brown,
         'orange': orange,
@@ -655,7 +669,7 @@ class Background(HoldUpdatesMixin):
                 }.items()
                 if img is not None}
 
-        self._grid.min_cell_rects={
+        self._grid.min_cell_rects = {
             ij: Rect.from_size(img.width, img.height)
             for ij, img in self._tile_images.items()}
 
@@ -817,6 +831,60 @@ class WhereStencilIsnt (OrderedGroup):
 
 
 
+# Alignment utilities
+
+def fill(child_rect, parent_rect):
+    child_rect.set(parent_rect)
+
+def top_left(child_rect, parent_rect):
+    child_rect.top_left = parent_rect.top_left
+
+def top_center(child_rect, parent_rect):
+    child_rect.top_center = parent_rect.top_center
+
+def top_right(child_rect, parent_rect):
+    child_rect.top_right = parent_rect.top_right
+
+def center_left(child_rect, parent_rect):
+    child_rect.center_left = parent_rect.center_left
+
+def center(child_rect, parent_rect):
+    child_rect.center = parent_rect.center
+
+def center_right(child_rect, parent_rect):
+    child_rect.center_right = parent_rect.center_right
+
+def bottom_left(child_rect, parent_rect):
+    child_rect.bottom_left = parent_rect.bottom_left
+
+def bottom_center(child_rect, parent_rect):
+    child_rect.bottom_center = parent_rect.bottom_center
+
+def bottom_right(child_rect, parent_rect):
+    child_rect.bottom_right = parent_rect.bottom_right
+
+alignments = {
+        'fill': fill,
+        'center': center,
+        'top': top_center,
+        'top left': top_left,
+        'top right': top_right,
+        'bottom': bottom_center,
+        'bottom left': bottom_left,
+        'bottom right': bottom_right,
+        'left': center_left,
+        'right': center_right,
+}
+
+def cast_to_alignment(key_or_function):
+    # Could raise a nicer error if the key isn't found, and could possibly 
+    # check to make the signature checks out...
+    if isinstance(key_or_function, str):
+        return alignments[key_or_function.lower()]
+    else:
+        return key_or_function
+
+
 # Rectangle placement utilities
 
 @autoprop
@@ -968,8 +1036,9 @@ class Grid:
         self._invalidate_claim()
 
     def del_row_height(self, i):
-        del self._requested_row_heights[i]
-        self._invalidate_claim()
+        if i in self._requested_row_heights:
+            del self._requested_row_heights[i]
+            self._invalidate_claim()
 
     def get_row_heights(self):
         return self._row_heights
@@ -990,8 +1059,9 @@ class Grid:
         self._invalidate_claim()
 
     def del_col_width(self, j):
-        del self._requested_col_widths[j]
-        self._invalidate_claim()
+        if j in self._requested_col_widths:
+            del self._requested_col_widths[j]
+            self._invalidate_claim()
 
     def get_col_widths(self):
         return self._col_widths

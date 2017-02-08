@@ -1,85 +1,65 @@
 #!/usr/bin/env python3
 
-"""The screen should begin with 5 vertically stacked boxes and the following 
-hotkeys should have the following effects:
-
-u: Add a red box to the top of the screen.
-i: Add an orange box to the middle of the screen.
-o: Add a yellow box to the bottom of the screen.
-
-If you hold <Ctrl>, the box will be given 100 px of space.
-If you hold <Shift>, the box will be given as little space as possible.
-If you hold neither, the box will expand to fill any available space.
-
-left click: replace the box you clicked on with one of a different color.
-right click: remove the box you clicked on.
-
-q,w,e,a,s,d,f,z,x,c: Change the placement algorithm.
-j,k: Change the padding
-"""
-
 import pyglet
 import demo_helpers
 from glooey import *
 from glooey.drawing import *
 from pprint import pprint
 
-print(__doc__)
-
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
 root = Gui(window, batch=batch)
-vbox = VBox(padding=4)
-for i in range(5):
-    vbox.add(PlaceHolder(20, 20, color=green))
+vbox = VBox()
 root.add(vbox)
 
-@window.event
-def on_key_press(symbol, modifiers):
-    from pyglet.window import key
+@demo_helpers.interactive_tests(window, batch) #
+def interactive_vbox_tests():
 
-    size = 100 if modifiers & key.MOD_CTRL else None
-    size = 0 if modifiers & key.MOD_SHIFT else size
-    placement = 'fill' if size is not None else None
+    # Test adding and removing widgets.
+    for i in range(2):
+        vbox.add(PlaceHolder(50, 50))
+    yield "Make an VBox with 2 cells."
 
-    if symbol == key.U:
-        print('u')
-        widget = PlaceHolder(20, 20, color=red)
-        vbox.add_top(widget, size, placement)
-        widget.diagnose_drawing_problems()
+    top = PlaceHolder(50, 50, red)
+    vbox.add_top(top)
+    yield "Add a red widget on the top."
 
-    if symbol == key.I:
-        i = len(vbox) // 2
-        widget = PlaceHolder(20, 20, color=orange)
-        vbox.insert(widget, i, size, placement)
+    bottom = PlaceHolder(50, 50, red)
+    vbox.add_bottom(bottom)
+    yield "Add a red widget on the bottom."
 
-    if symbol == key.O:
-        widget = PlaceHolder(20, 20, color=yellow)
-        vbox.add_bottom(widget, size, placement)
+    middle = PlaceHolder(50, 50, red)
+    vbox.insert(middle, 2)
+    yield "Insert a red widget in the middle."
 
-@window.event
-def on_mouse_press(x, y, button, modifiers):
-    from pyglet.window import key
+    vbox.replace(middle, PlaceHolder(50, 50, green))
+    yield "Replace the red widget in the middle with a green one."
 
-    for widget in vbox:
-        if widget.is_under_mouse(x, y):
-            break
-    else:
-        return
+    vbox.remove(top)
+    yield "Remove the widget on the top."
 
-    if button == pyglet.window.mouse.LEFT:
-        color = blue if widget.color == green else green
-        new_widget = PlaceHolder(20, 20, color=color)
-        vbox.replace(widget, new_widget)
+    vbox.remove(bottom)
+    yield "Remove the widget on the bottom."
 
-    if button == pyglet.window.mouse.RIGHT:
-        vbox.remove(widget)
+    # Test alignment.
+    vbox.alignment = 'center'
+    yield "alignment = 'center'"
 
+    vbox.alignment = 'fill'
+    yield "alignment = 'fill'"
 
-demo_helpers.install_padding_hotkeys(window, vbox)
-demo_helpers.install_placement_hotkeys(window, vbox)
+    vbox.cell_alignment = 'center'
+    yield "cell_alignment = 'center'"
+
+    vbox.cell_alignment = 'fill'
+    yield "cell_alignment = 'fill'"
+
+    # Get ready to restart the tests (and make sure clear() works).
+    vbox.clear()
+    yield "Clear the VBox."
 
 pyglet.app.run()
+
 
 
