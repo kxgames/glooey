@@ -9,12 +9,12 @@ from .helpers import *
 class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     default_padding = None
-    default_padding_horz = None
-    default_padding_vert = None
-    default_padding_left = None
-    default_padding_right = None
-    default_padding_top = None
-    default_padding_bottom = None
+    default_horz_padding = None
+    default_vert_padding = None
+    default_left_padding = None
+    default_right_padding = None
+    default_top_padding = None
+    default_bottom_padding = None
     default_alignment = 'fill'
 
     def __init__(self):
@@ -32,27 +32,26 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._claimed_width = 0
         self._claimed_height = 0
         self._assigned_rect = None
-        self._padding_left = 0
-        self._padding_right = 0
-        self._padding_top = 0
-        self._padding_bottom = 0
-        self._alignment_func = None
         self._is_hidden = False
         self._is_claim_stale = True
         self._spurious_leave_event = False
 
-        self.set_padding(
+        # Take care to avoid calling any potentially polymorphic methods, such 
+        # as set_padding() or repack().  When these methods are overridden, 
+        # they often become dependent on the overriding subclass being properly
+        # initialized.  Since that hasn't happened by the time this constructor 
+        # is called, these polymorphic methods can cause headaches.
+        self._set_padding(
                 all=self.default_padding,
-                horz=self.default_padding_horz,
-                vert=self.default_padding_vert,
-                left=self.default_padding_left,
-                right=self.default_padding_right,
-                top=self.default_padding_top,
-                bottom=self.default_padding_bottom,
+                horz=self.default_horz_padding,
+                vert=self.default_vert_padding,
+                left=self.default_left_padding,
+                right=self.default_right_padding,
+                top=self.default_top_padding,
+                bottom=self.default_bottom_padding,
         )
-        self.set_alignment(
-                self.default_alignment,
-        )
+        self._set_alignment(
+                self.default_alignment)
 
     def __repr__(self):
         return '{}(id={})'.format(
@@ -102,8 +101,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
         # Claim space for this widget.
         self._claimed_width, self._claimed_height = self.do_claim()
-        self._claimed_width += self._padding_left + self._padding_right
-        self._claimed_height += self._padding_top + self._padding_bottom
+        self._claimed_width += self._left_padding + self._right_padding
+        self._claimed_height += self._top_padding + self._bottom_padding
 
         # Return whether or not the claim has changed since the last repack.  
         # This determines whether the widget's parent needs to be repacked.
@@ -124,10 +123,10 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # Subtract padding from the full amount of space assigned to this 
         # widget.
         padded_rect = self._assigned_rect.copy()
-        padded_rect.left += self._padding_left
-        padded_rect.bottom += self._padding_bottom
-        padded_rect.width -= self._padding_left + self._padding_right
-        padded_rect.height -= self._padding_top + self._padding_bottom
+        padded_rect.left += self._left_padding
+        padded_rect.bottom += self._bottom_padding
+        padded_rect.width -= self._left_padding + self._right_padding
+        padded_rect.height -= self._top_padding + self._bottom_padding
 
         # Align this widget within the space available to it (i.e. the assigned 
         # space minus the padding).
@@ -465,69 +464,65 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         return self._claimed_height
 
     def get_padding(self):
-        return (self._padding_left, self._padding_right,
-                self._padding_top, self._padding_bottom)
+        return (self._left_padding, self._right_padding,
+                self._top_padding, self._bottom_padding)
 
     def set_padding(self, all=None, *, horz=None, vert=None,
             left=None, right=None, top=None, bottom=None):
-
-        self._padding_left = first_not_none((left, horz, all, 0))
-        self._padding_right = first_not_none((right, horz, all, 0))
-        self._padding_top = first_not_none((top, vert, all, 0))
-        self._padding_bottom = first_not_none((bottom, vert, all, 0))
+        self._set_padding(all, horz, vert, left, right, top, bottom)
         self.repack()
 
-    padding = property(get_padding, set_padding)
+    padding = late_binding_property(get_padding, set_padding)
 
-    def get_padding_horz(self):
-        return self._padding_left, self._padding_right
+    def get_horz_padding(self):
+        return self._left_padding, self._right_padding
 
-    def set_padding_horz(self, new_padding):
-        self._padding_left = new_padding
-        self._padding_right = new_padding
+    def set_horz_padding(self, new_padding):
+        self._left_padding = new_padding
+        self._right_padding = new_padding
         self.repack()
 
-    def get_padding_vert(self):
-        return self._padding_top, self._padding_bottom
+    def get_vert_padding(self):
+        return self._top_padding, self._bottom_padding
 
-    def set_padding_vert(self, new_padding):
-        self._padding_top = new_padding
-        self._padding_bottom = new_padding
+    def set_vert_padding(self, new_padding):
+        self._top_padding = new_padding
+        self._bottom_padding = new_padding
         self.repack()
 
-    def get_padding_left(self):
-        return self._padding_left
+    def get_left_padding(self):
+        return self._left_padding
 
-    def set_padding_left(self, new_padding):
-        self._padding_left = new_padding
+    def set_left_padding(self, new_padding):
+        self._left_padding = new_padding
         self.repack()
 
-    def get_padding_right(self):
-        return self._padding_right
+    def get_right_padding(self):
+        return self._right_padding
 
-    def set_padding_right(self, new_padding):
-        self._padding_right = new_padding
+    def set_right_padding(self, new_padding):
+        self._right_padding = new_padding
         self.repack()
 
-    def get_padding_top(self):
-        return self._padding_top
+    def get_top_padding(self):
+        return self._top_padding
 
-    def set_padding_top(self, new_padding):
-        self._padding_top = new_padding
+    def set_top_padding(self, new_padding):
+        self._top_padding = new_padding
         self.repack()
 
-    def get_padding_bottom(self):
-        return self._padding_bottom
+    def get_bottom_padding(self):
+        return self._bottom_padding
 
-    def set_padding_bottom(self, new_padding):
-        self._padding_bottom = new_padding
+    def set_bottom_padding(self, new_padding):
+        self._bottom_padding = new_padding
         self.repack()
 
     def get_alignment(self):
         return self._alignment_func
 
     def set_alignment(self, new_alignment):
-        self._alignment_func = drawing.cast_to_alignment(new_alignment)
+        self._set_alignment(new_alignment)
         self.repack()
 
     @property
@@ -751,6 +746,28 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         return len(self.__children)
 
     _num_children = property(_get_num_children)
+
+    def _set_padding(self, all=None, horz=None, vert=None,
+            left=None, right=None, top=None, bottom=None):
+        """
+        Set the four padding attributes (top, left, bottom, right) defined in 
+        the Widget class and don't repack.  This method is provided to help the 
+        Widget constructor initialize its default paddings without calling and 
+        polymorphic methods.
+        """
+        self._left_padding = first_not_none((left, horz, all, 0))
+        self._right_padding = first_not_none((right, horz, all, 0))
+        self._top_padding = first_not_none((top, vert, all, 0))
+        self._bottom_padding = first_not_none((bottom, vert, all, 0))
+
+    def _set_alignment(self, new_alignment):
+        """
+        Set the alignment attribute and don't repack.  This method is provided 
+        to help the Widget constructor initialize its default paddings without 
+        calling and polymorphic methods.
+        """
+        self._alignment_func = drawing.cast_to_alignment(new_alignment)
+
 
 
 Widget.register_event_type('on_add_child')

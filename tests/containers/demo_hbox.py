@@ -41,19 +41,24 @@ def interactive_hbox_tests():
 
     hbox.remove(right)
     yield "Remove the widget on the right."
+    
+    # Test padding.
+    hbox.padding = 10
+    yield "Pad the widgets by 10px."
+    hbox.padding = 0
+
+    hbox.cell_padding = 10
+    yield "Only pad between the widgets."
+    hbox.cell_padding = 0
 
     # Test alignment.
     hbox.alignment = 'center'
-    yield "alignment = 'center'"
-
+    yield "Center-align the whole HBox."
     hbox.alignment = 'fill'
-    yield "alignment = 'fill'"
 
     hbox.cell_alignment = 'center'
-    yield "cell_alignment = 'center'"
-
+    yield "Center-align the widgets."
     hbox.cell_alignment = 'fill'
-    yield "cell_alignment = 'fill'"
 
     # Get ready to restart the tests (and make sure clear() works).
     hbox.clear()

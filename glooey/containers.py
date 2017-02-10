@@ -255,15 +255,20 @@ Viewport.register_event_type('on_mouse_pan')
 @autoprop
 class Grid (Widget):
 
+    default_cell_padding = None
+    default_cell_alignment = 'fill'
+
     def __init__(self, rows=0, cols=0):
         Widget.__init__(self)
         self._children = {}
         self._children_can_overlap = False
-        self._cell_alignment_func = drawing.fill
         self._grid = drawing.Grid(
                 num_rows=rows,
                 num_cols=cols,
         )
+        self.cell_padding = first_not_none((
+                self.default_cell_padding, self.default_padding, 0))
+        self.cell_alignment = self.default_cell_alignment
 
     def __getitem__(self, row_col):
         return self._children[row_col]
@@ -321,14 +326,23 @@ class Grid (Widget):
         self._grid.num_cols = new_num
         self.repack()
 
+    def get_padding(self):
+        return super().get_padding() + (self.cell_padding,)
 
-    #def get_padding(self):
-    #    return self._grid.padding
+    def set_padding(self, all=None, *, horz=None, vert=None,
+            left=None, right=None, top=None, bottom=None, cell=None):
+        super().set_padding(
+                all=all, horz=horz, vert=vert, left=left, right=right,
+                top=top, bottom=bottom)
+        self._grid.inner_padding = first_not_none((cell, all, 0))
+        self.repack()
 
-    #def set_padding(self, new_padding):
-    #    super().set_padding(0)
-    #    self._grid.padding = new_padding
-    #    self.repack()
+    def get_cell_padding(self):
+        return self._grid.inner_padding
+
+    def set_cell_padding(self, new_padding):
+        self._grid.inner_padding = new_padding
+        self.repack()
 
     def get_cell_alignment(self):
         return self._cell_alignment_func
@@ -425,13 +439,19 @@ class Grid (Widget):
 @autoprop
 class HVBox (Widget):
 
+    default_cell_padding = None
+    default_cell_alignment = 'fill'
+
     def __init__(self):
         super().__init__()
         self._children = []
         self._children_can_overlap = False
-        self._cell_alignment_func = drawing.fill
         self._sizes = {}
         self._grid = drawing.Grid()
+
+        self.cell_padding = first_not_none((
+                self.default_cell_padding, self.default_padding, 0))
+        self.cell_alignment = self.default_cell_alignment
 
     def add(self, child, size=None):
         self.add_back(child, size)
@@ -498,14 +518,23 @@ class HVBox (Widget):
         # by the HVBox.
         return tuple(self._children)
 
+    def get_padding(self):
+        return super().get_padding() + (self.cell_padding,)
 
-    #def get_padding(self):
-    #    return self._grid.padding
+    def set_padding(self, all=None, *, horz=None, vert=None,
+            left=None, right=None, top=None, bottom=None, cell=None):
+        super().set_padding(
+                all=all, horz=horz, vert=vert, left=left, right=right,
+                top=top, bottom=bottom)
+        self._grid.inner_padding = first_not_none((cell, all, 0))
+        self.repack()
 
-    #def set_padding(self, new_padding):
-    #    super().set_padding(0)
-    #    self._grid.padding = new_padding
-    #    self.repack()
+    def get_cell_padding(self):
+        return self._grid.inner_padding
+
+    def set_cell_padding(self, new_padding):
+        self._grid.inner_padding = new_padding
+        self.repack()
 
     def get_cell_alignment(self):
         return self._cell_alignment_func

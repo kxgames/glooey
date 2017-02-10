@@ -891,7 +891,8 @@ def cast_to_alignment(key_or_function):
 class Grid:
 
     def __init__(self, *, bounding_rect=None, min_cell_rects={},
-            num_rows=0, num_cols=0, padding=0, row_heights={}, col_widths={},
+            num_rows=0, num_cols=0, padding=None, inner_padding=None, 
+            outer_padding=None, row_heights={}, col_widths={},
             default_row_height='expand', default_col_width='expand'):
 
         # Attributes that the user can set to affect the shape of the grid.  
@@ -899,7 +900,8 @@ class Grid:
         self._min_cell_rects = min_cell_rects
         self._requested_num_rows = num_rows
         self._requested_num_cols = num_cols
-        self._padding = padding
+        self._inner_padding = first_not_none((inner_padding, padding, 0))
+        self._outer_padding = first_not_none((outer_padding, padding, 0))
         self._requested_row_heights = row_heights
         self._requested_col_widths = col_widths
         self._default_row_height = default_row_height
@@ -918,6 +920,8 @@ class Grid:
         self._fixed_col_widths = {}
         self._min_expandable_row_heights = {}
         self._min_expandable_col_widths = {}
+        self._padding_height = 0
+        self._padding_width = 0
         self._min_height = 0
         self._min_width = 0
         self._row_heights = {}
@@ -1022,10 +1026,25 @@ class Grid:
         self._invalidate_shape()
 
     def get_padding(self):
-        return self._padding
+        return self._inner_padding, self._outer_padding
 
     def set_padding(self, new_padding):
-        self._padding = new_padding
+        self._inner_padding = new_padding
+        self._outer_padding = new_padding
+        self._invalidate_claim()
+
+    def get_inner_padding(self):
+        return self._inner_padding
+
+    def set_inner_padding(self, new_padding):
+        self._inner_padding = new_padding
+        self._invalidate_claim()
+
+    def get_outer_padding(self):
+        return self._outer_padding
+
+    def set_outer_padding(self, new_padding):
+        self._outer_padding = new_padding
         self._invalidate_claim()
 
     def get_row_height(self, i):
@@ -1135,6 +1154,8 @@ class Grid:
             self._find_fixed_col_widths()
             self._find_min_expandable_row_heights()
             self._find_min_expandable_col_widths()
+            self._find_padding_height()
+            self._find_padding_width()
             self._find_min_height()
             self._find_min_width()
             self._is_claim_stale = False
@@ -1254,21 +1275,31 @@ class Grid:
             self._min_expandable_col_widths[j] = \
                     self._max_cell_widths.get(j, 0)
 
+    def _find_padding_height(self):
+        self._padding_height = \
+                + self._inner_padding * (self._num_rows - 1) \
+                + self._outer_padding * 2
+
+    def _find_padding_width(self):
+        self._padding_width = \
+                + self._inner_padding * (self._num_cols - 1) \
+                + self._outer_padding * 2
+
     def _find_min_height(self):
         min_expandable_height = max(
                 self._min_expandable_row_heights.values() or [0])
         self._min_height = \
-                + sum(self._fixed_row_heights.values())  \
+                + sum(self._fixed_row_heights.values()) \
                 + min_expandable_height * self._num_expandable_rows \
-                + self._padding * (self._num_rows + 1)
+                + self._padding_height
 
     def _find_min_width(self):
         min_expandable_width = max(
                 self._min_expandable_col_widths.values() or [0])
         self._min_width = \
-                + sum(self._fixed_col_widths.values())  \
+                + sum(self._fixed_col_widths.values()) \
                 + min_expandable_width * self._num_expandable_cols \
-                + self._padding * (self._num_cols + 1)
+                + self._padding_width
 
     def _find_row_heights(self):
         self._row_heights = self._fixed_row_heights.copy()
@@ -1277,14 +1308,15 @@ class Grid:
             expandable_row_height = (
                     + self._bounding_rect.height
                     - sum(self._fixed_row_heights.values())
-                    - self._padding * (self._num_rows + 1)
+                    - self._padding_height
                     ) / self._num_expandable_rows
 
             for i in self._expandable_rows:
                 self._row_heights[i] = expandable_row_height
 
-        self._height = sum(self._row_heights.values()) \
-                + self._padding + (self._num_rows + 1)
+        self._height = \
+                + sum(self._row_heights.values()) \
+                + self._padding_height
 
     def _find_col_widths(self):
         self._col_widths = self._fixed_col_widths.copy()
@@ -1293,26 +1325,27 @@ class Grid:
             expandable_col_width = (
                     + self._bounding_rect.width
                     - sum(self._fixed_col_widths.values())
-                    - self._padding * (self._num_cols + 1)
+                    - self._padding_width
                     ) / self._num_expandable_cols
 
             for j in self._expandable_cols:
                 self._col_widths[j] = expandable_col_width
 
-        self._width = sum(self._col_widths.values()) \
-                + self._padding + (self._num_cols + 1)
+        self._width = \
+                + sum(self._col_widths.values()) \
+                + self._padding_width
 
     def _find_cell_rects(self):
         self._cell_rects = {}
         top_cursor = self._bounding_rect.top
 
         for i in range(self._num_rows):
-            top_cursor -= self._padding
-            row_height = self._row_heights[i]
+            top_cursor -= self._get_row_padding(i)
             left_cursor = self._bounding_rect.left
+            row_height = self._row_heights[i]
 
             for j in range(self._num_cols):
-                left_cursor += self._padding
+                left_cursor += self._get_col_padding(j)
                 col_width = self._col_widths[j]
 
                 self._cell_rects[i,j] = Rect.from_size(col_width, row_height)
@@ -1327,11 +1360,17 @@ class Grid:
     def _get_requested_col_width(self, j):
         return self._requested_col_widths.get(j, self._default_col_width)
 
+    def _get_row_padding(self, i):
+        return self._outer_padding if i == 0 else self._inner_padding
+
+    def _get_col_padding(self, j):
+        return self._outer_padding if j == 0 else self._inner_padding
 
 
-def make_grid(rect, cells={}, num_rows=0, num_cols=0, padding=0,
-        row_heights={}, col_widths={}, default_row_height='expand',
-        default_col_width='expand'):
+
+def make_grid(rect, cells={}, num_rows=0, num_cols=0, padding=None,
+        inner_padding=None, outer_padding=None, row_heights={}, col_widths={}, 
+        default_row_height='expand', default_col_width='expand'):
     """
     Return rectangles for each cell in the specified grid.  The rectangles are 
     returned in a dictionary where the keys are (row, col) tuples.
@@ -1342,6 +1381,8 @@ def make_grid(rect, cells={}, num_rows=0, num_cols=0, padding=0,
             num_rows=num_rows,
             num_cols=num_cols,
             padding=padding,
+            inner_padding=inner_padding,
+            outer_padding=outer_padding,
             row_heights=row_heights,
             col_widths=col_widths,
             default_row_height=default_row_height,

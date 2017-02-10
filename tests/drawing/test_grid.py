@@ -74,6 +74,72 @@ def test_padding():
             (0,1): Rect(6, 1, 4, 8),
     }
 
+def test_inner_padding():
+    cells = drawing.make_grid(
+            Rect.from_size(10, 10),
+            num_rows=1,
+            num_cols=1,
+            inner_padding=1,
+    )
+    assert cells == {
+            (0,0): Rect(0, 0, 10, 10),
+    }
+
+    cells = drawing.make_grid(
+            Rect.from_size(10, 11),
+            num_rows=2,
+            num_cols=1,
+            inner_padding=1,
+    )
+    assert cells == {
+            (0,0): Rect(0, 6, 10, 5),
+            (1,0): Rect(0, 0, 10, 5),
+    }
+
+    cells = drawing.make_grid(
+            Rect.from_size(11, 10),
+            num_rows=1,
+            num_cols=2,
+            inner_padding=1
+    )
+    assert cells == {
+            (0,0): Rect(0, 0, 5, 10),
+            (0,1): Rect(6, 0, 5, 10),
+    }
+
+def test_outer_padding():
+    cells = drawing.make_grid(
+            Rect.from_size(10, 10),
+            num_rows=1,
+            num_cols=1,
+            outer_padding=1,
+    )
+    assert cells == {
+            (0,0): Rect(1, 1, 8, 8),
+    }
+
+    cells = drawing.make_grid(
+            Rect.from_size(10, 10),
+            num_rows=2,
+            num_cols=1,
+            outer_padding=1,
+    )
+    assert cells == {
+            (0,0): Rect(1, 5, 8, 4),
+            (1,0): Rect(1, 1, 8, 4),
+    }
+
+    cells = drawing.make_grid(
+            Rect.from_size(10, 10),
+            num_rows=1,
+            num_cols=2,
+            outer_padding=1
+    )
+    assert cells == {
+            (0,0): Rect(1, 1, 4, 8),
+            (0,1): Rect(5, 1, 4, 8),
+    }
+
 def test_request_row_height():
     cells = drawing.make_grid(
             Rect.from_size(10, 10),

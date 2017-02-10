@@ -17,9 +17,9 @@ class TestButton(glooey.Button):
         default_font_size = 14
         default_bold = True
         default_padding = 100
-        #default_padding_horz = 8
-        #default_padding_top = 5
-        #default_padding_bottom = 2
+        #default_horz_padding_horz = 8
+        #default_top_padding_top = 5
+        #default_bottom_padding = 2
 
     default_base_top_left     = pyglet.image.load('assets/button/orange.png')
     default_base_top          = pyglet.image.load('assets/button/orange.png')
@@ -69,9 +69,6 @@ class TestButton(glooey.Button):
 root = glooey.Gui(window, batch=batch)
 button = TestButton('Hello world!')
 root.add(button)
-
-print(button.label.default_padding)
-print(button.label.padding)
 
 @button.event
 def on_click(widget):

@@ -41,25 +41,29 @@ def interactive_vbox_tests():
 
     vbox.remove(bottom)
     yield "Remove the widget on the bottom."
+    
+    # Test padding.
+    vbox.padding = 10
+    yield "Pad the widgets by 10px."
+    vbox.padding = 0
+
+    vbox.cell_padding = 10
+    yield "Only pad between the widgets."
+    vbox.cell_padding = 0
 
     # Test alignment.
     vbox.alignment = 'center'
-    yield "alignment = 'center'"
-
+    yield "Center-align the whole VBox."
     vbox.alignment = 'fill'
-    yield "alignment = 'fill'"
 
     vbox.cell_alignment = 'center'
-    yield "cell_alignment = 'center'"
-
+    yield "Center-align the widgets."
     vbox.cell_alignment = 'fill'
-    yield "cell_alignment = 'fill'"
 
     # Get ready to restart the tests (and make sure clear() works).
     vbox.clear()
     yield "Clear the VBox."
 
 pyglet.app.run()
-
 
 
