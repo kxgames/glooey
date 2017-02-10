@@ -10,8 +10,11 @@ batch = pyglet.graphics.Batch()
 pyglet.font.load('assets/fonts/LiberationMono-Bold.ttf')
 
 class TestButton(glooey.Button):
+    default_vtile = True
+    default_htile = True
+    default_alignment = 'center'
 
-    class Label(glooey.Label): #
+    class Label(glooey.Label):
         default_color = '#deeed6'
         default_font_name = 'Liberation Mono'
         default_font_size = 14
@@ -21,49 +24,50 @@ class TestButton(glooey.Button):
         #default_top_padding_top = 5
         #default_bottom_padding = 2
 
-    default_base_top_left     = pyglet.image.load('assets/button/orange.png')
-    default_base_top          = pyglet.image.load('assets/button/orange.png')
-    default_base_top_right    = pyglet.image.load('assets/button/orange.png')
-    default_base_left         = pyglet.image.load('assets/button/orange.png')
-    default_base_center       = pyglet.image.load('assets/button/red.png')
-    default_base_right        = pyglet.image.load('assets/button/orange.png')
-    default_base_bottom_left  = pyglet.image.load('assets/button/orange.png')
-    default_base_bottom       = pyglet.image.load('assets/button/orange.png')
-    default_base_bottom_right = pyglet.image.load('assets/button/orange.png')
+    class Base(glooey.Background):
+        default_top_left     = pyglet.image.load('assets/button/orange.png')
+        default_top          = pyglet.image.load('assets/button/orange.png')
+        default_top_right    = pyglet.image.load('assets/button/orange.png')
+        default_left         = pyglet.image.load('assets/button/orange.png')
+        default_center       = pyglet.image.load('assets/button/red.png')
+        default_right        = pyglet.image.load('assets/button/orange.png')
+        default_bottom_left  = pyglet.image.load('assets/button/orange.png')
+        default_bottom       = pyglet.image.load('assets/button/orange.png')
+        default_bottom_right = pyglet.image.load('assets/button/orange.png')
 
-    default_over_top_left     = pyglet.image.load('assets/button/yellow.png')
-    default_over_top          = pyglet.image.load('assets/button/yellow.png')
-    default_over_top_right    = pyglet.image.load('assets/button/yellow.png')
-    default_over_left         = pyglet.image.load('assets/button/yellow.png')
-    default_over_center       = pyglet.image.load('assets/button/green.png')
-    default_over_right        = pyglet.image.load('assets/button/yellow.png')
-    default_over_bottom_left  = pyglet.image.load('assets/button/yellow.png')
-    default_over_bottom       = pyglet.image.load('assets/button/yellow.png')
-    default_over_bottom_right = pyglet.image.load('assets/button/yellow.png')
+    class Over(glooey.Background):
+        default_top_left     = pyglet.image.load('assets/button/yellow.png')
+        default_top          = pyglet.image.load('assets/button/yellow.png')
+        default_top_right    = pyglet.image.load('assets/button/yellow.png')
+        default_left         = pyglet.image.load('assets/button/yellow.png')
+        default_center       = pyglet.image.load('assets/button/green.png')
+        default_right        = pyglet.image.load('assets/button/yellow.png')
+        default_bottom_left  = pyglet.image.load('assets/button/yellow.png')
+        default_bottom       = pyglet.image.load('assets/button/yellow.png')
+        default_bottom_right = pyglet.image.load('assets/button/yellow.png')
 
-    default_down_top_left     = pyglet.image.load('assets/button/teal.png')
-    default_down_top          = pyglet.image.load('assets/button/teal.png')
-    default_down_top_right    = pyglet.image.load('assets/button/teal.png')
-    default_down_left         = pyglet.image.load('assets/button/teal.png')
-    default_down_center       = pyglet.image.load('assets/button/blue.png')
-    default_down_right        = pyglet.image.load('assets/button/teal.png')
-    default_down_bottom_left  = pyglet.image.load('assets/button/teal.png')
-    default_down_bottom       = pyglet.image.load('assets/button/teal.png')
-    default_down_bottom_right = pyglet.image.load('assets/button/teal.png')
+    class Down(glooey.Background):
+        default_top_left     = pyglet.image.load('assets/button/teal.png')
+        default_top          = pyglet.image.load('assets/button/teal.png')
+        default_top_right    = pyglet.image.load('assets/button/teal.png')
+        default_left         = pyglet.image.load('assets/button/teal.png')
+        default_center       = pyglet.image.load('assets/button/blue.png')
+        default_right        = pyglet.image.load('assets/button/teal.png')
+        default_bottom_left  = pyglet.image.load('assets/button/teal.png')
+        default_bottom       = pyglet.image.load('assets/button/teal.png')
+        default_bottom_right = pyglet.image.load('assets/button/teal.png')
 
-    default_off_top_left     = pyglet.image.load('assets/button/light_grey.png')
-    default_off_top          = pyglet.image.load('assets/button/light_grey.png')
-    default_off_top_right    = pyglet.image.load('assets/button/light_grey.png')
-    default_off_left         = pyglet.image.load('assets/button/light_grey.png')
-    default_off_center       = pyglet.image.load('assets/button/dark_grey.png')
-    default_off_right        = pyglet.image.load('assets/button/light_grey.png')
-    default_off_bottom_left  = pyglet.image.load('assets/button/light_grey.png')
-    default_off_bottom       = pyglet.image.load('assets/button/light_grey.png')
-    default_off_bottom_right = pyglet.image.load('assets/button/light_grey.png')
+    class Off(glooey.Background):
+        default_top_left     = pyglet.image.load('assets/button/light_grey.png')
+        default_top          = pyglet.image.load('assets/button/light_grey.png')
+        default_top_right    = pyglet.image.load('assets/button/light_grey.png')
+        default_left         = pyglet.image.load('assets/button/light_grey.png')
+        default_center       = pyglet.image.load('assets/button/dark_grey.png')
+        default_right        = pyglet.image.load('assets/button/light_grey.png')
+        default_bottom_left  = pyglet.image.load('assets/button/light_grey.png')
+        default_bottom       = pyglet.image.load('assets/button/light_grey.png')
+        default_bottom_right = pyglet.image.load('assets/button/light_grey.png')
 
-    default_vtile = True
-    default_htile = True
-    default_alignment = 'center'
 
 
 root = glooey.Gui(window, batch=batch)

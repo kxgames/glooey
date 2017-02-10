@@ -201,6 +201,7 @@ class EventLogger(PlaceHolder):
 
 @autoprop
 class Label(Widget):
+    default_text = ""
     default_font_name = None
     default_font_size = None
     default_bold = None
@@ -216,7 +217,7 @@ class Label(Widget):
     def __init__(self, text="", **style):
         super().__init__()
         self._layout = None
-        self._text = text
+        self._text = text or self.default_text
         self._line_wrap_width = 0
         self._style = {}
         self.set_style(
@@ -463,11 +464,12 @@ class Label(Widget):
 
 @autoprop
 class Image(Widget):
+    default_image = None
     default_alignment = 'center'
 
     def __init__(self, image=None):
         super().__init__()
-        self._image = image
+        self._image = image or self.default_image
         self._sprite = None
 
     def do_claim(self):
@@ -513,6 +515,18 @@ class Image(Widget):
 
 @autoprop
 class Background(Widget):
+    default_color = None
+    default_center = None
+    default_top = None
+    default_bottom = None
+    default_left = None
+    default_right = None
+    default_top_left = None
+    default_top_right = None
+    default_bottom_left = None
+    default_bottom_right = None
+    default_vtile = False
+    default_htile = False
 
     def __init__(self, *, color=None, center=None, top=None, bottom=None, 
             left=None, right=None, top_left=None, top_right=None, 
@@ -520,18 +534,18 @@ class Background(Widget):
 
         super().__init__()
         self._artist = drawing.Background(
-                color=color,
-                center=center,
-                top=top,
-                bottom=bottom,
-                left=left,
-                right=right,
-                top_left=top_left,
-                top_right=top_right,
-                bottom_left=bottom_left,
-                bottom_right=bottom_right,
-                vtile=vtile,
-                htile=htile,
+                color=color or self.default_color,
+                center=center or self.default_center,
+                top=top or self.default_top,
+                bottom=bottom or self.default_bottom,
+                left=left or self.default_left,
+                right=right or self.default_right,
+                top_left=top_left or self.default_top_left,
+                top_right=top_right or self.default_top_right,
+                bottom_left=bottom_left or self.default_bottom_left,
+                bottom_right=bottom_right or self.default_bottom_right,
+                vtile=vtile or self.default_vtile,
+                htile=htile or self.default_htile,
                 hidden=True,
         )
 
@@ -589,58 +603,28 @@ class Background(Widget):
 class Button(Clickable):
     Label = Label
     Image = Image
-    Rollover = Rollover
+    Base = Background
+    Over = Background
+    Down = Background
+    Off = Background
 
-    default_text = ""
-    default_text_style = {}
     default_label_layer = 3
-    default_image = None
     default_image_layer = 2
-    default_base = None;              default_over = None;              default_down = None;              default_off = None;
-    default_base_color = None;        default_over_color = None;        default_down_color = None;        default_off_color = None;
-    default_base_center = None;       default_over_center = None;       default_down_center = None;       default_off_center = None;
-    default_base_top = None;          default_over_top = None;          default_down_top = None;          default_off_top = None; 
-    default_base_bottom = None;       default_over_bottom = None;       default_down_bottom = None;       default_off_bottom = None; 
-    default_base_left = None;         default_over_left = None;         default_down_left = None;         default_off_left = None;
-    default_base_right = None;        default_over_right = None;        default_down_right = None;        default_off_right = None;
-    default_base_top_left = None;     default_over_top_left = None;     default_down_top_left = None;     default_off_top_left = None;
-    default_base_top_right = None;    default_over_top_right = None;    default_down_top_right = None;    default_off_top_right = None;
-    default_base_bottom_left = None;  default_over_bottom_left = None;  default_down_bottom_left = None;  default_off_bottom_left = None;
-    default_base_bottom_right = None; default_over_bottom_right = None; default_down_bottom_right = None; default_off_bottom_right = None;
-    default_vtile = False
-    default_htile = False
     default_background_layer = 1
+    default_vtile = None
+    default_htile = None
     default_alignment = 'center'
 
-    def __init__(self, text=None, image=None):
+    def __init__(self, text='', image=None):
         super().__init__()
         self._stack = containers.Stack()
         self._label = self.Label()
         self._image = self.Image()
-        self._background = self.Rollover(self, 'base')
+        self._background = Rollover(self, 'base')
 
-        self.set_text(
-                text or self.default_text,
-                **self.default_text_style,
-        )
-        self.set_image(
-                image or self.default_image,
-        )
-        self.set_background(
-                base=self.default_base,                           over=self.default_over,                           down=self.default_down,                           off=self.default_off,                      
-                base_color=self.default_base_color,               over_color=self.default_over_color,               down_color=self.default_down_color,               off_color=self.default_off_color,                     
-                base_center=self.default_base_center,             over_center=self.default_over_center,             down_center=self.default_down_center,             off_center=self.default_off_center,                     
-                base_top=self.default_base_top,                   over_top=self.default_over_top,                   down_top=self.default_down_top,                   off_top=self.default_off_top,                      
-                base_bottom=self.default_base_bottom,             over_bottom=self.default_over_bottom,             down_bottom=self.default_down_bottom,             off_bottom=self.default_off_bottom,                      
-                base_left=self.default_base_left,                 over_left=self.default_over_left,                 down_left=self.default_down_left,                 off_left=self.default_off_left,                     
-                base_right=self.default_base_right,               over_right=self.default_over_right,               down_right=self.default_down_right,               off_right=self.default_off_right,                     
-                base_top_left=self.default_base_top_left,         over_top_left=self.default_over_top_left,         down_top_left=self.default_down_top_left,         off_top_left=self.default_off_top_left,                     
-                base_top_right=self.default_base_top_right,       over_top_right=self.default_over_top_right,       down_top_right=self.default_down_top_right,       off_top_right=self.default_off_top_right,                     
-                base_bottom_left=self.default_base_bottom_left,   over_bottom_left=self.default_over_bottom_left,   down_bottom_left=self.default_down_bottom_left,   off_bottom_left=self.default_off_bottom_left,                     
-                base_bottom_right=self.default_base_bottom_right, over_bottom_right=self.default_over_bottom_right, down_bottom_right=self.default_down_bottom_right, off_bottom_right=self.default_off_bottom_right,                     
-                vtile=self.default_vtile,
-                htile=self.default_htile,
-        )
+        self.set_text(text)
+        self.set_image(image)
+        self.set_background(vtile=self.default_vtile, htile=self.default_htile)
 
         self._attach_child(self._stack)
         self._stack.insert(self._label, self.default_label_layer)
@@ -656,7 +640,7 @@ class Button(Clickable):
     def set_text(self, text, **style):
         self._label.set_text(text, **style)
 
-    def unset_text(self):
+    def del_text(self):
         del self._label.text
 
     def get_label(self):
@@ -671,19 +655,13 @@ class Button(Clickable):
                 placement or self.default_label_placement,
         )
 
-    def set_label_placement(self, placement):
-        self._stack.set_placement_for(self._label, placement)
-
     def get_image(self):
         return self._image.image
 
     def set_image(self, image):
         self._image.set_image(image)
 
-    def set_image_placement(self, placement):
-        self._stack.set_placement_for(self._image, placement)
-
-    def unset_image(self):
+    def del_image(self):
         del self._image.image
 
     def set_background(self, *, 
@@ -707,7 +685,7 @@ class Button(Clickable):
 
         self._background.reset_states_if(
                 lambda w: not w.is_empty,
-                base=Background(
+                base=self.Base(
                     color        = base_color,
                     center       = base_center,
                     top          = base_top,         
@@ -721,7 +699,7 @@ class Button(Clickable):
                     vtile        = vtile,
                     htile        = htile,
                 ),
-                over=Background(
+                over=self.Over(
                     color        = over_color,
                     center       = over_center,
                     top          = over_top,         
@@ -735,7 +713,7 @@ class Button(Clickable):
                     vtile        = vtile,
                     htile        = htile,
                 ),
-                down=Background(
+                down=self.Down(
                     color        = down_color,
                     center       = down_center,
                     top          = down_top,         
@@ -749,7 +727,7 @@ class Button(Clickable):
                     vtile        = vtile,
                     htile        = htile,
                 ),
-                off=Background(
+                off=self.Off(
                     color        = off_color,
                     center       = off_center,
                     top          = off_top,         
@@ -765,7 +743,7 @@ class Button(Clickable):
                 ),
         )
 
-    def unset_background(self):
+    def del_background(self):
         self.set_background()
 
 
