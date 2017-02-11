@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
 
-"""\
-"""
-
 import pyglet
 import glooey.themes.golden as golden
 
-print(__doc__)
-
 window = pyglet.window.Window()
 root = golden.Gui(window)
-button = golden.LongButton('Click here')
-root.add(button, 'center')
+button = golden.FancyButton('Click here')
+root.add(button)
 
 @window.event
 def on_key_press(symbol, modifiers):
