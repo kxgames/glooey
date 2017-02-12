@@ -10,10 +10,10 @@ batch = pyglet.graphics.Batch()
 root = glooey.Gui(window, batch=batch)
 grid = glooey.Grid()
 widgets = { #
-        (0,0): glooey.PlaceHolder(50, 50),
-        (0,1): glooey.PlaceHolder(50, 50),
-        (1,0): glooey.PlaceHolder(50, 50),
-        (1,1): glooey.PlaceHolder(50, 50),
+        (0,0): glooey.EventLogger(50, 50),
+        (0,1): glooey.EventLogger(50, 50),
+        (1,0): glooey.EventLogger(50, 50),
+        (1,1): glooey.EventLogger(50, 50),
 }
 root.add(grid)
 
@@ -88,6 +88,7 @@ def interactive_grid_tests():
     grid.num_cols = 0
     assert grid.num_rows == 2
     assert grid.num_cols == 2
+
 
 pyglet.app.run()
 

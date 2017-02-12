@@ -18,22 +18,22 @@ def interactive_hbox_tests():
 
     # Test adding and removing widgets.
     for i in range(2):
-        hbox.add(PlaceHolder(50, 50))
+        hbox.add(EventLogger(50, 50))
     yield "Make an HBox with 2 cells."
 
-    left = PlaceHolder(50, 50, red)
+    left = EventLogger(50, 50, red)
     hbox.add_left(left)
     yield "Add a red widget on the left."
 
-    right = PlaceHolder(50, 50, red)
+    right = EventLogger(50, 50, red)
     hbox.add_right(right)
     yield "Add a red widget on the right."
 
-    middle = PlaceHolder(50, 50, red)
+    middle = EventLogger(50, 50, red)
     hbox.insert(middle, 2)
     yield "Insert a red widget in the middle."
 
-    hbox.replace(middle, PlaceHolder(50, 50, green))
+    hbox.replace(middle, EventLogger(50, 50, green))
     yield "Replace the red widget in the middle with a green one."
 
     hbox.remove(left)

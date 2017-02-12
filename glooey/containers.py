@@ -312,6 +312,19 @@ class Grid (Widget):
                     cell_rects[ij],
                     self._cell_alignment_func)
 
+    def do_find_children_under_mouse(self, x, y):
+        cell = self._grid.find_cell_under_mouse(x, y)
+        child = self._children.get(cell)
+
+        if cell is None:
+            return
+        if child is None:
+            return
+        if not child.is_under_mouse(x, y):
+            return
+
+        yield child
+
     def get_num_rows(self):
         return self._grid.num_rows
 
@@ -506,6 +519,22 @@ class HVBox (Widget):
             box = cell_rects[self.do_get_row_col(i)]
             align_widget_in_box(child, box, self._cell_alignment_func)
 
+    def do_find_children_under_mouse(self, x, y):
+        cell = self._grid.find_cell_under_mouse(x, y)
+        if cell is None:
+            return
+
+        child = self._children[self.do_get_index(*cell)]
+        if child is None:
+            return
+        if not child.is_under_mouse(x, y):
+            return
+
+        yield child
+
+    def do_get_index(self, row, col):
+        raise NotImplementedError
+
     def do_get_row_col(self, index):
         raise NotImplementedError
 
@@ -546,9 +575,11 @@ class HVBox (Widget):
 
 @autoprop
 class HBox (HVBox):
-
     add_left = HVBox.add_front
     add_right = HVBox.add_back
+
+    def do_get_index(self, row, col):
+        return col
 
     def do_get_row_col(self, index):
         return 0, index
@@ -565,9 +596,11 @@ class HBox (HVBox):
 
 @autoprop
 class VBox (HVBox):
-
     add_top = HVBox.add_front
     add_bottom = HVBox.add_back
+
+    def do_get_index(self, row, col):
+        return row
 
     def do_get_row_col(self, index):
         return index, 0
@@ -770,5 +803,4 @@ class Deck(Widget):
 
     def get_known_states(self):
         return self._states.keys()
-
 

@@ -66,7 +66,7 @@ class Clickable(Widget):
     def is_active(self):
         return self._active_state
 
-    def get_rollover(self):
+    def get_last_rollover_event(self):
         return self._last_rollover_event
 
     def _dispatch_rollover_event(self):
@@ -153,49 +153,49 @@ class PlaceHolder(Clickable):
 class EventLogger(PlaceHolder):
 
     def on_click(self, widget):
-        print(f'on_click(widget={widget})')
+        print(f'{self}.on_click(widget={widget})')
 
     def on_double_click(self, widget):
-        print(f'on_double_click(widget={widget})')
+        print(f'{self}.on_double_click(widget={widget})')
 
     def on_rollover(self, new_state, old_state):
-        print(f'on_rollover({new_state} {old_state})')
+        print(f'{self}.on_rollover(new_state={new_state}, old_state={old_state})')
 
     def on_mouse_press(self, x, y, button, modifiers):
         super().on_mouse_press(x, y, button, modifiers)
-        print(f'on_mouse_press(x={x}, y={y}, button={button}, modifiers={modifiers})')
+        print(f'{self}.on_mouse_press(x={x}, y={y}, button={button}, modifiers={modifiers})')
 
     def on_mouse_release(self, x, y, button, modifiers):
         super().on_mouse_release(x, y, button, modifiers)
-        print(f'on_mouse_release(x={x}, y={y}, button={button}, modifiers={modifiers})')
+        print(f'{self}.on_mouse_release(x={x}, y={y}, button={button}, modifiers={modifiers})')
 
     def on_mouse_motion(self, x, y, dx, dy):
         super().on_mouse_motion(x, y, dx, dy)
-        print(f'on_mouse_motion(x={x}, y={y}, dx={dx}, dy={dy})')
+        print(f'{self}.on_mouse_motion(x={x}, y={y}, dx={dx}, dy={dy})')
 
     def on_mouse_enter(self, x, y):
         super().on_mouse_enter(x, y)
-        print(f'on_mouse_enter(x={x}, y={y})')
+        print(f'{self}.on_mouse_enter(x={x}, y={y})')
 
     def on_mouse_leave(self, x, y):
         super().on_mouse_leave(x, y)
-        print(f'on_mouse_leave(x={x}, y={y})')
+        print(f'{self}.on_mouse_leave(x={x}, y={y})')
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         super().on_mouse_drag(x, y, dx, dy, buttons, modifiers)
-        print(f'on_mouse_drag(x={x}, y={y}, dx={dx}, dy={dy}, buttons={buttons}, modifiers={modifiers})')
+        print(f'{self}.on_mouse_drag(x={x}, y={y}, dx={dx}, dy={dy}, buttons={buttons}, modifiers={modifiers})')
 
     def on_mouse_drag_enter(self, x, y):
         super().on_mouse_drag_enter(x, y)
-        print(f'on_mouse_drag_enter(x={x}, y={y})')
+        print(f'{self}.on_mouse_drag_enter(x={x}, y={y})')
 
     def on_mouse_drag_leave(self, x, y):
         super().on_mouse_drag_leave(x, y)
-        print(f'on_mouse_drag_leave(x={x}, y={y})')
+        print(f'{self}.on_mouse_drag_leave(x={x}, y={y})')
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         super().on_mouse_scroll(x, y, scroll_x, scroll_y)
-        print(f'on_mouse_scroll(x={x}, y={y}, scroll_x={scroll_x}, scroll_y={scroll_y})')
+        print(f'{self}.on_mouse_scroll(x={x}, y={y}, scroll_x={scroll_x}, scroll_y={scroll_y})')
 
 
 
@@ -509,7 +509,7 @@ class Image(Widget):
             self._image = new_image
             self.repack()
 
-    def unset_image(self):
+    def del_image(self):
         self.set_image(None)
 
 

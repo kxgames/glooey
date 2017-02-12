@@ -18,22 +18,22 @@ def interactive_vbox_tests():
 
     # Test adding and removing widgets.
     for i in range(2):
-        vbox.add(PlaceHolder(50, 50))
+        vbox.add(EventLogger(50, 50))
     yield "Make an VBox with 2 cells."
 
-    top = PlaceHolder(50, 50, red)
+    top = EventLogger(50, 50, red)
     vbox.add_top(top)
     yield "Add a red widget on the top."
 
-    bottom = PlaceHolder(50, 50, red)
+    bottom = EventLogger(50, 50, red)
     vbox.add_bottom(bottom)
     yield "Add a red widget on the bottom."
 
-    middle = PlaceHolder(50, 50, red)
+    middle = EventLogger(50, 50, red)
     vbox.insert(middle, 2)
     yield "Insert a red widget in the middle."
 
-    vbox.replace(middle, PlaceHolder(50, 50, green))
+    vbox.replace(middle, EventLogger(50, 50, green))
     yield "Replace the red widget in the middle with a green one."
 
     vbox.remove(top)

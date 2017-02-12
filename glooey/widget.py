@@ -348,6 +348,33 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         """
         pass
 
+    def do_find_children_under_mouse(self, x, y):
+        """
+        Yield all the children under the given mouse coordinate.
+
+        It's ok to return children that are hidden; these will be filtered out 
+        later.
+        """
+
+        visible_children = {x for x in self.__children if x.is_visible}
+
+        def yield_previous_children_then_others():
+            yield from visible_children & self._children_under_mouse
+            yield from visible_children - self._children_under_mouse
+
+        for child in yield_previous_children_then_others():
+            if child.is_under_mouse(x, y):
+                yield child
+
+                # If a widget can guarantee that none of its children overlap, 
+                # it can speed up this method by aborting the search as soon as 
+                # the first widget under the mouse is found.  Since the widgets 
+                # that were previously under the mouse are checked first, this 
+                # makes the search constant-time in most cases.
+
+                if not self._children_can_overlap:
+                    break
+
     def on_mouse_press(self, x, y, button, modifiers):
         for child in self._children_under_mouse:
             child.dispatch_event('on_mouse_press', x, y, button, modifiers)
@@ -723,26 +750,10 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # z-order is important, but maybe that's something for the specific 
         # parent classes to worry about?
 
-        visible_children = {x for x in self.__children if x.is_visible}
         previously_under_mouse = self._children_under_mouse
-        self._children_under_mouse = set()
-
-        def yield_previous_children_then_others():
-            yield from visible_children & previously_under_mouse
-            yield from visible_children - previously_under_mouse
-
-        for child in yield_previous_children_then_others():
-            if child.is_under_mouse(x, y):
-                self._children_under_mouse.add(child)
-
-                # If a widget can guarantee that none of its children overlap, 
-                # it can speed up this method by aborting the search as soon as 
-                # the first widget under the mouse is found.  Since the widgets 
-                # that were previously under the mouse are checked first, this 
-                # makes the search constant-time in most cases.
-
-                if not self._children_can_overlap:
-                    break
+        self._children_under_mouse = {
+                w for w in self.do_find_children_under_mouse(x, y)
+                if w.is_visible}
 
         return self._children_under_mouse, previously_under_mouse
 
@@ -771,7 +782,6 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         calling and polymorphic methods.
         """
         self._alignment_func = drawing.cast_to_alignment(new_alignment)
-
 
 
 Widget.register_event_type('on_add_child')

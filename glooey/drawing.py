@@ -301,10 +301,10 @@ class Artist(HoldUpdatesMixin):
 @autoprop
 class Rectangle(Artist):
 
-    def __init__(self, rect, color=green, *,
+    def __init__(self, rect=None, color=green, *,
             batch=None, group=None, usage='static', hidden=False):
 
-        self._rect = rect
+        self._rect = rect or Rect.null()
         self._color = Color.from_anything(color)
 
         data = 'v2f/' + usage, 'c4B/' + usage
@@ -974,6 +974,8 @@ class Grid:
         self._col_widths = {}
         self._width = 0
         self._height = 0
+        self._row_tops = {}
+        self._col_lefts = {}
         self._cell_rects = {}
 
         # Attributes that manage the cache.
@@ -996,6 +998,27 @@ class Grid:
         self._update_cells()
 
         return self._cell_rects
+
+    def find_cell_under_mouse(self, x, y):
+        # Find the row the mouse is over.
+        for i in range(self._num_rows):
+            row_top = self._row_tops[i]
+            row_bottom = row_top - self._row_heights[i]
+            if row_top > y >= row_bottom:
+                break
+        else:
+            return None
+
+        # Find the col the mouse is over.
+        for j in range(self._num_cols):
+            col_left = self._col_lefts[j]
+            col_right = col_left + self._col_widths[j]
+            if col_left <= x < col_right:
+                break
+        else:
+            return None
+
+        return i, j
 
     def get_width(self):
         return self._width
@@ -1382,13 +1405,17 @@ class Grid:
                 + self._padding_width
 
     def _find_cell_rects(self):
+        self._row_tops = {}
+        self._col_lefts = {}
         self._cell_rects = {}
+
         top_cursor = self._bounding_rect.top
 
         for i in range(self._num_rows):
             top_cursor -= self._get_row_padding(i)
             left_cursor = self._bounding_rect.left
             row_height = self._row_heights[i]
+            self._row_tops[i] = top_cursor
 
             for j in range(self._num_cols):
                 left_cursor += self._get_col_padding(j)
@@ -1396,6 +1423,7 @@ class Grid:
 
                 self._cell_rects[i,j] = Rect.from_size(col_width, row_height)
                 self._cell_rects[i,j].top_left = left_cursor, top_cursor
+                self._col_lefts[j] = left_cursor
 
                 left_cursor += col_width
             top_cursor -= row_height
