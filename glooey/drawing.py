@@ -305,7 +305,7 @@ class Rectangle(Artist):
             batch=None, group=None, usage='static', hidden=False):
 
         self._rect = rect
-        self._color = color
+        self._color = Color.from_anything(color)
 
         data = 'v2f/' + usage, 'c4B/' + usage
         super().__init__(batch, group, 4, GL_QUADS, data, hidden)
@@ -334,12 +334,64 @@ class Rectangle(Artist):
         return self._color
 
     def set_color(self, new_color):
-        self._color = new_color
+        self._color = Color.from_anything(new_color)
         self.update_color()
 
     def update_color(self):
         if self.vertex_list:
             self.vertex_list.colors = 4 * self._color.tuple
+
+    def _update_vertex_list(self):
+        self.update_rect()
+        self.update_color()
+
+
+@autoprop
+class Outline(Artist):
+
+    def __init__(self, rect, color=green, *,
+            batch=None, group=None, usage='static', hidden=False):
+
+        self._rect = rect
+        self._color = Color.from_anything(color)
+
+        data = 'v2f/' + usage, 'c4B/' + usage
+        super().__init__(batch, group, 8, GL_LINES, data, hidden)
+
+    def get_rect(self):
+        return self._rect
+
+    def set_rect(self, new_rect):
+        self._rect = new_rect
+        self.update_rect()
+
+    def update_rect(self):
+        """
+        Call this method to update the tile after you've made an in-place 
+        change to its rectangle.
+        """
+        if self.vertex_list:
+            self.vertex_list.vertices = (
+                    self._rect.bottom_left.tuple +
+                    self._rect.bottom_right.tuple +
+                    self._rect.bottom_right.tuple +
+                    self._rect.top_right.tuple +
+                    self._rect.top_right.tuple +
+                    self._rect.top_left.tuple +
+                    self._rect.top_left.tuple +
+                    self._rect.bottom_left.tuple
+            )
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, new_color):
+        self._color = Color.from_anything(new_color)
+        self.update_color()
+
+    def update_color(self):
+        if self.vertex_list:
+            self.vertex_list.colors = 8 * self._color.tuple
 
     def _update_vertex_list(self):
         self.update_rect()
