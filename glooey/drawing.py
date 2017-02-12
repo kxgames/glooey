@@ -486,6 +486,13 @@ class Tile(Artist):
 
         texture = self._image.get_texture()
 
+        # Get the actual texture (not just a region of a texture) associated 
+        # for this image.  This will be used to make sure that 
+        try:
+            underlying_texture = texture.owner
+        except AttributeError:
+            underlying_texture = texture
+
         # Figure out which texture coordinates are bound to which vertices.  
         # This is not always an intuitive mapping, because textures can be 
         # rotated by changing which texture coordinates are bound to which 
@@ -497,28 +504,36 @@ class Tile(Artist):
         c = Vector(*texture.tex_coords[6:8])     #    │   │
         d = Vector(*texture.tex_coords[9:11])    #   A└───┘B
 
-        # The given image must have a power-of-two size in each dimension being 
-        # tiled.  This is because OpenGL internally requires that textures have 
-        # power-of-two dimensions.  When pyglet loads an image that doesn't 
-        # have the right dimensions, it creates a properly dimensioned texture 
-        # big enough to hold the image, sets texture coordinates to indicate 
-        # where in that texture the actual image is, and uses that information 
-        # to hide the extra space.
-        #
-        # However, tiling the image requires using the whole texture in each  
-        # dimension being tiled.  If the given image doesn't have a power-of- 
-        # two size in that dimension, this extra space would be rendered.
+        # Give a really nice error message if the image can't be tiled, because 
+        # the restrictions on which images can be tiled don't make sense unless 
+        # you really know how OpenGL works.
+
+        error_template = """\
+image can't be tiled {} because it's {} than its underlying texture ({} px vs {} px).
+
+The most common way to get this error is to use an image that doesn't have a 
+power-of-two size (e.g. 1, 2, 4, 8, etc.) in each dimension being tiled.  
+OpenGL requires that textures have power-of-two dimensions, so images with 
+non-power-of-two sizes end up in textures with some unused space.  This unused 
+space is usually not shown, but tiling requires showing the whole texture in 
+the dimension being tiled, so the unused space would ruin the effect.
+
+Another common way to get this error is by loading the image as an `image` 
+rather than a `texture`.  Pyglet tries to be smart about packing images into 
+contiguous regions of memory, and sometimes this means putting images in 
+textures that are larger than they need to be.  Loading the image as a texture 
+avoids this logic at the expense of less well-organized memory."""
 
         if self._htile:
-            if not _is_power_of_two(self._image.width):
-                raise UsageError(f"image is {self._image.width} px wide; can only tile images with power-of-two dimensions")
+            if self._image.width != underlying_texture.width:
+                raise UsageError(error_template.format('horizontally', 'narrower', self._image.width, underlying_texture.width))
             w = self._rect.width / self._image.width
         else:
             w = a.get_distance(b)
 
         if self._vtile:
-            if not _is_power_of_two(self._image.height):
-                raise UsageError("image is {self._image.height} px tall; can only tile images with power-of-two dimensions")
+            if self._image.height != underlying_texture.height:
+                raise UsageError(error_template.format('vertically', 'shorter', self._image.height, underlying_texture.height))
             h = self._rect.height / self._image.height
         else:
             h = a.get_distance(d)
@@ -785,27 +800,6 @@ class Background(HoldUpdatesMixin):
             self._hidden = False
             self._update_tiles()
 
-
-
-def _is_power_of_two(x):
-    """
-    Return true if ``x`` is a power of two, e.g. 1, 2, 4, 8, etc.
-    """
-
-    # Like most binary tricks, this is best explained with examples.  First, 
-    # consider a case where x is a power of two, e.g. x = 16:
-    #
-    # x           = 16 = 10000
-    # x - 1       = 15 = 01111
-    # x & (x - 1) =  0 = 00000 == 0
-    #
-    # Now consider a case where x is not a power of two, e.g. x = 17
-    #
-    # x           = 17 = 10001
-    # x - 1       = 16 = 10000
-    # x & (x - 1) = 16 = 10000 != 0
-
-    return x > 0 and x & (x - 1) == 0
 
 
 # Clipping mask utilities
