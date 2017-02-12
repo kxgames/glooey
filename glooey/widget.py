@@ -7,7 +7,6 @@ from .helpers import *
 
 @autoprop
 class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
-
     default_padding = None
     default_horz_padding = None
     default_vert_padding = None
@@ -29,6 +28,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._children_can_overlap = True
         self._group = None
         self._rect = None
+        self._content_width = 0
+        self._content_height = 0
         self._claimed_width = 0
         self._claimed_height = 0
         self._assigned_rect = None
@@ -99,10 +100,13 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # changed.
         previous_claim = self._claimed_width, self._claimed_height
 
-        # Claim space for this widget.
-        self._claimed_width, self._claimed_height = self.do_claim()
-        self._claimed_width += self._left_padding + self._right_padding
-        self._claimed_height += self._top_padding + self._bottom_padding
+        # Keep track of the amount of space the widget needs for itself 
+        # (content) and for itself in addition to its padding (claim).
+        self._min_width, self._min_height = self.do_claim()
+        self._claimed_width = \
+                self._min_width + self._left_padding + self._right_padding
+        self._claimed_height = \
+                self._min_height + self._top_padding + self._bottom_padding
 
         # Return whether or not the claim has changed since the last repack.  
         # This determines whether the widget's parent needs to be repacked.
@@ -130,7 +134,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
         # Align this widget within the space available to it (i.e. the assigned 
         # space minus the padding).
-        content_rect = self.claimed_rect.copy()
+        content_rect = Rect.from_size(self._min_width, self._min_height)
         self._alignment_func(content_rect, padded_rect)
 
         # Guarantee that do_resize() is only called if the size of the widget 
