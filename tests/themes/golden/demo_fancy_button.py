@@ -5,7 +5,7 @@ import glooey.themes.golden as golden
 
 window = pyglet.window.Window()
 root = golden.Gui(window)
-button = golden.FancyButton('Click here')
+button = golden.FancyButton('lorem ipsum')
 root.add(button)
 
 @window.event

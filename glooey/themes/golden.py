@@ -38,7 +38,7 @@ class Label(glooey.Label):
 @autoprop
 class RoundButton(glooey.Button):
     default_color = 'red'
-    defult_icon = None
+    default_icon = None
 
     def __init__(self, color=None, icon=None):
         super().__init__()
@@ -78,6 +78,26 @@ class RoundButton(glooey.Button):
 
 
 @autoprop
+class BasicButton(glooey.Button):
+    default_htile = True
+
+    class Label(Label):
+        default_horz_padding = 12
+        default_bottom_padding = 3
+        default_alignment = 'center'
+
+    class Base(glooey.Background):
+        default_left=assets.image(f'buttons/basic/base_left.png')
+        default_center=assets.texture('buttons/basic/base_center.png')
+        default_right=assets.image(f'buttons/basic/base_right.png')
+
+    class Down(glooey.Background):
+        default_left=assets.image(f'buttons/basic/down_left.png')
+        default_center=assets.texture('buttons/basic/down_center.png')
+        default_right=assets.image(f'buttons/basic/down_right.png')
+
+
+@autoprop
 class FancyButton(glooey.Button):
     default_htile = True
 
@@ -107,6 +127,86 @@ class FancyButton(glooey.Button):
 class RadioButton(glooey.RadioButton):
     default_checked_base = assets.image('buttons/radio/checked.png')
     default_unchecked_base = assets.image('buttons/radio/unchecked.png')
+
+@autoprop
+class BasicFillBar(glooey.FillBar):
+
+    class Base(glooey.Background):
+        default_left = assets.image('fill_bars/basic/base_left.png')
+        default_center = assets.texture('fill_bars/basic/base_center.png')
+        default_right = assets.image('fill_bars/basic/base_right.png')
+        default_htile = True
+
+    class Fill(glooey.Background):
+        default_alignment = 'fill horz'
+        default_horz_padding = 5
+
+    def __init__(self, fraction_full=0, color='red'):
+        super().__init__(fraction_full)
+        self.color = color
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, color):
+        try:
+            self._color = color
+            self.fill.set_images(
+                    left=assets.image(f'fill_bars/basic/{color}_left.png'),
+                    center=assets.texture(f'fill_bars/basic/{color}_center.png'),
+                    right=assets.image(f'fill_bars/basic/{color}_right.png'),
+                    htile=True,
+            )
+        except pyglet.resource.ResourceNotFoundException:
+            raise UsageError(f"the Golden theme doesn't have a '{color}' fill bar.")
+
+
+@autoprop
+class FancyFillBar(glooey.FillBar):
+
+    class Base(glooey.Background):
+        default_left = assets.image('fill_bars/fancy/base_left.png')
+        default_center = assets.texture('fill_bars/fancy/base_center.png')
+        default_right = assets.image('fill_bars/fancy/base_right.png')
+        default_htile = True
+
+    class Fill(glooey.Background):
+        default_alignment = 'fill horz'
+        default_horz_padding = 9
+
+    def __init__(self, fraction_full=0, color='red'):
+        super().__init__(fraction_full)
+        self.color = color
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, color):
+        try:
+            self._color = color
+            self.fill.set_images(
+                    left=assets.image(f'fill_bars/fancy/{color}_left.png'),
+                    center=assets.texture(f'fill_bars/fancy/{color}_center.png'),
+                    right=assets.image(f'fill_bars/fancy/{color}_right.png'),
+                    htile=True,
+            )
+        except pyglet.resource.ResourceNotFoundException:
+            raise UsageError(f"the Golden theme doesn't have a '{color}' fill bar.")
+
+
+
+
+
+
+class BigFrame:
+    pass
+
+class SmallFrame:
+    pass
+
+class SubFrame:
+    pass
+
 
 
 class Frame:

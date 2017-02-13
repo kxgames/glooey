@@ -864,7 +864,9 @@ class FillBar(Widget):
         self._attach_child(self._fill)
 
     def do_claim(self):
-        return self._fill.claimed_size
+        min_width = max(self.base.claimed_width, self.fill.claimed_width)
+        min_height = max(self.base.claimed_height, self.fill.claimed_height)
+        return min_width, min_height
 
     def do_resize(self):
         self._update_fill()
@@ -878,6 +880,9 @@ class FillBar(Widget):
 
         self._base.regroup(base_layer)
         self._fill.regroup(self._fill_group)
+
+    def do_draw(self):
+        self._update_fill()
 
     def get_fill(self):
         return self._fill
@@ -893,8 +898,8 @@ class FillBar(Widget):
         self._update_fill()
 
     def _update_fill(self):
-        if self._fill_group and self.rect:
-            self._fill_group.rect = self.rect.copy()
+        if self._fill_group and self.fill.rect:
+            self._fill_group.rect = self.fill.rect.copy()
             self._fill_group.rect.width *= self._fill_fraction
 
 

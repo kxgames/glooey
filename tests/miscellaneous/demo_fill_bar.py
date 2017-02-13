@@ -21,6 +21,8 @@ class TestFillBar(glooey.FillBar):
         default_horz_padding = 4
         default_htile = True
 
+
+
 root = glooey.Gui(window, batch=batch)
 bar = TestFillBar()
 root.add(bar)
