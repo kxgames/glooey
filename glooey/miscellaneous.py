@@ -847,6 +847,57 @@ class RadioButton(Checkbox):
         self._peers = peers
 
 
+@autoprop
+class FillBar(Widget):
+    Base = Background
+    Fill = Background
+
+    def __init__(self, fraction_filled=0):
+        super().__init__()
+
+        self._base = self.Base()
+        self._fill = self.Fill()
+        self._fill_fraction = fraction_filled
+        self._fill_group = None
+
+        self._attach_child(self._base)
+        self._attach_child(self._fill)
+
+    def do_claim(self):
+        return self._fill.claimed_size
+
+    def do_resize(self):
+        self._update_fill()
+
+    def do_regroup_children(self):
+        base_layer = pyglet.graphics.OrderedGroup(1, self.group)
+        fill_layer = pyglet.graphics.OrderedGroup(2, self.group)
+
+        self._fill_group = drawing.ScissorGroup(parent=fill_layer)
+        self._update_fill()
+
+        self._base.regroup(base_layer)
+        self._fill.regroup(self._fill_group)
+
+    def get_fill(self):
+        return self._fill
+
+    def get_base(self):
+        return self._base
+
+    def get_fraction_filled(self):
+        return self._fill_fraction
+
+    def set_fraction_filled(self, new_fraction):
+        self._fill_fraction = new_fraction
+        self._update_fill()
+
+    def _update_fill(self):
+        if self._fill_group and self.rect:
+            self._fill_group.rect = self.rect.copy()
+            self._fill_group.rect.width *= self._fill_fraction
+
+
 
 # Work in progress...
 

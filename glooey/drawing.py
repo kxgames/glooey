@@ -13,7 +13,7 @@ from .helpers import *
 
 # Color utilities
 
-class Color (object):
+class Color:
     # Right now, the color class's internal representation is integers.  I 
     # don't know if this is a good thing, because integers aren't as expressive 
     # as floats.  This surprised me when I tried to use __truediv__ to 
@@ -804,7 +804,7 @@ class Background(HoldUpdatesMixin):
 
 # Clipping mask utilities
 
-class StencilGroup (Group):
+class StencilGroup(Group):
 
     def __init__(self, parent=None):
         Group.__init__(self, parent)
@@ -823,7 +823,7 @@ class StencilGroup (Group):
         pyglet.gl.glDisable(GL_STENCIL_TEST)
 
 
-class StencilMask (OrderedGroup):
+class StencilMask(OrderedGroup):
 
     def __init__(self, parent=None, order=0):
         super().__init__(order, parent)
@@ -846,7 +846,7 @@ class StencilMask (OrderedGroup):
         pyglet.gl.glDepthMask(GL_TRUE);
 
 
-class WhereStencilIs (OrderedGroup):
+class WhereStencilIs(OrderedGroup):
 
     def __init__(self, parent=None, order=1):
         super().__init__(order, parent)
@@ -861,7 +861,7 @@ class WhereStencilIs (OrderedGroup):
         pass
 
 
-class WhereStencilIsnt (OrderedGroup):
+class WhereStencilIsnt(OrderedGroup):
 
     def __init__(self, parent=None, order=1):
         super().__init__(order, parent)
@@ -877,50 +877,33 @@ class WhereStencilIsnt (OrderedGroup):
 
 
 
+class ScissorGroup(Group):
+
+    def __init__(self, rect=None, parent=None):
+        super().__init__(parent)
+        self.rect = rect
+
+    def set_state(self):
+        glPushAttrib(GL_ENABLE_BIT)
+        glEnable(GL_SCISSOR_TEST)
+        glScissor(
+                int(self.rect.left),
+                int(self.rect.bottom),
+                int(self.rect.width),
+                int(self.rect.height),
+        )
+
+    def unset_state(self):
+        glPopAttrib(GL_ENABLE_BIT)
+
+
+
 # Alignment utilities
 
-def fill(child_rect, parent_rect):
-    child_rect.set(parent_rect)
-
-def top_left(child_rect, parent_rect):
-    child_rect.top_left = parent_rect.top_left
-
-def top_center(child_rect, parent_rect):
-    child_rect.top_center = parent_rect.top_center
-
-def top_right(child_rect, parent_rect):
-    child_rect.top_right = parent_rect.top_right
-
-def center_left(child_rect, parent_rect):
-    child_rect.center_left = parent_rect.center_left
-
-def center(child_rect, parent_rect):
-    child_rect.center = parent_rect.center
-
-def center_right(child_rect, parent_rect):
-    child_rect.center_right = parent_rect.center_right
-
-def bottom_left(child_rect, parent_rect):
-    child_rect.bottom_left = parent_rect.bottom_left
-
-def bottom_center(child_rect, parent_rect):
-    child_rect.bottom_center = parent_rect.bottom_center
-
-def bottom_right(child_rect, parent_rect):
-    child_rect.bottom_right = parent_rect.bottom_right
-
-alignments = {
-        'fill': fill,
-        'center': center,
-        'top': top_center,
-        'top left': top_left,
-        'top right': top_right,
-        'bottom': bottom_center,
-        'bottom left': bottom_left,
-        'bottom right': bottom_right,
-        'left': center_left,
-        'right': center_right,
-}
+alignments = {}
+def alignment(func):
+    alignments[func.__name__.replace('_', ' ')] = func
+    return func
 
 def cast_to_alignment(key_or_function):
     # Could raise a nicer error if the key isn't found, and could possibly 
@@ -929,6 +912,77 @@ def cast_to_alignment(key_or_function):
         return alignments[key_or_function.lower()]
     else:
         return key_or_function
+
+
+@alignment
+def fill(child_rect, parent_rect):
+    child_rect.set(parent_rect)
+
+@alignment
+def fill_horz(child_rect, parent_rect):
+    child_rect.width = parent_rect.width
+    child_rect.center = parent_rect.center
+
+@alignment
+def fill_vert(child_rect, parent_rect):
+    child_rect.height = parent_rect.height
+    child_rect.center = parent_rect.center
+
+@alignment
+def fill_top(child_rect, parent_rect):
+    child_rect.width = parent_rect.width
+    child_rect.top = parent_rect.top
+
+@alignment
+def fill_bottom(child_rect, parent_rect):
+    child_rect.width = parent_rect.width
+    child_rect.bottom = parent_rect.bottom
+
+@alignment
+def fill_left(child_rect, parent_rect):
+    child_rect.height = parent_rect.height
+    child_rect.left = parent_rect.left
+
+@alignment
+def fill_right(child_rect, parent_rect):
+    child_rect.height = parent_rect.height
+    child_rect.right = parent_rect.right
+
+@alignment
+def top_left(child_rect, parent_rect):
+    child_rect.top_left = parent_rect.top_left
+
+@alignment
+def top(child_rect, parent_rect):
+    child_rect.top_center = parent_rect.top_center
+
+@alignment
+def top_right(child_rect, parent_rect):
+    child_rect.top_right = parent_rect.top_right
+
+@alignment
+def left(child_rect, parent_rect):
+    child_rect.center_left = parent_rect.center_left
+
+@alignment
+def center(child_rect, parent_rect):
+    child_rect.center = parent_rect.center
+
+@alignment
+def right(child_rect, parent_rect):
+    child_rect.center_right = parent_rect.center_right
+
+@alignment
+def bottom_left(child_rect, parent_rect):
+    child_rect.bottom_left = parent_rect.bottom_left
+
+@alignment
+def bottom(child_rect, parent_rect):
+    child_rect.bottom_center = parent_rect.bottom_center
+
+@alignment
+def bottom_right(child_rect, parent_rect):
+    child_rect.bottom_right = parent_rect.bottom_right
 
 
 # Rectangle placement utilities
