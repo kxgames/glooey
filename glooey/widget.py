@@ -136,6 +136,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # space minus the padding).
         content_rect = Rect.from_size(self._min_width, self._min_height)
         self._alignment_func(content_rect, padded_rect)
+        content_rect.round()
 
         # Guarantee that do_resize() is only called if the size of the widget 
         # actually changed.  This is probably doesn't have a significant effect 
