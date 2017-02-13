@@ -31,6 +31,7 @@ setup(
         'more_itertools',
         'vecrec', 
         'autoprop',
+        'debugtools',
     ],
     license='MIT',
     zip_safe=False,
