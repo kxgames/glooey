@@ -5,7 +5,7 @@ from vecrec import Vector, Rect
 from debugtools import p, pp, pv
 from . import drawing, containers
 from .widget import Widget
-from .containers import Deck
+from .containers import Deck, Bin, claim_stacked_widgets
 
 @autoprop
 class Clickable(Widget):
@@ -97,11 +97,12 @@ class Rollover(Deck):
         self.set_state(new_state)
 
 
+@autoprop
 class PlaceHolder(Clickable):
 
-    def __init__(self, width=0, height=0, color=drawing.green, align='fill'):
+    def __init__(self, width=0, height=0, color='green', align='fill'):
         super().__init__()
-        self.color = color
+        self.color = drawing.Color.from_anything(color)
         self.width = width
         self.height = height
         self.vertex_list = None
@@ -150,6 +151,7 @@ class PlaceHolder(Clickable):
             self.vertex_list = None
 
 
+@autoprop
 class EventLogger(PlaceHolder):
 
     def on_click(self, widget):
@@ -528,24 +530,21 @@ class Background(Widget):
     default_vtile = False
     default_htile = False
 
-    def __init__(self, *, color=None, center=None, top=None, bottom=None, 
-            left=None, right=None, top_left=None, top_right=None, 
-            bottom_left=None, bottom_right=None, vtile=False, htile=False):
-
+    def __init__(self):
         super().__init__()
         self._artist = drawing.Background(
-                color=color or self.default_color,
-                center=center or self.default_center,
-                top=top or self.default_top,
-                bottom=bottom or self.default_bottom,
-                left=left or self.default_left,
-                right=right or self.default_right,
-                top_left=top_left or self.default_top_left,
-                top_right=top_right or self.default_top_right,
-                bottom_left=bottom_left or self.default_bottom_left,
-                bottom_right=bottom_right or self.default_bottom_right,
-                vtile=vtile or self.default_vtile,
-                htile=htile or self.default_htile,
+                color=self.default_color,
+                center=self.default_center,
+                top=self.default_top,
+                bottom=self.default_bottom,
+                left=self.default_left,
+                right=self.default_right,
+                top_left=self.default_top_left,
+                top_right=self.default_top_right,
+                bottom_left=self.default_bottom_left,
+                bottom_right=self.default_bottom_right,
+                vtile=self.default_vtile,
+                htile=self.default_htile,
                 hidden=True,
         )
 
@@ -597,6 +596,40 @@ class Background(Widget):
     @property
     def is_empty(self):
         return self._artist.is_empty
+
+
+@autoprop
+class Frame(Widget):
+    Bin = Bin
+    Background = Background
+
+    def __init__(self):
+        super().__init__()
+
+        self._bin = self.Bin()
+        self._background = self.Background()
+
+        self._attach_child(self._bin)
+        self._attach_child(self._background)
+
+    def do_claim(self):
+        return claim_stacked_widgets(self._bin, self._background)
+
+    def do_regroup_children(self):
+        self._bin.regroup(pyglet.graphics.OrderedGroup(2, self.group))
+        self._background.regroup(pyglet.graphics.OrderedGroup(1, self.group))
+
+    def add(self, child):
+        self._bin.add(child)
+
+    def clear(self):
+        self._bin.clear()
+
+    def get_bin(self):
+        return self._bin
+
+    def get_background(self):
+        return self._background
 
 
 @autoprop
@@ -819,7 +852,7 @@ class Checkbox(Clickable):
             self._deck.add_state(True, checked)
             self._deck.add_state(False, unchecked)
 
-    def unset_images(self):
+    def del_images(self):
         self._deck.clear_states()
 
 

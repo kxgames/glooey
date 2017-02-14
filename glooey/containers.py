@@ -23,6 +23,16 @@ def align_widget_in_box(widget, box_rect, key_or_func='fill', widget_rect=None):
     alignment_func(widget_rect, box_rect)
     widget.resize(widget_rect)
 
+def claim_stacked_widgets(*widgets):
+    max_widget_width = 0
+    max_widget_height = 0
+
+    for widget in widgets:
+        max_widget_width = max(max_widget_width, widget.claimed_width)
+        max_widget_height = max(max_widget_height, widget.claimed_height)
+
+    return max_widget_width, max_widget_height
+
 
 @autoprop
 class Bin (Widget):
@@ -654,17 +664,7 @@ class Stack (Widget):
         self._resize_and_regroup_children()
 
     def do_claim(self):
-        max_child_width = 0
-        max_child_height = 0
-
-        for child in self.children:
-            max_child_width = max(max_child_width, child.claimed_width)
-            max_child_height = max(max_child_height, child.claimed_height)
-
-        min_width = max_child_width
-        min_height = max_child_height
-
-        return min_width, min_height
+        return claim_stacked_widgets(self.children)
 
     def do_resize_children(self):
         for child in self.children:
@@ -714,15 +714,7 @@ class Deck(Widget):
         # Claim enough space for the biggest child, so that we won't need to 
         # repack when we change states.  (Also, I can't think of any reason why 
         # you'd want states of different sizes.)
-
-        min_width = 0
-        min_height = 0
-
-        for child in self._states.values():
-            min_width = max(child.claimed_width, min_width)
-            min_height = max(child.claimed_height, min_height)
-
-        return min_width, min_height
+        return claim_stacked_widgets(self._states.values())
 
     def add_state(self, state, widget):
         self._add_state(state, widget)
