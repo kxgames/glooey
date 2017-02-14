@@ -6,7 +6,7 @@ import contextlib
 import yaml
 
 from pathlib import Path
-from debugtools import pprint, debug
+from debugtools import p, pp, pv
 
 class ResourceLoader(pyglet.resource.Loader):
 
