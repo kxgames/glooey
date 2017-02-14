@@ -3,7 +3,7 @@
 import functools
 import contextlib
 import more_itertools
-from debugtools import pprint, debug
+from debugtools import p, pp, pv
 
 class UsageError (Exception):
     pass

@@ -2,7 +2,7 @@ import pyglet
 import autoprop
 
 from vecrec import Vector, Rect
-from debugtools import pprint, debug
+from debugtools import p, pp, pv
 from . import drawing, containers
 from .widget import Widget
 from .containers import Deck

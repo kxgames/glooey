@@ -6,7 +6,7 @@ import vecrec
 
 from collections import defaultdict
 from vecrec import Vector, Rect
-from debugtools import pprint, debug
+from debugtools import p, pp, pv
 from pyglet.gl import *
 from pyglet.graphics import Group, OrderedGroup
 from .helpers import *
