@@ -661,11 +661,14 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         This method is only meant to be called in subclasses of Widget, which 
         is why it's prefixed with an underscore.
         """
+        if not isinstance(child, Widget):
+            raise UsageError(f"{child} is not a widget, did you forget to inherit from something?")
+
         if child.parent is self:
             return child
 
         if child.parent is not None:
-            raise UsageError('{} is already attached to {}, cannot attach to {}'.format(child, child.parent, self))
+            raise UsageError(f"{child} is already attached to {child.parent}, cannot attach to {self}")
 
         child._parent = self
         self.__children.add(child)
