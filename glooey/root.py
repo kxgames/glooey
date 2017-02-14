@@ -16,7 +16,7 @@ class Root (Bin):
         self._rect = rect
         self._window = window
         self._batch = batch or pyglet.graphics.Batch()
-        self._group = group or pyglet.graphics.Group()
+        self._group = group or pyglet.graphics.OrderedGroup(0)
 
         window.push_handlers(self)
 
