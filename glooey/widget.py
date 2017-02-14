@@ -577,7 +577,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
             return False
         return (x, y) in self.rect
 
-    def diagnose_drawing_problems(self):
+    def debug_drawing_problems(self):
         """
         Suggest reasons why a widget is not displaying.
 
@@ -649,6 +649,34 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
         for diagnosis, sep in join(diagnoses, '\n'):
             print(diagnosis.format(**locals()) + sep, flush=True)
+
+    def debug_placement_problems(self, claimed='red', assigned='green', content='blue'):
+        """
+        Draw boxes showing the widgets assigned, claimed, and content rects.
+        """
+        if not self.is_attached_to_gui:
+            raise UsageError("the widget must be attached to the GUI to debug placement problems.")
+
+        group = pyglet.graphics.OrderedGroup(1)
+
+        drawing.Outline(
+            rect=self.claimed_rect,
+            color=claimed,
+            batch=self.batch,
+            group=group,
+        )
+        drawing.Outline(
+            rect=self._assigned_rect,
+            color=assigned,
+            batch=self.batch,
+            group=group,
+        )
+        drawing.Outline(
+            rect=self.rect,
+            color=content,
+            batch=self.batch,
+            group=group,
+        )
 
     def _attach_child(self, child):
         """
