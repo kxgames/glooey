@@ -128,6 +128,41 @@ class RadioButton(glooey.RadioButton):
     default_checked_base = assets.image('buttons/radio/checked.png')
     default_unchecked_base = assets.image('buttons/radio/unchecked.png')
 
+class BigFrame(glooey.Frame):
+
+    class Background(glooey.Background):
+        default_left = assets.image('frames/big/left.png')
+        default_center = assets.texture('frames/big/center.png')
+        default_right = assets.image('frames/big/right.png')
+        default_htile = True
+
+    class Bin(glooey.Bin):
+        default_vert_padding = 16
+        default_horz_padding = 24
+
+
+class SmallFrame(glooey.Frame):
+
+    class Background(glooey.Background):
+        default_center = assets.texture('frames/small/center.png')
+        default_top = assets.texture('frames/small/top.png')
+        default_bottom = assets.texture('frames/small/bottom.png')
+        default_left = assets.texture('frames/small/left.png')
+        default_right = assets.texture('frames/small/right.png')
+        default_top_left = assets.image('frames/small/top_left.png')
+        default_top_right = assets.image('frames/small/top_right.png')
+        default_bottom_left = assets.image('frames/small/bottom_left.png')
+        default_bottom_right = assets.image('frames/small/bottom_right.png')
+        default_htile = True
+        default_vtile = True
+
+    class Bin(glooey.Bin):
+        default_padding = 6
+
+
+class SubFrame:
+    pass
+
 @autoprop
 class BasicFillBar(glooey.FillBar):
 
@@ -194,26 +229,3 @@ class FancyFillBar(glooey.FillBar):
             raise UsageError(f"the Golden theme doesn't have a '{color}' fill bar.")
 
 
-
-
-
-
-class BigFrame:
-    pass
-
-class SmallFrame:
-    pass
-
-class SubFrame:
-    pass
-
-
-
-class Frame:
-    pass
-
-class Header:
-    pass
-
-class Slots:
-    pass

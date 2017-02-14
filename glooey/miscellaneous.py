@@ -603,6 +603,8 @@ class Frame(Widget):
     Bin = Bin
     Background = Background
 
+    default_alignment = 'center'
+
     def __init__(self):
         super().__init__()
 
