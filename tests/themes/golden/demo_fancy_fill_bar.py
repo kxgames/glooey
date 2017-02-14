@@ -19,6 +19,6 @@ def test_fancy_fill_bar():
         bar.color = color
         for frac in fractions:
             bar.fraction_filled = frac
-            yield f"{int(100 * bar.fraction_filled)}% filled."
+            yield f"{int(100 * bar.fraction_filled)}% {color}."
 
 pyglet.app.run()
