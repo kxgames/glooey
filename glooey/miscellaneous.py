@@ -517,6 +517,8 @@ class Image(Widget):
 
 @autoprop
 class Background(Widget):
+    # Add ``default_image``.  It's an alias for ``default_center``, but it 
+    # affects how htile='auto' and vtile='auto' are interpreted.
     default_color = None
     default_center = None
     default_top = None
@@ -530,21 +532,24 @@ class Background(Widget):
     default_vtile = False
     default_htile = False
 
-    def __init__(self):
+    def __init__(self, *, color=None, center=None, top=None, bottom=None, 
+            left=None, right=None, top_left=None, top_right=None, 
+            bottom_left=None, bottom_right=None, vtile=False, htile=False):
+
         super().__init__()
         self._artist = drawing.Background(
-                color=self.default_color,
-                center=self.default_center,
-                top=self.default_top,
-                bottom=self.default_bottom,
-                left=self.default_left,
-                right=self.default_right,
-                top_left=self.default_top_left,
-                top_right=self.default_top_right,
-                bottom_left=self.default_bottom_left,
-                bottom_right=self.default_bottom_right,
-                vtile=self.default_vtile,
-                htile=self.default_htile,
+                color=color or self.default_color,
+                center=center or self.default_center,
+                top=top or self.default_top,
+                bottom=bottom or self.default_bottom,
+                left=left or self.default_left,
+                right=right or self.default_right,
+                top_left=top_left or self.default_top_left,
+                top_right=top_right or self.default_top_right,
+                bottom_left=bottom_left or self.default_bottom_left,
+                bottom_right=bottom_right or self.default_bottom_right,
+                vtile=vtile or self.default_vtile,
+                htile=htile or self.default_htile,
                 hidden=True,
         )
 
@@ -648,7 +653,6 @@ class Button(Clickable):
     default_background_layer = 1
     default_vtile = None
     default_htile = None
-    default_alignment = 'center'
 
     def __init__(self, text='', image=None):
         super().__init__()

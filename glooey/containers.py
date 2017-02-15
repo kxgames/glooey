@@ -664,7 +664,7 @@ class Stack (Widget):
         self._resize_and_regroup_children()
 
     def do_claim(self):
-        return claim_stacked_widgets(self.children)
+        return claim_stacked_widgets(*self.children)
 
     def do_resize_children(self):
         for child in self.children:
@@ -714,7 +714,7 @@ class Deck(Widget):
         # Claim enough space for the biggest child, so that we won't need to 
         # repack when we change states.  (Also, I can't think of any reason why 
         # you'd want states of different sizes.)
-        return claim_stacked_widgets(self._states.values())
+        return claim_stacked_widgets(*self._states.values())
 
     def add_state(self, state, widget):
         self._add_state(state, widget)
