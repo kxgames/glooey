@@ -25,6 +25,7 @@ Complete API documentation is in the works, but here's a brief example to give
 a flavor for how ``glooey`` is supposed to work:
 
 .. code:: python
+
    #!/usr/bin/env python3
 
    import pyglet
