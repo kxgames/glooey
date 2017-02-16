@@ -717,14 +717,15 @@ class Deck(Widget):
         return claim_stacked_widgets(*self._states.values())
 
     def add_state(self, state, widget):
+        self._remove_state(state)
         self._add_state(state, widget)
-        self.repack()
+        self._resize_and_regroup_children()
 
     def add_states(self, **states):
         for state, widget in states.items():
             self._remove_state(state)
             self._add_state(state, widget)
-        self.repack()
+        self._resize_and_regroup_children()
 
     def add_states_if(self, predicate, **states):
         filtered_states = {
@@ -734,18 +735,18 @@ class Deck(Widget):
         self.add_states(**filtered_states)
 
     def reset_states(self, **states):
-        for state in self.known_states:
+        for state in list(self.known_states):
             self._remove_state(state)
         for state, widget in states.items():
             self._add_state(state, widget)
-        self.repack()
+        self._resize_and_regroup_children()
 
     def reset_states_if(self, predicate, **states):
         filtered_states = {
                 k: w for k,w in states.items()
                 if predicate(w)
         }
-        self.add_states(**filtered_states)
+        self.reset_states(**filtered_states)
 
     def remove_state(self, state):
         self.remove_states(state)
@@ -753,10 +754,10 @@ class Deck(Widget):
     def remove_states(self, *states):
         for state in states:
             self._remove_state(state)
-        self.repack()
+        self._resize_and_regroup_children()
 
-    def clear_states(self):
-        self.remove_states(self.known_states)
+    def clear(self):
+        self.remove_states(*self.known_states)
 
     def _add_state(self, state, widget):
         widget.unhide() if state == self.state else widget.hide()

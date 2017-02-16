@@ -743,6 +743,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # after this method.
         return child
 
+    @update_function
     def _resize_and_regroup_children(self):
         """
         Resize and regroup the children of this widget if this widget is 
