@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 
-"""A green box with a cross should take up most of the screen."""
-
 import pyglet
 import glooey
-
-print(__doc__)
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()

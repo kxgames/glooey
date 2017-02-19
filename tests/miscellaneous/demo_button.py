@@ -2,12 +2,12 @@
 
 import pyglet
 import glooey
-from pprint import pprint
+import demo_helpers
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-class TestButton(glooey.Button):
+class TestButton(glooey.Button): #
     default_alignment = 'center'
 
     class Label(glooey.Label):
@@ -28,28 +28,24 @@ class TestButton(glooey.Button):
     class Off(glooey.Background):
         default_center = pyglet.image.load('assets/64x64/grey.png')
 
-
-
 root = glooey.Gui(window, batch=batch)
 button = TestButton('Hello world!')
 root.add(button)
 
-@button.event
+@button.event #
 def on_click(widget):
     print("{} clicked!".format(widget))
 
-@button.event
+@button.event #
 def on_double_click(widget):
     print("{} double clicked!".format(widget))
 
-@window.event
-def on_key_press(symbol, modifier):
-    if symbol == pyglet.window.key.SPACE:
-        if button.is_active:
-            button.deactivate()
-        else:
-            button.reactivate()
-
+@demo_helpers.interactive_tests(window, batch) #
+def test_checkbox():
+    yield "Green button with orange over and purple down states."
+    button.deactivate()
+    yield "Grey inactive button (no rollover)."
+    button.reactivate()
 
 pyglet.app.run()
 

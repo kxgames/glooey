@@ -14,7 +14,7 @@ root.add(widget)
 @demo_helpers.interactive_tests(window, batch) #
 def test_image():
     widget.image = pyglet.image.load('assets/misc/star_5.png')
-    yield "Show a red star."
+    yield "Show a green star."
 
     widget.image = pyglet.image.load('assets/misc/star_7.png')
     yield "Show a orange star."

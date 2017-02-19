@@ -9,17 +9,16 @@ batch = pyglet.graphics.Batch()
 
 class TestFillBar(glooey.FillBar):
     default_alignment = 'fill horz'
+    default_padding = 100
 
     class Base(glooey.Background):
-        default_left = pyglet.image.load('assets/4x24/blue.png')
-        default_center = pyglet.image.load('assets/4x24/green.png')
-        default_right = pyglet.image.load('assets/4x24/blue.png')
-        default_htile = True
+        default_left = pyglet.image.load('assets/4x64/purple.png')
+        default_center = pyglet.image.load('assets/64x64/grey.png')
+        default_right = pyglet.image.load('assets/4x64/purple.png')
 
     class Fill(glooey.Background):
-        default_center = pyglet.image.load('assets/4x24/red.png')
+        default_center = pyglet.image.load('assets/64x64/green.png')
         default_horz_padding = 4
-        default_htile = True
 
 
 
@@ -34,22 +33,22 @@ def test_image():
     # Make sure the default parameters work as expected.
     for i in range(11):
         bar.fraction_filled = i / 10
-        yield f"{int(100 * bar.fraction_filled)}% red."
+        yield f"{int(100 * bar.fraction_filled)}% green."
 
     # Make sure the images can be changed after initialization.
     bar.base.set_images(
-        left=pyglet.image.load('assets/4x24/red.png'),
-        center=pyglet.image.load('assets/4x24/blue.png'),
-        right=pyglet.image.load('assets/4x24/red.png'),
+        left=pyglet.image.load('assets/4x64/purple.png'),
+        center=pyglet.image.load('assets/64x64/grey.png'),
+        right=pyglet.image.load('assets/4x64/purple.png'),
         htile=True,
     )
     bar.fill.set_images(
-        center=pyglet.image.load('assets/4x24/green.png'),
+        center=pyglet.image.load('assets/64x64/orange.png'),
         htile=True,
     )
     for i in range(11):
         bar.fraction_filled = i / 10
-        yield f"{int(100 * bar.fraction_filled)}% green."
+        yield f"{int(100 * bar.fraction_filled)}% orange."
 
     # Reset the test.
     bar = TestFillBar()
