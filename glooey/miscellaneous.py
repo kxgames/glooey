@@ -59,7 +59,7 @@ class Clickable(Widget):
 
     def on_mouse_drag_leave(self, x, y):
         super().on_mouse_drag_leave(x, y)
-        self._mouse = 'base'
+        self._mouse_state = 'base'
         self._dispatch_rollover_event()
     
     @property
@@ -82,19 +82,31 @@ Clickable.register_event_type('on_rollover')
 
 @autoprop
 class Rollover(Deck):
+    default_predicate = lambda w: True
 
-    def __init__(self, clickable, initial_state, **widgets):
+    def __init__(self, clickable, initial_state, predicate=None, **widgets):
         super().__init__(initial_state, **widgets)
+        self._predicate = predicate or self.default_predicate
         clickable.push_handlers(self.on_rollover)
 
     def on_rollover(self, new_state, old_state):
-        if new_state not in self.known_states and new_state == 'down':
+        if self.is_state_missing(new_state) and new_state == 'down':
             new_state = 'over'
 
-        if new_state not in self.known_states and new_state == 'over':
+        if self.is_state_missing(new_state) and new_state == 'over':
             new_state = 'base'
 
         self.set_state(new_state)
+
+    def get_predicate(self):
+        return self._predicate
+
+    def set_predicate(self, new_predicate):
+        self._predicate = new_predicate
+
+    def is_state_missing(self, state):
+        widget = self.get_widget(state)
+        return state not in self.known_states or not self.predicate(widget)
 
 
 @autoprop
@@ -517,9 +529,8 @@ class Image(Widget):
 
 @autoprop
 class Background(Widget):
-    # Add ``default_image``.  It's an alias for ``default_center``, but it 
-    # affects how htile='auto' and vtile='auto' are interpreted.
     default_color = None
+    default_image = None
     default_center = None
     default_top = None
     default_bottom = None
@@ -529,27 +540,25 @@ class Background(Widget):
     default_top_right = None
     default_bottom_left = None
     default_bottom_right = None
-    default_vtile = False
-    default_htile = False
+    default_vtile = 'auto'
+    default_htile = 'auto'
 
-    def __init__(self, *, color=None, center=None, top=None, bottom=None, 
-            left=None, right=None, top_left=None, top_right=None, 
-            bottom_left=None, bottom_right=None, vtile=False, htile=False):
-
+    def __init__(self):
         super().__init__()
         self._artist = drawing.Background(
-                color=color or self.default_color,
-                center=center or self.default_center,
-                top=top or self.default_top,
-                bottom=bottom or self.default_bottom,
-                left=left or self.default_left,
-                right=right or self.default_right,
-                top_left=top_left or self.default_top_left,
-                top_right=top_right or self.default_top_right,
-                bottom_left=bottom_left or self.default_bottom_left,
-                bottom_right=bottom_right or self.default_bottom_right,
-                vtile=vtile or self.default_vtile,
-                htile=htile or self.default_htile,
+                color=self.default_color,
+                image=self.default_image,
+                center=self.default_center,
+                top=self.default_top,
+                bottom=self.default_bottom,
+                left=self.default_left,
+                right=self.default_right,
+                top_left=self.default_top_left,
+                top_right=self.default_top_right,
+                bottom_left=self.default_bottom_left,
+                bottom_right=self.default_bottom_right,
+                vtile=self.default_vtile,
+                htile=self.default_htile,
                 hidden=True,
         )
 
@@ -574,12 +583,13 @@ class Background(Widget):
     def get_images(self):
         return self._artist.images
 
-    def set_images(self, *, color=None, center=None, top=None, bottom=None, 
-            left=None, right=None, top_left=None, top_right=None, 
+    def set_images(self, *, color=None, image=None, center=None, top=None,
+            bottom=None, left=None, right=None, top_left=None, top_right=None,
             bottom_left=None, bottom_right=None, vtile=None, htile=None):
 
         self._artist.set_images(
                 color=color,
+                image=image,
                 center=center,
                 top=top,
                 bottom=bottom,
@@ -651,24 +661,28 @@ class Button(Clickable):
     default_label_layer = 3
     default_image_layer = 2
     default_background_layer = 1
-    default_vtile = None
-    default_htile = None
 
     def __init__(self, text='', image=None):
         super().__init__()
         self._stack = containers.Stack()
         self._label = self.Label()
         self._image = self.Image()
-        self._background = Rollover(self, 'base')
+        self._backgrounds = {
+                'base': self.Base(),
+                'over': self.Over(),
+                'down': self.Down(),
+                'off': self.Off(),
+        }
+        self._rollover = Rollover(self, 'base', lambda w: not w.is_empty)
+        self._rollover.add_states(**self._backgrounds)
 
         self.set_text(text)
         self.set_image(image)
-        self.set_background(vtile=self.default_vtile, htile=self.default_htile)
 
         self._attach_child(self._stack)
         self._stack.insert(self._label, self.default_label_layer)
         self._stack.insert(self._image, self.default_image_layer)
-        self._stack.insert(self._background, self.default_background_layer)
+        self._stack.insert(self._rollover, self.default_background_layer)
 
     def do_claim(self):
         return self._stack.claimed_size
@@ -703,84 +717,13 @@ class Button(Clickable):
     def del_image(self):
         del self._image.image
 
-    def set_background(self, *, 
-            base=None,              over=None,              down=None,              off=None,
-            base_color=None,        over_color=None,        down_color=None,        off_color=None,
-            base_center=None,       over_center=None,       down_center=None,       off_center=None,
-            base_top=None,          over_top=None,          down_top=None,          off_top=None, 
-            base_bottom=None,       over_bottom=None,       down_bottom=None,       off_bottom=None, 
-            base_left=None,         over_left=None,         down_left=None,         off_left=None,
-            base_right=None,        over_right=None,        down_right=None,        off_right=None,
-            base_top_left=None,     over_top_left=None,     down_top_left=None,     off_top_left=None,
-            base_top_right=None,    over_top_right=None,    down_top_right=None,    off_top_right=None,
-            base_bottom_left=None,  over_bottom_left=None,  down_bottom_left=None,  off_bottom_left=None,
-            base_bottom_right=None, over_bottom_right=None, down_bottom_right=None, off_bottom_right=None,
-            vtile=None, htile=None, placement=None):
-
-        base_center = base_center or base
-        over_center = over_center or over
-        down_center = down_center or down
-        off_center  = off_center  or off
-
-        self._background.reset_states_if(
-                lambda w: not w.is_empty,
-                base=self.Base(
-                    color        = base_color,
-                    center       = base_center,
-                    top          = base_top,         
-                    bottom       = base_bottom,      
-                    left         = base_left,        
-                    right        = base_right,       
-                    top_left     = base_top_left,    
-                    top_right    = base_top_right,   
-                    bottom_left  = base_bottom_left, 
-                    bottom_right = base_bottom_right,
-                    vtile        = vtile,
-                    htile        = htile,
-                ),
-                over=self.Over(
-                    color        = over_color,
-                    center       = over_center,
-                    top          = over_top,         
-                    bottom       = over_bottom,      
-                    left         = over_left,        
-                    right        = over_right,       
-                    top_left     = over_top_left,    
-                    top_right    = over_top_right,   
-                    bottom_left  = over_bottom_left, 
-                    bottom_right = over_bottom_right,
-                    vtile        = vtile,
-                    htile        = htile,
-                ),
-                down=self.Down(
-                    color        = down_color,
-                    center       = down_center,
-                    top          = down_top,         
-                    bottom       = down_bottom,      
-                    left         = down_left,        
-                    right        = down_right,       
-                    top_left     = down_top_left,    
-                    top_right    = down_top_right,   
-                    bottom_left  = down_bottom_left, 
-                    bottom_right = down_bottom_right,
-                    vtile        = vtile,
-                    htile        = htile,
-                ),
-                off=self.Off(
-                    color        = off_color,
-                    center       = off_center,
-                    top          = off_top,         
-                    bottom       = off_bottom,      
-                    left         = off_left,        
-                    right        = off_right,       
-                    top_left     = off_top_left,    
-                    top_right    = off_top_right,   
-                    bottom_left  = off_bottom_left, 
-                    bottom_right = off_bottom_right,
-                    vtile        = vtile,
-                    htile        = htile,
-                ),
-        )
+    def set_background(self, **kwargs):
+        for state, widget in self._backgrounds.items():
+            widget.set_images(**{
+                k.split('_', 1)[1]: v
+                for k,v in kwargs.items()
+                if k.startswith(state)
+            })
 
     def del_background(self):
         self.set_background()
