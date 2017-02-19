@@ -2,52 +2,124 @@
 
 import pyglet
 import glooey
-import vecrec
+import demo_helpers
+from vecrec import Rect
+from pyglet.image import load
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
+rect = Rect.from_size(64*8, 64*6)
+rect.center = Rect.from_pyglet_window(window).center
+bg = glooey.drawing.Background(rect=rect, batch=batch)
 
-rects = glooey.drawing.make_grid(
-        rect=vecrec.Rect.from_pyglet_window(window),
-        num_rows=2,
-        num_cols=2,
-        padding=40,
-)
-bg1 = glooey.drawing.Background(
-        rect=rects[0,0],
-        color=glooey.drawing.Color.from_hex('#847e87'),
-        batch=batch,
-)
-bg2 = glooey.drawing.Background(
-        rect=rects[0,1],
-        center=pyglet.image.load('frame_center.png'),
-        vtile=True,
-        htile=True,
-        batch=batch,
-)
-bg3 = glooey.drawing.Background(
-        rect=rects[1,0],
-        left=pyglet.image.load('header_left.png'),
-        center=pyglet.image.load('header_center.png'),
-        right=pyglet.image.load('header_right.png'),
-        htile=True,
-        batch=batch,
-)
-bg4 = glooey.drawing.Background(
-        rect=rects[1,1],
-        center=pyglet.image.load('frame_center.png'),
-        left=pyglet.image.load('frame_left.png'),
-        right=pyglet.image.load('frame_right.png'),
-        top=pyglet.image.load('frame_top.png'),
-        bottom=pyglet.image.load('frame_bottom.png'),
-        top_left=pyglet.image.load('frame_top_left.png'),
-        top_right=pyglet.image.load('frame_top_right.png'),
-        bottom_left=pyglet.image.load('frame_bottom_left.png'),
-        bottom_right=pyglet.image.load('frame_bottom_right.png'),
-        vtile=True,
-        htile=True,
-        batch=batch,
-)
+@demo_helpers.interactive_tests(window, batch)
+def test_background():
+    # Make sure colors can be set, updated, and removed.
+    bg.set_images(color='green')
+    yield "Show a solid green background."
+
+    bg.set_images(color='orange')
+    yield "Change to a solid orange background."
+
+    # Make sure non-tiled images can be set, updated, and removed.
+    bg.image = load('assets/misc/star_5.png')
+    yield "Show a green star."
+
+    bg.image = load('assets/misc/star_7.png')
+    yield "Change to an orange star."
+
+    # Make sure the center image can be set, updated, and removed.
+    bg.set_images(center=pyglet.image.load('assets/64x64/green.png'))
+    yield "Show a tiled green background."
+
+    bg.set_images(center=pyglet.image.load('assets/64x64/orange.png'))
+    yield "Change to a tiled orange background."
+
+    # Make sure the side and corner images can bet set, updated, and removed.
+    dims = {
+            'top': '64x4',
+            'right': '4x64',
+            'bottom': '64x4',
+            'left': '4x64',
+            'top_left': '4x4',
+            'top_right': '4x4',
+            'bottom_right': '4x4',
+            'bottom_left': '4x4',
+    }
+    for side in dims:
+        bg.set_images(**{
+            side: load(f'assets/{dims[side]}/green.png'),
+            'htile': True, 'vtile': True
+        })
+        yield f"Show a green {side.replace('_', ' ')}."
+
+        bg.set_images(**{
+            side: load(f'assets/{dims[side]}/orange.png'),
+            'htile': True, 'vtile': True
+        })
+        yield f"Change to an orange {side.replace('_', ' ')}."
+
+    # Make sure the background can be hidden and unhidden.
+    bg.set_images(center=pyglet.image.load('assets/64x64/green.png'))
+    yield "Show a tiled green background."
+
+    bg.hide()
+    yield "Hide the background."
+
+    bg.unhide()
+    yield "Unhide the background."
+
+    # Make sure tiling scales with size properly.
+    vrect = rect.copy()
+    vrect.height -= 96
+    vrect.center = rect.center
+    bg.rect = vrect
+    yield "Squish the rect vertically.  The tiles should remain square."
+
+    hrect = vrect.copy()
+    hrect.width -= 96
+    hrect.center = rect.center
+    bg.rect = hrect
+    yield "Squish the rect horizontally.  The tiles should remain square."
+    bg.rect = rect
+
+    # Make sure vtile='auto' and htile='auto' work.
+    bg.set_images(
+            top=load('assets/64x4/orange.png'),
+            center=load('assets/64x64/green.png'),
+            bottom=load('assets/64x4/orange.png'),
+    )
+    yield "Automatically tile vertically."
+
+    bg.set_images(
+            left=load('assets/4x64/orange.png'),
+            center=load('assets/64x64/green.png'),
+            right=load('assets/4x64/orange.png'),
+    )
+    yield "Automatically tile horizontally."
+
+    bg.set_images(
+            center=load('assets/64x64/green.png'),
+    )
+    yield "Automatically tile in both dimensions."
+
+    bg.set_images(
+            center=load('assets/64x64/green.png'),
+            top=load('assets/64x4/orange.png'),
+            bottom=load('assets/64x4/orange.png'),
+            left=load('assets/4x64/orange.png'),
+            right=load('assets/4x64/orange.png'),
+            top_left=load('assets/4x4/purple.png'),
+            top_right=load('assets/4x4/purple.png'),
+            bottom_left=load('assets/4x4/purple.png'),
+            bottom_right=load('assets/4x4/purple.png'),
+    )
+    yield "Automatically tile in both dimensions with a border."
+
+    # Make sure the background can be empty.
+    bg.set_images()
+    yield "Empty the background."
+
 
 @window.event
 def on_draw():

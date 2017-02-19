@@ -34,6 +34,8 @@ class Color:
             else:
                 return Color.from_int_tuple(color)
 
+        raise ValueError(f"cannot convert {repr(color)} to color")
+
     @staticmethod
     def from_str(str):
         # If the given string is to the name of a known color, return that 
@@ -563,10 +565,10 @@ avoids this logic at the expense of less well-organized memory."""
 @autoprop
 class Background(HoldUpdatesMixin):
 
-    def __init__(self, *, rect=None, color=None, center=None, top=None, 
-            bottom=None, left=None, right=None, top_left=None, top_right=None, 
-            bottom_left=None, bottom_right=None, vtile=False, htile=False, 
-            batch=None, group=None, usage='static', hidden=False):
+    def __init__(self, *, rect=None, color=None, image=None, center=None, 
+            top=None, bottom=None, left=None, right=None, top_left=None, 
+            top_right=None, bottom_left=None, bottom_right=None, vtile='auto', 
+            htile='auto', batch=None, group=None, usage='static', hidden=False):
 
         super().__init__()
 
@@ -583,8 +585,8 @@ class Background(HoldUpdatesMixin):
         self._tile_images = {}
         self._tile_artists = {}
         self._tile_group = None
-        self._htile = htile
-        self._vtile = vtile
+        self._htile = False
+        self._vtile = False
         self._batch = batch
         self._group = group
         self._usage = usage
@@ -593,6 +595,7 @@ class Background(HoldUpdatesMixin):
         self._update_group()
         self.set_images(
                 color=color,
+                image=image,
                 center=center,
                 top=top,
                 bottom=bottom,
@@ -602,6 +605,8 @@ class Background(HoldUpdatesMixin):
                 top_right=top_right,
                 bottom_left=bottom_left,
                 bottom_right=bottom_right,
+                htile=htile,
+                vtile=vtile,
         )
 
     @update_function
@@ -687,9 +692,9 @@ class Background(HoldUpdatesMixin):
                     vtile=vtile_flags[ij],
                     htile=htile_flags[ij],
             )
-        for key in artists_to_remove:
+        for ij in artists_to_remove:
             self._tile_artists[ij].hide()
-            del self._tile_artists[key]
+            del self._tile_artists[ij]
 
     def get_rect(self):
         return self._rect
@@ -717,9 +722,35 @@ class Background(HoldUpdatesMixin):
         images['vtile'] = self._vtile
         return images
 
-    def set_images(self, *, color=None, center=None, top=None, bottom=None, 
-            left=None, right=None, top_left=None, top_right=None, 
-            bottom_left=None, bottom_right=None, vtile=None, htile=None):
+    def set_images(self, *, color=None, image=None, center=None, top=None, 
+            bottom=None, left=None, right=None, top_left=None, top_right=None, 
+            bottom_left=None, bottom_right=None, vtile='auto', htile='auto'):
+
+        if image and center:
+            raise UsageError("""\
+specifying both 'image' and 'center' is ambiguous.
+
+Both of these options specify an image that should go in the middle of the 
+frame.  The only difference is that, if 'htile' or 'vtile' are set to 'auto' 
+(the default value), 'center' enables tiling and 'image' doesn't.""")
+
+        # Decide whether the background should tile in either dimension.
+
+        auto_vtile = False
+        auto_htile = False
+
+        if top or bottom:
+            auto_vtile = True
+        if left or right:
+            auto_htile = True
+        if center and not (top or left or bottom or right):
+            auto_vtile = True
+            auto_htile = True
+
+        self._vtile = auto_vtile if vtile == 'auto' else vtile
+        self._htile = auto_htile if htile == 'auto' else htile
+
+        # Store the images in a grid-like data structure.
 
         self._color = color
         self._tile_images = {
@@ -728,7 +759,7 @@ class Background(HoldUpdatesMixin):
                     (0,1): top,
                     (0,2): top_right,
                     (1,0): left,
-                    (1,1): center,
+                    (1,1): center or image,
                     (1,2): right,
                     (2,0): bottom_left,
                     (2,1): bottom,
@@ -740,13 +771,10 @@ class Background(HoldUpdatesMixin):
             ij: Rect.from_size(img.width, img.height)
             for ij, img in self._tile_images.items()}
 
-        if vtile is not None: self._vtile = vtile
-        if htile is not None: self._htile = htile
-
         self._update_tiles()
 
     def set_image(self, image):
-        self.set_images(center=image, vtile=False, htile=False)
+        self.set_images(image=image)
 
     def get_batch(self):
         return self._batch
