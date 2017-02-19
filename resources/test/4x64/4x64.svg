@@ -15,7 +15,7 @@
    id="svg4245"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="64x4.svg">
+   sodipodi:docname="4x64.svg">
   <defs
      id="defs4247" />
   <sodipodi:namedview
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="-134.35728"
-     inkscape:cy="691.25861"
+     inkscape:cx="-248.87849"
+     inkscape:cy="683.17739"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -56,7 +56,8 @@
     <g
        id="g4844"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90">
+       inkscape:export-ydpi="90"
+       transform="matrix(0,1,-1,0,-76.825891,475.40266)">
       <rect
          y="251.33154"
          x="-179.31982"
@@ -75,7 +76,8 @@
     <g
        id="g4848"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90">
+       inkscape:export-ydpi="90"
+       transform="matrix(0,1,-1,0,48.270585,494.75802)">
       <rect
          y="314.97116"
          x="-195.64471"
@@ -94,7 +96,8 @@
     <g
        id="g4852"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90">
+       inkscape:export-ydpi="90"
+       transform="matrix(0,1,-1,0,177.5701,492.73769)">
       <rect
          y="385.68182"
          x="-192.61426"
@@ -113,7 +116,8 @@
     <g
        id="g4856"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90">
+       inkscape:export-ydpi="90"
+       transform="matrix(0,1,-1,0,286.66658,488.69709)">
       <rect
          y="437.19962"
          x="-186.55334"

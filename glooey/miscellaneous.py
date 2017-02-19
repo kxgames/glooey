@@ -82,7 +82,7 @@ Clickable.register_event_type('on_rollover')
 
 @autoprop
 class Rollover(Deck):
-    default_predicate = lambda w: True
+    default_predicate = lambda self, w: True
 
     def __init__(self, clickable, initial_state, predicate=None, **widgets):
         super().__init__(initial_state, **widgets)
@@ -617,7 +617,6 @@ class Background(Widget):
 class Frame(Widget):
     Bin = Bin
     Background = Background
-
     default_alignment = 'center'
 
     def __init__(self):
@@ -731,7 +730,6 @@ class Button(Clickable):
 
 @autoprop
 class Checkbox(Clickable):
-
     default_checked_base = None; default_unchecked_base = None
     default_checked_over = None; default_unchecked_over = None
     default_checked_down = None; default_unchecked_down = None

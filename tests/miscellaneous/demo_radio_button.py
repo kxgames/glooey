@@ -10,24 +10,27 @@ root = glooey.Gui(window, batch=batch)
 hbox = glooey.HBox()
 hbox.alignment = 'center'
 hbox.cell_alignment = 'center'
+hbox.cell_padding = 8
 theme = glooey.themes.ResourceLoader('wesnoth')
 
-class WesnothRadioButton(glooey.RadioButton): #
-    default_unchecked_base = theme.image('buttons/checkbox.png')
-    default_unchecked_over = theme.image('buttons/checkbox-active.png')
-    default_unchecked_down = theme.image('buttons/checkbox-touched.png')
-    default_checked_base = theme.image('buttons/checkbox-pressed.png')
-    default_checked_over = theme.image('buttons/checkbox-active-pressed.png')
-    default_checked_down = theme.image('buttons/checkbox-touched.png')
+class TestRadioButton(glooey.RadioButton): #
+    default_checked_base = pyglet.image.load('assets/misc/checked_base.png')
+    default_checked_over = pyglet.image.load('assets/misc/checked_over.png')
+    default_checked_down = pyglet.image.load('assets/misc/checked_down.png')
+    default_checked_off = pyglet.image.load('assets/misc/checked_off.png')
+
+    default_unchecked_base = pyglet.image.load('assets/misc/unchecked_base.png')
+    default_unchecked_over = pyglet.image.load('assets/misc/unchecked_over.png')
+    default_unchecked_down = pyglet.image.load('assets/misc/unchecked_down.png')
+    default_unchecked_off = pyglet.image.load('assets/misc/unchecked_off.png')
 
 def on_toggle(widget): #
     print(f"{widget}: {widget.is_checked}")
 
 buttons = []
 for i in range(3):
-    button = WesnothRadioButton(buttons)
+    button = TestRadioButton(buttons)
     button.push_handlers(on_toggle=on_toggle)
-    button.padding = 2
     hbox.add(button)
 
 root.add(hbox)

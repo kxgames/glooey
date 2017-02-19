@@ -12,7 +12,7 @@ class interactive_tests:
                 color=glooey.drawing.white.tuple,
                 x=window.width - 5, y=5,
                 anchor_x='right', anchor_y='bottom',
-                batch=batch,
+                batch=batch, group=pyglet.graphics.OrderedGroup(100),
         )
         self.test_generator = lambda: iter(())
         self.test_iterator = iter(())

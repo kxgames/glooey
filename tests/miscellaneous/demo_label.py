@@ -47,12 +47,12 @@ def test_label():
     # sure it works with both.
     label.underline = False
 
-    label.color = 'yellow'
-    yield "Make the text yellow."
+    label.color = 'orange'
+    yield "Make the text orange."
     label.color = 'green'
 
-    label.background_color = 'gray'
-    yield "Make the background gray."
+    label.background_color = 'orange'
+    yield "Make the background orange."
     del label.background_color
 
     label.text_alignment = 'center'
