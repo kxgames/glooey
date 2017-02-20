@@ -9,9 +9,13 @@ batch = pyglet.graphics.Batch()
 
 lorem_ipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam justo sem, malesuada ut ultricies ac, bibendum eu neque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean at tellus ut velit dignissim tincidunt. Curabitur euismod laoreet orci semper dignissim. Suspendisse potenti. Vivamus sed enim quis dui pulvinar pharetra. Duis condimentum ultricies ipsum, sed ornare leo vestibulum vitae. Sed ut justo massa, varius molestie diam. Sed lacus quam, tempor in dictum sed, posuere et diam.'
 root = glooey.Gui(window, batch=batch)
+stack = glooey.Stack()
+stack.alignment = 'center'
 label = glooey.Label()
-label.alignment = 'center'
-root.add(label)
+outline = glooey.PlaceHolder(color='purple')
+stack.add(outline)
+stack.add(label)
+root.add(stack)
 
 @demo_helpers.interactive_tests(window, batch) #
 def test_label():

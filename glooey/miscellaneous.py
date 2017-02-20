@@ -105,8 +105,11 @@ class Rollover(Deck):
         self._predicate = new_predicate
 
     def is_state_missing(self, state):
-        widget = self.get_widget(state)
-        return state not in self.known_states or not self.predicate(widget)
+        if state not in self.known_states:
+            return True
+        else:
+            widget = self.get_widget(state)
+            return not self.predicate(widget)
 
 
 @autoprop
@@ -660,6 +663,7 @@ class Button(Clickable):
     default_label_layer = 3
     default_image_layer = 2
     default_background_layer = 1
+    default_alignment = 'center'
 
     def __init__(self, text='', image=None):
         super().__init__()
@@ -726,6 +730,18 @@ class Button(Clickable):
 
     def del_background(self):
         self.set_background()
+
+    def get_base_background(self):
+        return self._backgrounds['base']
+
+    def get_over_background(self):
+        return self._backgrounds['over']
+
+    def get_base_background(self):
+        return self._backgrounds['base']
+
+    def get_off_background(self):
+        return self._backgrounds['off']
 
 
 @autoprop

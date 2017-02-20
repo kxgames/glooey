@@ -9,18 +9,18 @@ root = golden.Gui(window)
 frame = golden.SmallFrame()
 root.add(frame)
 
-@demo_helpers.interactive_tests(window, root.batch)
+lorem_ipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam justo sem, malesuada ut ultricies ac, bibendum eu neque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean at tellus ut velit dignissim tincidunt. Curabitur euismod laoreet orci semper dignissim. Suspendisse potenti. Vivamus sed enim quis dui pulvinar pharetra. Duis condimentum ultricies ipsum, sed ornare leo vestibulum vitae. Sed ut justo massa, varius molestie diam. Sed lacus quam, tempor in dictum sed, posuere et diam.'
+
+@demo_helpers.interactive_tests(window, root.batch) #
 def test_big_frame():
     frame.clear()
     yield "Empty frame."
 
-    label = golden.Label("Lorem ipsum")
-    label.alignment = 'center'
+    label = golden.Label(lorem_ipsum)
+    label.enable_line_wrap(200)
     frame.add(label)
-    yield "One line of text."
-
-    label.text = "Lorem ipsum\ndolor sit amet."
-    yield "Two lines of text."
+    label.debug_placement_problems()
+    yield "Frame containing a paragraph."
 
 pyglet.app.run()
 

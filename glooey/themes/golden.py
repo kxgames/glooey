@@ -52,9 +52,9 @@ class RoundButton(glooey.Button):
         try:
             self._color = color
             self.set_background(
-                    base=assets.image(f'buttons/round/{color}_base.png'),
-                    over=assets.image(f'buttons/round/{color}_over.png'),
-                    down=assets.image(f'buttons/round/{color}_down.png'),
+                    base_image=assets.image(f'buttons/round/{color}_base.png'),
+                    over_image=assets.image(f'buttons/round/{color}_over.png'),
+                    down_image=assets.image(f'buttons/round/{color}_down.png'),
             )
         except pyglet.resource.ResourceNotFoundException:
             raise UsageError(f"the Golden theme doesn't have a '{color}' button.")
@@ -79,7 +79,6 @@ class RoundButton(glooey.Button):
 
 @autoprop
 class BasicButton(glooey.Button):
-    default_htile = True
 
     class Label(Label):
         default_horz_padding = 12
@@ -157,7 +156,7 @@ class SmallFrame(glooey.Frame):
         default_vtile = True
 
     class Bin(glooey.Bin):
-        default_padding = 6
+        default_padding = 10
 
 
 class SubFrame:
