@@ -28,8 +28,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._children_can_overlap = True
         self._group = None
         self._rect = None
-        self._content_width = 0
-        self._content_height = 0
+        self._min_width = 0
+        self._min_height = 0
         self._claimed_width = 0
         self._claimed_height = 0
         self._assigned_rect = None
@@ -119,11 +119,17 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         This method is triggered by repack(), which recursively climbs the 
         widget hierarchy to make space for the widgets that need it, then calls 
         resize() on any widget that need to adapt to the new space allocation.
+
+        This method should not be called outside of a repack, because it 
+        assumes that the claims have already been updated.
         """
         self._assigned_rect = new_rect
         self.realign()
 
     def realign(self):
+        # This method should not be called outside of a repack, because it 
+        # assumes that the claims have already been updated.
+
         # Subtract padding from the full amount of space assigned to this 
         # widget.
         padded_rect = self._assigned_rect.copy()

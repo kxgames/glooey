@@ -9,11 +9,10 @@ from .helpers import *
 @autoprop
 class Root (Bin):
 
-    def __init__(self, rect, window, batch=None, group=None):
+    def __init__(self, window, batch=None, group=None):
         super().__init__()
 
         self._parent = self
-        self._rect = rect
         self._window = window
         self._batch = batch or pyglet.graphics.Batch()
         self._group = group or pyglet.graphics.OrderedGroup(0)
@@ -24,20 +23,20 @@ class Root (Bin):
     def repack(self):
         self.claim()
 
-        too_narrow = self.rect.width < self.claimed_width
-        too_short = self.rect.height < self.claimed_height
+        too_narrow = self.territory.width < self.claimed_width
+        too_short = self.territory.height < self.claimed_height
 
-        # Complain if the GUI needs more space than is available in the window.
+        # Complain if the root widget needs more space than it claimed.
         if too_narrow or too_short:
             message = "{} is only {}x{}, but its children are {}x{}."
             raise RuntimeError(
                     message.format(
                         self,
-                        self.rect.width, self.rect.height,
+                        self.territory.width, self.territory.height,
                         self.claimed_width, self.claimed_height,
             ))
 
-        self.do_resize_children()
+        self.resize(self.territory)
 
     def regroup(self, group):
         super().regroup(group or pyglet.graphics.Group())
@@ -54,6 +53,9 @@ class Root (Bin):
     def get_group(self):
         return self._group
 
+    def get_territory(self):
+        raise NotImplementedError
+
     @property
     def is_hidden(self):
         return self._is_hidden
@@ -62,18 +64,16 @@ class Root (Bin):
 @autoprop
 class Gui (Root):
 
-    def __init__(self, window, batch=None, group=None):
-        rect = Rect.from_pyglet_window(window)
-        super().__init__(rect, window, batch, group)
-
     def on_draw(self):
         self.window.clear()
         self.batch.draw()
 
     def on_resize(self, width, height):
-        rect = Rect.from_pyglet_window(self.window)
-        self.resize(rect)
+        self.repack()
 
+    def get_territory(self):
+        return Rect.from_pyglet_window(self.window)
+        
     def set_cursor(self, image, hot_spot):
         hx, hy = Vector.from_anything(hot_spot)
         cursor = pyglet.window.ImageMouseCursor(image, hx, hy)

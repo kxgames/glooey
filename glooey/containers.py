@@ -57,14 +57,10 @@ class Bin (Widget):
         self._resize_and_regroup_children()
 
     def do_claim(self):
-        min_width = 0
-        min_height = 0
-
         if self.child is not None:
-            min_width += self.child.claimed_width
-            min_height += self.child.claimed_height
-
-        return min_width, min_height
+            return self.child.claimed_size
+        else:
+            return 0, 0
 
     def do_resize_children(self):
         if self.child is not None:

@@ -4,8 +4,6 @@ import pyglet
 import glooey
 import demo_helpers
 
-print(__doc__)
-
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
