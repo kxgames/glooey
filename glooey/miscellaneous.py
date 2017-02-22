@@ -231,7 +231,7 @@ class Label(Widget):
     default_text_alignment = None
     default_line_spacing = None
 
-    def __init__(self, text="", **style):
+    def __init__(self, text="", line_wrap=None, **style):
         super().__init__()
         self._layout = None
         self._text = text or self.default_text
@@ -251,6 +251,8 @@ class Label(Widget):
                 line_spacing=self.default_line_spacing,
         )
         self.set_style(**style)
+        if line_wrap:
+            self.enable_line_wrap(line_wrap)
 
     def do_claim(self):
         # Make sure the label's text and style are up-to-date before we request 

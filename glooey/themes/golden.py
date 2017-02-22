@@ -98,7 +98,6 @@ class BasicButton(glooey.Button):
 
 @autoprop
 class FancyButton(glooey.Button):
-    default_htile = True
 
     class Label(glooey.Label):
         # "Wellmere Sans" is proprietary, so it cannot be included with glooey.
@@ -133,7 +132,6 @@ class BigFrame(glooey.Frame):
         default_left = assets.image('frames/big/left.png')
         default_center = assets.texture('frames/big/center.png')
         default_right = assets.image('frames/big/right.png')
-        default_htile = True
 
     class Bin(glooey.Bin):
         default_vert_padding = 16
@@ -152,15 +150,38 @@ class SmallFrame(glooey.Frame):
         default_top_right = assets.image('frames/small/top_right.png')
         default_bottom_left = assets.image('frames/small/bottom_left.png')
         default_bottom_right = assets.image('frames/small/bottom_right.png')
-        default_htile = True
-        default_vtile = True
 
     class Bin(glooey.Bin):
         default_padding = 10
 
 
-class SubFrame:
-    pass
+class SubFrame(glooey.Frame):
+
+    class Background(glooey.Background):
+        default_top = assets.texture('frames/sub/top.png')
+        default_bottom = assets.texture('frames/sub/bottom.png')
+        default_left = assets.texture('frames/sub/left.png')
+        default_right = assets.texture('frames/sub/right.png')
+        default_top_left = assets.image('frames/sub/top_left.png')
+        default_top_right = assets.image('frames/sub/top_right.png')
+        default_bottom_left = assets.image('frames/sub/bottom_left.png')
+        default_bottom_right = assets.image('frames/sub/bottom_right.png')
+
+    class Bin(glooey.Bin):
+        default_padding = 6
+
+
+class HRule(glooey.Background):
+    default_center = assets.texture('dividers/hrule/center.png')
+    default_left = assets.texture('dividers/hrule/left.png')
+    default_right = assets.texture('dividers/hrule/right.png')
+    default_vert_padding = 3
+
+class VRule(glooey.Background):
+    default_center = assets.texture('dividers/vrule/center.png')
+    default_top = assets.texture('dividers/vrule/top.png')
+    default_bottom = assets.texture('dividers/vrule/bottom.png')
+    default_horz_padding = 3
 
 @autoprop
 class BasicFillBar(glooey.FillBar):
