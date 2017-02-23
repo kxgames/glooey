@@ -260,12 +260,11 @@ Viewport.register_event_type('on_mouse_pan')
 
 @autoprop
 class Grid (Widget):
-
     default_cell_padding = None
     default_cell_alignment = 'fill'
 
     def __init__(self, rows=0, cols=0):
-        Widget.__init__(self)
+        super().__init__()
         self._children = {}
         self._children_can_overlap = False
         self._grid = drawing.Grid(

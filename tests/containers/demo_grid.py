@@ -75,6 +75,14 @@ def interactive_grid_tests():
     grid.del_row_height(0)
     grid.del_col_width(0)
 
+    grid.default_row_height = 0
+    yield "Make both rows as short as possible."
+
+    grid.default_col_width = 0
+    yield "Make both columns as narrow as possible."
+    grid.default_row_height = 'expand'
+    grid.default_col_width = 'expand'
+
     # Test custom grid shapes
     grid.num_rows = 3
     assert grid.num_rows == 3
