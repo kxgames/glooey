@@ -21,20 +21,20 @@ def interactive_hbox_tests():
         hbox.add(EventLogger(50, 50))
     yield "Make an HBox with 2 cells."
 
-    left = EventLogger(50, 50, red)
+    left = EventLogger(50, 50, orange)
     hbox.add_left(left)
-    yield "Add a red widget on the left."
+    yield "Add a orange widget on the left."
 
-    right = EventLogger(50, 50, red)
+    right = EventLogger(50, 50, orange)
     hbox.add_right(right)
-    yield "Add a red widget on the right."
+    yield "Add a orange widget on the right."
 
-    middle = EventLogger(50, 50, red)
+    middle = EventLogger(50, 50, orange)
     hbox.insert(middle, 2)
-    yield "Insert a red widget in the middle."
+    yield "Insert a orange widget in the middle."
 
     hbox.replace(middle, EventLogger(50, 50, green))
-    yield "Replace the red widget in the middle with a green one."
+    yield "Replace the orange widget in the middle with a green one."
 
     hbox.remove(left)
     yield "Remove the widget on the left."

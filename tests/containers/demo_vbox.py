@@ -21,20 +21,20 @@ def interactive_vbox_tests():
         vbox.add(EventLogger(50, 50))
     yield "Make an VBox with 2 cells."
 
-    top = EventLogger(50, 50, red)
+    top = EventLogger(50, 50, orange)
     vbox.add_top(top)
-    yield "Add a red widget on the top."
+    yield "Add a orange widget on the top."
 
-    bottom = EventLogger(50, 50, red)
+    bottom = EventLogger(50, 50, orange)
     vbox.add_bottom(bottom)
-    yield "Add a red widget on the bottom."
+    yield "Add a orange widget on the bottom."
 
-    middle = EventLogger(50, 50, red)
+    middle = EventLogger(50, 50, orange)
     vbox.insert(middle, 2)
-    yield "Insert a red widget in the middle."
+    yield "Insert a orange widget in the middle."
 
     vbox.replace(middle, EventLogger(50, 50, green))
-    yield "Replace the red widget in the middle with a green one."
+    yield "Replace the orange widget in the middle with a green one."
 
     vbox.remove(top)
     yield "Remove the widget on the top."

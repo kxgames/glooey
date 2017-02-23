@@ -47,14 +47,14 @@ class Bin (Widget):
 
         self._child = self._attach_child(child)
         assert len(self) == 1
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def clear(self):
         if self._child is not None:
             self._detach_child(self._child)
         self._child = None
         assert len(self) == 0
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def do_claim(self):
         if self.child is not None:
@@ -288,19 +288,19 @@ class Grid (Widget):
 
         self._attach_child(child)
         self._children[row, col] = child
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def remove(self, row, col):
         child = self._children[row, col]
         self._detach_child(child)
         del self._children[row, col]
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def clear(self):
         for child in self._children.values():
             self._detach_child(child)
         self._children = {}
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def do_claim(self):
         min_cell_rects = {
@@ -484,7 +484,7 @@ class HVBox (Widget):
         self._attach_child(child)
         self._children.insert(index, child)
         self._sizes[child] = size
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def replace(self, old_child, new_child):
         old_index = self._children.index(old_child)
@@ -497,14 +497,14 @@ class HVBox (Widget):
         self._detach_child(child)
         self._children.remove(child)
         del self._sizes[child]
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def clear(self):
         for child in self._children:
             self._detach_child(child)
         self._children = []
         self._sizes = {}
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def do_claim(self):
         self.do_set_row_col_sizes({
@@ -645,18 +645,18 @@ class Stack (Widget):
     def insert(self, widget, layer):
         self._attach_child(widget)
         self._children[widget] = layer
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def remove(self, widget):
         self._detach_child(widget)
         del self._children[widget]
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def clear(self):
         for child in self.children:
             self._detach_child(child)
         self._children = {}
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def do_claim(self):
         return claim_stacked_widgets(*self.children)
@@ -714,13 +714,13 @@ class Deck(Widget):
     def add_state(self, state, widget):
         self._remove_state(state)
         self._add_state(state, widget)
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def add_states(self, **states):
         for state, widget in states.items():
             self._remove_state(state)
             self._add_state(state, widget)
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def add_states_if(self, predicate, **states):
         filtered_states = {
@@ -734,7 +734,7 @@ class Deck(Widget):
             self._remove_state(state)
         for state, widget in states.items():
             self._add_state(state, widget)
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def reset_states_if(self, predicate, **states):
         filtered_states = {
@@ -749,7 +749,7 @@ class Deck(Widget):
     def remove_states(self, *states):
         for state in states:
             self._remove_state(state)
-        self._resize_and_regroup_children()
+        self._repack_and_regroup_children()
 
     def clear(self):
         self.remove_states(*self.known_states)

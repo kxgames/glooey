@@ -745,12 +745,12 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # Let the user react to a child being attached.
         self.dispatch_event('on_remove_child', child)
 
-        # Derived classes are expected to call _resize_and_regroup_children() 
+        # Derived classes are expected to call _repack_and_regroup_children() 
         # after this method.
         return child
 
     @update_function
-    def _resize_and_regroup_children(self):
+    def _repack_and_regroup_children(self):
         """
         Resize and regroup the children of this widget if this widget is 
         already attached to the GUI.  Otherwise, don't do anything.

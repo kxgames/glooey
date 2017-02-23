@@ -16,7 +16,6 @@ def test_stack():
 
     def layer(size, color='green'): #
         size = size * (window.height - 20)
-        color = glooey.drawing.str_to_color(color)
         return glooey.PlaceHolder(size, size, color, align='center')
 
     stack.add(layer(0.8, 'green'))
