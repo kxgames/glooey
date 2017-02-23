@@ -7,14 +7,14 @@ from .helpers import *
 
 @autoprop
 class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
-    default_padding = None
-    default_horz_padding = None
-    default_vert_padding = None
-    default_left_padding = None
-    default_right_padding = None
-    default_top_padding = None
-    default_bottom_padding = None
-    default_alignment = 'fill'
+    custom_padding = None
+    custom_horz_padding = None
+    custom_vert_padding = None
+    custom_left_padding = None
+    custom_right_padding = None
+    custom_top_padding = None
+    custom_bottom_padding = None
+    custom_alignment = 'fill'
 
     def __init__(self):
         pyglet.event.EventDispatcher.__init__(self)
@@ -43,16 +43,16 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # initialized.  Since that hasn't happened by the time this constructor 
         # is called, these polymorphic methods can cause headaches.
         self._set_padding(
-                all=self.default_padding,
-                horz=self.default_horz_padding,
-                vert=self.default_vert_padding,
-                left=self.default_left_padding,
-                right=self.default_right_padding,
-                top=self.default_top_padding,
-                bottom=self.default_bottom_padding,
+                all=self.custom_padding,
+                horz=self.custom_horz_padding,
+                vert=self.custom_vert_padding,
+                left=self.custom_left_padding,
+                right=self.custom_right_padding,
+                top=self.custom_top_padding,
+                bottom=self.custom_bottom_padding,
         )
         self._set_alignment(
-                self.default_alignment)
+                self.custom_alignment)
 
     def __repr__(self):
         return '{}(id={})'.format(

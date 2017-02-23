@@ -8,17 +8,17 @@ window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
 class TestFillBar(glooey.FillBar):
-    default_alignment = 'fill horz'
-    default_padding = 100
+    custom_alignment = 'fill horz'
+    custom_padding = 100
 
     class Base(glooey.Background):
-        default_left = pyglet.image.load('assets/4x64/purple.png')
-        default_center = pyglet.image.load('assets/64x64/grey.png')
-        default_right = pyglet.image.load('assets/4x64/purple.png')
+        custom_left = pyglet.image.load('assets/4x64/purple.png')
+        custom_center = pyglet.image.load('assets/64x64/grey.png')
+        custom_right = pyglet.image.load('assets/4x64/purple.png')
 
     class Fill(glooey.Background):
-        default_center = pyglet.image.load('assets/64x64/green.png')
-        default_horz_padding = 4
+        custom_center = pyglet.image.load('assets/64x64/green.png')
+        custom_horz_padding = 4
 
 
 

@@ -8,25 +8,25 @@ window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
 class TestButton(glooey.Button): #
-    default_alignment = 'center'
+    custom_alignment = 'center'
 
     class Label(glooey.Label):
-        default_color = '#deeed6'
-        default_font_size = 14
-        default_bold = True
-        default_padding = 20
+        custom_color = '#deeed6'
+        custom_font_size = 14
+        custom_bold = True
+        custom_padding = 20
 
     class Base(glooey.Background):
-        default_center = pyglet.image.load('assets/64x64/green.png')
+        custom_center = pyglet.image.load('assets/64x64/green.png')
 
     class Over(glooey.Background):
-        default_center = pyglet.image.load('assets/64x64/orange.png')
+        custom_center = pyglet.image.load('assets/64x64/orange.png')
 
     class Down(glooey.Background):
-        default_center = pyglet.image.load('assets/64x64/purple.png')
+        custom_center = pyglet.image.load('assets/64x64/purple.png')
 
     class Off(glooey.Background):
-        default_center = pyglet.image.load('assets/64x64/grey.png')
+        custom_center = pyglet.image.load('assets/64x64/grey.png')
 
 root = glooey.Gui(window, batch=batch)
 button = TestButton('Hello world!')

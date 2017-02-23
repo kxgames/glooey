@@ -260,8 +260,8 @@ Viewport.register_event_type('on_mouse_pan')
 
 @autoprop
 class Grid (Widget):
-    default_cell_padding = None
-    default_cell_alignment = 'fill'
+    custom_cell_padding = None
+    custom_cell_alignment = 'fill'
 
     def __init__(self, rows=0, cols=0):
         super().__init__()
@@ -272,8 +272,8 @@ class Grid (Widget):
                 num_cols=cols,
         )
         self.cell_padding = first_not_none((
-                self.default_cell_padding, self.default_padding, 0))
-        self.cell_alignment = self.default_cell_alignment
+                self.custom_cell_padding, self.custom_padding, 0))
+        self.cell_alignment = self.custom_cell_alignment
 
     def __getitem__(self, row_col):
         return self._children[row_col]
@@ -456,9 +456,9 @@ class Grid (Widget):
 
 @autoprop
 class HVBox (Widget):
-
-    default_cell_padding = None
-    default_cell_alignment = 'fill'
+    custom_cell_padding = None
+    custom_cell_alignment = 'fill'
+    custom_default_cell_size = 'expand'
 
     def __init__(self):
         super().__init__()
@@ -468,8 +468,9 @@ class HVBox (Widget):
         self._grid = drawing.Grid()
 
         self.cell_padding = first_not_none((
-                self.default_cell_padding, self.default_padding, 0))
-        self.cell_alignment = self.default_cell_alignment
+                self.custom_cell_padding, self.custom_padding, 0))
+        self.cell_alignment = self.custom_cell_alignment
+        self.default_cell_size = self.custom_default_cell_size
 
     def add(self, child, size=None):
         self.add_back(child, size)
@@ -577,6 +578,12 @@ class HVBox (Widget):
         self._cell_alignment_func = drawing.cast_to_alignment(new_alignment)
         self.repack()
 
+    def get_default_cell_size(self):
+        raise NotImplementedError
+
+    def set_default_cell_size(self, size):
+        raise NotImplementedError
+
 
 @autoprop
 class HBox (HVBox):
@@ -592,10 +599,10 @@ class HBox (HVBox):
     def do_set_row_col_sizes(self, sizes):
         self._grid.col_widths = sizes
 
-    def get_default_size(self):
+    def get_default_cell_size(self):
         return self._grid.default_col_width
 
-    def set_default_size(self, size):
+    def set_default_cell_size(self, size):
         self._grid.default_col_width = size
 
 
@@ -613,10 +620,10 @@ class VBox (HVBox):
     def do_set_row_col_sizes(self, sizes):
         self._grid.row_heights = sizes
 
-    def get_default_size(self):
+    def get_default_cell_size(self):
         return self._grid.default_row_height
 
-    def set_default_size(self, size):
+    def set_default_cell_size(self, size):
         self._grid.default_row_height = size
 
 

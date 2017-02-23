@@ -7,12 +7,12 @@ theme.add_font('font/kenvector_future.ttf')
 class LabelButton(glooey.Button):
 
     class Label(glooey.Label): #
-        default_color = 'white'
-        default_bold = 'True'
-        default_font_name = 'KenVector Future'
-        default_font_size = 12
+        custom_color = 'white'
+        custom_bold = 'True'
+        custom_font_name = 'KenVector Future'
+        custom_font_size = 12
 
-    default_label_placement = 'center'
+    custom_label_placement = 'center'
 
     def on_rollover(self, new_state, old_state):
         def down_placement(child_rect, parent_rect):
@@ -26,11 +26,11 @@ class LabelButton(glooey.Button):
 
 
 class BlueButton(LabelButton):
-    default_base = theme.image('png/blue_button04.png')
-    default_down = theme.image('png/blue_button05.png')
+    custom_base = theme.image('png/blue_button04.png')
+    custom_down = theme.image('png/blue_button05.png')
 
 class RedButton(LabelButton):
-    default_base = theme.image('png/blue_button04.png')
-    default_down = theme.image('png/blue_button05.png')
+    custom_base = theme.image('png/blue_button04.png')
+    custom_down = theme.image('png/blue_button05.png')
 
 

@@ -8,13 +8,13 @@ window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
 class TestFrame(glooey.Frame): #
-    default_alignment = 'fill'
+    custom_alignment = 'fill'
 
     class Background(glooey.Background):
-        default_center = pyglet.image.load('assets/64x64/green.png')
+        custom_center = pyglet.image.load('assets/64x64/green.png')
 
     class Bin(glooey.Bin):
-        default_padding = 16
+        custom_padding = 16
 
 root = glooey.Gui(window, batch=batch)
 frame = TestFrame()

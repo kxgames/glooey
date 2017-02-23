@@ -82,11 +82,11 @@ Clickable.register_event_type('on_rollover')
 
 @autoprop
 class Rollover(Deck):
-    default_predicate = lambda self, w: True
+    custom_predicate = lambda self, w: True
 
     def __init__(self, clickable, initial_state, predicate=None, **widgets):
         super().__init__(initial_state, **widgets)
-        self._predicate = predicate or self.default_predicate
+        self._predicate = predicate or self.custom_predicate
         clickable.push_handlers(self.on_rollover)
 
     def on_rollover(self, new_state, old_state):
@@ -218,37 +218,37 @@ class EventLogger(PlaceHolder):
 
 @autoprop
 class Label(Widget):
-    default_text = ""
-    default_font_name = None
-    default_font_size = None
-    default_bold = None
-    default_italic = None
-    default_underline = None
-    default_kerning = None
-    default_baseline = None
-    default_color = 'green'
-    default_background_color = None
-    default_text_alignment = None
-    default_line_spacing = None
+    custom_text = ""
+    custom_font_name = None
+    custom_font_size = None
+    custom_bold = None
+    custom_italic = None
+    custom_underline = None
+    custom_kerning = None
+    custom_baseline = None
+    custom_color = 'green'
+    custom_background_color = None
+    custom_text_alignment = None
+    custom_line_spacing = None
 
     def __init__(self, text="", line_wrap=None, **style):
         super().__init__()
         self._layout = None
-        self._text = text or self.default_text
+        self._text = text or self.custom_text
         self._line_wrap_width = 0
         self._style = {}
         self.set_style(
-                font_name=self.default_font_name,
-                font_size=self.default_font_size,
-                bold=self.default_bold,
-                italic=self.default_italic,
-                underline=self.default_underline,
-                kerning=self.default_kerning,
-                baseline=self.default_baseline,
-                color=self.default_color,
-                background_color=self.default_background_color,
-                align=self.default_text_alignment,
-                line_spacing=self.default_line_spacing,
+                font_name=self.custom_font_name,
+                font_size=self.custom_font_size,
+                bold=self.custom_bold,
+                italic=self.custom_italic,
+                underline=self.custom_underline,
+                kerning=self.custom_kerning,
+                baseline=self.custom_baseline,
+                color=self.custom_color,
+                background_color=self.custom_background_color,
+                align=self.custom_text_alignment,
+                line_spacing=self.custom_line_spacing,
         )
         self.set_style(**style)
         if line_wrap:
@@ -483,12 +483,12 @@ class Label(Widget):
 
 @autoprop
 class Image(Widget):
-    default_image = None
-    default_alignment = 'center'
+    custom_image = None
+    custom_alignment = 'center'
 
     def __init__(self, image=None):
         super().__init__()
-        self._image = image or self.default_image
+        self._image = image or self.custom_image
         self._sprite = None
 
     def do_claim(self):
@@ -534,36 +534,36 @@ class Image(Widget):
 
 @autoprop
 class Background(Widget):
-    default_color = None
-    default_image = None
-    default_center = None
-    default_top = None
-    default_bottom = None
-    default_left = None
-    default_right = None
-    default_top_left = None
-    default_top_right = None
-    default_bottom_left = None
-    default_bottom_right = None
-    default_vtile = 'auto'
-    default_htile = 'auto'
+    custom_color = None
+    custom_image = None
+    custom_center = None
+    custom_top = None
+    custom_bottom = None
+    custom_left = None
+    custom_right = None
+    custom_top_left = None
+    custom_top_right = None
+    custom_bottom_left = None
+    custom_bottom_right = None
+    custom_vtile = 'auto'
+    custom_htile = 'auto'
 
     def __init__(self):
         super().__init__()
         self._artist = drawing.Background(
-                color=self.default_color,
-                image=self.default_image,
-                center=self.default_center,
-                top=self.default_top,
-                bottom=self.default_bottom,
-                left=self.default_left,
-                right=self.default_right,
-                top_left=self.default_top_left,
-                top_right=self.default_top_right,
-                bottom_left=self.default_bottom_left,
-                bottom_right=self.default_bottom_right,
-                vtile=self.default_vtile,
-                htile=self.default_htile,
+                color=self.custom_color,
+                image=self.custom_image,
+                center=self.custom_center,
+                top=self.custom_top,
+                bottom=self.custom_bottom,
+                left=self.custom_left,
+                right=self.custom_right,
+                top_left=self.custom_top_left,
+                top_right=self.custom_top_right,
+                bottom_left=self.custom_bottom_left,
+                bottom_right=self.custom_bottom_right,
+                vtile=self.custom_vtile,
+                htile=self.custom_htile,
                 hidden=True,
         )
 
@@ -622,7 +622,7 @@ class Background(Widget):
 class Frame(Widget):
     Bin = Bin
     Background = Background
-    default_alignment = 'center'
+    custom_alignment = 'center'
 
     def __init__(self):
         super().__init__()
@@ -662,10 +662,10 @@ class Button(Clickable):
     Down = Background
     Off = Background
 
-    default_label_layer = 3
-    default_image_layer = 2
-    default_background_layer = 1
-    default_alignment = 'center'
+    custom_label_layer = 3
+    custom_image_layer = 2
+    custom_background_layer = 1
+    custom_alignment = 'center'
 
     def __init__(self, text='', image=None):
         super().__init__()
@@ -685,9 +685,9 @@ class Button(Clickable):
         self.set_image(image)
 
         self._attach_child(self._stack)
-        self._stack.insert(self._label, self.default_label_layer)
-        self._stack.insert(self._image, self.default_image_layer)
-        self._stack.insert(self._rollover, self.default_background_layer)
+        self._stack.insert(self._label, self.custom_label_layer)
+        self._stack.insert(self._image, self.custom_image_layer)
+        self._stack.insert(self._rollover, self.custom_background_layer)
 
     def do_claim(self):
         return self._stack.claimed_size
@@ -707,11 +707,7 @@ class Button(Clickable):
     def set_label(self, label, placement=None):
         self._stack.remove(self._label)
         self._label = label
-        self._stack.insert(
-                self._label,
-                self.default_label_layer,
-                placement or self.default_label_placement,
-        )
+        self._stack.insert(self._label, self.custom_label_layer)
 
     def get_image(self):
         return self._image.image
@@ -748,25 +744,25 @@ class Button(Clickable):
 
 @autoprop
 class Checkbox(Clickable):
-    default_checked_base = None; default_unchecked_base = None
-    default_checked_over = None; default_unchecked_over = None
-    default_checked_down = None; default_unchecked_down = None
-    default_checked_off  = None; default_unchecked_off  = None
-    default_alignment = 'center'
+    custom_checked_base = None; custom_unchecked_base = None
+    custom_checked_over = None; custom_unchecked_over = None
+    custom_checked_down = None; custom_unchecked_down = None
+    custom_checked_off  = None; custom_unchecked_off  = None
+    custom_alignment = 'center'
 
     def __init__(self, is_checked=False):
         super().__init__()
         self._deck = Deck(is_checked)
         self._attach_child(self._deck)
         self.set_images(
-                checked_base=self.default_checked_base,
-                checked_over=self.default_checked_over,
-                checked_down=self.default_checked_down,
-                checked_off=self.default_checked_off,
-                unchecked_base=self.default_unchecked_base,
-                unchecked_over=self.default_unchecked_over,
-                unchecked_down=self.default_unchecked_down,
-                unchecked_off=self.default_unchecked_off,
+                checked_base=self.custom_checked_base,
+                checked_over=self.custom_checked_over,
+                checked_down=self.custom_checked_down,
+                checked_off=self.custom_checked_off,
+                unchecked_base=self.custom_unchecked_base,
+                unchecked_over=self.custom_unchecked_over,
+                unchecked_down=self.custom_unchecked_down,
+                unchecked_off=self.custom_unchecked_off,
         )
 
     def do_claim(self):
