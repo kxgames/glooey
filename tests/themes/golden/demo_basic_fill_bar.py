@@ -13,7 +13,7 @@ root.add(bar)
 @demo_helpers.interactive_tests(window, root.batch) #
 def test_basic_fill_bar():
     colors = 'red', 'yellow', 'lime', 'green', 'teal', 'blue'
-    fractions = [i/10 for i in range(11)]
+    fractions = [i/5 for i in range(6)]
 
     for color in colors:
         bar.color = color

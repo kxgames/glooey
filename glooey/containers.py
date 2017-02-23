@@ -262,8 +262,12 @@ Viewport.register_event_type('on_mouse_pan')
 class Grid (Widget):
     custom_cell_padding = None
     custom_cell_alignment = 'fill'
+    custom_default_row_height = 'expand'
+    custom_default_col_width = 'expand'
 
-    def __init__(self, rows=0, cols=0):
+    def __init__(self, rows=0, cols=0, default_row_height=None, 
+            default_col_width=None):
+
         super().__init__()
         self._children = {}
         self._children_can_overlap = False
@@ -274,6 +278,10 @@ class Grid (Widget):
         self.cell_padding = first_not_none((
                 self.custom_cell_padding, self.custom_padding, 0))
         self.cell_alignment = self.custom_cell_alignment
+        self.default_row_height = first_not_none((
+                default_row_height, self.custom_default_row_height))
+        self.default_col_width = first_not_none((
+                default_col_width, self.custom_default_col_width))
 
     def __getitem__(self, row_col):
         return self._children[row_col]
@@ -460,7 +468,7 @@ class HVBox (Widget):
     custom_cell_alignment = 'fill'
     custom_default_cell_size = 'expand'
 
-    def __init__(self):
+    def __init__(self, default_cell_size=None):
         super().__init__()
         self._children = []
         self._children_can_overlap = False
@@ -470,7 +478,8 @@ class HVBox (Widget):
         self.cell_padding = first_not_none((
                 self.custom_cell_padding, self.custom_padding, 0))
         self.cell_alignment = self.custom_cell_alignment
-        self.default_cell_size = self.custom_default_cell_size
+        self.default_cell_size = first_not_none((
+                default_cell_size, self.custom_default_cell_size))
 
     def add(self, child, size=None):
         self.add_back(child, size)

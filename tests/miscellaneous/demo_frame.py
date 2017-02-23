@@ -10,21 +10,24 @@ batch = pyglet.graphics.Batch()
 class TestFrame(glooey.Frame): #
     custom_alignment = 'fill'
 
-    class Background(glooey.Background):
+    class Background(glooey.Background): #
         custom_center = pyglet.image.load('assets/64x64/green.png')
 
-    class Bin(glooey.Bin):
+    class Bin(glooey.Bin): #
         custom_padding = 16
+
+class TestBackground(glooey.Background): #
+    custom_center = pyglet.image.load('assets/64x64/orange.png')
 
 root = glooey.Gui(window, batch=batch)
 frame = TestFrame()
-widget = glooey.PlaceHolder(color='orange')
+widget = TestBackground()
 frame.add(widget)
 root.add(frame)
 
 @demo_helpers.interactive_tests(window, batch) #
 def test_image():
-    yield "A orange place-holder in green tiled frame."
+    yield "A orange tiled background in green tiled frame."
 
     frame.padding = 32
     yield "Pad around the frame."
