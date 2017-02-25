@@ -114,14 +114,16 @@ class Rollover(Deck):
 
 @autoprop
 class PlaceHolder(Clickable):
+    custom_color = 'green'
+    custom_alignment = 'fill'
 
-    def __init__(self, width=0, height=0, color='green', align='fill'):
+    def __init__(self, width=0, height=0, color=None, align=None):
         super().__init__()
-        self.color = drawing.Color.from_anything(color)
+        self.color = drawing.Color.from_anything(color or self.custom_color)
         self.width = width
         self.height = height
         self.vertex_list = None
-        self.alignment = align
+        self.alignment = align or self.custom_alignment
 
     def do_claim(self):
         return self.width, self.height

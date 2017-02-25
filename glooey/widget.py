@@ -7,6 +7,10 @@ from .helpers import *
 
 @autoprop
 class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
+    custom_size_hint = 0, 0
+    custom_width_hint = None
+    custom_height_hint = None
+
     custom_padding = None
     custom_horz_padding = None
     custom_vert_padding = None
@@ -14,6 +18,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
     custom_right_padding = None
     custom_top_padding = None
     custom_bottom_padding = None
+
     custom_alignment = 'fill'
 
     def __init__(self):
@@ -21,18 +26,43 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         HoldUpdatesMixin.__init__(self)
 
         self._parent = None
+        self._group = None
+
         # Use a double-underscore to avoid name conflicts; `_children` is a 
         # useful name for subclasses, so I don't want it to cause conflicts.
         self.__children = set()
         self._children_under_mouse = set()
         self._children_can_overlap = True
-        self._group = None
-        self._rect = None
-        self._min_width = 0
+
+        # The amount of space requested by the user for this widget.
+        self._width_hint = first_not_none((
+                self.custom_width_hint,
+                self.custom_size_hint[0],
+        ))
+        self._height_hint = first_not_none((
+                self.custom_height_hint,
+                self.custom_size_hint[1],
+        ))
+        # The minimal amount of space needed to display the content of this 
+        # widget.  This is a combination of the size returned by the widget's 
+        # do_claim() method and any size hints manually set by the user.
         self._min_height = 0
+        self._min_width = 0
+
+        # The minimum amount of space containers need to allocate for this 
+        # widget.  This is just the size of the content plus any padding.
         self._claimed_width = 0
         self._claimed_height = 0
+
+        # The space assigned to the widget by it's parent.  This cannot be 
+        # smaller than self.claimed_rect, but it can be larger.
         self._assigned_rect = None
+
+        # The rect the widget show actually use to render itself.  This is 
+        # determined by the alignment function from the content rect and the 
+        # assigned rect.
+        self._rect = None
+
         self._is_hidden = False
         self._is_claim_stale = True
         self._spurious_leave_event = False
@@ -88,6 +118,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
             self.realign()
 
     def claim(self):
+        # Only calculate the claim once during each repack.
         if not self._is_claim_stale:
             return False
 
@@ -100,13 +131,18 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # changed.
         previous_claim = self._claimed_width, self._claimed_height
 
-        # Keep track of the amount of space the widget needs for itself 
-        # (content) and for itself in addition to its padding (claim).
-        self._min_width, self._min_height = self.do_claim()
-        self._claimed_width = \
-                self._min_width + self._left_padding + self._right_padding
-        self._claimed_height = \
-                self._min_height + self._top_padding + self._bottom_padding
+        # Keep track of the amount of space the widget needs for itself (min_*) 
+        # and for itself in addition to its padding (claimed_*).
+        min_width, min_height = self.do_claim()
+
+        self._min_width = max(min_width, self._width_hint)
+        self._min_height = max(min_height, self._height_hint)
+
+        horz_padding = self._left_padding + self._right_padding
+        vert_padding = self._top_padding + self._bottom_padding
+
+        self._claimed_width = self._min_width + horz_padding
+        self._claimed_height = self._min_height + vert_padding
 
         # Return whether or not the claim has changed since the last repack.  
         # This determines whether the widget's parent needs to be repacked.
@@ -142,6 +178,10 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # space minus the padding).
         content_rect = Rect.from_size(self._min_width, self._min_height)
         self._alignment_func(content_rect, padded_rect)
+
+        # Round the rectangle to the nearest integer pixel, because sometimes 
+        # images can't line up right (e.g. in Background widgets) if the widget 
+        # has fractional coordinates.
         content_rect.round()
 
         # Guarantee that do_resize() is only called if the size of the widget 
@@ -488,6 +528,31 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     def get_rect(self):
         return self._rect
+
+    def get_size_hint(self):
+        return self._width_hint, self._min_height
+
+    def set_size_hint(self, new_width, new_height):
+        self._width_hint = new_width
+        self._height_hint = new_height
+        self.repack()
+
+    size_hint = property(
+            get_size_hint, lambda self, size: self.set_size_hint(*size))
+
+    def get_width_hint(self):
+        return self._width_hint
+
+    def set_width_hint(self, new_width):
+        self._width_hint = new_width
+        self.repack()
+
+    def get_height_hint(self):
+        return self._height_hint
+
+    def set_height_hint(self, new_height):
+        self._height_hint = new_height
+        self.repack()
 
     def get_claimed_rect(self):
         return Rect.from_size(self._claimed_width, self._claimed_height)
