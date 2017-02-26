@@ -218,7 +218,9 @@ colors = { #
         'blue': blue,
         'purple': purple,
         'black': black,
+        'dark': dark,
         'gray': gray,
+        'light': light,
         'white': white }
 
 rainbow_cycle = red, orange, yellow, green, blue, purple, brown
@@ -714,6 +716,13 @@ class Background(HoldUpdatesMixin):
     def get_min_size(self):
         self._grid.make_claim()
         return self._grid.min_width, self._grid.min_height
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, new_color):
+        self._color = new_color
+        self._update_tiles()
 
     def get_images(self):
         images = self._tile_images.copy()

@@ -587,6 +587,12 @@ class Background(Widget):
     def do_undraw(self):
         self._artist.hide()
 
+    def get_color(self):
+        return self._artist.color
+
+    def set_color(self, new_color):
+        self._artist.color = new_color
+
     def get_images(self):
         return self._artist.images
 
