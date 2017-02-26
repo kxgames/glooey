@@ -114,3 +114,5 @@ def late_binding_property(fget=None, fset=None, fdel=None, doc=None):
 def first_not_none(iterable):
     return more_itertools.first_true(iterable, pred=lambda x: x is not None)
 
+def clamp(value, low, high):
+    return max(low, min(value, high))

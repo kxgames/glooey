@@ -196,7 +196,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # example, consider a container that takes up the whole window.  It's 
         # size won't change when a widget is added or removed from it, but it's 
         # children will still need to be resized.
-        self.do_resize_children()
+        if self._num_children > 0:
+            self.do_resize_children()
 
         # Try to redraw the widget.  This won't do anything if the widget isn't 
         # ready to draw.
@@ -213,7 +214,9 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         if self._group is None or self._group != new_group:
             self._group = new_group
             self.do_regroup()
-            self.do_regroup_children()
+
+            if self._num_children > 0:
+                self.do_regroup_children()
 
         # Try to redraw the widget.  This won't do anything if the widget 
         # isn't ready to draw.
