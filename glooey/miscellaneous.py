@@ -629,24 +629,19 @@ class Background(Widget):
 @autoprop
 class Frame(Widget):
     Bin = Bin
-    Background = Background
+    Decoration = Background
     custom_alignment = 'center'
+    custom_bin_layer = 2
+    custom_decoration_layer = 1
 
     def __init__(self):
         super().__init__()
 
         self._bin = self.Bin()
-        self._background = self.Background()
+        self._decoration = self.Decoration()
 
         self._attach_child(self._bin)
-        self._attach_child(self._background)
-
-    def do_claim(self):
-        return claim_stacked_widgets(self._bin, self._background)
-
-    def do_regroup_children(self):
-        self._bin.regroup(pyglet.graphics.OrderedGroup(2, self.group))
-        self._background.regroup(pyglet.graphics.OrderedGroup(1, self.group))
+        self._attach_child(self._decoration)
 
     def add(self, child):
         self._bin.add(child)
@@ -654,11 +649,83 @@ class Frame(Widget):
     def clear(self):
         self._bin.clear()
 
+    def do_claim(self):
+        return claim_stacked_widgets(self._bin, self._decoration)
+
+    def do_regroup_children(self):
+        self._bin.regroup(pyglet.graphics.OrderedGroup(
+            self.custom_bin_layer, self.group))
+        self._decoration.regroup(pyglet.graphics.OrderedGroup(
+            self.custom_decoration_layer, self.group))
+
     def get_bin(self):
         return self._bin
 
-    def get_background(self):
-        return self._background
+    def get_decoration(self):
+        return self._decoration
+
+
+@autoprop
+class Outline(Frame):
+    custom_color = 'green'
+    custom_decoration_layer = 2
+    custom_bin_layer = 1
+
+    class Decoration(Widget):
+
+        def __init__(self):
+            super().__init__()
+            self.vertex_list = None
+            self.color = None
+
+        def do_claim(self):
+            return 0, 0
+
+        def do_regroup(self):
+            if self.vertex_list is not None:
+                self.batch.migrate(
+                        self.vertex_list, pyglet.gl.GL_LINES,
+                        self.group, self.batch)
+
+        def do_draw(self):
+            if self.vertex_list is None:
+                self.vertex_list = self.batch.add(
+                        8, pyglet.gl.GL_LINES, self.group, 'v2f', 'c4B')
+
+            top_left = self.rect.top_left
+            top_right = self.rect.top_right
+            bottom_left = self.rect.bottom_left
+            bottom_right = self.rect.bottom_right
+
+            # Originally I used GL_LINE_STRIP, but I couldn't figure out how to 
+            # stop the place holders from connecting to each other (i.e. I couldn't 
+            # figure out how to break the line strip).  Now I'm just using GL_LINES 
+            # instead.
+
+            self.vertex_list.vertices = (
+                    bottom_left.tuple + bottom_right.tuple + 
+                    bottom_right.tuple + top_right.tuple + 
+                    top_right.tuple + top_left.tuple + 
+                    top_left.tuple + bottom_left.tuple
+            ) 
+            self.vertex_list.colors = 8 * self.color.tuple
+
+        def do_undraw(self):
+            if self.vertex_list is not None:
+                self.vertex_list.delete()
+                self.vertex_list = None
+
+
+    def __init__(self, color=None):
+        super().__init__()
+        self.color = color or self.custom_color
+
+    def get_color(self):
+        return self.decoration.color
+
+    def set_color(self, new_color):
+        self.decoration.color = drawing.Color.from_anything(new_color)
+        self.decoration.draw()
 
 
 @autoprop

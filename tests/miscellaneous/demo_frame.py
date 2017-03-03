@@ -10,7 +10,7 @@ batch = pyglet.graphics.Batch()
 class TestFrame(glooey.Frame): #
     custom_alignment = 'fill'
 
-    class Background(glooey.Background): #
+    class Decoration(glooey.Background): #
         custom_center = pyglet.image.load('assets/64x64/green.png')
 
     class Bin(glooey.Bin): #

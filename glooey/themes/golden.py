@@ -128,7 +128,7 @@ class RadioButton(glooey.RadioButton):
 
 class BigFrame(glooey.Frame):
 
-    class Background(glooey.Background):
+    class Decoration(glooey.Background):
         custom_left = assets.image('frames/big/left.png')
         custom_center = assets.texture('frames/big/center.png')
         custom_right = assets.image('frames/big/right.png')
@@ -140,7 +140,7 @@ class BigFrame(glooey.Frame):
 
 class SmallFrame(glooey.Frame):
 
-    class Background(glooey.Background):
+    class Decoration(glooey.Background):
         custom_center = assets.texture('frames/small/center.png')
         custom_top = assets.texture('frames/small/top.png')
         custom_bottom = assets.texture('frames/small/bottom.png')
@@ -157,7 +157,7 @@ class SmallFrame(glooey.Frame):
 
 class SubFrame(glooey.Frame):
 
-    class Background(glooey.Background):
+    class Decoration(glooey.Background):
         custom_top = assets.texture('frames/sub/top.png')
         custom_bottom = assets.texture('frames/sub/bottom.png')
         custom_left = assets.texture('frames/sub/left.png')
