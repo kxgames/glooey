@@ -942,15 +942,6 @@ def alignment(func):
     alignments[func.__name__.replace('_', ' ')] = func
     return func
 
-def cast_to_alignment(key_or_function):
-    # Could raise a nicer error if the key isn't found, and could possibly 
-    # check to make the signature checks out...
-    if isinstance(key_or_function, str):
-        return alignments[key_or_function.lower()]
-    else:
-        return key_or_function
-
-
 @alignment
 def fill(child_rect, parent_rect):
     child_rect.set(parent_rect)
@@ -1020,6 +1011,21 @@ def bottom(child_rect, parent_rect):
 @alignment
 def bottom_right(child_rect, parent_rect):
     child_rect.bottom_right = parent_rect.bottom_right
+
+
+def align(key_or_function, child_rect, parent_rect):
+    try:
+        alignment_func = alignments[key_or_function]
+    except KeyError:
+        alignment_func = key_or_function
+
+    alignment_func(child_rect, parent_rect)
+
+def fixed_size_align(key_or_function, child_rect, parent_rect):
+    fixed_size = child_rect.size
+    align(key_or_function, child_rect, parent_rect)
+    if child_rect.size != fixed_size:
+        raise UsageError(f"a fixed-sized alignment was required, but {repr(key_or_function)} resized the rect being aligned from {'x'.join(fixed_size)} to {'x'.join(child_rect.size)}.")
 
 
 # Rectangle placement utilities

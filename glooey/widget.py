@@ -81,8 +81,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
                 top=self.custom_top_padding,
                 bottom=self.custom_bottom_padding,
         )
-        self._set_alignment(
-                self.custom_alignment)
+        self._alignment = self.custom_alignment
 
     def __repr__(self):
         return '{}(id={})'.format(
@@ -177,7 +176,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # Align this widget within the space available to it (i.e. the assigned 
         # space minus the padding).
         content_rect = Rect.from_size(self._min_width, self._min_height)
-        self._alignment_func(content_rect, padded_rect)
+        drawing.align(self._alignment, content_rect, padded_rect)
 
         # Round the rectangle to the nearest integer pixel, because sometimes 
         # images can't line up right (e.g. in Background widgets) if the widget 
@@ -625,10 +624,10 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self.repack()
 
     def get_alignment(self):
-        return self._alignment_func
+        return self._alignment
 
     def set_alignment(self, new_alignment):
-        self._set_alignment(new_alignment)
+        self._alignment = new_alignment
         self.repack()
 
     @property
@@ -881,14 +880,6 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._right_padding = first_not_none((right, horz, all, 0))
         self._top_padding = first_not_none((top, vert, all, 0))
         self._bottom_padding = first_not_none((bottom, vert, all, 0))
-
-    def _set_alignment(self, new_alignment):
-        """
-        Set the alignment attribute and don't repack.  This method is provided 
-        to help the Widget constructor initialize its default paddings without 
-        calling and polymorphic methods.
-        """
-        self._alignment_func = drawing.cast_to_alignment(new_alignment)
 
 
 Widget.register_event_type('on_add_child')

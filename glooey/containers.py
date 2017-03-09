@@ -14,13 +14,10 @@ from . import drawing
 from .widget import Widget
 from .helpers import *
 
-def align_widget_in_box(widget, box_rect, key_or_func='fill', widget_rect=None):
-    alignment_func = drawing.cast_to_alignment(key_or_func)
-
+def align_widget_in_box(widget, box_rect, alignment='fill', widget_rect=None):
     if widget_rect is None:
         widget_rect = widget.claimed_rect
-
-    alignment_func(widget_rect, box_rect)
+    drawing.align(alignment, widget_rect, box_rect)
     widget.resize(widget_rect)
 
 def claim_stacked_widgets(*widgets):
@@ -64,198 +61,11 @@ class Bin (Widget):
 
     def do_resize_children(self):
         if self.child is not None:
-            align_widget_in_box(self.child, self.rect)
+            self.child.resize(self.rect)
 
     def get_child(self):
         return self._child
 
-
-@autoprop
-class Viewport (Bin):
-
-    class PanningGroup (pyglet.graphics.Group):
-
-        def __init__(self, viewport, parent=None):
-            pyglet.graphics.Group.__init__(self, parent)
-            self.viewport = viewport
-
-        def set_state(self):
-            translation = -self.viewport.get_child_coords(0, 0)
-            pyglet.gl.glPushMatrix()
-            pyglet.gl.glTranslatef(translation.x, translation.y, 0)
-
-        def unset_state(self):
-            pyglet.gl.glPopMatrix()
-
-    def __init__(self, sensitivity=3):
-        super().__init__()
-
-        # The panning_vector is the displacement between the bottom-left corner 
-        # of this widget and the bottom-left corner of the child widget.
-
-        self._panning_vector = Vector.null()
-        self._deferred_center_of_view = None
-        self.sensitivity = sensitivity
-
-        # The stencil_group, mask_group, and visible_group members manage the 
-        # clipping mask to make sure the child is only visible inside the 
-        # viewport.  The panning_group member is used to translate the child in 
-        # response to panning events.
-
-        self.stencil_group = None
-        self.mask_group = None
-        self.visible_group = None
-        self.panning_group = None
-        self.mask_artist = None
-
-    def do_attach(self):
-        # If this line raises a pyglet EventException, you're probably trying 
-        # to attach this widget to a GUI that doesn't support mouse pan events.  
-        # See the Viewport documentation for more information.
-        self.root.push_handlers(self.on_mouse_pan)
-
-    def do_detach(self):
-        self.window.remove_handler(self.on_mouse_pan)
-
-    def do_claim(self):
-        # The widget being displayed in the viewport can claim however much 
-        # space it wants.  The viewport doesn't claim any space, because it can 
-        # be as small as it needs to be.
-        return 0, 0
-
-    def do_resize(self):
-        # Set the center of view if it was previously specified.  The center of 
-        # view cannot be directly set until the size of the viewport is known, 
-        # but this limitation is hidden from the user by indirectly setting the 
-        # center of view as soon as the viewport has a size.
-        if self._deferred_center_of_view is not None:
-            self.set_center_of_view(self._deferred_center_of_view)
-
-    def do_resize_children(self):
-        # Make the child whatever size it wants to be.
-        if self.child is not None:
-            self.child.resize(self.child.claimed_rect)
-
-    def do_regroup(self):
-        self.stencil_group = drawing.StencilGroup(self.group)
-        self.mask_group = drawing.StencilMask(self.stencil_group)
-        self.visible_group = drawing.WhereStencilIs(self.stencil_group)
-        self.panning_group = Viewport.PanningGroup(self, self.visible_group)
-
-        if self.mask_artist is not None:
-            self.mask_artist.group = self.mask_group
-
-    def do_regroup_children(self):
-        self.child.regroup(self.panning_group)
-
-    def do_draw(self):
-        if self.mask_artist is None:
-            self.mask_artist = drawing.Rectangle(
-                    self.rect,
-                    batch=self.batch,
-                    group=self.mask_group)
-
-        self.mask_artist.rect = self.rect
-
-    def do_undraw(self):
-        if self.mask_artist is not None:
-            self.mask_artist.delete()
-
-    def on_mouse_press(self, x, y, button, modifiers):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_press(x, y, button, modifiers)
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_release(x, y, button, modifiers)
-
-    def on_mouse_motion(self, x, y, dx, dy):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_motion(x, y, dx, dy)
-
-    def on_mouse_enter(self, x, y):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_enter(x, y)
-
-    def on_mouse_leave(self, x, y):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_leave(x, y)
-
-    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_drag(x, y, dx, dy, buttons, modifiers)
-
-    def on_mouse_drag_enter(self, x, y):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_drag_enter(x, y)
-
-    def on_mouse_drag_leave(self, x, y):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_drag_leave(x, y)
-
-    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        x, y = self.get_child_coords(x, y)
-        super().on_mouse_scroll(x, y, scroll_x, scroll_y)
-
-    def on_mouse_pan(self, direction, dt):
-        self.panning_vector += direction * self.sensitivity * dt
-
-    @vecrec.accept_anything_as_vector
-    def get_child_coords(self, screen_coords):
-        viewport_origin = self.rect.bottom_left
-        viewport_coords = screen_coords - viewport_origin
-        child_origin = self.child.rect.bottom_left
-        child_coords = child_origin + self.panning_vector + viewport_coords
-        return child_coords
-
-    @vecrec.accept_anything_as_vector
-    def get_screen_coords(self, child_coords):
-        child_origin = self.child.rect.bottom_left
-        viewport_origin = self.rect.bottom_left
-        viewport_coords = child_coords - child_origin - self.panning_vector
-        screen_coords = view_port_coords + viewport_origin
-        return screen_coords
-
-    def get_visible_area(self):
-        left, bottom = self.get_child_coords(self.rect.left, self.rect.bottom)
-        return Rect.from_dimensions(
-                left, bottom, self.rect.width, self.rect.height)
-
-    def get_panning_vector(self):
-        return self._panning_vector
-
-    def set_panning_vector(self, vector):
-        self._panning_vector = vector
-
-        if self._panning_vector.x < self.child.rect.left:
-            self._panning_vector.x = self.child.rect.left
-
-        if self._panning_vector.x > self.child.rect.right - self.rect.width:
-            self._panning_vector.x = self.child.rect.right - self.rect.width
-
-        if self._panning_vector.y < self.child.rect.bottom:
-            self._panning_vector.y = self.child.rect.bottom
-
-        if self._panning_vector.y > self.child.rect.top - self.rect.height:
-            self._panning_vector.y = self.child.rect.top - self.rect.height
-
-    @vecrec.accept_anything_as_vector
-    def set_center_of_view(self, child_coords):
-        # In order to set the center of view, the size of the viewport widget 
-        # is needed.  Unfortunately this information is not available until the 
-        # viewport has been attached to a root widget.  To allow this method to 
-        # be called at any time, the _deferred_center_of_view member is used in 
-        # conjunction with do_resize() to cache the desired center of view.
-
-        if self.rect is None:
-            self._deferred_center_of_view = child_coords
-        else:
-            viewport_center = self.rect.center - self.rect.bottom_left
-            self.panning_vector = child_coords - viewport_center
-            self._deferred_center_of_view = None
-
-
-Viewport.register_event_type('on_mouse_pan')
 
 @autoprop
 class Grid (Widget):
@@ -322,7 +132,7 @@ class Grid (Widget):
             align_widget_in_box(
                     self._children[ij],
                     cell_rects[ij],
-                    self._cell_alignment_func)
+                    self.cell_alignment)
 
     def do_find_children_under_mouse(self, x, y):
         cell = self._grid.find_cell_under_mouse(x, y)
@@ -374,10 +184,10 @@ class Grid (Widget):
         self.repack()
 
     def get_cell_alignment(self):
-        return self._cell_alignment_func
+        return self._cell_alignment
 
     def set_cell_alignment(self, new_alignment):
-        self._cell_alignment_func = drawing.cast_to_alignment(new_alignment)
+        self._cell_alignment = new_alignment
         self.repack()
 
     def get_row_height(self, row):
@@ -535,7 +345,7 @@ class HVBox (Widget):
         cell_rects = self._grid.make_cells(self.rect)
         for i, child in enumerate(self._children):
             box = cell_rects[self.do_get_row_col(i)]
-            align_widget_in_box(child, box, self._cell_alignment_func)
+            align_widget_in_box(child, box, self.cell_alignment)
 
     def do_find_children_under_mouse(self, x, y):
         cell = self._grid.find_cell_under_mouse(x, y)
@@ -584,10 +394,10 @@ class HVBox (Widget):
         self.repack()
 
     def get_cell_alignment(self):
-        return self._cell_alignment_func
+        return self._cell_alignment
 
     def set_cell_alignment(self, new_alignment):
-        self._cell_alignment_func = drawing.cast_to_alignment(new_alignment)
+        self._cell_alignment = new_alignment
         self.repack()
 
     def get_default_cell_size(self):
@@ -815,222 +625,194 @@ class Deck(Widget):
         return self._states.keys()
 
 
-class Board(widget):
+class Board(Widget):
     pass
 
+
 @autoprop
-class ScrollPane(Bin):
-    custom_initial_view = 'top left'
-    custom_horz_scrolling = False
-    custom_vert_scrolling = False
+class Viewport (Bin):
 
-    class ScrollGroup(pyglet.graphics.Group):
+    class PanningGroup (pyglet.graphics.Group):
 
-        def __init__(self, pane, parent=None):
+        def __init__(self, viewport, parent=None):
             pyglet.graphics.Group.__init__(self, parent)
-            self.pane = pane
+            self.viewport = viewport
 
         def set_state(self):
-            translation = -self.pane.screen_to_child_coords(0, 0)
+            translation = -self.viewport.get_child_coords(0, 0)
             pyglet.gl.glPushMatrix()
             pyglet.gl.glTranslatef(translation.x, translation.y, 0)
 
         def unset_state(self):
             pyglet.gl.glPopMatrix()
 
-
-    def __init__(self):
+    def __init__(self, sensitivity=3):
         super().__init__()
 
-        # The offset_vector is the displacement between the bottom-left corner 
+        # The panning_vector is the displacement between the bottom-left corner 
         # of this widget and the bottom-left corner of the child widget.
-        self._offset_vector = None
 
-        # The initial_view is an alignment string or function that will be used 
-        # to set the initial offset.  It must not change the size of the child.
-        self._initial_view = self.custom_initial_view
+        self._panning_vector = Vector.null()
+        self._deferred_center_of_view = None
+        self.sensitivity = sensitivity
 
-        # The scissor_group manages the clipping mask to make sure the child is 
-        # only visible inside the pane.  The panning_group member is used to 
-        # translate the child in response to scroll events.
-        self._scissor_group = None
-        self._scroll_group = None
+        # The stencil_group, mask_group, and visible_group members manage the 
+        # clipping mask to make sure the child is only visible inside the 
+        # viewport.  The panning_group member is used to translate the child in 
+        # response to panning events.
 
-        # Keep track of the dimensions that are allowed to scroll.
-        self._horz_scrolling = self.custom_horz_scrolling
-        self._vert_scrolling = self.custom_vert_scrolling
+        self.stencil_group = None
+        self.mask_group = None
+        self.visible_group = None
+        self.panning_group = None
+        self.mask_artist = None
 
-    @vecrec.accept_anything_as_vector
-    def jump(self, new_offset):
-        """
-        Offset specified from bottom left corner.
-        """
-        if self._horz_scrolling:
-            self._offset_vector.x = new_offset.x
-        if self._vert_scrolling:
-            self._offset_vector.y = new_offset.y
-        self._keep_offset_in_bounds()
+    def do_attach(self):
+        # If this line raises a pyglet EventException, you're probably trying 
+        # to attach this widget to a GUI that doesn't support mouse pan events.  
+        # See the Viewport documentation for more information.
+        self.root.push_handlers(self.on_mouse_pan)
 
-    @vecrec.accept_anything_as_vector
-    def jump_percent(self, new_percent):
-        """
-        new_percent should be between -1.0 and 1.0.  Values outside this range 
-        are not illegal, but they will be clamped into it.
-        """
-        self.jump(new_percent * (self.child.rect.size - self.rect.size))
-
-    @vecrec.accept_anything_as_vector
-    def scroll(self, delta_offset):
-        if self._horz_scrolling:
-            self._offset_vector.x += delta_offset.x
-        if self._vert_scrolling:
-            self._offset_vector.y += delta_offset.y
-        self._keep_offset_in_bounds()
-
-    @vecrec.accept_anything_as_vector
-    def scroll_percent(self, delta_percent):
-        self.scroll(delta_percent * (self.child.rect.size - self.rect.size))
+    def do_detach(self):
+        self.window.remove_handler(self.on_mouse_pan)
 
     def do_claim(self):
-        # The widget being displayed in the scroll pane can claim however much 
-        # space it wants in the dimension being scrolled.  The scroll pane 
-        # itself doesn't need to claim any space, because it can be as small as 
-        # it needs to be.
-        min_width = 0 if self._horz_scrolling else self.child.claimed_width
-        min_height = 0 if self._vert_scrolling else self.child.claimed_height
-        return min_width, min_height
+        # The widget being displayed in the viewport can claim however much 
+        # space it wants.  The viewport doesn't claim any space, because it can 
+        # be as small as it needs to be.
+        return 0, 0
 
     def do_resize(self):
-        # Update the region that will be clipped by OpenGL, unless the widget 
-        # hasn't been assigned a group yet.
-        if self._scissor_group:
-            self._scissor_group.rect = self.rect
+        # Set the center of view if it was previously specified.  The center of 
+        # view cannot be directly set until the size of the viewport is known, 
+        # but this limitation is hidden from the user by indirectly setting the 
+        # center of view as soon as the viewport has a size.
+        if self._deferred_center_of_view is not None:
+            self.set_center_of_view(self._deferred_center_of_view)
 
     def do_resize_children(self):
         # Make the child whatever size it wants to be.
-        self.child.resize(self.child.claimed_rect)
+        if self.child is not None:
+            self.child.resize(self.child.claimed_rect)
 
-        # If the offset vector hasn't been set yet, set it based on the initial 
-        # view requested by the user.
-        if self._offset_vector is None:
-            self.set_view(self._initial_view)
+    def do_regroup(self):
+        self.stencil_group = drawing.StencilGroup(self.group)
+        self.mask_group = drawing.StencilMask(self.stencil_group)
+        self.visible_group = drawing.WhereStencilIs(self.stencil_group)
+        self.panning_group = Viewport.PanningGroup(self, self.visible_group)
+
+        if self.mask_artist is not None:
+            self.mask_artist.group = self.mask_group
 
     def do_regroup_children(self):
-        self._scissor_group = drawing.ScissorGroup(self.rect, self.group)
-        self._scroll_group = self.ScrollGroup(self, self._scissor_group)
-        self.child.regroup(self._scroll_group)
+        self.child.regroup(self.panning_group)
+
+    def do_draw(self):
+        if self.mask_artist is None:
+            self.mask_artist = drawing.Rectangle(
+                    self.rect,
+                    batch=self.batch,
+                    group=self.mask_group)
+
+        self.mask_artist.rect = self.rect
+
+    def do_undraw(self):
+        if self.mask_artist is not None:
+            self.mask_artist.delete()
 
     def on_mouse_press(self, x, y, button, modifiers):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_press(x, y, button, modifiers)
 
     def on_mouse_release(self, x, y, button, modifiers):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_release(x, y, button, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_motion(x, y, dx, dy)
 
     def on_mouse_enter(self, x, y):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_enter(x, y)
 
     def on_mouse_leave(self, x, y):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_leave(x, y)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_drag(x, y, dx, dy, buttons, modifiers)
 
     def on_mouse_drag_enter(self, x, y):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_drag_enter(x, y)
 
     def on_mouse_drag_leave(self, x, y):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_drag_leave(x, y)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        x, y = self.screen_to_child_coords(x, y)
+        x, y = self.get_child_coords(x, y)
         super().on_mouse_scroll(x, y, scroll_x, scroll_y)
 
-    def get_view(self):
-        if not self.rect:
-            return None
-        return Rect.from_bottom_left(
-                self._offset_vector, self.rect.width, self.rect.height)
-
-    def set_view(self, new_alignment):
-        # In order to set the center of view, the sizes of the scroll pane 
-        # widget and its child are needed.  Unfortunately this information is 
-        # not available until the scroll pane has been attached to a root 
-        # widget and given a child.  To allow this method to be called at any 
-        # time, the _initial_view member is used in conjunction with 
-        # do_resize_children() to cache and apply the desired center of view.
-        if not self.rect or not self.child or not self.child.rect:
-            self._initial_view = new_alignment
-            return
-
-        new_view = Rect.from_size(*self.rect.size)
-        alignment_func = drawing.cast_to_alignment(new_alignment)
-        alignment_func(new_view, self.child.rect)
-
-        if new_view.size != self.rect.size:
-            raise UsageError(f"""\
-the alignment function used to set the view in a {self.__class__.__name__} must not change the shape of its first argument.
-
-The given function '{new_alignment}' changed its first argument from {'x'.join(self.rect.size)} to {'x'.join(new_view.size)}.  A common way to get this error is to use one of the 'fill' alignments.  Instead, limit yourself to 'top left', 'bottom right', etc.""")
-
-        self._offset_vector = new_view.bottom_left - self.child.rect.bottom_left
-        self._keep_offset_in_bounds()
-
-    def get_horz_scrolling(self):
-        return self._horz_scrolling
-
-    def set_horz_scrolling(self, new_setting):
-        self._horz_scrolling = new_setting
-        self.repack()
-
-    def get_vert_scrolling(self):
-        return self._vert_scrolling
-
-    def set_vert_scrolling(self, new_setting):
-        self._vert_scrolling = new_setting
-        self.repack()
+    def on_mouse_pan(self, direction, dt):
+        self.panning_vector += direction * self.sensitivity * dt
 
     @vecrec.accept_anything_as_vector
-    def screen_to_child_coords(self, screen_coords):
-        pane_origin = self.rect.bottom_left
-        pane_coords = screen_coords - pane_origin
+    def get_child_coords(self, screen_coords):
+        viewport_origin = self.rect.bottom_left
+        viewport_coords = screen_coords - viewport_origin
         child_origin = self.child.rect.bottom_left
-        child_coords = child_origin + self._offset_vector + pane_coords
+        child_coords = child_origin + self.panning_vector + viewport_coords
         return child_coords
 
     @vecrec.accept_anything_as_vector
-    def child_to_screen_coords(self, child_coords):
+    def get_screen_coords(self, child_coords):
         child_origin = self.child.rect.bottom_left
-        pane_origin = self.rect.bottom_left
-        pane_coords = child_coords - child_origin - self._offset_vector
-        screen_coords = pane_coords + pane_origin
+        viewport_origin = self.rect.bottom_left
+        viewport_coords = child_coords - child_origin - self.panning_vector
+        screen_coords = view_port_coords + viewport_origin
         return screen_coords
 
-    def _keep_offset_in_bounds(self):
-        self._offset_vector.x = clamp(
-                self._offset_vector.x,
-                0, 
-                self.child.rect.width - self.rect.width,
-        )
-        self._offset_vector.y = clamp(
-                self._offset_vector.y,
-                0,
-                self.child.rect.height - self.rect.height,
-        )
+    def get_visible_area(self):
+        left, bottom = self.get_child_coords(self.rect.left, self.rect.bottom)
+        return Rect.from_dimensions(
+                left, bottom, self.rect.width, self.rect.height)
+
+    def get_panning_vector(self):
+        return self._panning_vector
+
+    def set_panning_vector(self, vector):
+        self._panning_vector = vector
+
+        if self._panning_vector.x < self.child.rect.left:
+            self._panning_vector.x = self.child.rect.left
+
+        if self._panning_vector.x > self.child.rect.right - self.rect.width:
+            self._panning_vector.x = self.child.rect.right - self.rect.width
+
+        if self._panning_vector.y < self.child.rect.bottom:
+            self._panning_vector.y = self.child.rect.bottom
+
+        if self._panning_vector.y > self.child.rect.top - self.rect.height:
+            self._panning_vector.y = self.child.rect.top - self.rect.height
+
+    @vecrec.accept_anything_as_vector
+    def set_center_of_view(self, child_coords):
+        # In order to set the center of view, the size of the viewport widget 
+        # is needed.  Unfortunately this information is not available until the 
+        # viewport has been attached to a root widget.  To allow this method to 
+        # be called at any time, the _deferred_center_of_view member is used in 
+        # conjunction with do_resize() to cache the desired center of view.
+
+        if self.rect is None:
+            self._deferred_center_of_view = child_coords
+        else:
+            viewport_center = self.rect.center - self.rect.bottom_left
+            self.panning_vector = child_coords - viewport_center
+            self._deferred_center_of_view = None
 
 
-class ScrollBar(Widget):
-    pass
+Viewport.register_event_type('on_mouse_pan')
 
-class ScrollBox(Widget):
-    pass

@@ -9,17 +9,16 @@ batch = pyglet.graphics.Batch()
 
 root = glooey.Gui(window, batch=batch)
 widget = glooey.PlaceHolder(200, 200)
-root.add(widget)
 
-def left_half(rect, boundry): #
-    rect.width = boundry.width / 2
-    rect.height = boundry.height
-    rect.top_left = boundry.top_left
+def left_half(rect, boundary): #
+    rect.width = boundary.width / 2
+    rect.height = boundary.height
+    rect.top_left = boundary.top_left
 
-def top_left_quarter(rect, boundry): #
-    rect.width = boundry.width / 2
-    rect.height = boundry.height / 2
-    rect.top_left = boundry.top_left
+def right_half(rect, boundary): #
+    rect.width = boundary.width / 2
+    rect.height = boundary.height
+    rect.top_right = boundary.top_right
 
 alignments = [ #
         'fill', 'fill horz', 'fill vert',
@@ -27,13 +26,22 @@ alignments = [ #
         'top left', 'top', 'top right', 
         'left', 'center', 'right',
         'bottom left', 'bottom', 'bottom right',
-        left_half, top_left_quarter,
+        left_half, right_half,
 ]
 @demo_helpers.interactive_tests(window, batch) #
 def interactive_padding_tests():
+    root.add(widget)
     for test in alignments:
         widget.alignment = test
         yield f"alignment = '{test}'"
+
+    for test in alignments:
+        custom_widget_cls = type('TestWidget', (glooey.PlaceHolder,), {
+            'custom_alignment':
+                test if isinstance(test, str) else staticmethod(test),
+        })
+        root.add(custom_widget_cls(200, 200))
+        yield f"custom_alignment = '{test}'"
 
 
 pyglet.app.run()
