@@ -5,6 +5,7 @@ __version__ = '0.1.0'
 from .widget import *
 from .root import *
 from .containers import *
+from .scrolling import *
 from .miscellaneous import *
 from . import drawing
 from . import themes

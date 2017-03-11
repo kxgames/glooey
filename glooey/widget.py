@@ -844,7 +844,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         """
         if self.is_attached_to_gui:
             self.repack()
-            self.do_regroup_children()
+            if self._num_children > 0:
+                self.do_regroup_children()
 
     def _yield_self_and_all_children(self):
         yield self
