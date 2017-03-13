@@ -15,9 +15,9 @@ import demo_helpers
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 deck = glooey.Deck('a')
-root.add(deck)
+gui.add(deck)
 
 @demo_helpers.interactive_tests(window, batch) #
 def test_deck():

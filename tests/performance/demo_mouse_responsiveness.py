@@ -66,13 +66,13 @@ class TestButton(glooey.Clickable):
 
 
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 grid = glooey.Grid()
 
 for i in range(window.height//4):
     for j in range(window.width//4):
         grid.add(i, j, TestButton())
 
-root.add(grid)
+gui.add(grid)
 pyglet.app.run()
 

@@ -7,9 +7,9 @@ import demo_helpers
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 widget = glooey.PlaceHolder()
-root.add(widget)
+gui.add(widget)
 
 @demo_helpers.interactive_tests(window, batch) #
 def interactive_padding_tests():

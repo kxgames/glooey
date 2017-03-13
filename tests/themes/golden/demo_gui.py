@@ -4,7 +4,7 @@ import pyglet
 import glooey.themes.golden as golden
 
 window = pyglet.window.Window()
-root = golden.Gui(window)
+gui = golden.Gui(window)
 
 pyglet.app.run()
 

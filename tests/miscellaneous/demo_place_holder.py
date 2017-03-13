@@ -6,10 +6,10 @@ import glooey
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = glooey.Gui(window, batch=batch)
-root.padding = 50
+gui = glooey.Gui(window, batch=batch)
+gui.padding = 50
 widget = glooey.PlaceHolder()
-root.add(widget)
+gui.add(widget)
 
 pyglet.app.run()
 

@@ -7,7 +7,7 @@ import demo_helpers
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 grid = glooey.Grid()
 widgets = { #
         (0,0): glooey.EventLogger(50, 50),
@@ -15,7 +15,7 @@ widgets = { #
         (1,0): glooey.EventLogger(50, 50),
         (1,1): glooey.EventLogger(50, 50),
 }
-root.add(grid)
+gui.add(grid)
 
 @demo_helpers.interactive_tests(window, batch) #
 def interactive_grid_tests():

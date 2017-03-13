@@ -6,7 +6,7 @@ import glooey
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 hbox = glooey.HBox()
 hbox.alignment = 'center'
 hbox.cell_alignment = 'center'
@@ -33,7 +33,7 @@ for i in range(3):
     button.push_handlers(on_toggle=on_toggle)
     hbox.add(button)
 
-root.add(hbox)
+gui.add(hbox)
 
 pyglet.app.run()
 

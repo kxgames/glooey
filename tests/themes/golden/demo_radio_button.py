@@ -4,9 +4,9 @@ import pyglet
 import glooey.themes.golden as golden
 
 window = pyglet.window.Window()
-root = golden.Gui(window)
+gui = golden.Gui(window)
 radio = golden.RadioButton()
-root.add(radio)
+gui.add(radio)
 
 pyglet.app.run()
 

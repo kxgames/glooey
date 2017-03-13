@@ -4,7 +4,7 @@ import pyglet
 import glooey.themes.golden as golden
 
 window = pyglet.window.Window()
-root = golden.Gui(window)
+gui = golden.Gui(window)
 frame = golden.SmallFrame()
 vbox = golden.VBox(0)
 hrule = golden.HRule()
@@ -17,7 +17,7 @@ vbox.add(labels[0])
 vbox.add(hrule)
 vbox.add(labels[1])
 frame.add(vbox)
-root.add(frame)
+gui.add(frame)
 
 pyglet.app.run()
 

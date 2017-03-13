@@ -8,11 +8,11 @@ colors = 'red', 'green', 'blue', 'grey'
 icons = None, 'save', 'chat', 'zoom', 'yes', 'no', 'plus', 'minus', 'up', 'right', 'down', 'left'
 
 window = pyglet.window.Window()
-root = golden.Gui(window)
+gui = golden.Gui(window)
 button = golden.RoundButton()
-root.add(button)
+gui.add(button)
 
-@demo_helpers.interactive_tests(window, root.batch) #
+@demo_helpers.interactive_tests(window, gui.batch) #
 def test_round_button():
     for color in colors:
         button.color = color

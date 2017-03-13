@@ -7,12 +7,12 @@ import demo_helpers
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 bin = glooey.Bin()
 widget = glooey.PlaceHolder(100, 100)
 
 bin.add(widget)
-root.add(bin)
+gui.add(bin)
 
 @demo_helpers.interactive_tests(window, batch) 
 def interactive_bin_tests():

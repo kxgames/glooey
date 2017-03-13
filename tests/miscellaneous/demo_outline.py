@@ -7,12 +7,12 @@ import demo_helpers
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 outline = glooey.Outline(color='orange')
 widget = glooey.PlaceHolder(50, 50, color='green')
 
 outline.add(widget)
-root.add(outline)
+gui.add(outline)
 
 @demo_helpers.interactive_tests(window, batch) #
 def test_image():

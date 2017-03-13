@@ -9,9 +9,9 @@ from pprint import pprint
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = Gui(window, batch=batch)
+gui = Gui(window, batch=batch)
 hbox = HBox()
-root.add(hbox)
+gui.add(hbox)
 
 @demo_helpers.interactive_tests(window, batch) #
 def interactive_hbox_tests():

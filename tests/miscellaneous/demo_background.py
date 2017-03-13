@@ -18,9 +18,9 @@ class TestBackground(glooey.Background): #
     custom_bottom_left = pyglet.image.load('assets/4x4/purple.png')
     custom_bottom_right = pyglet.image.load('assets/4x4/purple.png')
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 bg = TestBackground()
-root.add(bg)
+gui.add(bg)
 
 @demo_helpers.interactive_tests(window, batch) #
 def test_background():

@@ -22,9 +22,9 @@ class TestFillBar(glooey.FillBar):
 
 
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 bar = TestFillBar()
-root.add(bar)
+gui.add(bar)
 
 @demo_helpers.interactive_tests(window, batch) #
 def test_image():
@@ -52,7 +52,7 @@ def test_image():
 
     # Reset the test.
     bar = TestFillBar()
-    root.add(bar)
+    gui.add(bar)
 
 
 pyglet.app.run()

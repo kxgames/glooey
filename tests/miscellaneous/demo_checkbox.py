@@ -18,9 +18,9 @@ class TestCheckbox(glooey.Checkbox): #
     custom_unchecked_down = pyglet.image.load('assets/misc/unchecked_down.png')
     custom_unchecked_off = pyglet.image.load('assets/misc/unchecked_off.png')
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 button = TestCheckbox()
-root.add(button)
+gui.add(button)
 
 @button.event #
 def on_toggle(widget):

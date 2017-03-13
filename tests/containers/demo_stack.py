@@ -7,9 +7,9 @@ import demo_helpers
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 stack = glooey.Stack()
-root.add(stack)
+gui.add(stack)
 
 @demo_helpers.interactive_tests(window, batch) #
 def test_stack():

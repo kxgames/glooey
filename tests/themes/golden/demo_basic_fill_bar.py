@@ -5,12 +5,12 @@ import glooey.themes.golden as golden
 import demo_helpers
 
 window = pyglet.window.Window()
-root = golden.Gui(window)
+gui = golden.Gui(window)
 bar = golden.BasicFillBar()
 bar.alignment = 'center'
-root.add(bar)
+gui.add(bar)
 
-@demo_helpers.interactive_tests(window, root.batch) #
+@demo_helpers.interactive_tests(window, gui.batch) #
 def test_basic_fill_bar():
     colors = 'red', 'yellow', 'lime', 'green', 'teal', 'blue'
     fractions = [i/5 for i in range(6)]

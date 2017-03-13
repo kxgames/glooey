@@ -19,11 +19,11 @@ class TestFrame(glooey.Frame): #
 class TestBackground(glooey.Background): #
     custom_center = pyglet.image.load('assets/64x64/orange.png')
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 frame = TestFrame()
 widget = TestBackground()
 frame.add(widget)
-root.add(frame)
+gui.add(frame)
 
 @demo_helpers.interactive_tests(window, batch) #
 def test_image():

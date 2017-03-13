@@ -8,7 +8,6 @@ window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
 class TestButton(glooey.Button): #
-    custom_alignment = 'center'
 
     class Label(glooey.Label):
         custom_color = '#deeed6'
@@ -28,9 +27,9 @@ class TestButton(glooey.Button): #
     class Off(glooey.Background):
         custom_center = pyglet.image.load('assets/64x64/grey.png')
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 button = TestButton('Hello world!')
-root.add(button)
+gui.add(button)
 
 @button.event #
 def on_click(widget):

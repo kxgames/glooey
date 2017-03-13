@@ -7,7 +7,7 @@ import demo_helpers
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-root = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window, batch=batch)
 widget = glooey.PlaceHolder(200, 200)
 
 def left_half(rect, boundary): #
@@ -30,7 +30,7 @@ alignments = [ #
 ]
 @demo_helpers.interactive_tests(window, batch) #
 def interactive_padding_tests():
-    root.add(widget)
+    gui.add(widget)
     for test in alignments:
         widget.alignment = test
         yield f"alignment = '{test}'"
@@ -40,7 +40,7 @@ def interactive_padding_tests():
             'custom_alignment':
                 test if isinstance(test, str) else staticmethod(test),
         })
-        root.add(custom_widget_cls(200, 200))
+        gui.add(custom_widget_cls(200, 200))
         yield f"custom_alignment = '{test}'"
 
 

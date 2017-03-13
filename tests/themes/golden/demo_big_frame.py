@@ -5,11 +5,11 @@ import demo_helpers
 import glooey.themes.golden as golden
 
 window = pyglet.window.Window()
-root = golden.Gui(window)
+gui = golden.Gui(window)
 frame = golden.BigFrame()
-root.add(frame)
+gui.add(frame)
 
-@demo_helpers.interactive_tests(window, root.batch)
+@demo_helpers.interactive_tests(window, gui.batch)
 def test_big_frame():
     frame.clear()
     yield "Empty frame."
