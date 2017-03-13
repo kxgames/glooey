@@ -1097,11 +1097,24 @@ class Grid:
         return self._cell_rects
 
     def find_cell_under_mouse(self, x, y):
+        # The >=/<= comparisons in this method were chosen to be compatible 
+        # with the comparisons in Widget.is_under_mouse().  That method counts 
+        # points that are on any edge of a widget as being over that widget.  
+        # The >=/<= comparisons do the same thing here.
+        #
+        # I initially wrote this method using an inclusive operator on one side 
+        # and an exclusive one on the other, to avoid any ambiguity in the case 
+        # where there's no padding.  For example, imagine a 2x2 grid with no 
+        # padding.  In theory, the point exactly in the middle is over all four 
+        # cells.  In practice, the algorithm will identify the top-left-most 
+        # cell first and return it.  So the algorithm isn't really ambiguous, 
+        # but it is more dependent on what's really an implementation detail.
+
         # Find the row the mouse is over.
         for i in range(self._num_rows):
             row_top = self._row_tops[i]
             row_bottom = row_top - self._row_heights[i]
-            if row_top > y >= row_bottom:
+            if row_top >= y >= row_bottom:
                 break
         else:
             return None
@@ -1110,7 +1123,7 @@ class Grid:
         for j in range(self._num_cols):
             col_left = self._col_lefts[j]
             col_right = col_left + self._col_widths[j]
-            if col_left <= x < col_right:
+            if col_left <= x <= col_right:
                 break
         else:
             return None

@@ -447,27 +447,27 @@ def test_find_cell_under_mouse():
 
             (1, 0): None,
             (1, 1): (1, 0),
-            (1, 2): None,
+            (1, 2): (1, 0),
             (1, 3): (0, 0),
-            (1, 4): None,
+            (1, 4): (0, 0),
 
             (2, 0): None,
-            (2, 1): None,
-            (2, 2): None,
-            (2, 3): None,
-            (2, 4): None,
+            (2, 1): (1, 0),
+            (2, 2): (1, 0),
+            (2, 3): (0, 0),
+            (2, 4): (0, 0),
 
             (3, 0): None,
             (3, 1): (1, 1),
-            (3, 2): None,
+            (3, 2): (1, 1),
             (3, 3): (0, 1),
-            (3, 4): None,
+            (3, 4): (0, 1),
 
             (4, 0): None,
-            (4, 1): None,
-            (4, 2): None,
-            (4, 3): None,
-            (4, 4): None,
+            (4, 1): (1, 1),
+            (4, 2): (1, 1),
+            (4, 3): (0, 1),
+            (4, 4): (0, 1),
     }
     for mouse, cell in expected_results.items():
         assert grid.find_cell_under_mouse(*mouse) == cell
