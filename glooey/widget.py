@@ -91,6 +91,17 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
     def __iter__(self):
         yield from self.__children
 
+    def __bool__(self):
+        """
+        Always consider widgets to be "true".
+
+        This behavior is meant to facilitate comparisons against None.  This 
+        method has to be explicitly implemented because otherwise python would 
+        fallback on __len__(), which confusingly depends on whether or not the 
+        widget has children.
+        """
+        return True
+
     def __len__(self):
         return len(self.__children)
 
