@@ -65,7 +65,6 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
         self._is_hidden = False
         self._is_claim_stale = True
-        self._spurious_leave_event = False
 
         # Take care to avoid calling any potentially polymorphic methods, such 
         # as set_padding() or repack().  When these methods are overridden, 
@@ -433,80 +432,54 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
             child.dispatch_event('on_mouse_release', x, y, button, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        under_mouse, previously_under_mouse = \
-                self._find_children_under_mouse(x, y)
+        children_under_mouse = self._find_children_under_mouse(x, y)
 
-        for child in previously_under_mouse:
-            if child not in under_mouse:
-                child.dispatch_event('on_mouse_leave', x, y)
+        for child in children_under_mouse.exited:
+            child.dispatch_event('on_mouse_leave', x, y)
 
-        for child in under_mouse:
-            if child not in previously_under_mouse:
-                child.dispatch_event('on_mouse_enter', x, y)
+        for child in children_under_mouse.entered:
+            child.dispatch_event('on_mouse_enter', x, y)
 
+        for child in children_under_mouse.current:
             child.dispatch_event('on_mouse_motion', x, y, dx, dy)
 
     def on_mouse_enter(self, x, y):
-        # For some reason, whenever the mouse is clicked, pyglet generates a 
-        # on_mouse_leave event followed by a on_mouse_enter event.  There's no 
-        # way to tell whether or not that happened in this handler alone, so we 
-        # check a flag that would be set in on_mouse_leave() if a spurious 
-        # event was detected.  If the event is spurious, reset the flag, ignore 
-        # the event, and stop it from propagating.
-        if self._spurious_leave_event:
-            self._spurious_leave_event = False
-            return True
+        children_under_mouse = self._find_children_under_mouse(x, y)
+        assert not children_under_mouse.previous
 
-        under_mouse, previously_under_mouse = \
-                self._find_children_under_mouse(x, y)
-        assert not previously_under_mouse
-
-        for child in under_mouse:
+        for child in children_under_mouse.entered:
             child.dispatch_event('on_mouse_enter', x, y)
 
     def on_mouse_leave(self, x, y):
-        # For some reason, whenever the mouse is clicked, pyglet generates a 
-        # on_mouse_leave event followed by a on_mouse_enter event.  We can tell 
-        # that this is happening in this handler because the mouse coordinates 
-        # will still be under the widget.  In this case, set a flag so 
-        # on_mouse_enter() will know to ignore the spurious event to follow, 
-        # ignore the event, and stop it from propagating.
-        if self.is_under_mouse(x, y):
-            self._spurious_leave_event = True
-            return True
-
         for child in self._children_under_mouse:
             child.dispatch_event('on_mouse_leave', x, y)
 
         self._children_under_mouse = set()
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        under_mouse, previously_under_mouse = \
-                self._find_children_under_mouse(x, y)
+        children_under_mouse = self._find_children_under_mouse(x, y)
 
-        for child in previously_under_mouse:
-            if child not in under_mouse:
-                child.dispatch_event('on_mouse_drag_leave', x, y)
+        for child in children_under_mouse.exited:
+            child.dispatch_event('on_mouse_drag_leave', x, y)
 
-        for child in under_mouse:
-            if child not in previously_under_mouse:
-                child.dispatch_event('on_mouse_drag_enter', x, y)
+        for child in children_under_mouse.entered:
+            child.dispatch_event('on_mouse_drag_enter', x, y)
 
-            child.dispatch_event(
-                    'on_mouse_drag', x, y, dx, dy, buttons, modifiers)
+        for child in children_under_mouse.current:
+            child.dispatch_event('on_mouse_drag', x, y, dx, dy, buttons, modifiers)
 
     def on_mouse_drag_enter(self, x, y):
-        under_mouse, previously_under_mouse = \
-                self._find_children_under_mouse(x, y)
+        children_under_mouse = self._find_children_under_mouse(x, y)
 
-        assert not previously_under_mouse
+        assert not children_under_mouse.previous
 
-        for child in under_mouse:
+        for child in children_under_mouse.entered:
             child.dispatch_event('on_mouse_drag_enter', x, y)
 
     def on_mouse_drag_leave(self, x, y):
         for child in self._children_under_mouse:
             child.dispatch_event('on_mouse_drag_leave', x, y)
+
         self._children_under_mouse = set()
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
@@ -853,16 +826,18 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
             yield from child._yield_self_and_all_children()
 
     def _find_children_under_mouse(self, x, y):
-        # This method returns a set, but maybe it should return a list?  
-        # z-order is important, but maybe that's something for the specific 
-        # parent classes to worry about?
-
         previously_under_mouse = self._children_under_mouse
-        self._children_under_mouse = {
-                w for w in self.do_find_children_under_mouse(x, y)
-                if w.is_visible}
 
-        return self._children_under_mouse, previously_under_mouse
+        if self._mouse_grabber is not None:
+            self._children_under_mouse = {self._mouse_grabber}
+        else:
+            self._children_under_mouse = {
+                    w for w in self.do_find_children_under_mouse(x, y)
+                    if w.is_visible
+            }
+
+        return Widget._ChildrenUnderMouse(
+                previously_under_mouse, self._children_under_mouse)
 
     def _get_num_children(self):
         return len(self.__children)
@@ -881,6 +856,33 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         self._right_padding = first_not_none((right, horz, all, 0))
         self._top_padding = first_not_none((top, vert, all, 0))
         self._bottom_padding = first_not_none((bottom, vert, all, 0))
+
+
+    class _ChildrenUnderMouse:
+
+        def __init__(self, previous, current):
+            self._previous = previous
+            self._current = current
+
+        @property
+        def previous(self):
+            return self._previous
+
+        @property
+        def current(self):
+            return self._current
+
+        @property
+        def entered(self):
+            return self.current - self.previous
+
+        @property
+        def unchanged(self):
+            return self.current & self.previous
+
+        @property
+        def exited(self):
+            return self.previous - self.current
 
 
 Widget.register_event_type('on_add_child')

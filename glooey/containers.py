@@ -138,12 +138,9 @@ class Grid (Widget):
         cell = self._grid.find_cell_under_mouse(x, y)
         child = self._children.get(cell)
 
-        if cell is None:
-            return
-        if child is None:
-            return
-        if not child.is_under_mouse(x, y):
-            return
+        if cell is None: return
+        if child is None: return
+        if not child.is_under_mouse(x, y): return
 
         yield child
 
@@ -349,14 +346,11 @@ class HVBox (Widget):
 
     def do_find_children_under_mouse(self, x, y):
         cell = self._grid.find_cell_under_mouse(x, y)
-        if cell is None:
-            return
+        if cell is None: return
 
         child = self._children[self.do_get_index(*cell)]
-        if child is None:
-            return
-        if not child.is_under_mouse(x, y):
-            return
+        if child is None: return
+        if not child.is_under_mouse(x, y): return
 
         yield child
 

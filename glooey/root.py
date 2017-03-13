@@ -16,6 +16,7 @@ class Root (Bin):
         self._window = window
         self._batch = batch or pyglet.graphics.Batch()
         self._group = group or pyglet.graphics.OrderedGroup(0)
+        self._spurious_leave_event = False
 
         window.push_handlers(self)
 
@@ -40,6 +41,35 @@ class Root (Bin):
 
     def regroup(self, group):
         super().regroup(group or pyglet.graphics.Group())
+
+    
+    def on_mouse_enter(self, x, y):
+        # For some reason, whenever the mouse is clicked, X11 generates a 
+        # on_mouse_leave event followed by a on_mouse_enter event.  There's no 
+        # way to tell whether or not that happened in this handler alone, so we 
+        # check a flag that would be set in on_mouse_leave() if a spurious 
+        # event was detected.  If the event is spurious, reset the flag, ignore 
+        # the event, and stop it from propagating.
+
+        if self._spurious_leave_event:
+            self._spurious_leave_event = False
+            return True
+        else:
+            super().on_mouse_enter(x, y)
+
+    def on_mouse_leave(self, x, y):
+        # For some reason, whenever the mouse is clicked, X11 generates a 
+        # on_mouse_leave event followed by a on_mouse_enter event.  We can tell 
+        # that this is happening in this handler because the mouse coordinates 
+        # will still be under the widget.  In this case, set a flag so 
+        # on_mouse_enter() will know to ignore the spurious event to follow, 
+        # ignore the event, and stop it from propagating.
+
+        if self.is_under_mouse(x, y):
+            self._spurious_leave_event = True
+            return True
+        else:
+            super().on_mouse_leave(x, y)
 
     def get_root(self):
         return self
