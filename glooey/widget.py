@@ -31,8 +31,10 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         # Use a double-underscore to avoid name conflicts; `_children` is a 
         # useful name for subclasses, so I don't want it to cause conflicts.
         self.__children = set()
+
         self._children_under_mouse = set()
         self._children_can_overlap = True
+        self._mouse_grabber = None
 
         # The amount of space requested by the user for this widget.
         self._width_hint = first_not_none((
@@ -233,6 +235,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     def hide(self):
         if self.is_visible:
+            self.ungrab_mouse()
             self.undraw_all()
         self._is_hidden = True
 
@@ -277,6 +280,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     def undraw_all(self):
         self.undraw()
+
         for child in self.__children:
             child.undraw_all()
 
@@ -411,28 +415,10 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         """
         Yield all the children under the given mouse coordinate.
 
-        It's ok to return children that are hidden; these will be filtered out 
-        later.
+        The order in which the children are yielded is arbitrary.  It's ok to 
+        return children that are hidden; they will be filtered out later.  
         """
-
-        visible_children = {x for x in self.__children if x.is_visible}
-
-        def yield_previous_children_then_others():
-            yield from visible_children & self._children_under_mouse
-            yield from visible_children - self._children_under_mouse
-
-        for child in yield_previous_children_then_others():
-            if child.is_under_mouse(x, y):
-                yield child
-
-                # If a widget can guarantee that none of its children overlap, 
-                # it can speed up this method by aborting the search as soon as 
-                # the first widget under the mouse is found.  Since the widgets 
-                # that were previously under the mouse are checked first, this 
-                # makes the search constant-time in most cases.
-
-                if not self._children_can_overlap:
-                    break
+        yield from (w for w in self.__children if w.is_under_mouse(x, y))
 
     def on_mouse_press(self, x, y, button, modifiers):
         for child in self._children_under_mouse:
@@ -456,16 +442,18 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
     def on_mouse_enter(self, x, y):
         children_under_mouse = self._find_children_under_mouse(x, y)
-        assert not children_under_mouse.previous
 
         for child in children_under_mouse.entered:
             child.dispatch_event('on_mouse_enter', x, y)
 
     def on_mouse_leave(self, x, y):
-        for child in self._children_under_mouse:
-            child.dispatch_event('on_mouse_leave', x, y)
+        # We have to actually check which widgets are still "under the mouse" 
+        # to correctly handle widgets that are grabbing the mouse when the 
+        # mouse leaves the window.
+        children_under_mouse = self._find_children_under_mouse(x, y)
 
-        self._children_under_mouse = set()
+        for child in children_under_mouse.exited:
+            child.dispatch_event('on_mouse_leave', x, y)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         children_under_mouse = self._find_children_under_mouse(x, y)
@@ -482,20 +470,40 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
     def on_mouse_drag_enter(self, x, y):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        assert not children_under_mouse.previous
-
         for child in children_under_mouse.entered:
             child.dispatch_event('on_mouse_drag_enter', x, y)
 
     def on_mouse_drag_leave(self, x, y):
-        for child in self._children_under_mouse:
-            child.dispatch_event('on_mouse_drag_leave', x, y)
+        # We have to actually check which widgets are still "under the mouse" 
+        # to correctly handle widgets that are grabbing the mouse when the 
+        # mouse leaves the window.
+        children_under_mouse = self._find_children_under_mouse(x, y)
 
-        self._children_under_mouse = set()
+        for child in children_under_mouse.exited:
+            child.dispatch_event('on_mouse_drag_leave', x, y)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         for child in self._children_under_mouse:
             child.dispatch_event('on_mouse_scroll', x, y, scroll_x, scroll_y)
+
+    def grab_mouse(self):
+        if self.parent is self:
+            return
+
+        if self.parent._mouse_grabber is not None:
+            grabber = self.root._find_mouse_grabber()
+            raise UsageError(f"{grabber} is already grabbing the mouse, {self} can't grab it.")
+
+        self.parent._mouse_grabber = self
+        self.parent.grab_mouse()
+
+    def ungrab_mouse(self):
+        if self.parent is None: return
+        if self.parent is self: return
+
+        if self.parent._mouse_grabber is self:
+            self.parent._mouse_grabber = None
+            self.parent.ungrab_mouse()
 
     def get_parent(self):
         return self._parent
@@ -672,7 +680,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
                 diagnoses.append("{self} was not given a size by its parent.\nCheck for bugs in {self.parent.__class__.__name__}.do_resize_children()")
 
             elif self.rect.area == 0:
-                diagnoses.append("{self} reqested (and was given) no space.\nCheck for bugs in {self.__class__.__name__}.do_claim()")
+                diagnoses.append("{self} requested (and was given) no space.\nCheck for bugs in {self.__class__.__name__}.do_claim()")
 
             if self.group is None:
                 diagnoses.append("{self} was not given a group by its parent.\nCheck for bugs in {self.parent.__class__.__name__}.do_regroup_children()")
@@ -783,6 +791,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         for widget in child._yield_self_and_all_children():
             widget.do_detach()
 
+        child.ungrab_mouse()
         child.undraw_all()
         self.__children.discard(child)
         child._parent = None
@@ -849,6 +858,25 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
         return Widget._ChildrenUnderMouse(
                 previously_under_mouse, self._children_under_mouse)
+
+    def _find_mouse_grabber(self):
+        """
+        Return the widget grabbing the mouse from this widget, or None if the 
+        mouse isn't being grabbed.  
+        
+        Note that unless this method is being called on the root widget, some 
+        widget elsewhere in the hierarchy may still be grabbing the mouse even 
+        if this returns None.
+        """
+
+        if self._mouse_grabber is None:
+            return None
+
+        def recursive_find(parent):
+            grabber = parent._mouse_grabber
+            return parent if grabber is None else recursive_find(grabber)
+
+        return recursive_find(self)
 
     def _get_num_children(self):
         return len(self.__children)
