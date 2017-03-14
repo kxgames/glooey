@@ -69,20 +69,22 @@ class Bin (Widget):
 
 @autoprop
 class Grid (Widget):
+    custom_num_rows = 0
+    custom_num_cols = 0
     custom_cell_padding = None
     custom_cell_alignment = 'fill'
     custom_default_row_height = 'expand'
     custom_default_col_width = 'expand'
 
-    def __init__(self, rows=0, cols=0, default_row_height=None, 
+    def __init__(self, num_rows=None, num_cols=None, default_row_height=None, 
             default_col_width=None):
 
         super().__init__()
         self._children = {}
         self._children_can_overlap = False
         self._grid = drawing.Grid(
-                num_rows=rows,
-                num_cols=cols,
+                num_rows=num_rows or self.custom_num_rows,
+                num_cols=num_cols or self.custom_num_cols,
         )
         self.cell_padding = first_not_none((
                 self.custom_cell_padding, self.custom_padding, 0))

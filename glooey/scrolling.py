@@ -5,22 +5,12 @@ import vecrec
 import autoprop
 
 from vecrec import Vector, Rect
+from debugtools import p, pp, pv
 from .widget import Widget
-from .containers import Bin
-from .miscellaneous import Button
+from .containers import Bin, HVBox, HBox, VBox
+from .miscellaneous import Frame, Button
 from .helpers import *
 from . import drawing
-
-def accept_alignment_or_vector(method):
-    import functools
-    @functools.wraps(method) #
-    def decorator(self, x, y=None):
-        position = x if y is None else (x,y)
-        try: position = vecrec.cast_anything_to_vector(position)
-        except vecrec.VectorCastError: pass
-        return method(self, position)
-    return decorator
-
 
 @autoprop
 class Mover(Bin):
@@ -49,16 +39,19 @@ class Mover(Bin):
 
     @vecrec.accept_anything_as_vector
     def pan(self, step):
-        self.translation += step
+        self.jump(self.position + step)
 
     @vecrec.accept_anything_as_vector
     def pan_percent(self, step_percent):
-        self._require_mover_and_child_rects()
-        self.pan(step_percent * (self.rect.size - self.child.claimed_rect.size))
+        self._require_rects()
+        self.pan(step_percent * self.unoccupied_size)
 
     @vecrec.accept_anything_as_vector
     def jump(self, new_position):
-        self.translation = new_position
+        self._require_rects()
+        self._child_position = new_position
+        self._keep_child_in_rect()
+        self.dispatch_event('on_translate', self)
 
     @vecrec.accept_anything_as_vector
     def jump_percent(self, new_percent):
@@ -66,9 +59,8 @@ class Mover(Bin):
         new_percent should be between -1.0 and 1.0.  Values outside this range 
         are not illegal, but they will be clamped into it.
         """
-        self._require_mover_and_child_rects()
-        self.translation = new_percent * (
-                self.rect.size - self.child.claimed_rect.size)
+        self._require_rects()
+        self.jump(new_percent * self.unoccupied_size)
 
     def do_resize_children(self):
         # Make the child whatever size it wants to be.
@@ -118,14 +110,34 @@ class Mover(Bin):
         x, y = self.screen_to_child_coords(x, y)
         super().on_mouse_scroll(x, y, scroll_x, scroll_y)
 
-    def get_translation(self):
+    def get_position(self):
         return self._child_position
 
-    def set_translation(self, x, y=None):
-        new_position = vecrec.cast_anything_to_vector(x if y is None else (x,y))
-        self._require_mover_and_child_rects()
-        self._child_position = new_position
-        self._keep_child_in_rect()
+    def get_position_percent(self):
+        percent = Vector.null()
+        ux, uy = self.unoccupied_size
+        
+        if ux != 0: percent.x = self.position.x / ux
+        if uy != 0: percent.y = self.position.y / uy
+
+        return percent
+
+    def get_unoccupied_size(self):
+        return self.rect.size - self.child.claimed_rect.size
+
+    @vecrec.accept_anything_as_vector
+    def pixels_to_percent(self, pixels):
+        percent = Vector.null()
+        ux, uy = self.unoccupied_size
+        
+        if ux != 0: percent.x = pixels.x / ux
+        if uy != 0: percent.y = pixels.y / uy
+
+        return percent
+
+    @vecrec.accept_anything_as_vector
+    def percent_to_pixels(self, percent):
+        return percent * self.unoccupied_size
 
     @vecrec.accept_anything_as_vector
     def screen_to_child_coords(self, screen_coords):
@@ -155,7 +167,7 @@ class Mover(Bin):
                 self.rect.height - self.child.claimed_rect.height,
         )
 
-    def _require_mover_and_child_rects(self):
+    def _require_rects(self):
         if self.child is None:
             raise UsageError("can't pan/jump until the mover has a child widget.")
 
@@ -165,6 +177,8 @@ class Mover(Bin):
         if self.child.rect is None:
             raise UsageError("can't pan/jump until the mover's child has been given a size.")
 
+
+Mover.register_event_type('on_translate')
 
 @autoprop
 class ScrollPane(Widget):
@@ -177,6 +191,7 @@ class ScrollPane(Widget):
         super().__init__()
 
         self._mover = self.Mover()
+        self._mover.push_handlers(self.on_translate)
         self._attach_child(self._mover)
 
         self._scissor_group = None
@@ -225,7 +240,7 @@ class ScrollPane(Widget):
         self._require_rects()
         self._mover.jump_percent((1,1) - new_percent)
 
-    def do_attach(self):
+    def do_draw(self):
         if self._apply_initial_view and self.child is not None:
             self._apply_initial_view = False
             self.view = self.initial_view
@@ -268,15 +283,26 @@ class ScrollPane(Widget):
         self._scissor_group = drawing.ScissorGroup(self.rect, self.group)
         self._mover.regroup(self._scissor_group)
 
+    def on_translate(self, mover):
+        self.dispatch_event('on_scroll', self)
+
     def get_child(self):
         return self._mover.child
+
+    def get_position(self):
+        self._require_rects()
+        mover_to_pane = self.rect.bottom_left - self._mover.rect.bottom_left
+        return mover_to_pane - self._mover.position
+
+    def get_position_percent(self):
+        return (1,1) - self._mover.position_percent
 
     def get_view(self):
         """
         Return the currently visible rectangle in child coordinates.
         """
         mover_to_pane = self.rect.bottom_left - self._mover.rect.bottom_left
-        mover_to_child = self._mover.translation
+        mover_to_child = self._mover.position
 
         view_rect = self.rect.copy()
         view_rect.bottom_left = mover_to_pane - mover_to_child
@@ -324,26 +350,123 @@ class ScrollPane(Widget):
             raise UsageError("can't scroll until the scroll pane's child has been given a size.")
 
 
+ScrollPane.register_event_type('on_scroll')
 
-class ScrollBar(Widget):
-    Mover = Mover
-    Forward = Button
-    Backward = Button
+@autoprop
+class ScrollGripMixin:
+    """
+    A widget that is capable of controlling a scroll pane.
 
-    class Slider(Button):
+    This class cannot be used on its own.  You have to create a new class that 
+    inherits from this class and a widget class, and this class has to be at 
+    the front of the method resolution order (MRO).  For example:
 
-        def __init__(self, mover):
-            self.mover = mover
+        class MyGrip(ScrollGripMixin, Button):
+            pass
+    """
 
-        def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-            self.mover.pan(dx, dy)
+    def __init__(self, mover, pane, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mover = mover
+        self.pane = pane
+        self.pane.push_handlers(self.on_scroll)
+        self.reference_point = None
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        super().on_mouse_press(x, y, button, modifiers)
+        self.grab_mouse()
+        self.reference_point = Vector(x, y)
+
+    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        super().on_mouse_drag(x, y, dx, dy, buttons, modifiers)
+
+        if self.reference_point is not None:
+            drag_pixels = (x,y) - self.reference_point
+            drag_percent = self.mover.pixels_to_percent(drag_pixels)
+            self.pane.scroll_percent(drag_percent)
+        
+    def on_mouse_release(self, x, y, button, modifiers):
+        super().on_mouse_release(x, y, button, modifiers)
+        self.ungrab_mouse()
+
+    def on_scroll(self, pane):
+        self.mover.jump_percent(pane.position_percent)
 
 
-    def __init__(self):
-        self._mover = self.Mover()
-        self._slider = self.Slider(self._mover)
+@autoprop
+class HVScrollBar(Frame):
+    HVBox = HVBox
+    Forward = None
+    Backward = None
+    custom_alignment = 'fill'
+    custom_button_step = 0.05
+
+    class Grip(ScrollGripMixin, Button): #
+        pass
+
+    def __init__(self, pane):
+        super().__init__()
+
+        self._pane = pane
+        self._hvbox = self.HVBox()
+        self._button_step = self.custom_button_step
+
+        if self.Backward is not None:
+            self._backward = self.Backward()
+            self._backward.push_handlers(on_click=self.on_backward_click)
+            self._hvbox.add(self._backward, 0)
+
+        self._mover = Mover()
+        self._grip = self.Grip(self._mover, self._pane)
+        self._mover.add(self._grip)
+        self._hvbox.add(self._mover)
+
+        if self.Forward is not None:
+            self._forward = self.Forward()
+            self._forward.push_handlers(on_click=self.on_forward_click)
+            self._hvbox.add(self._forward, 0)
+
+        self.add(self._hvbox)
+
+    def on_forward_click(self, button):
+        self._pane.scroll_percent(self.button_step * self.step_direction)
+
+    def on_backward_click(self, button):
+        self._pane.scroll_percent(self.button_step * -self.step_direction)
+
+    def get_step_direction(self):
+        if isinstance(self._hvbox, HBox):
+            return Vector(1, 0)
+        elif isinstance(self._hvbox, VBox):
+            return Vector(0, -1)
+        else:
+            raise NotImplementedError
+
+    def get_button_step(self):
+        return self._button_step
+
+    def set_button_step(self, new_step):
+        self._button_step = new_step
 
 
+@autoprop
+class HScrollBar(HVScrollBar):
+    HVBox = HBox
 
+@autoprop
+class VScrollBar(HVScrollBar):
+    HVBox = VBox
+
+@autoprop
 class ScrollBox(Widget):
-    pass
+    custom_mouse_sensitivity = 5
+
+    # Make 2x2 grid
+    # For now, only allow scroll bars on bottom and right.  So make a 2x2 grid 
+    # and put the content in the top left.  Put the bars in their respective 
+    # spots as appropriate, and also give the user the ability to provide a 
+    # widget to fill in the very bottom right corner.
+
+    def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
+        self.pane.scroll(self.mouse_sensitivity * Vector(scroll_x, scroll_y))
+
