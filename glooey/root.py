@@ -111,10 +111,10 @@ class Gui (Root):
 
 
 @autoprop
-class PanningGui (Gui):
+class PanningGui(Gui):
     """
     A window with mouse exclusivity enabled.  This makes it possible to 
-    emit mouse push events, but it also complicates a lot of things.  First of 
+    emit mouse pan events, but it also complicates a lot of things.  First of 
     all, an image must be provided so that the mouse can be manually drawn.  
     Second, the mouse coordinates must be manually tracked and fed to the event 
     handlers. 
@@ -131,13 +131,13 @@ class PanningGui (Gui):
         cursor.anchor_x = hotspot.x
         cursor.anchor_y = hotspot.y
 
-        self.mouse = self.rect.center
+        self.mouse = self.territory.center
         self.shadow_mouse = None
         self.cursor = pyglet.sprite.Sprite(
-                cursor, batch=batch, group=mouse_group)
+                cursor, batch=self.batch, group=mouse_group)
 
-    def do_resize(self, rect):
-        self.mouse = rect.center
+    def do_resize(self):
+        self.mouse = self.territory.center
 
     def do_draw(self):
         self.cursor.visible = True
@@ -172,11 +172,11 @@ class PanningGui (Gui):
         # 
         # The solution to this problem is simply to ignore mouse_enter and 
         # mouse_exit events for PanningGui objects.
-        pass
+        return True
 
     def on_mouse_leave(self, x, y):
         # See comment in on_mouse_enter().
-        pass
+        return True
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         self._update_mouse(dx, dy)
@@ -191,18 +191,17 @@ class PanningGui (Gui):
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         super().on_mouse_scroll(self.mouse.x, self.mouse.y, scroll_x, scroll_y)
 
-
     def _update_mouse(self, dx, dy):
         self.mouse += (dx, dy)
 
         # Decide whether or to start or stop panning.
 
-        if self.mouse not in self.rect:
+        if self.mouse not in self.territory:
             if self.shadow_mouse is None:
                 self._start_mouse_pan()
 
         if self.shadow_mouse is not None:
-            if self.mouse in self.rect.get_shrunk(5):
+            if self.mouse in self.territory.get_shrunk(5):
                 self._stop_mouse_pan()
 
         # Move the shadow mouse.
@@ -210,18 +209,22 @@ class PanningGui (Gui):
         if self.shadow_mouse is not None:
             self.shadow_mouse += (dx, dy)
 
-            if self.rect.left < self.mouse.x < self.rect.right:
+            if self.territory.left < self.mouse.x < self.territory.right:
                 self.shadow_mouse.x = self.mouse.x
-            if self.rect.bottom < self.mouse.y < self.rect.top:
+            if self.territory.bottom < self.mouse.y < self.territory.top:
                 self.shadow_mouse.y = self.mouse.y
 
         # Keep the mouse on screen.  This feels like there should be a function 
         # for this in vecrec...
 
-        if self.mouse.x < self.rect.left: self.mouse.x = self.rect.left
-        if self.mouse.x > self.rect.right: self.mouse.x = self.rect.right
-        if self.mouse.y < self.rect.bottom: self.mouse.y = self.rect.bottom
-        if self.mouse.y > self.rect.top: self.mouse.y = self.rect.top
+        if self.mouse.x < self.territory.left:
+            self.mouse.x = self.territory.left
+        if self.mouse.x > self.territory.right:
+            self.mouse.x = self.territory.right
+        if self.mouse.y < self.territory.bottom:
+            self.mouse.y = self.territory.bottom
+        if self.mouse.y > self.territory.top:
+            self.mouse.y = self.territory.top
 
         # Update the mouse sprite.
 

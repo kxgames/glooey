@@ -21,6 +21,7 @@ class TestScrollContent(glooey.Grid):
 
 
 class TestScrollBox(glooey.ScrollBox):
+    Frame = glooey.Outline
 
     class HVBar(glooey.HVScrollBar):
 

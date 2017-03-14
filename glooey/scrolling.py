@@ -460,10 +460,10 @@ class VScrollBar(HVScrollBar):
 @autoprop
 class ScrollBox(Widget):
     Pane = ScrollPane
+    Frame = None
     HBar = None
     VBar = None
     Corner = None
-
     custom_mouse_sensitivity = 5
 
     def __init__(self):
@@ -478,18 +478,27 @@ class ScrollBox(Widget):
         self._pane.horz_scrolling = (self.HBar is not None)
         self._pane.vert_scrolling = (self.VBar is not None)
 
+        self._frame = None
         self._hbar = None
         self._vbar = None
         self._corner = None
 
-        self._grid.add(0, 0, self._pane)
+        if self.Frame:
+            self._frame = self.Frame()
+            self._frame.alignment = 'fill'
+            self._frame.add(self._pane)
+            self._grid.add(0, 0, self._frame)
+        else:
+            self._grid.add(0, 0, self._pane)
 
         if self._pane.horz_scrolling:
             self._hbar = self.HBar(self._pane)
             self._grid.add(1, 0, self._hbar)
+
         if self._pane.vert_scrolling:
             self._vbar = self.VBar(self._pane)
             self._grid.add(0, 1, self._vbar)
+
         if self.Corner is not None:
             self._corner = self.Corner()
             self._grid.add(1, 1, self._corner)
@@ -513,4 +522,36 @@ class ScrollBox(Widget):
 
     def set_mouse_sensitivity(self, new_sensitivity):
         self._mouse_sensitivity = new_sensitivity
+
+
+@autoprop
+class Viewport(ScrollPane):
+    custom_horz_scrolling = True
+    custom_vert_scrolling = True
+    custom_sensitivity = 3
+
+    def __init__(self, sensitivity=None):
+        super().__init__()
+        self._sensitivity = sensitivity or self.custom_sensitivity
+
+    def do_attach(self):
+        # If this line raises a pyglet EventException, you're probably trying 
+        # to attach this widget to a GUI that doesn't support mouse pan events.  
+        # See the Viewport documentation for more information.
+        self.root.push_handlers(self.on_mouse_pan)
+
+    def do_detach(self):
+        self.window.remove_handler(self.on_mouse_pan)
+
+    def on_mouse_pan(self, direction, dt):
+        self.scroll(direction * self.sensitivity * dt)
+
+    def set_center_of_view(self, new_view):
+        self.view = lambda v, _: v.set_center(new_view)
+
+    def get_sensitivity(self):
+        return self._sensitivity
+
+    def set_sensitivity(self, new_sensitivity):
+        self._sensitivity = new_sensitivity
 
