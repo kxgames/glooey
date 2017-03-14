@@ -7,7 +7,7 @@ import autoprop
 from vecrec import Vector, Rect
 from debugtools import p, pp, pv
 from .widget import Widget
-from .containers import Bin, HVBox, HBox, VBox
+from .containers import Bin, Grid, HVBox, HBox, VBox
 from .miscellaneous import Frame, Button
 from .helpers import *
 from . import drawing
@@ -459,14 +459,58 @@ class VScrollBar(HVScrollBar):
 
 @autoprop
 class ScrollBox(Widget):
+    Pane = ScrollPane
+    HBar = None
+    VBar = None
+    Corner = None
+
     custom_mouse_sensitivity = 5
 
-    # Make 2x2 grid
-    # For now, only allow scroll bars on bottom and right.  So make a 2x2 grid 
-    # and put the content in the top left.  Put the bars in their respective 
-    # spots as appropriate, and also give the user the ability to provide a 
-    # widget to fill in the very bottom right corner.
+    def __init__(self):
+        super().__init__()
+
+        self._grid = Grid(2, 2)
+        self._grid.set_row_height(1, 0)
+        self._grid.set_col_width(1, 0)
+        self._attach_child(self._grid)
+
+        self._pane = self.Pane()
+        self._pane.horz_scrolling = (self.HBar is not None)
+        self._pane.vert_scrolling = (self.VBar is not None)
+
+        self._hbar = None
+        self._vbar = None
+        self._corner = None
+
+        self._grid.add(0, 0, self._pane)
+
+        if self._pane.horz_scrolling:
+            self._hbar = self.HBar(self._pane)
+            self._grid.add(1, 0, self._hbar)
+        if self._pane.vert_scrolling:
+            self._vbar = self.VBar(self._pane)
+            self._grid.add(0, 1, self._vbar)
+        if self.Corner is not None:
+            self._corner = self.Corner()
+            self._grid.add(1, 1, self._corner)
+
+        self._mouse_sensitivity = self.custom_mouse_sensitivity
+    
+    def add(self, widget):
+        self._pane.add(widget)
+
+    def clear(self):
+        self._pane.clear()
+
+    def do_claim(self):
+        return self._grid.claimed_size
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        self.pane.scroll(self.mouse_sensitivity * Vector(scroll_x, scroll_y))
+        self._pane.scroll(self.mouse_sensitivity * Vector(scroll_x, scroll_y))
+
+    def get_mouse_sensitivity(self):
+        return self._mouse_sensitivity
+
+    def set_mouse_sensitivity(self, new_sensitivity):
+        self._mouse_sensitivity = new_sensitivity
 

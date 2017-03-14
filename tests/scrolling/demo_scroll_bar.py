@@ -97,11 +97,6 @@ grid.add(0, 1, vbar)
 grid.add(1, 0, hbar)
 gui.add(grid)
 
-@demo_helpers.interactive_tests(window, gui.batch) #
-def interactive_scroll_bar_tests():
-    yield
-
-
 pyglet.app.run()
 
 
