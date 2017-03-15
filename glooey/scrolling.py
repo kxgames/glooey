@@ -8,7 +8,7 @@ from vecrec import Vector, Rect
 from debugtools import p, pp, pv
 from .widget import Widget
 from .containers import Bin, Grid, HVBox, HBox, VBox
-from .miscellaneous import Frame, Button
+from .miscellaneous import Frame, Button, Image
 from .helpers import *
 from . import drawing
 
@@ -393,16 +393,21 @@ class ScrollGripMixin:
         self.mover.jump_percent(pane.position_percent)
 
 
+class ButtonScrollGrip(ScrollGripMixin, Button):
+    pass
+
+class ImageScrollGrip(ScrollGripMixin, Image):
+    pass
+
 @autoprop
 class HVScrollBar(Frame):
     HVBox = HVBox
+    Grip = ButtonScrollGrip
     Forward = None
     Backward = None
+
     custom_alignment = 'fill'
     custom_button_step = 0.05
-
-    class Grip(ScrollGripMixin, Button): #
-        pass
 
     def __init__(self, pane):
         super().__init__()

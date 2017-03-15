@@ -249,3 +249,40 @@ class FancyFillBar(glooey.FillBar):
             raise UsageError(f"the Golden theme doesn't have a '{color}' fill bar.")
 
 
+@autoprop
+class ScrollBox(glooey.ScrollBox):
+
+    class VBar(glooey.VScrollBar):
+
+        class Decoration(glooey.Background):
+            custom_top = assets.image('scroll_bars/bar_top.png')
+            custom_center = assets.texture('scroll_bars/bar_center.png')
+            custom_bottom = assets.image('scroll_bars/bar_bottom.png')
+
+        class Forward(RoundButton):
+            custom_color = 'green'
+            custom_icon = 'down'
+            custom_top_padding = 6
+            custom_bottom_padding = 5
+            custom_left_padding = 1
+            custom_right_padding = 5
+
+        class Backward(RoundButton):
+            custom_color = 'green'
+            custom_icon = 'up'
+            custom_top_padding = 5
+            custom_bottom_padding = 8
+            custom_left_padding = 1
+            custom_right_padding = 5
+
+        class Grip(glooey.ImageScrollGrip):
+            custom_image = assets.image('scroll_bars/grip.png')
+            custom_left_padding = 2
+            custom_right_padding = 6
+
+    class Frame(SmallFrame):
+
+        class Bin(SmallFrame.Bin):
+            custom_top_padding = 6
+            custom_bottom_padding = 5
+
