@@ -5,8 +5,49 @@ from debugtools import p, pp, pv
 from . import drawing
 from .helpers import *
 
+class EventDispatcher(pyglet.event.EventDispatcher):
+
+    def __init__(self):
+        super().__init__()
+        self.__timers = {}
+
+    def start_event(self, event_type, *args, dt=1/60):
+        # Don't bother scheduling a timer if nobody's listening.  This isn't 
+        # great from a general-purpose perspective, because a long-lived event 
+        # could have listeners attach and detach in the middle.  But I don't 
+        # like the idea of making a bunch of clocks to spit out a bunch of 
+        # events that are never used.  If I want to make this more general 
+        # purpose, I could start and stop timers as necessary in the methods 
+        # that add or remove handlers.
+        if not any(self.__yield_handlers(event_type)):
+            return
+
+        def on_time_interval(dt):
+            self.dispatch_event(event_type, *args, dt)
+
+        pyglet.clock.schedule_interval(on_time_interval, dt)
+        self.__timers[event_type] = on_time_interval
+
+    def stop_event(self, event_type):
+        if event_type in self.__timers:
+            pyglet.clock.unschedule(self.__timers[event_type])
+
+    def __yield_handlers(self, event_type):
+        if event_type not in self.event_types:
+            raise ValueError("%r not found in %r.event_types == %r" % (event_type, self, self.event_types))
+
+        # Search handler stack for matching event handlers
+        for frame in list(self._event_stack):
+            if event_type in frame:
+                yield frame[event_type]
+
+        # Check instance for an event handler
+        if hasattr(self, event_type):
+            yield getattr(self, event_type)
+
+
 @autoprop
-class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
+class Widget(EventDispatcher, HoldUpdatesMixin):
     custom_size_hint = 0, 0
     custom_width_hint = None
     custom_height_hint = None
@@ -22,7 +63,7 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
     custom_alignment = 'fill'
 
     def __init__(self):
-        pyglet.event.EventDispatcher.__init__(self)
+        EventDispatcher.__init__(self)
         HoldUpdatesMixin.__init__(self)
 
         self._parent = None
@@ -424,9 +465,13 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         for child in self._children_under_mouse:
             child.dispatch_event('on_mouse_press', x, y, button, modifiers)
 
+        self.start_event('on_mouse_hold')
+
     def on_mouse_release(self, x, y, button, modifiers):
         for child in self._children_under_mouse:
             child.dispatch_event('on_mouse_release', x, y, button, modifiers)
+
+        self.stop_event('on_mouse_hold')
 
     def on_mouse_motion(self, x, y, dx, dy):
         children_under_mouse = self._find_children_under_mouse(x, y)
@@ -455,6 +500,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
         for child in children_under_mouse.exited:
             child.dispatch_event('on_mouse_leave', x, y)
 
+        self.stop_event('on_mouse_hold')
+
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
@@ -481,6 +528,8 @@ class Widget (pyglet.event.EventDispatcher, HoldUpdatesMixin):
 
         for child in children_under_mouse.exited:
             child.dispatch_event('on_mouse_drag_leave', x, y)
+
+        self.stop_event('on_mouse_hold')
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         for child in self._children_under_mouse:
@@ -928,6 +977,7 @@ Widget.register_event_type('on_add_child')
 Widget.register_event_type('on_remove_child')
 Widget.register_event_type('on_mouse_press')
 Widget.register_event_type('on_mouse_release')
+Widget.register_event_type('on_mouse_hold')
 Widget.register_event_type('on_mouse_motion')
 Widget.register_event_type('on_mouse_enter')
 Widget.register_event_type('on_mouse_leave')

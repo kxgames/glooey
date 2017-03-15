@@ -188,6 +188,9 @@ class EventLogger(PlaceHolder):
         super().on_mouse_release(x, y, button, modifiers)
         print(f'{self}.on_mouse_release(x={x}, y={y}, button={button}, modifiers={modifiers})')
 
+    def on_mouse_hold(self, dt):
+        print(f'{self}.on_mouse_hold(dt={dt})')
+
     def on_mouse_motion(self, x, y, dx, dy):
         super().on_mouse_motion(x, y, dx, dy)
         print(f'{self}.on_mouse_motion(x={x}, y={y}, dx={dx}, dy={dy})')
