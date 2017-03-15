@@ -271,7 +271,7 @@ class ScrollBox(glooey.ScrollBox):
             custom_color = 'green'
             custom_icon = 'up'
             custom_top_padding = 5
-            custom_bottom_padding = 8
+            custom_bottom_padding = 7
             custom_left_padding = 1
             custom_right_padding = 5
 

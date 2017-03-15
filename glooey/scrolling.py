@@ -24,7 +24,7 @@ class Mover(Bin):
         def set_state(self):
             translation = -self.mover.screen_to_child_coords(0, 0)
             pyglet.gl.glPushMatrix()
-            pyglet.gl.glTranslatef(translation.x, translation.y, 0)
+            pyglet.gl.glTranslatef(int(translation.x), int(translation.y), 0)
 
         def unset_state(self):
             pyglet.gl.glPopMatrix()
@@ -407,18 +407,18 @@ class HVScrollBar(Frame):
     Backward = None
 
     custom_alignment = 'fill'
-    custom_button_step = 0.05
+    custom_button_speed = 200 # px/sec
 
     def __init__(self, pane):
         super().__init__()
 
         self._pane = pane
         self._hvbox = self.HVBox()
-        self._button_step = self.custom_button_step
+        self._button_speed = self.custom_button_speed
 
         if self.Backward is not None:
             self._backward = self.Backward()
-            self._backward.push_handlers(on_click=self.on_backward_click)
+            self._backward.push_handlers(on_mouse_hold=self.on_backward_click)
             self._hvbox.add(self._backward, 0)
 
         self._mover = Mover()
@@ -428,18 +428,18 @@ class HVScrollBar(Frame):
 
         if self.Forward is not None:
             self._forward = self.Forward()
-            self._forward.push_handlers(on_click=self.on_forward_click)
+            self._forward.push_handlers(on_mouse_hold=self.on_forward_click)
             self._hvbox.add(self._forward, 0)
 
         self.add(self._hvbox)
 
-    def on_forward_click(self, button):
-        self._pane.scroll_percent(self.button_step * self.step_direction)
+    def on_forward_click(self, dt):
+        self._pane.scroll(dt * self.button_speed * self.orientation)
 
-    def on_backward_click(self, button):
-        self._pane.scroll_percent(self.button_step * -self.step_direction)
+    def on_backward_click(self, dt):
+        self._pane.scroll(dt * self.button_speed * -self.orientation)
 
-    def get_step_direction(self):
+    def get_orientation(self):
         if isinstance(self._hvbox, HBox):
             return Vector(1, 0)
         elif isinstance(self._hvbox, VBox):
@@ -447,11 +447,11 @@ class HVScrollBar(Frame):
         else:
             raise NotImplementedError
 
-    def get_button_step(self):
-        return self._button_step
+    def get_button_speed(self):
+        return self._button_speed
 
-    def set_button_step(self, new_step):
-        self._button_step = new_step
+    def set_button_speed(self, new_speed):
+        self._button_speed = new_speed
 
 
 @autoprop
@@ -469,7 +469,7 @@ class ScrollBox(Widget):
     HBar = None
     VBar = None
     Corner = None
-    custom_mouse_sensitivity = 5
+    custom_mouse_sensitivity = 15 # px/click
 
     def __init__(self):
         super().__init__()
