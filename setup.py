@@ -24,7 +24,7 @@ setup(
     url='https://github.com/kxgames/glooey',
     packages=[
         'glooey',
-        'glooey.themes'
+        'glooey.themes',
     ],
     include_package_data=True,
     install_requires=[
@@ -33,6 +33,7 @@ setup(
         'vecrec', 
         'autoprop',
         'debugtools',
+        'yaml',
     ],
     license='MIT',
     zip_safe=False,
