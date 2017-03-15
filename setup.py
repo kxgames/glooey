@@ -32,6 +32,7 @@ setup(
         'vecrec', 
         'autoprop',
         'debugtools',
+        'yaml',
     ],
     license='MIT',
     zip_safe=False,
