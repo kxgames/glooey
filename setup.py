@@ -33,7 +33,7 @@ setup(
         'vecrec', 
         'autoprop',
         'debugtools',
-        'yaml',
+        'pyyaml',
     ],
     license='MIT',
     zip_safe=False,
