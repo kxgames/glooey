@@ -35,10 +35,10 @@ class TestScrollBox(glooey.ScrollBox):
                 custom_color = 'green'
 
             class Over(glooey.Background):
-                custom_color = 'purple'
+                custom_color = 'orange'
 
             class Down(glooey.Background):
-                custom_color = 'orange'
+                custom_color = 'purple'
 
         class Backward(glooey.Button):
             custom_size_hint = 20, 20
@@ -47,10 +47,10 @@ class TestScrollBox(glooey.ScrollBox):
                 custom_color = 'green'
 
             class Over(glooey.Background):
-                custom_color = 'purple'
+                custom_color = 'orange'
 
             class Down(glooey.Background):
-                custom_color = 'orange'
+                custom_color = 'purple'
 
         class Grip(glooey.HVScrollBar.Grip):
             custom_size_hint = 20, 20
@@ -59,10 +59,10 @@ class TestScrollBox(glooey.ScrollBox):
                 custom_color = 'green'
 
             class Over(glooey.Background):
-                custom_color = 'purple'
+                custom_color = 'orange'
 
             class Down(glooey.Background):
-                custom_color = 'orange'
+                custom_color = 'purple'
 
     class HBar(HVBar):
         HVBox = glooey.HBox

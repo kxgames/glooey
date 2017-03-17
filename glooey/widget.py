@@ -495,7 +495,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # We have to actually check which widgets are still "under the mouse" 
         # to correctly handle widgets that are grabbing the mouse when the 
         # mouse leaves the window.
-        children_under_mouse = self._find_children_under_mouse(x, y)
+        children_under_mouse = self._find_children_under_mouse_after_leave()
 
         for child in children_under_mouse.exited:
             child.dispatch_event('on_mouse_leave', x, y)
@@ -524,7 +524,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # We have to actually check which widgets are still "under the mouse" 
         # to correctly handle widgets that are grabbing the mouse when the 
         # mouse leaves the window.
-        children_under_mouse = self._find_children_under_mouse(x, y)
+        children_under_mouse = self._find_children_under_mouse_after_leave()
 
         for child in children_under_mouse.exited:
             child.dispatch_event('on_mouse_drag_leave', x, y)
@@ -904,6 +904,17 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
                     w for w in self.do_find_children_under_mouse(x, y)
                     if w.is_visible
             }
+
+        return Widget._ChildrenUnderMouse(
+                previously_under_mouse, self._children_under_mouse)
+
+    def _find_children_under_mouse_after_leave(self):
+        previously_under_mouse = self._children_under_mouse
+
+        if self._mouse_grabber is not None:
+            self._children_under_mouse = {self._mouse_grabber}
+        else:
+            self._children_under_mouse = set()
 
         return Widget._ChildrenUnderMouse(
                 previously_under_mouse, self._children_under_mouse)
