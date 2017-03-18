@@ -3,8 +3,8 @@ import vecrec
 import autoprop
 
 from vecrec import Vector, Rect
-from .containers import Bin
-from .helpers import *
+from glooey.containers import Bin
+from glooey.helpers import *
 
 @autoprop
 class Root (Bin):

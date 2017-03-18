@@ -1,9 +1,9 @@
 import pyglet
 import autoprop
+
 from vecrec import Rect
-from debugtools import p, pp, pv
-from . import drawing
-from .helpers import *
+from glooey import drawing
+from glooey.helpers import *
 
 class EventDispatcher(pyglet.event.EventDispatcher):
 

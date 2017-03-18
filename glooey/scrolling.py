@@ -5,12 +5,12 @@ import vecrec
 import autoprop
 
 from vecrec import Vector, Rect
-from debugtools import p, pp, pv
-from .widget import Widget
-from .containers import Bin, Grid, HVBox, HBox, VBox
-from .miscellaneous import Frame, Button, Image
-from .helpers import *
-from . import drawing
+from glooey import drawing
+from glooey.widget import Widget
+from glooey.containers import Bin, Grid, HVBox, HBox, VBox
+from glooey.buttons import Button
+from glooey.images import Image, Frame
+from glooey.helpers import *
 
 @autoprop
 class Mover(Bin):

@@ -36,18 +36,18 @@ a flavor for how ``glooey`` is supposed to work:
    # variables to customize the text style.
 
    class MyLabel(glooey.Label):
-       default_color = '#babdb6'
-       default_font_size = 10
-       default_alignment = 'center'
+       custom_color = '#babdb6'
+       custom_font_size = 10
+       custom_alignment = 'center'
 
    # If we want another kind of text, for example a bigger font for section 
    # titles, we just have to derive another class:
 
    class MyTitle(glooey.Label):
-       default_color = '#eeeeec'
-       default_font_size = 12
-       default_alignment = 'center'
-       default_bold = True
+       custom_color = '#eeeeec'
+       custom_font_size = 12
+       custom_alignment = 'center'
+       custom_bold = True
 
    # It's also common to style a widget with existing widgets or with new 
    # widgets made just for that purpose.  The button widget is a good example.  
@@ -57,19 +57,20 @@ a flavor for how ``glooey`` is supposed to work:
 
    class MyButton(glooey.Button):
        Label = MyLabel
+       custom_alignment = 'fill'
 
        # More often you'd specify images for the different rollover states, but 
        # we're just using colors here so you won't have to download any files 
        # if you want to run this code.
 
        class Base(glooey.Background):
-           default_color = '#204a87'
+           custom_color = '#204a87'
 
        class Over(glooey.Background):
-           default_color = '#3465a4'
+           custom_color = '#3465a4'
 
        class Down(glooey.Background):
-           default_color = '#729fcff'
+           custom_color = '#729fcff'
 
        # Beyond just setting class variables in our widget subclasses, we can 
        # also implement new functionality.  Here we just print a programmed 
@@ -124,6 +125,5 @@ a flavor for how ``glooey`` is supposed to work:
    # Run pyglet's event loop as usual.
 
    pyglet.app.run()
-
 
 

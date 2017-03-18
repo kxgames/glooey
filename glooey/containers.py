@@ -4,15 +4,13 @@ don't draw anything themselves, they just position children widgets.
 """
 
 import pyglet
-import vecrec
 import autoprop
 
 from vecrec import Vector, Rect
 from collections import defaultdict
-from debugtools import p, pp, pv
-from . import drawing
-from .widget import Widget
-from .helpers import *
+from glooey import drawing
+from glooey.widget import Widget
+from glooey.helpers import *
 
 def align_widget_in_box(widget, box_rect, alignment='fill', widget_rect=None):
     if widget_rect is None:

@@ -3,13 +3,11 @@ import pyglet
 import more_itertools
 import autoprop
 import vecrec
-
-from collections import defaultdict
 from vecrec import Vector, Rect
-from debugtools import p, pp, pv
+from collections import defaultdict
 from pyglet.gl import *
 from pyglet.graphics import Group, OrderedGroup
-from .helpers import *
+from glooey.helpers import *
 
 # Color utilities
 
