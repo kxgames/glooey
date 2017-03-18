@@ -201,45 +201,25 @@ class Outline(Frame):
 
         def __init__(self):
             super().__init__()
-            self.vertex_list = None
-            self.color = None
+            self.artist = drawing.Outline(hidden=True)
 
         def do_claim(self):
-            return 0, 0
+            return 2, 2
+
+        def do_attach(self):
+            self.artist.batch = self.batch
+
+        def do_resize(self):
+            self.artist.rect = self.rect
 
         def do_regroup(self):
-            if self.vertex_list is not None:
-                self.batch.migrate(
-                        self.vertex_list, pyglet.gl.GL_LINES,
-                        self.group, self.batch)
+            self.artist.group = self.group
 
         def do_draw(self):
-            if self.vertex_list is None:
-                self.vertex_list = self.batch.add(
-                        8, pyglet.gl.GL_LINES, self.group, 'v2f', 'c4B')
-
-            top_left = self.rect.top_left
-            top_right = self.rect.top_right
-            bottom_left = self.rect.bottom_left
-            bottom_right = self.rect.bottom_right
-
-            # Originally I used GL_LINE_STRIP, but I couldn't figure out how to 
-            # stop the place holders from connecting to each other (i.e. I couldn't 
-            # figure out how to break the line strip).  Now I'm just using GL_LINES 
-            # instead.
-
-            self.vertex_list.vertices = (
-                    bottom_left.tuple + bottom_right.tuple + 
-                    bottom_right.tuple + top_right.tuple + 
-                    top_right.tuple + top_left.tuple + 
-                    top_left.tuple + bottom_left.tuple
-            ) 
-            self.vertex_list.colors = 8 * self.color.tuple
+            self.artist.unhide()
 
         def do_undraw(self):
-            if self.vertex_list is not None:
-                self.vertex_list.delete()
-                self.vertex_list = None
+            self.artist.hide()
 
 
     def __init__(self, color=None):
@@ -247,10 +227,10 @@ class Outline(Frame):
         self.color = color or self.custom_color
 
     def get_color(self):
-        return self.decoration.color
+        return self.decoration.artist.color
 
     def set_color(self, new_color):
-        self.decoration.color = drawing.Color.from_anything(new_color)
+        self.decoration.artist.color = drawing.Color.from_anything(new_color)
         self.decoration.draw()
 
 
