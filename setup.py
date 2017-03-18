@@ -24,6 +24,7 @@ setup(
     url='https://github.com/kxgames/glooey',
     packages=[
         'glooey',
+        'glooey.drawing',
         'glooey.themes',
     ],
     include_package_data=True,
