@@ -2,16 +2,14 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window)
 stack = glooey.Stack()
 gui.add(stack)
 
-@demo_helpers.interactive_tests(window, batch) #
+@run_demos.on_space(gui) #
 def test_stack():
 
     def layer(size, color='green'): #

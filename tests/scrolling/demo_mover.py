@@ -2,7 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
@@ -15,7 +15,7 @@ mover.alignment = 'center'
 frame.add(mover)
 gui.add(frame)
 
-@demo_helpers.interactive_tests(window, gui.batch) #
+@run_demos.on_space(gui) #
 def interactive_mover_tests():
     unpadded = glooey.EventLogger(50, 50, 'orange')
     padded = glooey.EventLogger(10, 10, 'purple')

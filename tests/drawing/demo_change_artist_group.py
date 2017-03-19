@@ -3,7 +3,7 @@
 import pyglet
 import glooey
 import vecrec
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
@@ -18,7 +18,7 @@ fg = pyglet.graphics.OrderedGroup(1)
 artist_1 = glooey.drawing.Rectangle(rect_1, color='green', batch=batch)
 artist_2 = glooey.drawing.Rectangle(rect_2, color='orange', batch=batch)
 
-@demo_helpers.interactive_tests(window, batch) #
+@run_demos.on_space(window, batch) #
 def test_changing_groups():
     artist_1.group = fg
     artist_2.group = bg

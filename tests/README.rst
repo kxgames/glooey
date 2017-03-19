@@ -1,10 +1,14 @@
 How to run tests
 ================
 The tests are all executable python scripts named ``demo_*.py``.  They are 
-meant to be executed from the directory they live in.  Most of the test test a 
+meant to be executed from the directory they live in.  Most of the tests test a 
 single widget, and you can press the "space" key to cycle through different 
 configurations of that widget.  A brief sentence in the lower right corner 
 described what you should expect to see.
+
+You can also run all the tests at once::
+
+   $ pytest -D .
 
 How to write tests
 ==================

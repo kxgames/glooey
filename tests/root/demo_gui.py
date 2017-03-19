@@ -2,20 +2,19 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
 w, h = window.width, window.height
-
 gui = glooey.Gui(window)
 logger = glooey.EventLogger(0.8 * w, 0.8 * h, align='center')
 gui.add(logger)
 
-@demo_helpers.interactive_tests(window, gui.batch) #
+@run_demos.on_space(gui) #
 def test_gui():
-    gui.set_cursor(pyglet.image.load('assets/misc/cursor_flipped.png'), (16, 0))
+    gui.set_cursor(pyglet.image.load('assets/misc/cursor_flipped.png'), (13, 0))
     yield "Use a cursor with a bottom-right hotspot."
-    gui.set_cursor(pyglet.image.load('assets/misc/cursor.png'), (0, 16))
+    gui.set_cursor(pyglet.image.load('assets/misc/cursor.png'), (0, 18))
 
     popup = glooey.EventLogger(0.2 * w, 0.2 * h, color='orange', align='center')
     gui.add(popup)

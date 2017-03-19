@@ -1,25 +1,15 @@
 #!/usr/bin/env python3
 
-"""\
-There are 5 place-holders, each of a different color, but only one should be 
-visible at a time.  Make sure there are no errors if all the place-holders are 
-deleted.
-
-space:  Replace the current place-holder with the next one.
-d:      Remove the current place-holder form the rotation.
-"""
-
 import glooey
 import pyglet
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-gui = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window)
 deck = glooey.Deck('a')
 gui.add(deck)
 
-@demo_helpers.interactive_tests(window, batch) #
+@run_demos.on_space(gui) #
 def test_deck():
 
     green = glooey.PlaceHolder(50, 50, 'green')

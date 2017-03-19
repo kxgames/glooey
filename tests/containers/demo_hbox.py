@@ -1,39 +1,35 @@
 #!/usr/bin/env python3
 
 import pyglet
-import demo_helpers
-from glooey import *
-from glooey.drawing import *
-from pprint import pprint
+import glooey
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = Gui(window, batch=batch)
-hbox = HBox()
+gui = glooey.Gui(window)
+hbox = glooey.HBox()
 gui.add(hbox)
 
-@demo_helpers.interactive_tests(window, batch) #
-def interactive_hbox_tests():
+@run_demos.on_space(gui) #
+def test_hbox():
 
     # Test adding and removing widgets.
     for i in range(2):
-        hbox.add(EventLogger(50, 50))
+        hbox.add(glooey.EventLogger(50, 50))
     yield "Make an HBox with 2 cells."
 
-    left = EventLogger(50, 50, 'orange')
+    left = glooey.EventLogger(50, 50, 'orange')
     hbox.add_left(left)
     yield "Add a orange widget on the left."
 
-    right = EventLogger(50, 50, 'orange')
+    right = glooey.EventLogger(50, 50, 'orange')
     hbox.add_right(right)
     yield "Add a orange widget on the right."
 
-    middle = EventLogger(50, 50, 'orange')
+    middle = glooey.EventLogger(50, 50, 'orange')
     hbox.insert(middle, 2)
     yield "Insert a orange widget in the middle."
 
-    hbox.replace(middle, EventLogger(50, 50, 'green'))
+    hbox.replace(middle, glooey.EventLogger(50, 50, 'green'))
     yield "Replace the orange widget in the middle with a green one."
 
     hbox.remove(left)

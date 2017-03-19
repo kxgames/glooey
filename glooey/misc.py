@@ -13,16 +13,16 @@ class PlaceHolder(Clickable):
     custom_color = 'green'
     custom_alignment = 'fill'
 
-    def __init__(self, width=0, height=0, color=None, align=None):
+    def __init__(self, min_width=0, min_height=0, color=None, align=None):
         super().__init__()
-        self.color = drawing.Color.from_anything(color or self.custom_color)
-        self.width = width
-        self.height = height
+        self._color = color or self.custom_color
+        self._min_width = min_width
+        self._min_height = min_height
         self.vertex_list = None
         self.alignment = align or self.custom_alignment
 
     def do_claim(self):
-        return self.width, self.height
+        return self._min_width, self._min_height
 
     def do_regroup(self):
         if self.vertex_list is not None:
@@ -56,12 +56,34 @@ class PlaceHolder(Clickable):
                 bottom_left.tuple + top_right.tuple + 
                 bottom_right.tuple + top_left.tuple
         ) 
-        self.vertex_list.colors = 12 * self.color.tuple
+        color = drawing.Color.from_anything(self.color)
+        self.vertex_list.colors = 12 * color.tuple
 
     def do_undraw(self):
         if self.vertex_list is not None:
             self.vertex_list.delete()
             self.vertex_list = None
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, new_color):
+        self._color = new_color
+        self.draw()
+
+    def get_min_width(self):
+        return self._min_width
+
+    def set_min_width(self, new_width):
+        self._min_width = new_width
+        self.repack()
+
+    def get_min_height(self):
+        return self._min_height
+
+    def set_min_height(self, new_height):
+        self._min_height = new_height
+        self.repack()
 
 
 @autoprop

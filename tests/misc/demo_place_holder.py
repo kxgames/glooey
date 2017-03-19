@@ -2,14 +2,22 @@
 
 import pyglet
 import glooey
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = glooey.Gui(window, batch=batch)
-gui.padding = 50
+gui = glooey.Gui(window)
 widget = glooey.PlaceHolder()
 gui.add(widget)
+
+@run_demos.on_space(gui)
+def test_place_holder():
+    widget.color = 'green'
+    yield 'green placeholder.'
+
+    widget.color = 'orange'
+    yield 'orange placeholder.'
+
+
 
 pyglet.app.run()
 

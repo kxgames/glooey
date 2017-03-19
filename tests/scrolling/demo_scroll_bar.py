@@ -2,7 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 class TestScrollContent(glooey.Grid):
     """

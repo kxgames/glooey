@@ -2,10 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
-
-window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
+import run_demos
 
 class TestBackground(glooey.Background): #
     custom_center = pyglet.image.load('assets/64x64/green.png')
@@ -18,11 +15,12 @@ class TestBackground(glooey.Background): #
     custom_bottom_left = pyglet.image.load('assets/4x4/purple.png')
     custom_bottom_right = pyglet.image.load('assets/4x4/purple.png')
 
-gui = glooey.Gui(window, batch=batch)
+window = pyglet.window.Window()
+gui = glooey.Gui(window)
 bg = TestBackground()
 gui.add(bg)
 
-@demo_helpers.interactive_tests(window, batch) #
+@run_demos.on_space(gui) #
 def test_background():
     yield "Show a green background with orange sides and purple corners."
 

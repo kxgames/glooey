@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 
-"""Two green rectangles should take up most of the screen."""
-
 import pyglet
 import glooey
 import vecrec
-
-print(__doc__)
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()

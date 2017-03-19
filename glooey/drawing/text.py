@@ -34,9 +34,9 @@ def lorem_ipsum(num_sentences=None, num_paragraphs=None):
     sentences = text.split('.')
 
     if num_sentences:
-        sentences = sentences[:num_paragraphs]
+        sentences = sentences[:num_sentences]
 
-    return '.'.join(sentences)
+    return '.'.join(sentences) + '.'
 
 
 

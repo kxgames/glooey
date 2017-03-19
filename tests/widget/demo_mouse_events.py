@@ -2,14 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
-
-window = pyglet.window.Window()
-gui = glooey.Gui(window)
-grid = glooey.Grid(2, 2)
-grid.padding = 50
-grid.cell_padding = 50
-grid.set_row_height(0, 0)
+import run_demos
 
 class EventLoggerLabel(glooey.Label):
     custom_alignment = 'center'
@@ -20,7 +13,14 @@ class EventLoggerLabel(glooey.Label):
 
 
 
-loggers = [
+window = pyglet.window.Window()
+gui = glooey.Gui(window)
+grid = glooey.Grid(2, 2)
+grid.padding = 50
+grid.cell_padding = 50
+grid.set_row_height(0, 0)
+
+loggers = [ #
         glooey.EventLogger(),
         glooey.EventLogger(),
 ]
@@ -32,8 +32,8 @@ grid[1,1] = loggers[1]
 
 gui.add(grid)
 
-@demo_helpers.interactive_tests(window, gui.batch) #
-def interactive_padding_tests():
+@run_demos.on_space(gui) #
+def test_mouse_events():
     yield "Move the mouse and make sure the correct events are printed."
 
     loggers[0].grab_mouse()

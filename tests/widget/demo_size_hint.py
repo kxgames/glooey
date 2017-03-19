@@ -2,17 +2,15 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window)
 widget = glooey.PlaceHolder()
 gui.add(widget)
 
-@demo_helpers.interactive_tests(window, batch) #
-def interactive_padding_tests():
+@run_demos.on_space(gui) #
+def test_size_hint():
     # Test setting and change the size hints.
     w = glooey.PlaceHolder(50, 50)
     w.alignment = 'center'

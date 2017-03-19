@@ -2,7 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
@@ -23,7 +23,7 @@ for i in range(2):
 frame.add(pane)
 gui.add(frame)
 
-@demo_helpers.interactive_tests(window, gui.batch) #
+@run_demos.on_space(gui) #
 def interactive_bin_tests():
     pane.add(grid)
     yield "Clip a 2x2 grid of placeholders."

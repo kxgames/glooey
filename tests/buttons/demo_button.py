@@ -2,32 +2,31 @@
 
 import pyglet
 import glooey
-import demo_helpers
-
-window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
+import run_demos
 
 class TestButton(glooey.Button): #
 
-    class Label(glooey.Label):
+    class Label(glooey.Label): #
         custom_color = '#deeed6'
         custom_font_size = 14
         custom_bold = True
         custom_padding = 20
 
-    class Base(glooey.Background):
+    class Base(glooey.Background): #
         custom_center = pyglet.image.load('assets/64x64/green.png')
 
-    class Over(glooey.Background):
+    class Over(glooey.Background): #
         custom_center = pyglet.image.load('assets/64x64/orange.png')
 
-    class Down(glooey.Background):
+    class Down(glooey.Background): #
         custom_center = pyglet.image.load('assets/64x64/purple.png')
 
-    class Off(glooey.Background):
+    class Off(glooey.Background): #
         custom_center = pyglet.image.load('assets/64x64/grey.png')
 
-gui = glooey.Gui(window, batch=batch)
+
+window = pyglet.window.Window()
+gui = glooey.Gui(window)
 button = TestButton('Hello world!')
 gui.add(button)
 
@@ -39,8 +38,8 @@ def on_click(widget):
 def on_double_click(widget):
     print("{} double clicked!".format(widget))
 
-@demo_helpers.interactive_tests(window, batch) #
-def test_checkbox():
+@run_demos.on_space(gui) #
+def test_button():
     yield "Green button with orange over and purple down states."
     button.deactivate()
     yield "Grey inactive button (no rollover)."

@@ -2,12 +2,10 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window)
 grid = glooey.Grid()
 widgets = { #
         (0,0): glooey.EventLogger(50, 50),
@@ -17,8 +15,8 @@ widgets = { #
 }
 gui.add(grid)
 
-@demo_helpers.interactive_tests(window, batch) #
-def interactive_grid_tests():
+@run_demos.on_space(gui) #
+def test_grid():
     # Test adding and removing cells.
     for row, col in widgets:
         grid.add(row, col, widgets[row,col])

@@ -2,20 +2,18 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window)
 bin = glooey.Bin()
 widget = glooey.PlaceHolder(100, 100)
 
 bin.add(widget)
 gui.add(bin)
 
-@demo_helpers.interactive_tests(window, batch) 
-def interactive_bin_tests():
+@run_demos.on_space(gui) 
+def test_bin():
     bin.add(widget)
     yield "Put a widget in the bin."
     bin.clear()

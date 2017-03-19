@@ -28,8 +28,8 @@
      height="0px"
      borderopacity="1.0"
      inkscape:current-layer="layer2"
-     inkscape:cx="-1415.1893"
-     inkscape:cy="650.01603"
+     inkscape:cx="-1426.5018"
+     inkscape:cy="649.51603"
      inkscape:object-paths="true"
      fit-margin-right="0"
      inkscape:window-maximized="1"
@@ -41,13 +41,13 @@
      inkscape:window-x="0"
      inkscape:window-y="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1600"
+     inkscape:window-width="1680"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      pagecolor="#ffffff"
      inkscape:bbox-paths="true"
      inkscape:bbox-nodes="true"
-     inkscape:window-height="897"
+     inkscape:window-height="1047"
      showborder="false"
      fit-margin-top="0"
      inkscape:snap-intersection-paths="true"
@@ -87,6 +87,29 @@
        d="m -831.72692,520.12857 0,2.125 0,16.20508 4.0918,-4.08985 1.9687,4.75977 2.9883,-1.49414 -2.0078,-4.82031 5.6445,0 -12.6855,-12.68555 z m 0.8809,2.125 9.6796,9.67969 -4.8398,0 2.1992,5.28125 -1.4082,0.70507 -2.1113,-5.10546 -3.5195,3.51953 0,-14.08008 z"
        id="path4392"
        inkscape:connector-curvature="0"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g4175"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="rect4141-3"
+         d="m -891.0601,524.16258 0,14 14,0 0,-14 -14,0 z m 4,4 6,0 0,6 -6,0 0,-6 z"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="rect4141"
+         d="m -890.0601,525.16258 0,12 12,0 0,-12 -12,0 z m 2,2 8,0 0,8 -8,0 0,-8 z"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <circle
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#8ae234;stroke-width:0.94117647;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4179"
+       cx="-883.81012"
+       cy="550.9126"
+       r="7.5294118"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

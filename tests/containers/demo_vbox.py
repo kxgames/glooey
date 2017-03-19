@@ -1,39 +1,35 @@
 #!/usr/bin/env python3
 
 import pyglet
-import demo_helpers
-from glooey import *
-from glooey.drawing import *
-from pprint import pprint
+import glooey
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = Gui(window, batch=batch)
-vbox = VBox()
+gui = glooey.Gui(window)
+vbox = glooey.VBox()
 gui.add(vbox)
 
-@demo_helpers.interactive_tests(window, batch) #
-def interactive_vbox_tests():
+@run_demos.on_space(gui) #
+def test_vbox():
 
     # Test adding and removing widgets.
     for i in range(2):
-        vbox.add(EventLogger(50, 50))
+        vbox.add(glooey.EventLogger(50, 50))
     yield "Make an VBox with 2 cells."
 
-    top = EventLogger(50, 50, 'orange')
+    top = glooey.EventLogger(50, 50, 'orange')
     vbox.add_top(top)
     yield "Add a orange widget on the top."
 
-    bottom = EventLogger(50, 50, 'orange')
+    bottom = glooey.EventLogger(50, 50, 'orange')
     vbox.add_bottom(bottom)
     yield "Add a orange widget on the bottom."
 
-    middle = EventLogger(50, 50, 'orange')
+    middle = glooey.EventLogger(50, 50, 'orange')
     vbox.insert(middle, 2)
     yield "Insert a orange widget in the middle."
 
-    vbox.replace(middle, EventLogger(50, 50, 'green'))
+    vbox.replace(middle, glooey.EventLogger(50, 50, 'green'))
     yield "Replace the orange widget in the middle with a green one."
 
     vbox.remove(top)

@@ -2,16 +2,7 @@
 
 import pyglet
 import glooey
-
-window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = glooey.Gui(window, batch=batch)
-hbox = glooey.HBox()
-hbox.alignment = 'center'
-hbox.cell_alignment = 'center'
-hbox.cell_padding = 8
-theme = glooey.themes.ResourceLoader('wesnoth')
+import run_demos
 
 class TestRadioButton(glooey.RadioButton): #
     custom_checked_base = pyglet.image.load('assets/misc/checked_base.png')
@@ -27,6 +18,13 @@ class TestRadioButton(glooey.RadioButton): #
 def on_toggle(widget): #
     print(f"{widget}: {widget.is_checked}")
 
+window = pyglet.window.Window()
+gui = glooey.Gui(window)
+hbox = glooey.HBox()
+hbox.alignment = 'center'
+hbox.cell_alignment = 'center'
+hbox.cell_padding = 8
+
 buttons = []
 for i in range(3):
     button = TestRadioButton(buttons)
@@ -34,6 +32,16 @@ for i in range(3):
     hbox.add(button)
 
 gui.add(hbox)
+
+@run_demos.on_space(gui) #
+def test_radio_buttons():
+    for button in buttons:
+        button.reactivate()
+    yield "Three green radio buttons with orange over and purple down states."
+
+    for button in buttons:
+        button.deactivate()
+    yield "Grey inactive buttons (no rollover)."
 
 pyglet.app.run()
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import pyglet
-import demo_helpers
+import run_demos
 import glooey.themes.golden as golden
 
 window = pyglet.window.Window()
@@ -9,7 +9,7 @@ gui = golden.Gui(window)
 frame = golden.BigFrame()
 gui.add(frame)
 
-@demo_helpers.interactive_tests(window, gui.batch)
+@run_demos.on_space(gui)
 def test_big_frame():
     frame.clear()
     yield "Empty frame."

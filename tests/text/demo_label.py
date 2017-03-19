@@ -2,13 +2,10 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-lorem_ipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam justo sem, malesuada ut ultricies ac, bibendum eu neque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean at tellus ut velit dignissim tincidunt. Curabitur euismod laoreet orci semper dignissim. Suspendisse potenti. Vivamus sed enim quis dui pulvinar pharetra. Duis condimentum ultricies ipsum, sed ornare leo vestibulum vitae. Sed ut justo massa, varius molestie diam. Sed lacus quam, tempor in dictum sed, posuere et diam.'
-gui = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window)
 stack = glooey.Stack()
 stack.alignment = 'center'
 label = glooey.Label()
@@ -17,7 +14,7 @@ stack.add(outline)
 stack.add(label)
 gui.add(stack)
 
-@demo_helpers.interactive_tests(window, batch) #
+@run_demos.on_space(gui) #
 def test_label():
     label.set_text('Lorem ipsum', 0)
     yield "Display \"lorem ipsum\"."
@@ -25,7 +22,7 @@ def test_label():
     label.text = ''
     yield "Clear the label."
 
-    label.set_text(lorem_ipsum, 400)
+    label.set_text(glooey.drawing.lorem_ipsum(10), 400)
     yield "Display wrapped text."
 
     label.font_name = 'serif'

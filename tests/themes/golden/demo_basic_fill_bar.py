@@ -2,7 +2,7 @@
 
 import pyglet
 import glooey.themes.golden as golden
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
 gui = golden.Gui(window)
@@ -10,7 +10,7 @@ bar = golden.BasicFillBar()
 bar.alignment = 'center'
 gui.add(bar)
 
-@demo_helpers.interactive_tests(window, gui.batch) #
+@run_demos.on_space(gui) #
 def test_basic_fill_bar():
     colors = 'red', 'yellow', 'lime', 'green', 'teal', 'blue'
     fractions = [i/5 for i in range(6)]

@@ -2,19 +2,17 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window)
 outline = glooey.Outline(color='orange')
 widget = glooey.PlaceHolder(50, 50, color='green')
 
 outline.add(widget)
 gui.add(outline)
 
-@demo_helpers.interactive_tests(window, batch) #
+@run_demos.on_space(gui) #
 def test_image():
     outline.bin.padding = 0
     yield "A orange outline around a green placeholder."

@@ -2,10 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
-
-window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
+import run_demos
 
 class TestCheckbox(glooey.Checkbox): #
     custom_checked_base = pyglet.image.load('assets/misc/checked_base.png')
@@ -18,7 +15,8 @@ class TestCheckbox(glooey.Checkbox): #
     custom_unchecked_down = pyglet.image.load('assets/misc/unchecked_down.png')
     custom_unchecked_off = pyglet.image.load('assets/misc/unchecked_off.png')
 
-gui = glooey.Gui(window, batch=batch)
+window = pyglet.window.Window()
+gui = glooey.Gui(window)
 button = TestCheckbox()
 gui.add(button)
 
@@ -26,7 +24,7 @@ gui.add(button)
 def on_toggle(widget):
     print(f"{widget} is {'checked' if widget.is_checked else 'unchecked'}!")
 
-@demo_helpers.interactive_tests(window, batch) #
+@run_demos.on_space(gui) #
 def test_checkbox():
     yield "Green button with orange over and purple down states."
     button.deactivate()

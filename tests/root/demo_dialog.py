@@ -2,10 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
-
-window = pyglet.window.Window()
-gui = glooey.Gui(window)
+import run_demos
 
 class TestDialog(glooey.Dialog):
 
@@ -23,9 +20,11 @@ class TestDialog(glooey.Dialog):
 
 
 
+window = pyglet.window.Window()
+gui = glooey.Gui(window)
 dialog = TestDialog()
 
-@demo_helpers.interactive_tests(window, gui.batch) #
+@run_demos.on_space(gui) #
 def test_dialog():
     dialog.open(gui)
     yield "Click on the dialog to close it."

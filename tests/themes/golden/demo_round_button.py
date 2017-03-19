@@ -2,7 +2,7 @@
 
 import pyglet
 import glooey.themes.golden as golden
-import demo_helpers
+import run_demos
 
 colors = 'red', 'green', 'blue', 'grey'
 icons = None, 'save', 'chat', 'zoom', 'yes', 'no', 'plus', 'minus', 'up', 'right', 'down', 'left'
@@ -12,7 +12,7 @@ gui = golden.Gui(window)
 button = golden.RoundButton()
 gui.add(button)
 
-@demo_helpers.interactive_tests(window, gui.batch) #
+@run_demos.on_space(gui) #
 def test_round_button():
     for color in colors:
         button.color = color

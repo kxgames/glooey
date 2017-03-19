@@ -2,7 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 from vecrec import Rect
 from pyglet.image import load
 
@@ -12,7 +12,7 @@ rect = Rect.from_size(64*8, 64*6)
 rect.center = Rect.from_pyglet_window(window).center
 bg = glooey.drawing.Background(rect=rect, batch=batch)
 
-@demo_helpers.interactive_tests(window, batch)
+@run_demos.on_space(window, batch)
 def test_background():
     # Make sure colors can be set, updated, and removed.
     bg.set_images(color='green')

@@ -22,14 +22,12 @@ under the mouse, which is effectively O(√N).  That said, this layout is totall
 flat, and a "real" GUI would probably be much more hierarchical.  In that case, 
 the search for widgets under the mouse would probably approach O(log(N))."""
 
+
 import pyglet
 import glooey
 from pprint import pprint
 
 print(__doc__)
-
-window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
 
 class TestButton(glooey.Clickable):
 
@@ -44,7 +42,7 @@ class TestButton(glooey.Clickable):
         if self.rectangle is None:
             self.rectangle = glooey.drawing.Rectangle(
                     rect=self.rect,
-                    color='red',
+                    color='green',
                     batch=self.batch,
                     group=self.group,
                     usage='dynamic',
@@ -58,21 +56,27 @@ class TestButton(glooey.Clickable):
 
     def on_rollover(self, new_state, old_state):
         if new_state == 'base':
-            self.rectangle.color = 'red'
+            self.rectangle.color = 'green'
         if new_state == 'over':
-            self.rectangle.color = 'yellow'
+            self.rectangle.color = 'orange'
         if new_state == 'down':
-            self.rectangle.color = 'blue'
+            self.rectangle.color = 'purple'
 
 
 
-gui = glooey.Gui(window, batch=batch)
+window = pyglet.window.Window()
+gui = glooey.Gui(window)
 grid = glooey.Grid()
 
 for i in range(window.height//4):
     for j in range(window.width//4):
         grid.add(i, j, TestButton())
 
+cursor = pyglet.image.load('assets/misc/cursor_green_circle.png')
+hotspot = 8, 8
+
+gui.set_cursor(cursor, hotspot)
 gui.add(grid)
+
 pyglet.app.run()
 

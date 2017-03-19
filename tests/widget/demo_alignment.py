@@ -2,12 +2,10 @@
 
 import pyglet
 import glooey
-import demo_helpers
+import run_demos
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
-
-gui = glooey.Gui(window, batch=batch)
+gui = glooey.Gui(window)
 widget = glooey.PlaceHolder(200, 200)
 
 def left_half(rect, boundary): #
@@ -28,8 +26,8 @@ alignments = [ #
         'bottom left', 'bottom', 'bottom right',
         left_half, right_half,
 ]
-@demo_helpers.interactive_tests(window, batch) #
-def interactive_padding_tests():
+@run_demos.on_space(gui) #
+def test_alignment():
     gui.add(widget)
     for test in alignments:
         widget.alignment = test

@@ -2,10 +2,7 @@
 
 import pyglet
 import glooey
-import demo_helpers
-
-window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
+import run_demos
 
 class TestFrame(glooey.Frame): #
     custom_alignment = 'fill'
@@ -19,13 +16,14 @@ class TestFrame(glooey.Frame): #
 class TestBackground(glooey.Background): #
     custom_center = pyglet.image.load('assets/64x64/orange.png')
 
-gui = glooey.Gui(window, batch=batch)
+window = pyglet.window.Window()
+gui = glooey.Gui(window)
 frame = TestFrame()
 widget = TestBackground()
 frame.add(widget)
 gui.add(frame)
 
-@demo_helpers.interactive_tests(window, batch) #
+@run_demos.on_space(gui) #
 def test_image():
     yield "A orange tiled background in green tiled frame."
 
