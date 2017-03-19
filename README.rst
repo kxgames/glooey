@@ -15,9 +15,14 @@ games.
 
 Installation
 ============
-Use ``pip`` to install ``glooey``::
+``glooey`` is currently still under active development, so the best way to 
+install it is to clone the repository and run ``pip`` on the local files::
 
-   $ pip install glooey
+    $ git clone https://github.com/kxgames/glooey
+    $ pip install ./glooey
+
+``glooey`` is also available on PyPI, but until the project becomes more 
+stable, this is likely to be significantly out-of-date.
 
 Usage
 =====

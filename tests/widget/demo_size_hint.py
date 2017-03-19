@@ -16,7 +16,7 @@ def interactive_padding_tests():
     # Test setting and change the size hints.
     w = glooey.PlaceHolder(50, 50)
     w.alignment = 'center'
-    gui.add(w)
+    gui.clear(); gui.add(w)
     yield "A 50x50 placeholder."
 
     w.width_hint = 200
@@ -37,21 +37,21 @@ def interactive_padding_tests():
         custom_alignment = 'center'
         custom_width_hint = 200
 
-    gui.add(Widget200x0(50, 50))
+    gui.clear(); gui.add(Widget200x0(50, 50))
     yield "A custom 200x50 placeholder."
 
     class Widget0x100(glooey.PlaceHolder): #
         custom_alignment = 'center'
         custom_height_hint = 100
 
-    gui.add(Widget0x100(50, 50))
+    gui.clear(); gui.add(Widget0x100(50, 50))
     yield "A custom 50x100 placeholder."
 
     class Widget200x100(glooey.PlaceHolder): #
         custom_alignment = 'center'
         custom_size_hint = 200, 100
 
-    gui.add(Widget200x100(50, 50))
+    gui.clear(); gui.add(Widget200x100(50, 50))
     yield "A custom 200x100 placeholder."
 
 pyglet.app.run()

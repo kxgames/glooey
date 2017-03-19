@@ -449,10 +449,12 @@ class Stack (Widget):
     Have any number of children, claim enough space for the biggest one, and 
     just draw them all in layers.
     """
+    custom_one_child_gets_mouse = False
 
     def __init__(self):
         Widget.__init__(self)
         self._children = {} # {child: layer}
+        self.one_child_gets_mouse = self.custom_one_child_gets_mouse
 
     def add(self, widget):
         self.add_front(widget)
@@ -499,6 +501,13 @@ class Stack (Widget):
         else:
             for child, layer in self._children.items():
                 child.regroup(pyglet.graphics.OrderedGroup(layer, self.group))
+
+    def do_find_children_under_mouse(self, x, y):
+        for child in self.children:
+            if child.is_under_mouse(x, y):
+                yield child
+                if self.one_child_gets_mouse:
+                    return
 
     def get_children(self):
         """

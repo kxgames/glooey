@@ -286,3 +286,44 @@ class ScrollBox(glooey.ScrollBox):
             custom_top_padding = 6
             custom_bottom_padding = 5
 
+
+class PopUp(glooey.Dialog):
+
+    def __init__(self, text=None, line_wrap=None):
+        super().__init__()
+
+        self._frame = glooey.Frame()
+        self._frame.bin.vert_padding = 16
+        self._frame.bin.left_padding = 24
+        self._frame.decoration.set_images(
+                left=assets.image('frames/big/left.png'),
+                center=assets.texture('frames/big/center.png'),
+        )
+
+        self._button = glooey.Button()
+        self._button.set_background(
+                base_image=assets.image('frames/big/right_button_base.png'),
+                over_image=assets.image('frames/big/right_button_over.png'),
+                down_image=assets.image('frames/big/right_button_down.png'),
+                off_image=assets.image('frames/big/right_button_off.png'),
+        )
+        self._button.push_handlers(on_click=lambda w: self.close())
+
+        self._hbox = glooey.HBox()
+        self._hbox.add(self._frame, 0)
+        self._hbox.add(self._button, 0)
+
+        self._attach_child(self._hbox)
+
+        if text is not None:
+            self.set_text(text, line_wrap)
+
+    def add(self, widget):
+        self._frame.add(widget)
+
+    def clear(self, widget):
+        self._frame.add(widget)
+
+    def set_text(self, text, line_wrap=None):
+        self.add(Label(text, line_wrap))
+

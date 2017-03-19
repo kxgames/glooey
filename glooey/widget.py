@@ -353,7 +353,13 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         pass
 
     def do_claim(self):
-        raise NotImplementedError
+        # If the widget only has one child, then it probably makes sense to 
+        # just claim enough space for that child.  Otherwise force the subclass 
+        # to provide an implementation.
+        if self._num_children == 1:
+            return next(iter(self.__children)).claimed_size
+        else:
+            raise NotImplementedError
 
     def do_resize(self):
         """

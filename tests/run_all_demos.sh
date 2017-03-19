@@ -4,7 +4,7 @@ IFS=$'\n\t'
 BOLD='\033[1;37m'
 NORMAL='\033[0m'
 
-for demo in **/demo_*.py; do
+for demo in $(find . -name 'demo_*.py' -executable); do
     [ -x $demo ] && (
         echo -e $BOLD$demo$NORMAL
         cd $(dirname $demo)

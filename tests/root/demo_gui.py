@@ -5,20 +5,23 @@ import glooey
 import demo_helpers
 
 window = pyglet.window.Window()
-batch = pyglet.graphics.Batch()
+w, h = window.width, window.height
 
-gui = glooey.Gui(window, batch=batch)
-logger = glooey.EventLogger()
-logger.padding = 100
+gui = glooey.Gui(window)
+logger = glooey.EventLogger(0.8 * w, 0.8 * h, align='center')
 gui.add(logger)
 
-@demo_helpers.interactive_tests(window, batch) #
+@demo_helpers.interactive_tests(window, gui.batch) #
 def test_gui():
-    gui.set_cursor(pyglet.image.load('cursor_nw.png'), (0, 16))
-    yield "Use a cursor with a top-left hotspot."
-
-    gui.set_cursor(pyglet.image.load('cursor_se.png'), (16, 0))
+    gui.set_cursor(pyglet.image.load('assets/misc/cursor_flipped.png'), (16, 0))
     yield "Use a cursor with a bottom-right hotspot."
+    gui.set_cursor(pyglet.image.load('assets/misc/cursor.png'), (0, 16))
+
+    popup = glooey.EventLogger(0.2 * w, 0.2 * h, color='orange', align='center')
+    gui.add(popup)
+    yield "Mouse events should preferentially go to the pop-up."
+    gui.remove(popup)
+
 
 pyglet.app.run()
 

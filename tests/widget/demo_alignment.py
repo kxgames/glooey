@@ -40,6 +40,7 @@ def interactive_padding_tests():
             'custom_alignment':
                 test if isinstance(test, str) else staticmethod(test),
         })
+        gui.clear()
         gui.add(custom_widget_cls(200, 200))
         yield f"custom_alignment = '{test}'"
 

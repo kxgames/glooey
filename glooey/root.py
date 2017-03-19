@@ -3,11 +3,13 @@ import vecrec
 import autoprop
 
 from vecrec import Vector, Rect
-from glooey.containers import Bin
+from glooey.widget import Widget
+from glooey.containers import Bin, Stack
 from glooey.helpers import *
 
 @autoprop
-class Root (Bin):
+class Root(Stack):
+    custom_one_child_gets_mouse = True
 
     def __init__(self, window, batch=None, group=None):
         super().__init__()
@@ -15,7 +17,7 @@ class Root (Bin):
         self._parent = self
         self._window = window
         self._batch = batch or pyglet.graphics.Batch()
-        self._group = group or pyglet.graphics.OrderedGroup(0)
+        self._group = group or pyglet.graphics.Group()
         self._spurious_leave_event = False
 
         window.push_handlers(self)
@@ -40,9 +42,10 @@ class Root (Bin):
         self.resize(self.territory)
 
     def regroup(self, group):
+        # We need to replace None with an actual group, because glooey 
+        # interprets None as "my parent hasn't given me a group yet."
         super().regroup(group or pyglet.graphics.Group())
 
-    
     def on_mouse_enter(self, x, y):
         # For some reason, whenever the mouse is clicked, X11 generates a 
         # on_mouse_leave event followed by a on_mouse_enter event.  There's no 
@@ -62,8 +65,8 @@ class Root (Bin):
         # on_mouse_leave event followed by a on_mouse_enter event.  We can tell 
         # that this is happening in this handler because the mouse coordinates 
         # will still be under the widget.  In this case, set a flag so 
-        # on_mouse_enter() will know to ignore the spurious event to follow, 
-        # ignore the event, and stop it from propagating.
+        # on_mouse_enter() will know to ignore the spurious event to follow and 
+        # to stop it from propagating.
 
         if self.is_under_mouse(x, y):
             self._spurious_leave_event = True
@@ -92,7 +95,7 @@ class Root (Bin):
 
 
 @autoprop
-class Gui (Root):
+class Gui(Root):
 
     def on_draw(self):
         self.window.clear()
@@ -245,9 +248,16 @@ class PanningGui(Gui):
 
 PanningGui.register_event_type('on_mouse_pan')
 
-@autoprop
-class Dialog (Root):
-    # Have to set size manually.
-    pass
+class Dialog(Widget):
+    custom_alignment = 'center'
+
+    def open(self, gui):
+        self.close()
+        gui.add(self)
+
+    def close(self):
+        if self.root is not None:
+            self.root.remove(self)
+
 
 

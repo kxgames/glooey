@@ -124,7 +124,7 @@ class Background(Widget):
 
     def set_images(self, *, color=None, image=None, center=None, top=None,
             bottom=None, left=None, right=None, top_left=None, top_right=None,
-            bottom_left=None, bottom_right=None, vtile=None, htile=None):
+            bottom_left=None, bottom_right=None, vtile='auto', htile='auto'):
 
         self._artist.set_images(
                 color=color,

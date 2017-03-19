@@ -605,6 +605,12 @@ frame.  The only difference is that, if 'htile' or 'vtile' are set to 'auto'
     def is_empty(self):
         return not self._color and not self._tile_images
 
+    def get_htile(self):
+        return self._htile
+
+    def get_vtile(self):
+        return self._vtile
+
     def hide(self):
         if self._color_artist:
             self._color_artist.hide()
