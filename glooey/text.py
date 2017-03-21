@@ -313,12 +313,14 @@ class EditableLabel(Label):
 
     def do_claim(self):
         font = pyglet.font.load(self.font_name)
-        return 0, font.ascent - font.descent
+        min_size = font.ascent - font.descent
+        return min_size, min_size
 
     def focus(self):
         # Push handlers directly to the window, so even if the user has 
         # attached their own handlers (e.g. for hotkeys) above the GUI, the 
         # form will still take focus.
+
         if not self._focus:
             self._focus = True
             self._caret.on_activate()
@@ -336,6 +338,7 @@ class EditableLabel(Label):
         # doesn't provide a way to be more specific), so if some other handlers 
         # were pushed in the meantime, they'll be popped instead of the ones 
         # pushed by the form.
+
         if self._focus:
             self._focus = False
             self._caret.on_deactivate()
@@ -361,10 +364,13 @@ class EditableLabel(Label):
         # leave events.  This is more robust than checking the mouse 
         # coordinates in this method, because it still works when the form has 
         # a parent that changes its coordinates, like a ScrollBox.
+
         if not self._is_mouse_over:
             self.unfocus()
+
             # This event will get swallowed by the caret, so dispatch a new 
             # event after the caret handlers have been popped.
+
             self.window.dispatch_event('on_mouse_press', x, y, button, modifiers)
     
     def on_window_key_press(self, symbol, modifiers):
@@ -461,8 +467,3 @@ class Form(Widget):
         self._label.text = new_text
 
 
-
-        
-
-
-    

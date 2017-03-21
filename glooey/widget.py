@@ -579,7 +579,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         return self._rect
 
     def get_size_hint(self):
-        return self._width_hint, self._min_height
+        return self._width_hint, self._height_hint
 
     def set_size_hint(self, new_width, new_height):
         self._width_hint = new_width

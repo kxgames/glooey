@@ -431,20 +431,26 @@ class Background(HoldUpdatesMixin):
 
         tile_rects = self._grid.make_cells()
 
+        # Figure out how big the color and outline artists need to be.  
+        # Normally they can just fill the whole background.  However, if the 
+        # images don't tile and only take up a subset of the available space, 
+        # we want the rest of the artists to use the same space.
+
+        apparent_rect = self._grid.rect if self._tile_images else self._rect
+
         # Draw a colored rectangle behind everything else if the user provided 
         # a color.
 
         have_artist = self._color_artist is not None
         have_color = self._color is not None
-        color_rect = self._grid.rect if self._tile_images else self._rect
-
+        
         if have_color and have_artist:
-            self._color_artist.rect = color_rect
+            self._color_artist.rect = apparent_rect
             self._color_artist.color = self._color
 
         if have_color and not have_artist:
             self._color_artist = Rectangle(
-                    rect=color_rect,
+                    rect=apparent_rect,
                     color=self._color, 
                     batch=self._batch,
                     group=self._color_group,
@@ -454,17 +460,17 @@ class Background(HoldUpdatesMixin):
             self._color_artist = None
 
         # Draw an outline if the user requested one.
+
         have_artist = self._outline_artist is not None
         have_outline = self._outline is not None
-        outline_rect = self._grid.rect if self._tile_images else self._rect
 
         if have_outline and have_artist:
-            self._outline_artist.rect = outline_rect
+            self._outline_artist.rect = apparent_rect
             self._outline_artist.color = self._outline
 
         if have_outline and not have_artist:
             self._outline_artist = Outline(
-                    rect=outline_rect,
+                    rect=apparent_rect,
                     color=self._outline, 
                     batch=self._batch,
                     group=self._outline_group,
@@ -657,10 +663,13 @@ frame.  The only difference is that, if 'htile' or 'vtile' are set to 'auto'
     def hide(self):
         if self._color_artist:
             self._color_artist.hide()
+        if self._outline_artist:
+            self._outline_artist.hide()
         for artist in self._tile_artists.values():
             artist.hide()
 
         self._color_artist = None
+        self._outline_artist = None
         self._tile_artists = {}
         self._hidden = True
 
