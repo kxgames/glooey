@@ -102,7 +102,11 @@ class Gui(Root):
         self.batch.draw()
 
     def on_resize(self, width, height):
-        self.repack()
+        # Make sure the window actually changed size before starting a repack.  
+        width -= self.left_padding + self.right_padding
+        height -= self.top_padding + self.bottom_padding
+        if self.rect.size != (width, height):
+            self.repack()
 
     def get_territory(self):
         return Rect.from_pyglet_window(self.window)
