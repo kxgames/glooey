@@ -77,7 +77,7 @@ window = pyglet.window.Window()
 gui = glooey.Gui(window)
 grid = glooey.Grid(2, 2)
 
-frame = glooey.Outline()
+frame = glooey.Frame()
 pane = TestScrollPane()
 hbar = TestHScrollBar(pane)
 vbar = TestVScrollBar(pane)
@@ -89,6 +89,7 @@ grid.set_row_height(1, 0)
 grid.set_col_width(1, 0)
 grid.alignment = 'center'
 frame.alignment = 'fill'
+frame.decoration.outline = 'green'
 
 pane.add(content)
 frame.add(pane)

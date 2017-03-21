@@ -33,13 +33,13 @@ def test_fill_bar():
         yield f"{int(100 * bar.fraction_filled)}% green."
 
     # Make sure the images can be changed after initialization.
-    bar.base.set_images(
+    bar.base.set_appearance(
         left=pyglet.image.load('assets/4x64/purple.png'),
         center=pyglet.image.load('assets/64x64/grey.png'),
         right=pyglet.image.load('assets/4x64/purple.png'),
         htile=True,
     )
-    bar.fill.set_images(
+    bar.fill.set_appearance(
         center=pyglet.image.load('assets/64x64/orange.png'),
         htile=True,
     )

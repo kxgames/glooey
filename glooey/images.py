@@ -63,6 +63,7 @@ class Image(Widget):
 @autoprop
 class Background(Widget):
     custom_color = None
+    custom_outline = None
     custom_image = None
     custom_center = None
     custom_top = None
@@ -80,6 +81,7 @@ class Background(Widget):
         super().__init__()
         self._artist = drawing.Background(
                 color=self.custom_color,
+                outline=self.custom_outline,
                 image=self.custom_image,
                 center=self.custom_center,
                 top=self.custom_top,
@@ -119,14 +121,24 @@ class Background(Widget):
     def set_color(self, new_color):
         self._artist.color = new_color
 
-    def get_images(self):
-        return self._artist.images
+    def get_outline(self):
+        return self._artist.outline
 
-    def set_images(self, *, color=None, image=None, center=None, top=None,
+    def set_outline(self, new_outline):
+        self._artist.outline = new_outline
+
+    def set_image(self, image):
+        self._artist.set_image(image)
+        self.repack()
+
+    def get_appearance(self):
+        return self._artist.appearance
+
+    def set_appearance(self, *, color=None, image=None, center=None, top=None,
             bottom=None, left=None, right=None, top_left=None, top_right=None,
             bottom_left=None, bottom_right=None, vtile='auto', htile='auto'):
 
-        self._artist.set_images(
+        self._artist.set_appearance(
                 color=color,
                 image=image,
                 center=center,
@@ -143,10 +155,6 @@ class Background(Widget):
         )
         self.repack()
 
-    def set_image(self, image):
-        self._artist.set_image(image)
-        self.repack()
-
     @property
     def is_empty(self):
         return self._artist.is_empty
@@ -155,6 +163,7 @@ class Background(Widget):
 @autoprop
 class Frame(Widget):
     Bin = Bin
+    Foreground = None
     Decoration = Background
     custom_alignment = 'center'
     custom_bin_layer = 2
@@ -168,6 +177,9 @@ class Frame(Widget):
 
         self._attach_child(self._bin)
         self._attach_child(self._decoration)
+
+        if self.Foreground:
+            self.add(self.Foreground())
 
     def add(self, child):
         self._bin.add(child)
@@ -187,50 +199,10 @@ class Frame(Widget):
     def get_bin(self):
         return self._bin
 
+    def get_child(self):
+        return self._bin.child
+
     def get_decoration(self):
         return self._decoration
-
-
-@autoprop
-class Outline(Frame):
-    custom_color = 'green'
-    custom_decoration_layer = 2
-    custom_bin_layer = 1
-
-    class Decoration(Widget):
-
-        def __init__(self):
-            super().__init__()
-            self.artist = drawing.Outline(hidden=True)
-
-        def do_claim(self):
-            return 2, 2
-
-        def do_attach(self):
-            self.artist.batch = self.batch
-
-        def do_resize(self):
-            self.artist.rect = self.rect
-
-        def do_regroup(self):
-            self.artist.group = self.group
-
-        def do_draw(self):
-            self.artist.unhide()
-
-        def do_undraw(self):
-            self.artist.hide()
-
-
-    def __init__(self, color=None):
-        super().__init__()
-        self.color = color or self.custom_color
-
-    def get_color(self):
-        return self.decoration.artist.color
-
-    def set_color(self, new_color):
-        self.decoration.artist.color = drawing.Color.from_anything(new_color)
-        self.decoration.draw()
 
 

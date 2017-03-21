@@ -21,7 +21,11 @@ class TestScrollContent(glooey.Grid):
 
 
 class TestScrollBox(glooey.ScrollBox):
-    Frame = glooey.Outline
+
+    class Frame(glooey.Frame):
+
+        class Decoration(glooey.Background):
+            custom_outline = 'green'
 
     class HVBar(glooey.HVScrollBar):
 

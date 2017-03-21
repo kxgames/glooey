@@ -7,7 +7,8 @@ import run_demos
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
 
-frame = glooey.Outline()
+frame = glooey.Frame()
+frame.decoration.outline = 'green'
 
 pane = glooey.ScrollPane()
 pane.size_hint = 300, 300

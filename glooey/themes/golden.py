@@ -206,7 +206,7 @@ class BasicFillBar(glooey.FillBar):
     def set_color(self, color):
         try:
             self._color = color
-            self.fill.set_images(
+            self.fill.set_appearance(
                     left=assets.image(f'fill_bars/basic/{color}_left.png'),
                     center=assets.texture(f'fill_bars/basic/{color}_center.png'),
                     right=assets.image(f'fill_bars/basic/{color}_right.png'),
@@ -239,7 +239,7 @@ class FancyFillBar(glooey.FillBar):
     def set_color(self, color):
         try:
             self._color = color
-            self.fill.set_images(
+            self.fill.set_appearance(
                     left=assets.image(f'fill_bars/fancy/{color}_left.png'),
                     center=assets.texture(f'fill_bars/fancy/{color}_center.png'),
                     right=assets.image(f'fill_bars/fancy/{color}_right.png'),
@@ -295,7 +295,7 @@ class PopUp(glooey.Dialog):
         self._frame = glooey.Frame()
         self._frame.bin.vert_padding = 16
         self._frame.bin.left_padding = 24
-        self._frame.decoration.set_images(
+        self._frame.decoration.set_appearance(
                 left=assets.image('frames/big/left.png'),
                 center=assets.texture('frames/big/center.png'),
         )

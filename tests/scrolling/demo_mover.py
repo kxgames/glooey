@@ -7,7 +7,8 @@ import run_demos
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
 mover = glooey.Mover()
-frame = glooey.Outline()
+frame = glooey.Frame()
+frame.decoration.outline = 'green'
 
 mover.size_hint = 200, 200
 mover.alignment = 'center'

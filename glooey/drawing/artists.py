@@ -165,7 +165,9 @@ class Outline(Artist):
                     self._rect.top_right.tuple +
                     self._rect.top_right.tuple +
                     self._rect.top_left.tuple +
-                    self._rect.top_left.tuple +
+                    # Don't know why this offset is necessary, but without it 
+                    # the top-left pixel doesn't get filled in...
+                    (self._rect.top_left + (1, 0)).tuple +
                     self._rect.bottom_left.tuple
             )
 
@@ -350,10 +352,11 @@ avoids this logic at the expense of less well-organized memory."""
 @autoprop
 class Background(HoldUpdatesMixin):
 
-    def __init__(self, *, rect=None, color=None, image=None, center=None, 
-            top=None, bottom=None, left=None, right=None, top_left=None, 
-            top_right=None, bottom_left=None, bottom_right=None, vtile='auto', 
-            htile='auto', batch=None, group=None, usage='static', hidden=False):
+    def __init__(self, *, rect=None, color=None, outline=None, image=None, 
+            center=None, top=None, bottom=None, left=None, right=None, 
+            top_left=None, top_right=None, bottom_left=None, bottom_right=None, 
+            vtile='auto', htile='auto', batch=None, group=None, usage='static', 
+            hidden=False):
 
         super().__init__()
 
@@ -367,6 +370,9 @@ class Background(HoldUpdatesMixin):
         self._color = None
         self._color_artist = None
         self._color_group = None
+        self._outline = None
+        self._outline_artist = None
+        self._outline_group = None
         self._tile_images = {}
         self._tile_artists = {}
         self._tile_group = None
@@ -378,8 +384,9 @@ class Background(HoldUpdatesMixin):
         self._hidden = hidden
 
         self._update_group()
-        self.set_images(
+        self.set_appearance(
                 color=color,
+                outline=outline,
                 image=image,
                 center=center,
                 top=top,
@@ -397,9 +404,15 @@ class Background(HoldUpdatesMixin):
     @update_function
     def _update_group(self):
         self._color_group = pyglet.graphics.OrderedGroup(0, self._group)
+        self._outline_group = pyglet.graphics.OrderedGroup(2, self._group)
         self._tile_group = pyglet.graphics.OrderedGroup(1, self._group)
+
         if self._color_artist:
             self._color_artist.group = self._color_group
+
+        if self._outline_artist:
+            self._otuline_artist.group = self._outline_group
+
         for artist in self._tile_artists.values():
             artist.group = self._tile_group
 
@@ -439,6 +452,26 @@ class Background(HoldUpdatesMixin):
         if not have_color and have_artist:
             self._color_artist.hide()
             self._color_artist = None
+
+        # Draw an outline if the user requested one.
+        have_artist = self._outline_artist is not None
+        have_outline = self._outline is not None
+        outline_rect = self._grid.rect if self._tile_images else self._rect
+
+        if have_outline and have_artist:
+            self._outline_artist.rect = outline_rect
+            self._outline_artist.color = self._outline
+
+        if have_outline and not have_artist:
+            self._outline_artist = Outline(
+                    rect=outline_rect,
+                    color=self._outline, 
+                    batch=self._batch,
+                    group=self._outline_group,
+            )
+        if not have_outline and have_artist:
+            self._outline_artist.hide()
+            self._outline_artist = None
 
         # Decide which images to tile.
 
@@ -507,16 +540,28 @@ class Background(HoldUpdatesMixin):
         self._color = new_color
         self._update_tiles()
 
-    def get_images(self):
+    def get_outline(self):
+        return self._outline
+
+    def set_outline(self, new_outline):
+        self._outline = new_outline
+        self._update_tiles()
+
+    def set_image(self, image):
+        self.set_appearance(image=image)
+
+    def get_appearance(self):
         images = self._tile_images.copy()
         images['color'] = self._color
+        images['outline'] = self._outline
         images['htile'] = self._htile
         images['vtile'] = self._vtile
         return images
 
-    def set_images(self, *, color=None, image=None, center=None, top=None, 
-            bottom=None, left=None, right=None, top_left=None, top_right=None, 
-            bottom_left=None, bottom_right=None, vtile='auto', htile='auto'):
+    def set_appearance(self, *, color=None, outline=None, image=None, 
+            center=None, top=None, bottom=None, left=None, right=None, 
+            top_left=None, top_right=None, bottom_left=None, bottom_right=None, 
+            vtile='auto', htile='auto'):
 
         if image and center:
             raise UsageError("""\
@@ -545,6 +590,7 @@ frame.  The only difference is that, if 'htile' or 'vtile' are set to 'auto'
         # Store the images in a grid-like data structure.
 
         self._color = color
+        self._outline = outline
         self._tile_images = {
                 ij: img for ij, img in {
                     (0,0): top_left,
@@ -564,9 +610,6 @@ frame.  The only difference is that, if 'htile' or 'vtile' are set to 'auto'
             for ij, img in self._tile_images.items()}
 
         self._update_tiles()
-
-    def set_image(self, image):
-        self.set_images(image=image)
 
     def get_batch(self):
         return self._batch

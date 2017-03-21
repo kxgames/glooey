@@ -1,52 +1,56 @@
 #!/usr/bin/env python3
 
-"""Brown floor tiles should take up most (but not all) of the screen.
-
-h: toggle horizontal tiling
-v: toggle vertical tiling
-left click: change the color of the tiles.
-scroll: change the size of the floor area."""
-
 import pyglet
 import glooey
-import vecrec
+import run_demos
+from vecrec import Vector, Rect
 
 print(__doc__)
 
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 
-rect = vecrec.Rect.from_pyglet_window(window)
-rect.shrink(50)
-images = [
-        pyglet.image.load('tile_brown.png'),
-        pyglet.image.load('tile_teal.png'),
-]
+rects = { #
+        'big': Rect.from_size(64*8, 64*6),
+        'small': Rect.from_size(64*4, 64*3),
+}
+images = { #
+        'green': pyglet.image.load('assets/64x64/green.png'),
+        'orange': pyglet.image.load('assets/64x64/orange.png'),
+}
+
+window_rect = Rect.from_pyglet_window(window)
+for rect in rects.values():
+    rect.center = window_rect.center
+
 artist = glooey.drawing.Tile(
-        rect, images[0], vtile=True, htile=True, batch=batch)
+        rects['big'], images['green'], vtile=True, htile=True, batch=batch)
+
+@run_demos.on_space(window, batch)
+def test_tile():
+    yield "Show a green pattern."
+    artist.image = images['orange']
+    yield "Change to an orange pattern."
+    artist.image = images['green']
+
+    artist.rect = rects['small']
+    yield "Make the rect smaller."
+    artist.rect = rects['big']
+
+    artist.htile = False
+    yield "Don't tile horizontally."
+    artist.htile = True
+    artist.vtile = False
+    yield "Don't tile vertically."
+    artist.htile = False
+    yield "Don't tile at all."
+    artist.htile = True
+    artist.vtile = True
 
 @window.event
 def on_draw():
     window.clear()
     batch.draw()
-
-@window.event
-def on_mouse_press(x, y, button, modifiers):
-    i = images.index(artist.image)
-    artist.image = images[(i+1) % len(images)]
-
-@window.event
-def on_mouse_scroll(x, y, dx, dy):
-    artist.rect = artist.rect.get_grown(5*dy)
-
-@window.event
-def on_key_press(symbol, modifier):
-    from pyglet.window import key
-
-    if symbol == key.H:
-        artist.htile = not artist.htile
-    if symbol == key.V:
-        artist.vtile = not artist.vtile
 
 
 pyglet.app.run()

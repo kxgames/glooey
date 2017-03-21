@@ -183,7 +183,7 @@ class Button(Clickable):
 
     def set_background(self, **kwargs):
         for state, widget in self._backgrounds.items():
-            widget.set_images(**{
+            widget.set_appearance(**{
                 k.split('_', 1)[1]: v
                 for k,v in kwargs.items()
                 if k.startswith(state)
