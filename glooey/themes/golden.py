@@ -35,6 +35,24 @@ class Label(glooey.Label):
     custom_font_name = 'm5x7'
     custom_color = '#deeed6'
 
+class Form(glooey.Form):
+
+    class Label(glooey.EditableLabel):
+        custom_font_name = 'm5x7'
+        custom_color = '#deeed6'
+        custom_selection_color = '#595652'
+        custom_padding = 2
+        custom_left_padding = 4
+
+    class Base(glooey.Background):
+        custom_top = assets.texture('frames/mini/top_left.png')
+        custom_left = assets.texture('frames/mini/top_left.png')
+        custom_top_left = assets.image('frames/mini/top_left.png')
+        custom_bottom = assets.texture('frames/mini/bottom_right.png')
+        custom_right = assets.texture('frames/mini/bottom_right.png')
+        custom_bottom_right = assets.image('frames/mini/bottom_right.png')
+
+
 @autoprop
 class RoundButton(glooey.Button):
     custom_color = 'red'

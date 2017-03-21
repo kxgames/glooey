@@ -295,8 +295,7 @@ Label.register_event_type('on_edit_text')
 @autoprop
 class EditableLabel(Label):
     custom_selection_color = 'black'
-    custom_selection_background_color = 'green'
-    custom_cursor_blink_period = 0.5
+    custom_selection_background_color = None
     custom_unfocus_on_enter = True
 
     def __init__(self, text="", line_wrap=None, **style):
@@ -381,23 +380,17 @@ class EditableLabel(Label):
     def on_window_key_release(self, symbol, modifiers):
         return True
 
-    def do_make_new_layout(self, document, label_kwargs):
-        # Make the layout as small as possible if no size is given.  This step 
-        # is necessary because IncrementalTextLayout always needs a size, while 
-        # TextLayout only needs a size if line wrapping is enabled.
-        kwargs = dict(width=0, height=0)
-        kwargs.update(label_kwargs)
-        
+    def do_make_new_layout(self, document, kwargs):
         # Create a layout and a caret that can be used to edit it.
         layout = pyglet.text.layout.IncrementalTextLayout(document, **kwargs)
 
         layout.selection_color = drawing.Color.from_anything(
                 self._selection_color).tuple
         layout.selection_background_color = drawing.Color.from_anything(
-                self._selection_background_color).tuple
+                self._selection_background_color or self.color).tuple
 
         self._caret = pyglet.text.caret.Caret(layout, color=self.color[:3])
-        self._caret.PERIOD = self.custom_cursor_blink_period
+        self._caret.on_deactivate()
 
         return layout
 
