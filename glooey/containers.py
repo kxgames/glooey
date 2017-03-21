@@ -618,6 +618,10 @@ class Deck(Widget):
             try: self._states[self._previous_state].hide()
             except KeyError: pass
 
+    def set_state_if_known(self, new_state):
+        if new_state in self.known_states:
+            self.state = new_state
+
     def get_widget(self, state):
         return self._states[state]
 

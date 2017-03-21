@@ -4,8 +4,11 @@ import pyglet
 import autoprop
 
 from vecrec import Vector, Rect
+from debugtools import p, pp, pv
 from glooey import drawing
 from glooey.widget import Widget
+from glooey.images import Background
+from glooey.containers import Stack, Deck
 
 @autoprop
 class Label(Widget):
@@ -85,6 +88,9 @@ class Label(Widget):
         if not ignore_rect:
             kwargs['width'] = self.rect.width
             kwargs['height'] = self.rect.height
+        else:
+            kwargs['width'] = 0
+            kwargs['height'] = 0
 
         # It's best to make a fresh document each time.  Previously I was 
         # storing the document as a member variable, but I ran into corner 
@@ -92,7 +98,8 @@ class Label(Widget):
         # compatible with the new TextLayout (specifically 'align' != 'left' if 
         # line wrapping is no loner enabled).
         document = pyglet.text.decode_text(self._text)
-        self._layout = pyglet.text.layout.TextLayout(document, **kwargs)
+        document.push_handlers(self.on_insert_text, self.on_delete_text)
+        self._layout = self.do_make_new_layout(document, kwargs)
 
         # Use begin_update() and end_update() to prevent the layout from 
         # generating new vertex lists until the styles and coordinates have 
@@ -116,8 +123,19 @@ class Label(Widget):
         if self._layout is not None:
             self._layout.delete()
 
+    def do_make_new_layout(self, document, kwargs):
+        return pyglet.text.layout.TextLayout(document, **kwargs)
+
+    def on_insert_text(self, start, text):
+        self._text = self._layout.document.text
+        self.dispatch_event('on_edit_text', self)
+
+    def on_delete_text(self, start, end):
+        self._text = self._layout.document.text
+        self.dispatch_event('on_edit_text', self)
+
     def get_text(self):
-        return self._text
+        return self._layout.document.text
 
     def set_text(self, text, width=None, **style):
         self._text = text
@@ -272,3 +290,179 @@ class Label(Widget):
         self.repack()
 
 
+Label.register_event_type('on_edit_text')
+
+@autoprop
+class EditableLabel(Label):
+    custom_selection_color = 'black'
+    custom_selection_background_color = 'green'
+    custom_cursor_blink_period = 0.5
+    custom_unfocus_on_enter = True
+
+    def __init__(self, text="", line_wrap=None, **style):
+        super().__init__(text, line_wrap, **style)
+        self._caret = None
+        self._focus = False
+        self._is_mouse_over = False
+        self._unfocus_on_enter = self.custom_unfocus_on_enter
+
+        # I'm surprised pyglet doesn't treat the selection colors like all the 
+        # other styles.  Instead they're attributes of IncrementalTextLayout.
+        self._selection_color = self.custom_selection_color
+        self._selection_background_color = self.custom_selection_background_color
+
+    def do_claim(self):
+        font = pyglet.font.load(self.font_name)
+        return 0, font.ascent - font.descent
+
+    def focus(self):
+        # Push handlers directly to the window, so even if the user has 
+        # attached their own handlers (e.g. for hotkeys) above the GUI, the 
+        # form will still take focus.
+        if not self._focus:
+            self._focus = True
+            self._caret.on_activate()
+            self.window.push_handlers(self._caret)
+            self.window.push_handlers(
+                    on_mouse_press=self.on_window_mouse_press,
+                    on_key_press=self.on_window_key_press,
+                    on_key_release=self.on_window_key_release,
+            )
+            self.dispatch_event('on_focus', self)
+
+    def unfocus(self):
+        # Pop the handlers that were pushed to the window by focus().  Be 
+        # careful: this just pops the top handlers (as far as I know, pyglet 
+        # doesn't provide a way to be more specific), so if some other handlers 
+        # were pushed in the meantime, they'll be popped instead of the ones 
+        # pushed by the form.
+        if self._focus:
+            self._focus = False
+            self._caret.on_deactivate()
+            self.window.pop_handlers()
+            self.window.pop_handlers()
+            self.dispatch_event('on_unfocus', self)
+
+    def on_mouse_enter(self, x, y):
+        super().on_mouse_enter(x, y)
+        self._is_mouse_over = True
+
+    def on_mouse_leave(self, x, y):
+        super().on_mouse_leave(x, y)
+        self._is_mouse_over = False
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        if not self._focus:
+            self.focus()
+            self._caret.on_mouse_press(x, y, button, modifiers)
+
+    def on_window_mouse_press(self, x, y, button, modifiers):
+        # Determine if the mouse is over the form by tracking mouse enter and 
+        # leave events.  This is more robust than checking the mouse 
+        # coordinates in this method, because it still works when the form has 
+        # a parent that changes its coordinates, like a ScrollBox.
+        if not self._is_mouse_over:
+            self.unfocus()
+            # This event will get swallowed by the caret, so dispatch a new 
+            # event after the caret handlers have been popped.
+            self.window.dispatch_event('on_mouse_press', x, y, button, modifiers)
+    
+    def on_window_key_press(self, symbol, modifiers):
+        if self._unfocus_on_enter and symbol == pyglet.window.key.ENTER:
+            self.unfocus()
+        return True
+
+    def on_window_key_release(self, symbol, modifiers):
+        return True
+
+    def do_make_new_layout(self, document, label_kwargs):
+        # Make the layout as small as possible if no size is given.  This step 
+        # is necessary because IncrementalTextLayout always needs a size, while 
+        # TextLayout only needs a size if line wrapping is enabled.
+        kwargs = dict(width=0, height=0)
+        kwargs.update(label_kwargs)
+        
+        # Create a layout and a caret that can be used to edit it.
+        layout = pyglet.text.layout.IncrementalTextLayout(document, **kwargs)
+
+        layout.selection_color = drawing.Color.from_anything(
+                self._selection_color).tuple
+        layout.selection_background_color = drawing.Color.from_anything(
+                self._selection_background_color).tuple
+
+        self._caret = pyglet.text.caret.Caret(layout, color=self.color[:3])
+        self._caret.PERIOD = self.custom_cursor_blink_period
+
+        return layout
+
+    def get_selection_color(self):
+        return self._selection_color
+
+    def set_selection_color(self, new_color):
+        self._selection_color = new_color
+        self.draw()
+
+    def get_selection_background_color(self):
+        return self._selection_background_color
+
+    def set_selection_background_color(self, new_color):
+        self._selection_background_color = new_color
+        self.draw()
+
+    def get_unfocus_on_enter(self):
+        return self._unfocus_on_enter
+
+    def set_unfocus_on_enter(self, new_behavior):
+        self._unfocus_on_enter = new_behavior
+
+
+EditableLabel.register_event_type('on_focus')
+EditableLabel.register_event_type('on_unfocus')
+
+class Form(Widget):
+    Label = EditableLabel
+    Base = Background
+    Focused = None
+    Deck = Deck
+
+    def __init__(self, text=""):
+        super().__init__()
+
+        self._stack = Stack()
+        self._label = self.Label(text)
+
+        # If there are two backgrounds, create a deck to switch between them.  
+        # Otherwise skip the extra layer of hierarchy.
+        if self.Focused is None:
+            self._bg = self.Base()
+
+        else:
+            self._bg = self.Deck('base')
+            self._bg.add_states(
+                    base=self.Base(),
+                    focused=self.Focused(),
+            )
+            self._label.push_handlers(
+                    on_focus=lambda w: self._bg.set_state('focused'),
+                    on_unfocus=lambda w: self._bg.set_state('base'),
+            )
+
+        self._stack.add_front(self._label)
+        self._stack.add_back(self._bg)
+        self._attach_child(self._stack)
+
+    def get_label(self):
+        return self._label
+
+    def get_text(self):
+        return self._label.text
+
+    def set_text(self, new_text):
+        self._label.text = new_text
+
+
+
+        
+
+
+    
