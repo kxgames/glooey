@@ -735,7 +735,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
                 diagnoses.append("{self} was not given a size by its parent.\nCheck for bugs in {self.parent.__class__.__name__}.do_resize_children()")
 
             elif self.rect.area == 0:
-                diagnoses.append("{self} requested (and was given) no space.\nCheck for bugs in {self.__class__.__name__}.do_claim()")
+                if self.claimed_width and self.claimed_height:
+                    diagnoses.append("{self} requested {self.claimed_width}x{self.claimed_height} but was given {self.rect.width}x{self.rect.height}.\nCheck for bugs in {self.parent.__class__.__name__}.do_resize_children()")
+                else:
+                    diagnoses.append("{self} was given no space because it requested {self.claimed_width}x{self.claimed_height}.\nCheck for bugs in {self.__class__.__name__}.do_claim()")
 
             if self.group is None:
                 diagnoses.append("{self} was not given a group by its parent.\nCheck for bugs in {self.parent.__class__.__name__}.do_regroup_children()")
