@@ -35,10 +35,15 @@ class PlaceHolder(Clickable):
             self.vertex_list = self.batch.add(
                     12, pyglet.gl.GL_LINES, self.group, 'v2f', 'c4B')
 
-        top_left = self.rect.top_left
-        top_right = self.rect.top_right
-        bottom_left = self.rect.bottom_left
-        bottom_right = self.rect.bottom_right
+        # Shrink the rectangle by half-a-pixel so there's no ambiguity about 
+        # where the line should be drawn.  (The problem is that the widget rect 
+        # is always rounded to the nearest pixel, but OpenGL doesn't seem 
+        # deterministic about which side of the pixel it draws the line on.)
+        rect = self.rect.get_shrunk(0.5)
+        top_left = rect.top_left
+        top_right = rect.top_right
+        bottom_left = rect.bottom_left
+        bottom_right = rect.bottom_right
 
         # Originally I used GL_LINE_STRIP, but I couldn't figure out how to 
         # stop the place holders from connecting to each other (i.e. I couldn't 
@@ -46,13 +51,15 @@ class PlaceHolder(Clickable):
         # instead.
 
         self.vertex_list.vertices = (
-                # the outline
-                bottom_left.tuple + bottom_right.tuple + 
+                # The outline.  Add one to the bottom right coordinate.  I 
+                # don't know why this is necessary, but without it the pixel in 
+                # the bottom-right corner doesn't get filled in.
+                bottom_left.tuple + (bottom_right + (1,0)).tuple + 
                 bottom_right.tuple + top_right.tuple + 
                 top_right.tuple + top_left.tuple + 
                 top_left.tuple + bottom_left.tuple + 
 
-                # the cross
+                # The cross
                 bottom_left.tuple + top_right.tuple + 
                 bottom_right.tuple + top_left.tuple
         ) 

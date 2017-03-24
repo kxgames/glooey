@@ -158,17 +158,23 @@ class Outline(Artist):
         change to its rectangle.
         """
         if self.vertex_list:
+            # Shrink the rectangle by half-a-pixel so there's no ambiguity 
+            # about where the line should be drawn.  (The problem is that the 
+            # widget rect is always rounded to the nearest pixel, but OpenGL 
+            # doesn't seem deterministic about which side of the pixel it draws 
+            # the line on.)
+            rect = self._rect.get_shrunk(0.5)
             self.vertex_list.vertices = (
-                    self._rect.bottom_left.tuple +
-                    self._rect.bottom_right.tuple +
-                    self._rect.bottom_right.tuple +
-                    self._rect.top_right.tuple +
-                    self._rect.top_right.tuple +
-                    self._rect.top_left.tuple +
+                    rect.bottom_left.tuple +
                     # Don't know why this offset is necessary, but without it 
-                    # the top-left pixel doesn't get filled in...
-                    (self._rect.top_left + (1, 0)).tuple +
-                    self._rect.bottom_left.tuple
+                    # the bottom-right pixel doesn't get filled in...
+                    (rect.bottom_right + (1,0)).tuple +
+                    rect.bottom_right.tuple +
+                    rect.top_right.tuple +
+                    rect.top_right.tuple +
+                    rect.top_left.tuple +
+                    rect.top_left.tuple +
+                    rect.bottom_left.tuple
             )
 
     def get_color(self):
