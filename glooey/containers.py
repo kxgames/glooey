@@ -5,6 +5,7 @@ don't draw anything themselves, they just position children widgets.
 
 import pyglet
 import autoprop
+import vecrec
 
 from vecrec import Vector, Rect
 from collections import defaultdict
@@ -30,7 +31,7 @@ def claim_stacked_widgets(*widgets):
 
 
 @autoprop
-class Bin (Widget):
+class Bin(Widget):
 
     def __init__(self):
         super().__init__()
@@ -66,7 +67,7 @@ class Bin (Widget):
 
 
 @autoprop
-class Grid (Widget):
+class Grid(Widget):
     custom_num_rows = 0
     custom_num_cols = 0
     custom_cell_padding = None
@@ -273,7 +274,7 @@ class Grid (Widget):
 
 
 @autoprop
-class HVBox (Widget):
+class HVBox(Widget):
     custom_cell_padding = None
     custom_cell_alignment = 'fill'
     custom_default_cell_size = 'expand'
@@ -402,7 +403,7 @@ class HVBox (Widget):
 
 
 @autoprop
-class HBox (HVBox):
+class HBox(HVBox):
     add_left = HVBox.add_front
     add_right = HVBox.add_back
 
@@ -423,7 +424,7 @@ class HBox (HVBox):
 
 
 @autoprop
-class VBox (HVBox):
+class VBox(HVBox):
     add_top = HVBox.add_front
     add_bottom = HVBox.add_back
 
@@ -444,7 +445,7 @@ class VBox (HVBox):
 
 
 @autoprop
-class Stack (Widget):
+class Stack(Widget):
     """
     Have any number of children, claim enough space for the biggest one, and 
     just draw them all in layers.
@@ -632,6 +633,383 @@ class Deck(Widget):
         return self._states.keys()
 
 
+@autoprop
 class Board(Widget):
-    pass
+
+    def __init__(self):
+        super().__init__()
+        self._pins = {}
+
+    def add(self, widget, **kwargs):
+        # Make the pin could fail, so do it before attaching the child.
+        pin = self._make_pin(kwargs)
+        # Attaching the child could also fail, so do it before updating the 
+        # widget to the _pins data structure.
+        self._attach_child(widget)
+        self._pins[widget] = pin
+        self._repack_and_regroup_children()
+
+    def move(self, widget, **kwargs):
+        self._pins[widget] = self._make_pin(kwargs)
+        self._repack_and_regroup_children()
+
+    def remove(self, widget):
+        self._detach_child(widget)
+        del self._pins[widget]
+
+    def clear(self):
+        for child, pin in self._pins.items():
+            self._detach_child(child)
+        self._pins = {}
+        self._repack_and_regroup_children()
+
+    def do_claim(self):
+        min_width = 0
+        min_height = 0
+
+        for child, pin in self._pins.items():
+            min_child_width = self._find_min_child_size('width', child, pin)
+            min_child_height = self._find_min_child_size('height', child, pin)
+
+            min_width = max(min_width, min_child_width)
+            min_height = max(min_height, min_child_height)
+
+        return min_width, min_height
+
+    def do_resize_children(self):
+        for child, pin in self._pins.items():
+            rect = Rect.null()
+
+            if 'width' in pin:
+                rect.width = pin['width']
+            if 'width_percent' in pin:
+                rect.width = self.rect.width * pin['width_percent']
+
+            if 'height' in pin:
+                rect.height = pin['height']
+            if 'height_percent' in pin:
+                rect.height = self.rect.height * pin['height_percent']
+
+            rect.width = max(rect.width, child.claimed_width)
+            rect.height = max(rect.height, child.claimed_height)
+
+            if 'left' in pin:
+                rect.left = pin['left']
+            if 'left_percent' in pin:
+                rect.left = self.rect.width * pin['left_percent']
+
+            if 'right' in pin:
+                rect.right = pin['right']
+            if 'right_percent' in pin:
+                rect.right = self.rect.width * pin['right_percent']
+
+            if 'center_x' in pin:
+                rect.center_x = pin['center_x']
+            if 'center_x_percent' in pin:
+                rect.center_x = self.rect.width * pin['center_x_percent']
+
+            if 'top' in pin:
+                rect.top = pin['top']
+            if 'top_percent' in pin:
+                rect.top = self.rect.height * pin['top_percent']
+
+            if 'bottom' in pin:
+                rect.bottom = pin['bottom']
+            if 'bottom_percent' in pin:
+                rect.bottom = self.rect.height * pin['bottom_percent']
+
+            if 'center_y' in pin:
+                rect.center_y = pin['center_y']
+            if 'center_y_percent' in pin:
+                rect.center_y = self.rect.height * pin['center_y_percent']
+
+            rect.left += self.rect.left
+            rect.bottom += self.rect.bottom
+
+            child.resize(rect)
+
+    def do_regroup_children(self):
+        for child, pin in self._pins.items():
+            if 'layer' in pin:
+                group = pyglet.graphics.OrderedGroup(pin['layer'], self.group)
+            else:
+                group = self.group
+
+            child.regroup(group)
+
+    def _make_pin(self, kwargs):
+
+        # Put the argument in a data structure that will keep track of which 
+        # keys have been used, so we can give a nice error if we find an 
+        # unexpected (i.e. misspelled) argument.
+
+        class argdict(dict):
+
+            def __init__(self, kwargs):
+                self.update(kwargs)
+                self.unused_keys = set(kwargs.keys())
+
+            def __getitem__(self, key):
+                self.unused_keys.discard(key)
+                return super().__getitem__(key)
+
+        kwargs = argdict(kwargs)
+
+        # Check to make sure the position of the widget isn't over- or 
+        # under-specified.
+
+        all_x_args = [
+                'rect',
+                'left', 'left_percent',
+                'center_x', 'center_x_percent',
+                'right', 'right_percent',
+                'top_left', 'top_left_percent',
+                'top_center', 'top_center_percent',
+                'top_right', 'top_right_percent',
+                'center_left', 'center_left_percent',
+                'center', 'center_percent',
+                'center_right', 'center_right_percent',
+                'bottom_left', 'bottom_left_percent',
+                'bottom_center', 'bottom_center_percent',
+                'bottom_right', 'bottom_right_percent',
+        ]
+        all_y_args = [
+                'rect',
+                'top', 'top_percent',
+                'center_y', 'center_y_percent',
+                'bottom', 'bottom_percent',
+                'top_left', 'top_left_percent',
+                'top_center', 'top_center_percent',
+                'top_right', 'top_right_percent',
+                'center_left', 'center_left_percent',
+                'center', 'center_percent',
+                'center_right', 'center_right_percent',
+                'bottom_left', 'bottom_left_percent',
+                'bottom_center', 'bottom_center_percent',
+                'bottom_right', 'bottom_right_percent',
+        ]
+        all_w_args = [
+                'rect',
+                'width', 'width_percent',
+        ]
+        all_h_args = [
+                'rect',
+                'height', 'height_percent',
+        ]
+
+        x_args = {x for x in all_x_args if x in kwargs}
+        y_args = {y for y in all_y_args if y in kwargs}
+        w_args = {w for w in all_w_args if w in kwargs}
+        h_args = {h for h in all_h_args if h in kwargs}
+
+        if len(x_args) > 1:
+            raise UsageError(f"multiple x positions specified: {''.join(sorted(x_args))}")
+        if len(x_args) < 1:
+            raise UsageError(f"no x position specified, only: {', '.join(kwargs.keys())}")
+
+        if len(y_args) > 1:
+            raise UsageError(f"multiple y positions specified: {''.join(sorted(y_args))}")
+        if len(y_args) < 1:
+            raise UsageError(f"no y position specified, only: {', '.join(kwargs.keys())}")
+
+        if len(w_args) > 1:
+            raise UsageError(f"multiple widths specified: {''.join(sorted(w_args))}")
+        if len(h_args) > 1:
+            raise UsageError(f"multiple heights specified: {''.join(sorted(h_args))}")
+
+        # Create the pin (which is just a dictionary) and fill it in with any 
+        # parameters that can be copied directly from the argument list.
+
+        pin_keys = [
+                'left', 'left_percent',
+                'center_x', 'center_x_percent',
+                'right', 'right_percent',
+                'top', 'top_percent',
+                'center_y', 'center_y_percent',
+                'bottom', 'bottom_percent',
+                'width', 'width_percent',
+                'height', 'height_percent',
+                'layer',
+        ]
+        pin = {
+                k: kwargs[k] for k in pin_keys 
+                if k in kwargs
+        }
+
+        # If a rectangle was provided in the argument list, using it to fill in 
+        # the pin.
+
+        if 'rect' in kwargs:
+            rect = kwargs['rect']
+            pin['left'] = rect.left
+            pin['bottom'] = rect.bottom
+            pin['width'] = rect.width
+            pin['height'] = rect.height
+
+        # If any corners or edges were specified in the argument list (e.g.  
+        # top_left, bottom_right, center, etc.), use them to fill in the pin.
+
+        vector_keys = {
+                'top_left':      ('left',     'top'),
+                'top_center':    ('center_x', 'top'),
+                'top_right':     ('right',    'top'),
+                'center_left':   ('left',     'center_y'),
+                'center':        ('center_x', 'center_y'),
+                'center_right':  ('right',    'center_y'),
+                'bottom_left':   ('left',     'bottom'),
+                'bottom_center': ('center_x', 'bottom'),
+                'bottom_right':  ('right',    'bottom'),
+                'top_left_percent':      ('left_percent',     'top_percent'),
+                'top_center_percent':    ('center_x_percent', 'top_percent'),
+                'top_right_percent':     ('right_percent',    'top_percent'),
+                'center_left_percent':   ('left_percent',     'center_y_percent'),
+                'center_percent':        ('center_x_percent', 'center_y_percent'),
+                'center_right_percent':  ('right_percent',    'center_y_percent'),
+                'bottom_left_percent':   ('left_percent',     'bottom_percent'),
+                'bottom_center_percent': ('center_x_percent', 'bottom_percent'),
+                'bottom_right_percent':  ('right_percent',    'bottom_percent'),
+        }
+
+        for key in vector_keys:
+            if key in kwargs:
+                x, y = vecrec.cast_anything_to_vector(kwargs[key])
+                kx, ky = vector_keys[key]
+                pin[kx] = x
+                pin[ky] = y
+
+        # Make sure the pin has both a width and a height.
+
+        if 'width' not in pin and 'width_percent' not in pin:
+            pin['width'] = 0
+        if 'height' not in pin and 'height_percent' not in pin:
+            pin['height'] = 0
+
+        # Make sure all the arguments were used.
+
+        if kwargs.unused_keys:
+            raise UsageError(f"got unexpected keyword argument(s): {', '.join(kwargs.unused_keys)}")
+
+        # Make sure none of the parameters in the pin are totally impossible.  
+        # These checks obviate the need for a number of divide-by-zero checks 
+        # in do_claim() and do_resize_children().
+
+        def sanity_check(pin, field, *bounds):
+            if field in pin:
+                if pin[field] in bounds:
+                    raise UsageError(f"{field} cannot be {pin[field]}")
+                if pin[field] < 0 or pin[field] > 1:
+                    raise UsageError(f"{field} must be between 0 and 1, not {pin[field]}")
+
+        sanity_check(pin, 'left_percent', 1)
+        sanity_check(pin, 'right_percent', 0)
+        sanity_check(pin, 'center_x_percent', 0, 1)
+        sanity_check(pin, 'bottom_percent', 1)
+        sanity_check(pin, 'top_percent', 0)
+        sanity_check(pin, 'center_y_percent', 0, 1)
+        sanity_check(pin, 'width_percent', 0)
+        sanity_check(pin, 'height_percent', 0)
+
+        return pin
+
+    def _find_min_child_size(self, dimension, child, pin):
+        # Initially set the board size to a negative number.  If it's still 
+        # negative by the end of the function, that means none of the 
+        # conditions triggered and there's a bug in the code.
+
+        board_size = -1
+
+        # Decide which dimension to look at.  The logic is the same for 
+        # determining the width and height claims, but the attributes differ.
+
+        if dimension == 'width':
+            child_claim = child.claimed_width
+            dimension_percent = 'width_percent'
+            near, near_percent = 'left', 'left_percent'
+            mid, mid_percent = 'center_x', 'center_x_percent'
+            far, far_percent = 'right', 'right_percent'
+        elif dimension == 'height':
+            child_claim = child.claimed_height
+            dimension_percent = 'height_percent'
+            near, near_percent = 'bottom', 'bottom_percent'
+            mid, mid_percent = 'center_y', 'center_y_percent'
+            far, far_percent = 'top', 'top_percent'
+        else:
+            raise AssertionError(f"unknown dimension: {dimension}")
+
+        # Find the claim if an absolute size was given.
+
+        if dimension in pin:
+            child_size = max(child_claim, pin[dimension])
+        
+            if near in pin:
+                board_size = pin[near] + child_size
+
+            if far in pin:
+                if pin[far] < child_size:
+                    raise UsageError(f"cannot fit {child}: {dimension}={child_size} px; {far}={pin[far]} px")
+                board_size = pin[far]
+
+            if mid in pin:
+                if pin[mid] < child_size / 2:
+                    raise UsageError(f"cannot fit {child}: {dimension}={child_size} px; {mid}={pin[mid]} px")
+                board_size = pin[mid] + child_size / 2
+
+            if near_percent in pin:
+                board_size = child_size / (1 - pin[near_percent])
+
+            if far_percent in pin:
+                board_size = child_size / pin[far_percent]
+
+            if mid_percent in pin:
+                board_size = max(
+                        (child_size / 2) / (1 - pin[mid_percent]),
+                        (child_size / 2) / (pin[mid_percent]))
+
+        # Find the claim if the size was given as a percentage of the whole 
+        # board.
+
+        if dimension_percent in pin:
+            child_size = child_claim
+            size_percent = pin[dimension_percent]
+
+            if near in pin:
+                board_size = max(
+                        pin[near] + child_size,
+                        # Explicitly check for zero so that near=0; size_percent=1 is allowed.
+                        0 if pin[near] == 0 else pin[near] / (1 - size_percent),
+                        child_size / size_percent)
+
+            if far in pin:
+                if pin[far] < child_size:
+                    raise UsageError(f"cannot fit {child}: {dimension}={child_size} px; {dimension_percent}={size_percent}; {far}={pin[far]} px")
+                board_size = max(
+                        pin[far],
+                        child_size / size_percent)
+
+            if mid in pin:
+                if pin[mid] < child_size / 2:
+                    raise UsageError(f"cannot fit {child}: {dimension}={child_size} px; {mid}={pin[mid]} px")
+                board_size = max(
+                        pin[mid] + child_size / 2,
+                        pin[mid] / (1 - size_percent / 2),
+                        child_size / size_percent)
+
+            if near_percent in pin:
+                if pin[near_percent] + size_percent > 1:
+                    raise UsageError(f"cannot fit {child}: {near_percent}={pin[near_percent]}; {dimension_percent}={size_percent}")
+                board_size = child_size / size_percent
+
+            if far_percent in pin:
+                if pin[far_percent] < size_percent:
+                    raise UsageError(f"cannot fit {child}: {far_percent}={pin[far_percent]}; {dimension_percent}={size_percent}")
+                board_size = child_size / size_percent
+
+            if mid_percent in pin:
+                if pin[mid_percent] + size_percent / 2 > 1 or pin[mid_percent] < size_percent / 2:
+                    raise UsageError(f"cannot fit {child}: {mid_percent}={pin[mid_percent]}; {dimension_percent}={size_percent}")
+                board_size = child_size / size_percent
+
+        assert board_size > -1
+        return board_size
+
 
