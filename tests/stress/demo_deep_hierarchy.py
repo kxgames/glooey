@@ -19,6 +19,11 @@ import glooey
 
 print(__doc__)
 
+import sys
+#sys.setrecursionlimit(...)
+print(f"Recursion limit: {sys.getrecursionlimit()} frames")
+
+
 class TestButton(glooey.Button):
     custom_size_hint = 50, 50
 
@@ -35,7 +40,7 @@ class TestButton(glooey.Button):
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
-bins = [glooey.Bin() for i in range(100)]
+bins = [glooey.Bin() for i in range(200)]
 button = TestButton()
 
 for i in range(1, len(bins)):

@@ -66,6 +66,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         EventDispatcher.__init__(self)
         HoldUpdatesMixin.__init__(self)
 
+        self._root = None
         self._parent = None
         self._group = None
 
@@ -107,6 +108,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self._rect = None
 
         self._is_hidden = False
+        self._is_parent_hidden = False
         self._is_claim_stale = True
 
         # Take care to avoid calling any potentially polymorphic methods, such 
@@ -277,13 +279,15 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def hide(self):
         if self.is_visible:
             self.ungrab_mouse()
-            self.undraw_all()
+            self.undraw()
         self._is_hidden = True
+        self._hide_children()
 
     def unhide(self, draw=True):
         self._is_hidden = False
         if self.is_visible and draw:
-            self.draw_all()
+            self.draw()
+        self._unhide_children(draw)
 
     def draw(self):
         """
@@ -564,7 +568,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         return self._parent
 
     def get_root(self):
-        return self.parent.root if self.parent is not None else None
+        return self._root
 
     def get_window(self):
         return self.root.window if self.is_attached_to_gui else None
@@ -679,10 +683,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     @property
     def is_hidden(self):
-        if self.parent is None:
-            return self._is_hidden
-        else:
-            return self._is_hidden or self.parent.is_hidden
+        return self._is_hidden or self._is_parent_hidden
 
     @property
     def is_visible(self):
@@ -826,7 +827,13 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         if self.is_attached_to_gui:
             for widget in child._yield_self_and_all_children():
+                widget._root = self.root
                 widget.do_attach()
+
+        if self.is_hidden:
+            self._hide_children()
+        else:
+            self._unhide_children(False)
 
         self.dispatch_event('on_add_child', child)
         return child
@@ -848,9 +855,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         for widget in child._yield_self_and_all_children():
             widget.do_detach()
+            widget.ungrab_mouse()
+            widget.undraw()
+            widget._root = None
 
-        child.ungrab_mouse()
-        child.undraw_all()
         self.__children.discard(child)
         child._parent = None
 
@@ -898,10 +906,41 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             if self._num_children > 0:
                 self.do_regroup_children()
 
-    def _yield_self_and_all_children(self):
-        yield self
+    def _hide_children(self):
+        for child in self._yield_all_children():
+            if child.is_visible:
+                child.ungrab_mouse()
+                child.undraw()
+
+            child._is_parent_hidden = True
+
+    def _unhide_children(self, draw=True):
+
+        def unhide_child(child):
+            # Indicate that this child's parent is no longer hidden.
+            child._is_parent_hidden = False
+
+            # If the child itself isn't hidden:
+            if child.is_visible:
+
+                # Draw the widget unless the caller asked not to.
+                if draw:
+                    child.draw()
+
+                # Recursively unhide the child's children.
+                for grandchild in child.__children:
+                    unhide_child(grandchild)
+
+        for child in self.__children:
+            unhide_child(child)
+
+    def _yield_all_children(self):
         for child in self.__children:
             yield from child._yield_self_and_all_children()
+
+    def _yield_self_and_all_children(self):
+        yield self
+        yield from self._yield_all_children()
 
     def _find_children_under_mouse(self, x, y):
         previously_under_mouse = self._children_under_mouse

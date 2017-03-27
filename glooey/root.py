@@ -103,9 +103,12 @@ class Gui(Root):
 
     def on_resize(self, width, height):
         # Make sure the window actually changed size before starting a repack.  
+        # We compare against `self.rect` (which requires subtracting the 
+        # padding from the given width and height) instead of `self.territory` 
+        # so that changing the padding triggers a repack like it should.
         width -= self.left_padding + self.right_padding
         height -= self.top_padding + self.bottom_padding
-        if self.rect.size != (width, height):
+        if self.rect and self.rect.size != (width, height):
             self.repack()
 
     def get_territory(self):

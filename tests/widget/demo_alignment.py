@@ -28,6 +28,7 @@ alignments = [ #
 ]
 @run_demos.on_space(gui) #
 def test_alignment():
+    gui.clear()
     gui.add(widget)
     for test in alignments:
         widget.alignment = test
