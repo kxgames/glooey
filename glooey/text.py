@@ -88,9 +88,6 @@ class Label(Widget):
         if not ignore_rect:
             kwargs['width'] = self.rect.width
             kwargs['height'] = self.rect.height
-        else:
-            kwargs['width'] = 0
-            kwargs['height'] = 0
 
         # It's best to make a fresh document each time.  Previously I was 
         # storing the document as a member variable, but I ran into corner 
