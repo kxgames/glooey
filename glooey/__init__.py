@@ -11,5 +11,6 @@ from .buttons import *
 from .scrolling import *
 from .misc import *
 from . import drawing
+from .drawing import Color
 from . import themes
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import glooey
 import autoprop
 from glooey.helpers import *
 
@@ -31,8 +32,8 @@ class Color:
     def from_str(str):
         # If the given string is to the name of a known color, return that 
         # color.  Otherwise, treat the string as a hex code.
-        if str in colors:
-            return colors[str]
+        if str in glooey.drawing.colors:
+            return glooey.drawing.colors[str]
         else:
             return Color.from_hex(str)
 
