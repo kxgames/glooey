@@ -8,7 +8,8 @@ import autoprop
 # widgets we want to overwrite and everything else will be directly available.
 from glooey import *
 
-# Create a resource loader that knows where the Golden assets are stored.
+# Create a resource loader that knows where the assets for this theme are 
+# stored.
 from glooey.themes import ResourceLoader
 assets = ResourceLoader('golden')
 assets.add_font('fonts/m5x7.ttf')
@@ -117,12 +118,11 @@ class BasicButton(glooey.Button):
 @autoprop
 class FancyButton(glooey.Button):
 
-    class Label(glooey.Label):
-        # "Wellmere Sans" is proprietary, so it cannot be included with glooey.
-        custom_font_name = 'wellmere_sans_bold'
+    class Label(Label):
         custom_color = '#140c1c'
         custom_alignment = 'center'
         custom_horz_padding = 30
+        custom_font_size = 12
 
     class Base(glooey.Background):
         custom_left = assets.image(f'buttons/fancy/left_base.png')
