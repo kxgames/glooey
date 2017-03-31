@@ -137,7 +137,7 @@ class Frame(glooey.Frame):
     custom_color = 'grey'
 
     class Bin(glooey.Bin):
-        custom_padding = 6
+        custom_padding = 18
 
     def __init__(self):
         super().__init__()
@@ -182,4 +182,27 @@ class YellowFrame(Frame):
 class GreyFrame(Frame):
     custom_color = 'grey'
 
+
+class Form(glooey.Form):
+
+    class Label(glooey.EditableLabel):
+        custom_padding = 14
+        custom_top_padding = 12
+        custom_bottom_padding = 10
+        custom_color = 'dark grey'
+        custom_selection_color = 'white'
+        custom_selection_background_color = 'blue'
+        custom_font_name = 'KenVector Future Thin'
+        custom_font_size = 10
+    
+    class Base(glooey.Background):
+        custom_center = assets.texture('form/center.png')
+        custom_top = assets.texture('form/top.png')
+        custom_left = assets.texture('form/left.png')
+        custom_right = assets.texture('form/right.png')
+        custom_bottom = assets.texture('form/bottom.png')
+        custom_top_left = assets.image('form/top_left.png')
+        custom_top_right = assets.image('form/top_right.png')
+        custom_bottom_left = assets.image('form/bottom_left.png')
+        custom_bottom_right = assets.image('form/bottom_right.png')
 
