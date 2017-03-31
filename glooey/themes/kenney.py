@@ -40,13 +40,13 @@ glooey.drawing.colors = {
 
 
 @autoprop
-class Label(glooey.Label):
+class BigLabel(glooey.Label):
     custom_color = 'dark grey'
     custom_font_name = 'KenVector Future'
     custom_font_size = 12
 
 @autoprop
-class Paragraph(glooey.Label):
+class Label(glooey.Label):
     custom_color = 'dark grey'
     custom_font_name = 'KenVector Future Thin'
     custom_font_size = 10
