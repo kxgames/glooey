@@ -8,8 +8,8 @@ window = pyglet.window.Window()
 gui = glooey.Gui(window)
 hbox = glooey.HBox()
 hbox.padding = 30
-first = glooey.PlaceHolder()
-second = glooey.PlaceHolder()
+first = glooey.Placeholder()
+second = glooey.Placeholder()
 hbox.add(first)
 hbox.add(second)
 gui.add(hbox)
@@ -28,7 +28,7 @@ def test_padding():
     hbox.hide()
     yield "Hide the hbox."
 
-    third = glooey.PlaceHolder()
+    third = glooey.Placeholder()
     hbox.add(third)
     yield "Add a third widget to the hbox, but don't show it."
 

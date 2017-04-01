@@ -50,14 +50,14 @@ class DummyBin(RepackObserver, glooey.Bin):
         return super().add(widget)
 
 
-class DummyPlaceHolder(RepackObserver, glooey.PlaceHolder):
+class DummyPlaceholder(RepackObserver, glooey.Placeholder):
     pass
 
 
 @pytest.fixture
 def dummy_widgets():
     window = DummyWindow()
-    return DummyGui(window), DummyBin(), DummyPlaceHolder()
+    return DummyGui(window), DummyBin(), DummyPlaceholder()
 
 
 def test_add_widget_to_bin(dummy_widgets):

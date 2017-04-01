@@ -12,18 +12,18 @@ gui.add(deck)
 @run_demos.on_space(gui) #
 def test_deck():
 
-    green = glooey.PlaceHolder(50, 50, 'green')
+    green = glooey.Placeholder(50, 50, 'green')
     deck.add_state('a', green)
     yield "Add state 'a'; show a green placeholder"
 
-    orange = glooey.PlaceHolder(50, 50, 'orange')
+    orange = glooey.Placeholder(50, 50, 'orange')
     deck.add_state('b', orange)
     yield "Add state 'b'; keep showing state 'a'"
 
     deck.state = 'b'
     yield "Change to state 'b'; show an orange placeholder"
 
-    purple = glooey.PlaceHolder(50, 50, 'purple')
+    purple = glooey.Placeholder(50, 50, 'purple')
     deck.add_state('b', purple)
     yield "Replace state 'b'; show a purple placeholder."
 

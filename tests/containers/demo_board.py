@@ -228,7 +228,7 @@ def test_percent_claims():
     yield "Claim 50 extra pixels on the bottom."
 
 def test_layers():
-    purple = glooey.PlaceHolder(48, 50, 'purple')
+    purple = glooey.Placeholder(48, 50, 'purple')
 
     board.move(widget, center_left=(175, 150), layer=1)
     board.add(purple, center_left=(175, 150), layer=2)

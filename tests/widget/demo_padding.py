@@ -6,7 +6,7 @@ import run_demos
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
-widget = glooey.PlaceHolder()
+widget = glooey.Placeholder()
 gui.add(widget)
 
 @run_demos.on_space(gui) #

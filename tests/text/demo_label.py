@@ -9,7 +9,7 @@ gui = glooey.Gui(window)
 stack = glooey.Stack()
 stack.alignment = 'center'
 label = glooey.Label()
-outline = glooey.PlaceHolder(color='purple')
+outline = glooey.Placeholder(color='purple')
 stack.add(outline)
 stack.add(label)
 gui.add(stack)

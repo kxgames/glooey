@@ -6,7 +6,7 @@ import run_demos
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
-widget = glooey.PlaceHolder(200, 200)
+widget = glooey.Placeholder(200, 200)
 
 def left_half(rect, boundary): #
     rect.width = boundary.width / 2
@@ -35,7 +35,7 @@ def test_alignment():
         yield f"alignment = '{test}'"
 
     for test in alignments:
-        custom_widget_cls = type('TestWidget', (glooey.PlaceHolder,), {
+        custom_widget_cls = type('TestWidget', (glooey.Placeholder,), {
             'custom_alignment':
                 test if isinstance(test, str) else staticmethod(test),
         })

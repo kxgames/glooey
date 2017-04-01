@@ -7,7 +7,7 @@ import run_demos
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
 bin = glooey.Bin()
-widget = glooey.PlaceHolder(100, 100)
+widget = glooey.Placeholder(100, 100)
 
 bin.add(widget)
 gui.add(bin)

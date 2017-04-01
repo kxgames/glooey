@@ -9,7 +9,7 @@ from glooey.images import Background
 from glooey.helpers import *
 
 @autoprop
-class PlaceHolder(Clickable):
+class Placeholder(Clickable):
     custom_color = 'green'
     custom_alignment = 'fill'
 
@@ -94,7 +94,7 @@ class PlaceHolder(Clickable):
 
 
 @autoprop
-class EventLogger(PlaceHolder):
+class EventLogger(Placeholder):
 
     def on_click(self, widget):
         print(f'{self}.on_click(widget={widget})')

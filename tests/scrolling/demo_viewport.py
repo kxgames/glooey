@@ -20,7 +20,7 @@ class TestContent(glooey.Grid):
 
         for i in range(5):
             for j in range(5):
-                self.add(i, j, glooey.PlaceHolder(150, 150))
+                self.add(i, j, glooey.Placeholder(150, 150))
 
         self.add(2, 2, glooey.EventLogger(150, 150, 'orange'))
 
