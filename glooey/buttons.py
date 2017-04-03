@@ -91,7 +91,11 @@ class Rollover(Deck):
     def __init__(self, clickable, initial_state, predicate=None, **widgets):
         super().__init__(initial_state, **widgets)
         self._predicate = predicate or self.custom_predicate
-        clickable.push_handlers(self.on_rollover)
+        self._clickable = clickable
+        self._clickable.push_handlers(self.on_rollover)
+
+    def do_detach(self):
+        self._clickable.remove_handlers(self.on_rollover)
 
     def on_rollover(self, new_state, old_state):
         if self.is_state_missing(new_state) and new_state == 'down':

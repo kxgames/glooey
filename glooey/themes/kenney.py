@@ -183,6 +183,7 @@ class GreyFrame(Frame):
     custom_color = 'grey'
 
 
+@autoprop
 class Form(glooey.Form):
 
     class Label(glooey.EditableLabel):
@@ -205,4 +206,100 @@ class Form(glooey.Form):
         custom_top_right = assets.image('form/top_right.png')
         custom_bottom_left = assets.image('form/bottom_left.png')
         custom_bottom_right = assets.image('form/bottom_right.png')
+
+
+
+@autoprop
+class Checkbox(glooey.Checkbox):
+    custom_color = 'blue'
+    custom_icon = 'checkmark' # 'cross'
+
+    def __init__(self):
+        super().__init__()
+        self._color = self.custom_color
+        self._icon = self.custom_icon
+        self._update_style()
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, new_color):
+        self._color = new_color
+        self._update_style()
+
+    def get_icon(self):
+        return self._icon
+
+    def set_icon(self, new_icon):
+        self._icon = new_icon
+        self._update_style()
+
+    def _update_style(self):
+        style = f'buttons/{self._color}/checkbox'
+        self.set_images(
+                checked_base=assets.image(f'{style}/{self._icon}.png'),
+                unchecked_base=assets.image(f'{style}/box.png'),
+        )
+
+
+@autoprop
+class BlueCheckbox(Checkbox):
+    custom_color = 'blue'
+
+@autoprop
+class RedCheckbox(Checkbox):
+    custom_color = 'red'
+
+@autoprop
+class GreenCheckbox(Checkbox):
+    custom_color = 'green'
+
+@autoprop
+class YellowCheckbox(Checkbox):
+    custom_color = 'yellow'
+
+@autoprop
+class GreyCheckbox(Checkbox):
+    custom_color = 'grey'
+
+
+@autoprop
+class RadioButton(glooey.RadioButton):
+    custom_color = 'blue'
+
+    def __init__(self):
+        super().__init__()
+        self.color = self.custom_color
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, new_color):
+        self._color = new_color
+        style = f'buttons/{new_color}/radio'
+        self.set_images(
+                checked_base=assets.image(f'{style}/tick.png'),
+                unchecked_base=assets.image(f'{style}/box.png'),
+        )
+
+
+@autoprop
+class BlueRadioButton(RadioButton):
+    custom_color = 'blue'
+
+@autoprop
+class RedRadioButton(RadioButton):
+    custom_color = 'red'
+
+@autoprop
+class GreenRadioButton(RadioButton):
+    custom_color = 'green'
+
+@autoprop
+class YellowRadioButton(RadioButton):
+    custom_color = 'yellow'
+
+@autoprop
+class GreyRadioButton(RadioButton):
+    custom_color = 'grey'
 
