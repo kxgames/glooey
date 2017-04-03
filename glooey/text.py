@@ -329,17 +329,16 @@ class EditableLabel(Label):
             self.dispatch_event('on_focus', self)
 
     def unfocus(self):
-        # Pop the handlers that were pushed to the window by focus().  Be 
-        # careful: this just pops the top handlers (as far as I know, pyglet 
-        # doesn't provide a way to be more specific), so if some other handlers 
-        # were pushed in the meantime, they'll be popped instead of the ones 
-        # pushed by the form.
-
         if self._focus:
             self._focus = False
             self._caret.on_deactivate()
-            self.window.pop_handlers()
-            self.window.pop_handlers()
+            self._layout.set_selection(0,0)
+            self.window.remove_handlers(self._caret)
+            self.window.remove_handlers(
+                    on_mouse_press=self.on_window_mouse_press,
+                    on_key_press=self.on_window_key_press,
+                    on_key_release=self.on_window_key_release,
+            )
             self.dispatch_event('on_unfocus', self)
 
     def on_mouse_enter(self, x, y):
