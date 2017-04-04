@@ -11,7 +11,7 @@ icons = 'cross', 'checkmark'
 window = pyglet.window.Window()
 gui = kenney.Gui(window)
 
-def on_click(widget):
+def on_click(widget): #
     print(f"{widget} was clicked!")
 
 @run_demos.on_space(gui) #
@@ -26,6 +26,11 @@ def test_round_button():
         button.color = color
         button.icon = icon
         yield f"{color} button with {icon}."
+        del button.image
+
+        button.text = '+'
+        yield f"{color} button with '+' sign."
+        del button.text
 
     # Test the pre-configured settings for the named button classes.
     for subcls in kenney.RoundButton.__subclasses__():

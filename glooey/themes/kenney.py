@@ -314,6 +314,12 @@ class RoundButton(glooey.Button):
     custom_color = 'red'
     custom_icon = 'cross'
 
+    class Label(BigLabel):
+        custom_color = 'white'
+        custom_alignment = 'center'
+        custom_font_size = 16
+
+
     def __init__(self):
         super().__init__()
         self.color = self.custom_color
