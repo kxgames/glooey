@@ -21,19 +21,17 @@ def test_radio_button():
         button.color = color
         yield f"{color}"
 
-    # Test the pre-configured settings for the named button classes.  Note that 
-    # when one radio button is switched for another (as in this test), you have 
-    # to move the mouse to trigger an on_mouse_enter() event before you can 
-    # click on the widget.  This is necessary because the GUI doesn't keep 
-    # track of where the mouse is, and I decided that fixing this would 
-    # introduce more complexity than its worth.
+    # Test the pre-configured settings for the named button classes.
+    # 
+    # Note that when one radio button is switched for another (as in this 
+    # test), you have to move the mouse to trigger an on_mouse_enter() event 
+    # before you can click on the widget.  This is necessary because the GUI 
+    # doesn't keep track of where the mouse is, and I decided that fixing this 
+    # would introduce more complexity than its worth.
     for subcls in kenney.RadioButton.__subclasses__():
         gui.clear()
         gui.add(subcls())
         yield subcls.__name__
-
-
-
 
 pyglet.app.run()
 

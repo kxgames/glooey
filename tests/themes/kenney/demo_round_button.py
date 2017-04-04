@@ -6,33 +6,33 @@ import run_demos
 import itertools
 
 colors = 'blue', 'red', 'green', 'yellow', 'grey'
-icons = 'checkmark', 'cross'
+icons = 'cross', 'checkmark'
 
 window = pyglet.window.Window()
 gui = kenney.Gui(window)
 
+def on_click(widget):
+    print(f"{widget} was clicked!")
+
 @run_demos.on_space(gui) #
-def test_checkbox():
+def test_round_button():
     # Test the getters and setters for the base button class.
-    button = kenney.Checkbox()
+    button = kenney.RoundButton()
+    button.push_handlers(on_click)
     gui.clear()
     gui.add(button)
 
     for color, icon in itertools.product(colors, icons):
         button.color = color
         button.icon = icon
-        yield f"{color}, {icon}"
+        yield f"{color} button with {icon}."
 
     # Test the pre-configured settings for the named button classes.
-    # 
-    # Note that when one checkbox is switched for another (as in this test), 
-    # you have to move the mouse to trigger an on_mouse_enter() event before 
-    # you can click on the widget.  This is necessary because the GUI doesn't 
-    # keep track of where the mouse is, and I decided that fixing this would 
-    # introduce more complexity than its worth.
-    for subcls in kenney.Checkbox.__subclasses__():
+    for subcls in kenney.RoundButton.__subclasses__():
+        button = subcls()
+        button.push_handlers(on_click)
         gui.clear()
-        gui.add(subcls())
+        gui.add(button)
         yield subcls.__name__
 
 pyglet.app.run()

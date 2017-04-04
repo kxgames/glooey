@@ -472,13 +472,17 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         yield from (w for w in self.__children if w.is_under_mouse(x, y))
 
     def on_mouse_press(self, x, y, button, modifiers):
-        for child in self._children_under_mouse:
+        children_under_mouse = self._find_children_under_mouse(x, y)
+
+        for child in children_under_mouse.current:
             child.dispatch_event('on_mouse_press', x, y, button, modifiers)
 
         self.start_event('on_mouse_hold')
 
     def on_mouse_release(self, x, y, button, modifiers):
-        for child in self._children_under_mouse:
+        children_under_mouse = self._find_children_under_mouse(x, y)
+
+        for child in children_under_mouse.current:
             child.dispatch_event('on_mouse_release', x, y, button, modifiers)
 
         self.stop_event('on_mouse_hold')
@@ -542,7 +546,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self.stop_event('on_mouse_hold')
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        for child in self._children_under_mouse:
+        children_under_mouse = self._find_children_under_mouse(x, y)
+        for child in children_under_mouse.current:
             child.dispatch_event('on_mouse_scroll', x, y, scroll_x, scroll_y)
 
     def grab_mouse(self):

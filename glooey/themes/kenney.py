@@ -40,6 +40,70 @@ glooey.drawing.colors = {
 
 
 @autoprop
+class Frame(glooey.Frame):
+    custom_color = 'grey'
+
+    class Bin(glooey.Bin):
+        custom_padding = 18
+
+    def __init__(self):
+        super().__init__()
+        self.color = self.custom_color
+
+    def get_color(self):
+        return self._color
+
+    def set_color(self, new_color):
+        self._color = new_color
+        style = f'frames/{self._color}'
+        self.decoration.set_appearance(
+                center=assets.texture(f'{style}/center.png'),
+                top=assets.texture(f'{style}/top.png'),
+                left=assets.texture(f'{style}/left.png'),
+                bottom=assets.texture(f'{style}/bottom.png'),
+                right=assets.texture(f'{style}/right.png'),
+                top_left=assets.image(f'{style}/top_left.png'),
+                top_right=assets.image(f'{style}/top_right.png'),
+                bottom_left=assets.image(f'{style}/bottom_left.png'),
+                bottom_right=assets.image(f'{style}/bottom_right.png'),
+        )
+
+
+@autoprop
+class BlueFrame(Frame):
+    custom_color = 'blue'
+
+@autoprop
+class RedFrame(Frame):
+    custom_color = 'red'
+
+@autoprop
+class GreenFrame(Frame):
+    custom_color = 'green'
+
+@autoprop
+class YellowFrame(Frame):
+    custom_color = 'yellow'
+
+@autoprop
+class GreyFrame(Frame):
+    custom_color = 'grey'
+
+
+class HRule(glooey.Background):
+    custom_center = assets.texture('dividers/horz.png')
+    custom_htile = True
+    custom_vtile = False
+    custom_vert_padding = 8
+
+class VRule(glooey.Background):
+    custom_center = assets.texture('dividers/vert.png')
+    custom_htile = False
+    custom_vtile = True
+    custom_horz_padding = 18
+
+
+@autoprop
 class BigLabel(glooey.Label):
     custom_color = 'dark grey'
     custom_font_name = 'KenVector Future'
@@ -50,6 +114,31 @@ class Label(glooey.Label):
     custom_color = 'dark grey'
     custom_font_name = 'KenVector Future Thin'
     custom_font_size = 10
+
+@autoprop
+class Form(glooey.Form):
+
+    class Label(glooey.EditableLabel):
+        custom_padding = 14
+        custom_top_padding = 12
+        custom_bottom_padding = 10
+        custom_color = 'dark grey'
+        custom_selection_color = 'white'
+        custom_selection_background_color = 'blue'
+        custom_font_name = 'KenVector Future Thin'
+        custom_font_size = 10
+    
+    class Base(glooey.Background):
+        custom_center = assets.texture('form/center.png')
+        custom_top = assets.texture('form/top.png')
+        custom_left = assets.texture('form/left.png')
+        custom_right = assets.texture('form/right.png')
+        custom_bottom = assets.texture('form/bottom.png')
+        custom_top_left = assets.image('form/top_left.png')
+        custom_top_right = assets.image('form/top_right.png')
+        custom_bottom_left = assets.image('form/bottom_left.png')
+        custom_bottom_right = assets.image('form/bottom_right.png')
+
 
 
 @autoprop
@@ -133,80 +222,54 @@ class GreyButton(Button):
 
 
 @autoprop
-class Frame(glooey.Frame):
-    custom_color = 'grey'
-
-    class Bin(glooey.Bin):
-        custom_padding = 18
+class RoundButton(glooey.Button):
+    custom_color = 'red'
+    custom_icon = 'cross'
 
     def __init__(self):
         super().__init__()
         self.color = self.custom_color
+        self.icon = self.custom_icon
 
     def get_color(self):
         return self._color
 
     def set_color(self, new_color):
         self._color = new_color
-        style = f'frames/{self._color}'
-        self.decoration.set_appearance(
-                center=assets.texture(f'{style}/center.png'),
-                top=assets.texture(f'{style}/top.png'),
-                left=assets.texture(f'{style}/left.png'),
-                bottom=assets.texture(f'{style}/bottom.png'),
-                right=assets.texture(f'{style}/right.png'),
-                top_left=assets.image(f'{style}/top_left.png'),
-                top_right=assets.image(f'{style}/top_right.png'),
-                bottom_left=assets.image(f'{style}/bottom_left.png'),
-                bottom_right=assets.image(f'{style}/bottom_right.png'),
+        self.set_background(
+                base_image=assets.image(f'buttons/{self._color}/round.png'),
         )
+
+    def get_icon(self):
+        return self._icon
+
+    def set_icon(self, new_icon):
+        self._icon = new_icon
+        icon_color = 'grey' if self._color == 'grey' else 'white'
+        self.image = assets.image(f'icons/{icon_color}/{self._icon}.png')
 
 
 @autoprop
-class BlueFrame(Frame):
+class BlueRoundButton(RoundButton):
     custom_color = 'blue'
 
 @autoprop
-class RedFrame(Frame):
+class RedRoundButton(RoundButton):
     custom_color = 'red'
 
 @autoprop
-class GreenFrame(Frame):
+class GreenRoundButton(RoundButton):
     custom_color = 'green'
 
 @autoprop
-class YellowFrame(Frame):
+class YellowRoundButton(RoundButton):
     custom_color = 'yellow'
+    custom_font_color = 'dark yellow'
 
 @autoprop
-class GreyFrame(Frame):
+class GreyRoundButton(RoundButton):
     custom_color = 'grey'
-
-
-@autoprop
-class Form(glooey.Form):
-
-    class Label(glooey.EditableLabel):
-        custom_padding = 14
-        custom_top_padding = 12
-        custom_bottom_padding = 10
-        custom_color = 'dark grey'
-        custom_selection_color = 'white'
-        custom_selection_background_color = 'blue'
-        custom_font_name = 'KenVector Future Thin'
-        custom_font_size = 10
-    
-    class Base(glooey.Background):
-        custom_center = assets.texture('form/center.png')
-        custom_top = assets.texture('form/top.png')
-        custom_left = assets.texture('form/left.png')
-        custom_right = assets.texture('form/right.png')
-        custom_bottom = assets.texture('form/bottom.png')
-        custom_top_left = assets.image('form/top_left.png')
-        custom_top_right = assets.image('form/top_right.png')
-        custom_bottom_left = assets.image('form/bottom_left.png')
-        custom_bottom_right = assets.image('form/bottom_right.png')
-
+    custom_font_color = 'dark grey'
 
 
 @autoprop
@@ -302,4 +365,5 @@ class YellowRadioButton(RadioButton):
 @autoprop
 class GreyRadioButton(RadioButton):
     custom_color = 'grey'
+
 

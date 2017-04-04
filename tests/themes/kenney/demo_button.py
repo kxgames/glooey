@@ -25,13 +25,9 @@ def test_button():
 
     # Test the pre-configured settings for the named button classes.
     for subcls in kenney.Button.__subclasses__():
-
         gui.clear()
         gui.add(subcls("Lorem ipsum"))
-        yield
-
-
-
+        yield subcls.__name__
 
 pyglet.app.run()
 

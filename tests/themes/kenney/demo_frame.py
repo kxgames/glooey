@@ -10,7 +10,6 @@ window = pyglet.window.Window()
 gui = kenney.Gui(window)
 label = kenney.Paragraph(kenney.drawing.lorem_ipsum(5), 300)
 
-
 @run_demos.on_space(gui) #
 def test_frame():
     # Test the setters for the base frame class.
@@ -36,9 +35,6 @@ def test_frame():
         yield f"{subcls.__name__}"
 
     frame.clear()
-
-
-
 
 pyglet.app.run()
 
