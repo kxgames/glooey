@@ -4,7 +4,7 @@
 from setuptools import setup
 
 import sys
-if sys.version_info[0] < (3, 6):
+if sys.version_info < (3, 6):
     raise RuntimeError("glooey requires python3.6 or better.")
 
 import re
