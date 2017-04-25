@@ -4,30 +4,37 @@
 
 Every game needs a user interface that matches its look and feel.  The 
 philosophy behind ``glooey`` is that deriving subclasses from a basic set of 
-widgets with no default style is the most elegant and flexible way to achieve 
-this.  It makes sense that this approach would be flexible, since subclasses 
-can customize or override most aspects of the basic widgets.  But it's also 
-surprisingly succinct and powerful: specifying a style is usually as simple as 
-setting a class variable, and styles can be easily composed using either inner 
-classes or previously defined widgets.  This philosophy makes ``glooey`` easy 
-to get started with, and powerful enough to support even the most complicated 
-games.  
+widgets with no default style is the most elegant way to achieve this.  This 
+approach is flexible because subclasses can customize or override most aspects 
+of the basic widgets.  But it's also surprisingly succinct and powerful: 
+specifying a style is usually as simple as setting a class variable, and styles 
+can be easily composed using either inner classes or previously defined 
+widgets.  This philosophy makes ``glooey`` easy to get started with, and 
+powerful enough to support even the most complicated games.  
 
-Installation
-============
-``glooey`` is currently still under active development, so the best way to 
-install it is to clone the repository and run ``pip`` on the local files::
+.. image:: https://img.shields.io/pypi/v/glooey.svg
+   :target: https://pypi.python.org/pypi/glooey
+.. image:: https://img.shields.io/pypi/pyversions/glooey.svg
+   :target: https://pypi.python.org/pypi/glooey
+.. image:: https://img.shields.io/travis/kxgames/glooey.svg
+   :target: https://travis-ci.org/kxgames/glooey
+.. image:: https://readthedocs.org/projects/glooey/badge/?version=latest
+   :target: http://glooey.readthedocs.io/en/latest/
 
-    $ git clone https://github.com/kxgames/glooey
-    $ pip install ./glooey
+Also, talk about:
 
-``glooey`` is also available on PyPI, but until the project becomes more 
-stable, this is likely to be significantly out-of-date.
+- Large widget set.  I should look for as many pyglet gui packages as I can 
+  find and make a list of widgets each one supports.  I could even make a 
+  widget comparison page.
 
-Usage
-=====
-Complete API documentation is in the works, but here's a brief example to give 
-a flavor for how ``glooey`` is supposed to work:
+- Built-in themes.
+
+A quick example
+===============
+The documentation thoroughly explains what ``glooey`` can do and how to use it, 
+but here's a quick example to give a feel for what it looks like in action::
+
+   $ pip install glooey
 
 .. code:: python
 

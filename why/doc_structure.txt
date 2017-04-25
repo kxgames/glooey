@@ -1,0 +1,222 @@
+I remember reading somewhere that documentation should have three sections:
+
+1. Introduction
+
+   This page is for people who are learning about the project for the first 
+   time.
+   
+   "Do I want to use this library?"
+   "Could this library make things easier for me?"
+
+   Questions like these are what I ask myself when I follow links to new 
+   libraries (e.g. links from on python.ideas or the pyglet mailing list).  I 
+   want to answer them as quickly as possible, so the introduction is the place 
+   for that.
+
+2. Tutorials
+
+   This section is for people who are learning how to use the library, or who 
+   were intrigued by the introduction but want to get a more in-depth feel for 
+   how the library actually works.  The topics I want to cover are:
+
+   - Installation
+      "Glooey is easy to install"
+
+   - Widget comparison
+
+   - Getting started
+      - imports
+      - pyglet
+      - glooey.Gui
+      - glooey.Placeholder
+
+   - Especially useful widgets
+
+      Glooey comes with a lot of widgets
+      Only need a few to get started
+      See API docs for exhaustive list.
+
+      I think I need a section like this early on to give an idea what can be 
+      done.  Without it I think the "stylize" and "compose" sections will be 
+      too...theoretical.
+
+      But I can't really talk about how to use these widgets until I've talked 
+      about how to stylize.  No, all these widgets can be used without a style, 
+      they're just ugly.  And I think it's important to get to a diversity of 
+      widgets ASAP.
+
+      - Label
+      - Background
+      - Button
+      - HBox
+      - VBox
+      - Grid
+
+      These aren't all of the widgets I plan to mention in the tutorials 
+      (Placeholder, Frame, Bin, and Stack will probably come up as well), but 
+      it's a good basic set.
+
+   - Stylizing widgets
+      - custom_* class attributes
+      - nested classes
+
+   - Padding, alignment, and size hints
+      - hints
+      - padding
+      - alignment
+
+   - Composing widgets
+      - Widget.__init__()
+      - nested classes
+
+   - The widget hierarchy
+
+   - How drawing works
+      - In order to be drawn, a widget needs:
+         - rect (see "How repacking works")
+         - group (see "How regrouping works")
+         - batch (comes from the root of the widget hierarchy)
+
+      - draw()
+      - undraw()
+      - hide()
+      - unhide()
+
+   - How repacking works
+
+   - How regrouping works
+
+   - How mouse events work
+
+   - Making widgets from scratch
+
+      - Useful widget attributes
+         - parent
+         - root
+         - window
+         - batch
+         - group
+         - rect
+         - claimed_rect
+
+      - Composite widgets
+
+         - __init__
+         - _attach_child
+         - _detach_child
+         - _repack_and_regroup_children
+
+      - Overriding `do_` methods
+       
+         - Claiming space
+         - Drawing
+         - Regrouping
+
+      - Reacting to changes
+
+         - repack()/redraw()
+         - hold_updates
+         
+      - Dispatching events
+
+   - Debugging drawing problems
+      - debug_drawing_problem()
+      - debug_placement_problem()
+
+   - Contributing
+
+   Missing topics:
+
+   
+
+3. API docs.
+
+   This section is for people who are using the library and need to quickly 
+   find class names, method names and signatures, etc.
+
+   Should I organize widgets alphabetically or into related groups?  
+   Alphabetically is only useful if you know what you're looking for, and 
+   hopefully the search can take care of that.   I'll organize by module (even 
+   though the modules aren't really exposed to the user).
+
+   - Widget
+
+   - Root
+      - Gui
+      - PanningGui
+      - Dialog
+      - Root
+
+   - Containers
+      - Bin
+      - Grid
+      - HBox
+      - VBox
+      - Stack
+      - Deck
+      - Board
+
+   - Buttons
+      - Button
+      - Checkbox
+      - RadioButton
+      - Clickable
+      - Rollover
+
+   - Images
+      - Image
+      - Background
+      - Frame
+
+   - Text
+      - Label
+      - EditableLabel
+      - Form
+
+   - Scrolling
+      - ScrollBox
+      - ScrollBar
+      - ScrollGrip
+      - Viewport
+
+      - ScrollPane
+      - Mover
+
+   - Miscellaneous
+      - Placeholder
+      - EventLogger
+      - FillBar
+
+   - Drawing
+      - Color
+      - Alignment
+      - Artists
+      - Grid
+      - Text
+      - Stencil
+
+   - Themes
+      - Golden
+        ...
+
+      - Kenney
+        ...
+
+      - Wesnoth
+        ...
+
+      - Camtatz
+        ...
+
+
+There are really three "kinds" of widget:
+
+- Just change custom_* attributes
+
+- Compose a group of widgets
+
+- Implement some new functionality.
+
+I should definitely explain how to work with each kind of widget separately.  
+Not only do they require more and more expertise, they're less and less 
+commonly needed.
