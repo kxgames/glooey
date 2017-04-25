@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
+
+import sys
+if sys.version_info[0] < (3, 6):
+    raise RuntimeError("glooey requires python3.6 or better.")
 
 import re
 with open('glooey/__init__.py') as file:
@@ -49,7 +50,7 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Games/Entertainment',
         'Topic :: Software Development :: User Interfaces',
         'Topic :: Software Development :: Libraries',
