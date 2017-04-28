@@ -14,3 +14,9 @@ class WesnothButton(glooey.Button):
     custom_over = assets.image('buttons/button_normal/button_H22-active.png')
     custom_down = assets.image('buttons/button_normal/button_H22-pressed.png')
     custom_label_placement = 'center'
+
+class BraidedFrame:
+    pass
+
+class GildedFrame:
+    pass
