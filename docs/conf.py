@@ -21,8 +21,12 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+## Customizations
 
-# -- General configuration ------------------------------------------------
+# Add a screenshot directive.  This would basically be the same as `figure`, 
+# but it would automatically add the download link as a caption.
+
+## General configuration
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
@@ -79,8 +83,7 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
-# -- Options for HTML output ----------------------------------------------
+## Options for HTML output
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -88,6 +91,8 @@ todo_include_todos = False
 from sphinx_rtd_theme import get_html_theme_path
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [get_html_theme_path()]
+
+html_favicon = 'favicon.ico'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -100,16 +105,14 @@ html_theme_path = [get_html_theme_path()]
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['.static']
 
-
-# -- Options for HTMLHelp output ------------------------------------------
+## Options for HTMLHelp output
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Glooeydoc'
 
+## Options for LaTeX output
 
-# -- Options for LaTeX output ---------------------------------------------
-
-latex_elements = {
+latex_elements = { #
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
@@ -130,28 +133,26 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
+latex_documents = [ #
     (master_doc, 'Glooey.tex', 'Glooey Documentation',
      'Kale Kundert', 'manual'),
 ]
 
-
-# -- Options for manual page output ---------------------------------------
+## Options for manual page output
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
+man_pages = [ #
     (master_doc, 'glooey', 'Glooey Documentation',
      [author], 1)
 ]
 
-
-# -- Options for Texinfo output -------------------------------------------
+## Options for Texinfo output
 
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
+texinfo_documents = [ #
     (master_doc, 'Glooey', 'Glooey Documentation',
      author, 'Glooey', 'One line description of project.',
      'Miscellaneous'),
