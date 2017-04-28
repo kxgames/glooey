@@ -1,7 +1,12 @@
+.. image:: masthead.svg
+   :align: center
+
 .. include:: ../README.rst
+    :start-line: 4
 
 .. toctree::
     :maxdepth: 2
+    :hidden:
 
     installation
     getting_started
