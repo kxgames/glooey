@@ -3,13 +3,13 @@ Getting started
 ***************
 
 This tutorial describes how to create a GUI from scratch, which basically boils 
-down to importing everything, initializing the GUI, attaching widgets to the 
-GUI, then running the event loop.  In the end, we'll have a GUI that fills the 
-screen with a single "placeholder" widget:
+down to importing everything, initializing the GUI, making a widget, then 
+running the event loop.  In the end, we'll have a GUI that fills the screen 
+with a single "placeholder" widget:
 
 .. figure:: getting_started.png
 
-    Source code: :download:`getting_started.py`
+    :download:`getting_started.py`
 
 As you can see, a placeholder widget just draws a box with a cross through it.  
 It's useful for quickly visualizing what a GUI looks like, and it will come up 
@@ -67,7 +67,7 @@ just stick with the defaults.
 
 Making a widget
 ===============
-To attach a widget to the GUI, we just need to instantiate it and call 
+To add a widget to the GUI, we just need to instantiate it and call 
 ``gui.add()``::
 
     widget = glooey.Placeholder()
@@ -75,9 +75,9 @@ To attach a widget to the GUI, we just need to instantiate it and call
 
 As mentioned before, a placeholder is a simple widget that just draws a box 
 with a cross through it.  That's good enough for this simple example, but in a 
-real GUI we would attach a widget that can contain other widgets (e.g. Grid, 
-HBox, VBox) before anything else, so we could build up an interface with 
-multiple widgets.
+real GUI we would add a widget that can contain other widgets (e.g. Grid, HBox, 
+VBox) before anything else, so we could build up an interface with multiple 
+widgets.
 
 Running the event loop
 ======================
