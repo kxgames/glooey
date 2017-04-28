@@ -10,5 +10,9 @@
 
     installation
     getting_started
+    especially_useful_widgets
+    stylizing_widgets
+    composing_widgets
+    api_reference
     widgets/index
     themes/index

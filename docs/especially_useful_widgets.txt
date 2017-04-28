@@ -1,0 +1,170 @@
+*************************
+Especially useful widgets
+*************************
+
+Glooey comes with a wide variety of built-in widgets, but you can go a long way 
+with just a few.  This tutorial introduces some of the most fundamental  
+widgets to give you a feel for what's available and how to make GUIs that are 
+more "real" than the :doc:`getting_started` example.  These introductions are  
+very brief, but you can find complete documentation for every widget in the 
+:doc:`api_reference`.
+
+Keep in mind that the built-in widgets are unstyled, so they're all kinda ugly 
+and/or aggressively minimalist [1]_.  Glooey's philosophy is that subclassing 
+widgets is the easiest and most powerful way to control how they look, so all 
+the built-in widgets try to remain blank slates in terms of style.  The 
+:doc:`stylizing_widgets` tutorial has more information on how to change what 
+the default widgets look like.
+
+.. note::
+
+    All the examples in this tutorial leave out the code to create the GUI and 
+    run the pyglet event loop.  Those steps are explained in the  
+    :doc:`getting_started` tutorial.  If you want to see those steps, you can 
+    download the script associated with each example.
+
+Grid --- organize widgets
+=========================
+The Grid widget is a container that organizes widgets into a grid.  Along with 
+HBox and VBox, it is one of the most common ways to control how widgets are 
+arranged::
+
+    grid = glooey.Grid()
+    grid.add(0, 0, glooey.Placeholder())
+    grid.add(0, 1, glooey.Placeholder())
+    grid.add(1, 0, glooey.Placeholder())
+    grid.add(1, 1, glooey.Placeholder())
+
+    gui.add(grid)
+
+.. figure:: especially_useful_widgets/grid.png
+
+    :download:`especially_useful_widgets/grid.py`
+
+In this example, the grid infers how many rows and columns to make from the 
+indices provided to the ``add()`` calls.  You can also explicitly tell the grid 
+how many rows and columns to make::
+
+    grid = glooey.Grid(3, 4)
+    grid.num_rows = 5
+    grid.num_cols = 6
+
+By default, the grid distributes space evenly between all its rows and columns, 
+but you can also control the size of any row or column.  The most common thing 
+to do is to set the size of a row or column to 0 to make it just large enough 
+to fit all its widgets::
+
+    grid.set_row_height(1, 0)
+    grid.set_col_width(1, 0)
+
+HBox --- horizontal layout
+==========================
+HBox arranges widgets horizontally.  It's essentially a simplified Grid with 
+only one row::
+
+    hbox = glooey.HBox()
+    hbox.add(glooey.Placeholder())
+    hbox.add(glooey.Placeholder())
+
+    gui.add(hbox)
+    
+.. figure:: especially_useful_widgets/hbox.png
+
+    :download:`especially_useful_widgets/hbox.py`
+
+VBox --- vertical layout
+========================
+VBox arranges widgets vertically.  It's essentially a simplified Grid with only 
+one column::
+
+    vbox = glooey.VBox()
+    vbox.add(glooey.Placeholder())
+    vbox.add(glooey.Placeholder())
+
+    gui.add(vbox)
+    
+.. figure:: especially_useful_widgets/vbox.png
+
+    :download:`especially_useful_widgets/vbox.py`
+
+Label --- show text
+===================
+The label widget displays text::
+    
+    label = glooey.Label('Hello world!')
+    gui.add(label)
+
+.. figure:: especially_useful_widgets/label.png
+
+    :download:`especially_useful_widgets/label.py`
+
+Background --- tile images
+==========================
+The background widget fills in space using tiled images.  You can think of it 
+like a picture frame: you specify images for the corners and edges, and it 
+tiles the edges to fill in all the space it needs to.  
+
+.. code::
+
+    bg = glooey.Background()
+    bg.set_appearance(
+            center=pyglet.resource.texture('center.png'),
+            top=pyglet.resource.texture('top.png'),
+            bottom=pyglet.resource.texture('bottom.png'),
+            left=pyglet.resource.texture('left.png'),
+            right=pyglet.resource.texture('right.png'),
+            top_left=pyglet.resource.texture('top_left.png'),
+            top_right=pyglet.resource.texture('top_right.png'),
+            bottom_left=pyglet.resource.texture('bottom_left.png'),
+            bottom_right=pyglet.resource.texture('bottom_right.png'),
+    )
+    gui.add(bg)
+
+.. figure:: especially_useful_widgets/background.png
+    
+    :download:`especially_useful_widgets/background.py`
+    :download:`especially_useful_widgets/background_images.zip` (from the 
+    Wesnoth theme)
+
+This example doesn't adequately reflect how flexible the background widget is.  
+In addition to what you see above, it can:
+
+- Grow horizontally or vertically or in both directions
+- Accommodate any combination of edge, corner, and center images
+- Use solid colors to make fills and outlines
+
+But the true power of the background widget is how easily it can be customized 
+and incorporated into other widgets.  Those topics are beyond the scope of this 
+tutorial, but it's worth mentioning that you should very rarely need to use the 
+``set_appearance()`` method.  See the tutorials on :doc:`stylizing_widgets` and 
+:doc:`composing_widgets` for more details.
+
+The caveat with the background widget is that you have to give it images that 
+fill their whole texture in the dimensions being tiled.  Usually this
+means images with power-of-two sizes (e.g. 16, 32, 64 px) that were loaded 
+using ``pyglet.resource.texture()``.  The reason for this caveat is that the 
+background widget tiles images by manipulating their texture coordinates.  This 
+approach is very efficient, but it doesn't work if the image is loaded into a 
+texture with extra space around the edges.
+
+Button --- react to clicks
+==========================
+The button widget reacts to being clicked by emitting an ``on_click`` event via 
+the `event framework`__ provided by pyglet.  In this example, we connect the 
+event to a simple handler that just prints a message to stdout.  The event has 
+one argument, which is the widget that generated the event::
+
+    button = glooey.Button("Click here!")
+    button.push_handlers(on_click=lambda w: print(f"{w} clicked!"))
+    gui.add(button)
+
+__ http://pyglet.readthedocs.io/en/pyglet-1.2-maintenance/programming_guide/events.html
+
+.. figure:: especially_useful_widgets/button.png
+
+    :download:`especially_useful_widgets/button.py`
+
+.. [1] You might wonder why all the built-in widgets are green by default.  
+   This is because they have to be some color, and green shows up well against 
+   both dark and light backgrounds.
+
