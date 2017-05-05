@@ -14,7 +14,7 @@ and/or aggressively minimalist [1]_.  Glooey's philosophy is that subclassing
 widgets is the easiest and most powerful way to control how they look, so all 
 the built-in widgets try to remain blank slates in terms of style.  The 
 :doc:`stylizing_widgets` tutorial has more information on how to change what 
-the default widgets look like.
+the built-in widgets look like.
 
 .. note::
 
@@ -45,7 +45,10 @@ In this example, the grid infers how many rows and columns to make from the
 indices provided to the ``add()`` calls.  You can also explicitly tell the grid 
 how many rows and columns to make::
 
+    # Initialize a grid with 3 rows and 4 columns.
     grid = glooey.Grid(3, 4)
+
+    # Resize the grid to have 5 rows and 6 columns.
     grid.num_rows = 5
     grid.num_cols = 6
 
@@ -122,7 +125,7 @@ tiles the edges to fill in all the space it needs to.
 
 .. figure:: especially_useful_widgets/background.png
     
-    :download:`especially_useful_widgets/background.py`
+    :download:`especially_useful_widgets/background.py` |br|
     :download:`especially_useful_widgets/background_images.zip` (from the 
     Wesnoth theme)
 
@@ -139,10 +142,10 @@ tutorial, but it's worth mentioning that you should very rarely need to use the
 ``set_appearance()`` method.  See the tutorials on :doc:`stylizing_widgets` and 
 :doc:`composing_widgets` for more details.
 
-The caveat with the background widget is that you have to give it images that 
-fill their whole texture in the dimensions being tiled.  Usually this
-means images with power-of-two sizes (e.g. 16, 32, 64 px) that were loaded 
-using ``pyglet.resource.texture()``.  The reason for this caveat is that the 
+The caveat with the background widget is that the images you give it must fill 
+their whole textures in the dimensions being tiled.  Usually this means images 
+with power-of-two sizes (e.g. 16, 32, 64 px) that were loaded using 
+``pyglet.resource.texture()``.  The reason for this caveat is that the 
 background widget tiles images by manipulating their texture coordinates.  This 
 approach is very efficient, but it doesn't work if the image is loaded into a 
 texture with extra space around the edges.

@@ -1,0 +1,30 @@
+**********************************
+Padding, alignment, and size hints
+**********************************
+
+The focus of this tutorial is on fine-tuning the size, shape, and position of 
+widgets.  The title gives away the three mechanisms for doing this: you can use 
+padding to control the amount of space around a widget, alignment to control 
+where a widgets goes within the space allocated for it, and size hints to 
+control how big a widget is.
+
+In order to explain these concepts in more detail, we need to know a little 
+more about how glooey allocates space to widgets.  
+
+In order to explain these concepts in more detail, it will be helpful to 
+establish some terminology.
+
+First, each widget is assigned (by it's parent) a rectangle specifying the 
+maximum space that widget can occupy.  This is called the "assigned rectangle".  
+Each widget also internally keeps track of the minimum amount of space it needs 
+for itself and all its children.  This is called the "content rectangle".  
+
+
+
+
+.. Another useful widget that depends on this kind of configuration is Frame.  
+   It's purpose is to put borders around other widgets, and to do that it needs 
+   both a background widget and a...
+
+.. Wait, customizing the bin is exclusively to control padding, and I hven't 
+   talked about that yet.  Maybe I should hold off on this example...

@@ -12,7 +12,9 @@
     getting_started
     especially_useful_widgets
     stylizing_widgets
+    padding_alignment_size_hints
     composing_widgets
+    making_widgets_from_scratch
     api_reference
     widgets/index
     themes/index

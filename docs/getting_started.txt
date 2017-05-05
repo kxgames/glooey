@@ -67,7 +67,7 @@ just stick with the defaults.
 
 Making a widget
 ===============
-To add a widget to the GUI, we just need to instantiate it and call 
+To add a widget to the GUI, we just need to instantiate one and pass it to  
 ``gui.add()``::
 
     widget = glooey.Placeholder()

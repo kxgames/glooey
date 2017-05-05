@@ -1,3 +1,140 @@
-=================
+*****************
 Stylizing widgets
-=================
+*****************
+
+Now that we know how to use a few basic widgets, we need to know how to 
+customize their appearance and behavior.  In the most general sense, you do 
+this by subclassing each widget you want to customize.  For example, if you 
+were making a Pong GUI, you would probably end up defining some sort of 
+retro/arcade style in classes like these::
+
+    class PongLabel(glooey.Label):
+        ...
+
+    class PongButton(glooey.Button):
+        ...
+
+There are several advantages to stylizing widgets by subclassing them like 
+this.  First, it's very easy to create multiple variants of the same widget.  
+This comes in handy because most GUIs need several different kinds of button, 
+header and body text, heavier and lighter borders or frames, etc.  Second, 
+subclassing does a great job of making the simple customizations easy (because 
+superclasses can anticipate and facilitate common tweaks) and the complex ones 
+possible (because subclasses can override any aspect of their base class).
+
+This tutorial focuses on the simplest and easiest customizations, which 
+typically amount to changing the appearance of existing widgets.  Later 
+tutorials focus on more powerful ways to customize widgets:
+
+- :doc:`composing_widgets`: How to make a new widget from one or more existing 
+  widgets.
+- :doc:`making_widgets_from_scratch`: How to make a new widget that doesn't 
+  look or behave like any existing widget.
+
+.. note::
+
+    These tutorials will use the Wesnoth theme as an example.  In case you're 
+    not aware, Wesnoth is a popular open-source, fantasy-themed, turned based 
+    strategy game [1]_.  Recapitulating parts of its user interface is a good 
+    real-world demonstration of what glooey can do.
+
+"Custom" attributes
+===================
+The easiest way to stylize a widget is to override its "custom" attributes.  
+These are class-wide attributes --- conventionally prefixed with ``custom_`` 
+--- that control basic properties like colors, images, fonts, etc.  The label 
+widget is a good example::
+
+    class WesnothLabel(glooey.Label):
+        custom_font_name = 'Lato Regular'
+        custom_font_size = 10
+        custom_color = '#b9ad86'
+        custom_alignment = 'center'
+
+    label = WesnothLabel('Hello world!')
+    gui.add(label)
+
+.. figure:: stylizing_widgets/label.png
+
+    :download:`stylizing_widgets/label.py` |br|
+    :download:`stylizing_widgets/label_assets.zip`
+
+Here ``custom_font_name``, ``custom_font_size``, ``custom_colors``, and 
+``custom_alignment`` are all attributes defined in the Label class (or one of 
+its superclasses) for the explicit purpose of being overridden in subclasses.  
+The Label class has a lot more of these attributes too, check the :doc:`API 
+documentation <widgets/button>` for a complete list.
+
+The background widget is another good example.  The more idiomatic way to write 
+the demo from the :doc:`stylizing_widgets` tutorial is like this::
+
+    class WesnothBorder(glooey.Background):
+        custom_center = pyglet.resource.texture('center.png')
+        custom_top = pyglet.resource.texture('top.png')
+        custom_bottom = pyglet.resource.texture('bottom.png')
+        custom_left = pyglet.resource.texture('left.png')
+        custom_right = pyglet.resource.texture('right.png')
+        custom_top_left = pyglet.resource.image('top_left.png')
+        custom_top_right = pyglet.resource.image('top_right.png')
+        custom_bottom_left = pyglet.resource.image('bottom_left.png')
+        custom_bottom_right = pyglet.resource.image('bottom_right.png')
+
+    border = WesnothBorder()
+    gui.add(border)
+
+.. figure:: stylizing_widgets/background.png
+
+    :download:`stylizing_widgets/background.py` |br|
+    :download:`stylizing_widgets/background_assets.zip`
+
+Inner classes
+=============
+It's also common to stylize widgets with other widgets.  For example, you can 
+stylize the button widget by providing different widgets for the label and the 
+various mouse rollover states.  The syntax for doing this is analogous to the 
+"custom" attributes defined above: just override a class variable with the 
+widget class you want to use.  The trick is that you can also create that 
+widget class *in place* (i.e. by defining an inner class).  This provides a 
+very succinct way to customize composite widgets::
+
+    class WesnothButton(glooey.Button):
+        Label = WesnothLabel
+
+        class Base(glooey.Image):
+            custom_image = pyglet.resource.image('base.png')
+
+        class Over(glooey.Image):
+            custom_image = pyglet.resource.image('over.png')
+
+        class Down(glooey.Image):
+            custom_image = pyglet.resource.image('down.png')
+
+    button = WesnothButton('Click me!')
+    gui.add(button)
+
+.. figure:: stylizing_widgets/button.png
+
+    :download:`stylizing_widgets/button.py` |br|
+    :download:`stylizing_widgets/button_assets.zip` |br|
+
+The Button class has four widget classes we can override: Label, Base, Over, 
+Down.  The first is used to format any text associated with the button.  The 
+rest are used to display different background images in the different rollover 
+states.
+
+This example shows off both ways of using widgets to define style.  The Label 
+attribute is directly set to an existing widget class.  The WesnothLabel widget 
+we created earlier in this tutorial already has the style we want for this 
+button, so it's nice that we can easily reuse it here.  The Base, Over, and 
+Down attributes are overridden by new widget classes defined in place.  These 
+background images aren't useful outside the button, so it's nice that we don't 
+have to define them separately.
+
+This is the first time we've seen the Image widget, but hopefully it's not too 
+hard to understand.  It just displays the image specified by ``custom_image``.  
+It's perhaps more common to derive Base, Over, and Down from Background (which 
+allows the button to grow and shrink with the text), but we use Image here 
+because the Wesnoth theme has fixed-size buttons.
+
+.. [1] Wesnoth itself doesn't use glooey (or pyglet), but glooey comes with a 
+   theme based on the Wesnoth assets.  
