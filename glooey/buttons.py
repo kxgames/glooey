@@ -92,6 +92,8 @@ class Rollover(Deck):
         super().__init__(initial_state, **widgets)
         self._predicate = predicate or self.custom_predicate
         self._clickable = clickable
+
+    def do_attach(self):
         self._clickable.push_handlers(self.on_rollover)
 
     def do_detach(self):
@@ -134,11 +136,11 @@ class Button(Clickable):
     custom_background_layer = 1
     custom_alignment = 'center'
 
-    def __init__(self, text='', image=None):
+    def __init__(self, text=None, image=None):
         super().__init__()
         self._stack = Stack()
-        self._label = self.Label()
-        self._image = self.Image()
+        self._label = self.Label(text)
+        self._image = self.Image(image)
         self._backgrounds = {
                 'base': self.Base(),
                 'over': self.Over(),
@@ -147,9 +149,6 @@ class Button(Clickable):
         }
         self._rollover = Rollover(self, 'base', lambda w: not w.is_empty)
         self._rollover.add_states(**self._backgrounds)
-
-        self.set_text(text)
-        self.set_image(image)
 
         self._attach_child(self._stack)
         self._stack.insert(self._label, self.custom_label_layer)
