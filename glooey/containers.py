@@ -292,14 +292,23 @@ class HVBox(Widget):
         self.default_cell_size = first_not_none((
                 default_cell_size, self.custom_default_cell_size))
 
-    def add(self, child, size=None):
-        self.add_back(child, size)
+    def add(self, widget, size=None):
+        self.add_back(widget, size)
 
-    def add_front(self, child, size=None):
-        self.insert(child, 0, size)
+    def add_front(self, widget, size=None):
+        self.insert(widget, 0, size)
 
-    def add_back(self, child, size=None):
-        self.insert(child, len(self._children), size)
+    def add_back(self, widget, size=None):
+        self.insert(widget, len(self._children), size)
+
+    def pack(self, widget):
+        self.add(widget, size=0)
+
+    def pack_front(self, widget):
+        self.add_front(widget, size=0)
+
+    def pack_back(self, widget):
+        self.add_back(widget, size=0)
 
     def insert(self, child, index, size=None):
         self._attach_child(child)
