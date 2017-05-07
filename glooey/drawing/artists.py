@@ -417,7 +417,7 @@ class Background(HoldUpdatesMixin):
             self._color_artist.group = self._color_group
 
         if self._outline_artist:
-            self._otuline_artist.group = self._outline_group
+            self._outline_artist.group = self._outline_group
 
         for artist in self._tile_artists.values():
             artist.group = self._tile_group

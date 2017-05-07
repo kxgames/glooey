@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+
+import pyglet
+import autoprop
+
+from glooey.text import Label
+from glooey.images import Background, Frame
+from glooey.buttons import Button
+from glooey.containers import Bin, HBox, VBox
+from glooey.misc import Spacer
+from glooey.helpers import *
+
+@autoprop
+class Dialog(Frame):
+
+    def open(self, gui):
+        self.close()
+        gui.add(self)
+
+    def close(self):
+        if self.root is not None:
+            self.root.remove(self)
+            self.dispatch_event('on_close', self)
+
+Dialog.register_event_type('on_close')
+
+
+@autoprop
+class ButtonDialog(Dialog):
+    Bin = VBox
+    Foreground = Label
+    custom_autoadd_foreground = False
+
+    class Buttons(HBox):
+        custom_alignment = 'right'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+
+        self.__foreground = self.Foreground(*args, **kwargs)
+        self.__buttons = self.Buttons()
+
+        self.bin.add(self.__foreground)
+        self.bin.pack(self.__buttons)
+
+    def add(self, widget):
+        self.bin.replace(self.__foreground, widget)
+        self.__foreground = widget
+
+    def clear(self):
+        self.add(Spacer())
+
+    def get_foreground(self):
+        return self.__foreground
+
+    def get_buttons(self):
+        return self.__buttons
+
+    def _swap_buttons(self, old_button, new_button, on_click):
+        old_button.remove_handlers(on_click)
+        new_button.push_handlers(on_click=on_click)
+        self.__buttons.replace(old_button, new_button)
+    
+
+@autoprop
+class OkDialog(ButtonDialog):
+
+    class OkButton(Button): #
+        class Label(Label):
+            custom_text = 'Ok'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._ok_button = self.OkButton()
+        self._ok_button.push_handlers(on_click=self.on_click_ok)
+        self.buttons.pack(self._ok_button)
+
+    def on_click_ok(self, widget):
+        self.close()
+
+    def get_ok_button(self):
+        return self._ok_button
+
+    def set_ok_button(self, button):
+        self._swap_button(self._ok_button, button, self.on_click_ok)
+        self._ok_button = button
+
+
+@autoprop
+class YesNoDialog(ButtonDialog):
+
+    class YesButton(Button): #
+        class Label(Label):
+            custom_text = 'Ok'
+
+    class NoButton(Button): #
+        class Label(Label):
+            custom_text = 'Cancel'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._yes_button = self.YesButton()
+        self._yes_button.push_handlers(on_click=self.on_click_yes)
+        self._no_button = self.NoButton()
+        self._no_button.push_handlers(on_click=self.on_click_no)
+        self._response = False
+
+        self.buttons.pack(self._yes_button)
+        self.buttons.pack(self._no_button)
+
+    def open(self, gui):
+        self._response = None
+        super().open(gui)
+
+    def on_click_yes(self, widget):
+        self._response = True
+        self.close()
+
+    def on_click_no(self, widget):
+        self._response = False
+        self.close()
+
+    def get_yes_button(self):
+        return self._yes_button
+
+    def set_yes_button(self, button):
+        self._swap_button(self._yes_button, button, self.on_click_yes)
+        self._yes_button = button
+
+    def get_no_button(self):
+        return self._no_button
+
+    def set_no_button(self, button):
+        self._swap_button(self._no_button, button, self.on_click_no)
+        self._no_button = button
+
+    def get_response(self):
+        return self._response
+
+

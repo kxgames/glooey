@@ -25,7 +25,7 @@ class Label(Widget):
     custom_text_alignment = None
     custom_line_spacing = None
 
-    def __init__(self, text="", line_wrap=None, **style):
+    def __init__(self, text=None, line_wrap=None, **style):
         super().__init__()
         self._layout = None
         self._text = text or self.custom_text
@@ -47,6 +47,14 @@ class Label(Widget):
         self.set_style(**style)
         if line_wrap:
             self.enable_line_wrap(line_wrap)
+
+    def __repr__(self):
+        import textwrap
+        return '{}(id={}, "{}")'.format(
+                self.__class__.__name__,
+                hex(id(self))[-4:],
+                textwrap.shorten(self.text, width=10, placeholder='...'),
+        )
 
     def do_claim(self):
         # Make sure the label's text and style are up-to-date before we request 

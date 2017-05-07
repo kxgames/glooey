@@ -8,6 +8,7 @@ from .containers import *
 from .text import *
 from .images import *
 from .buttons import *
+from .dialogs import *
 from .scrolling import *
 from .misc import *
 from . import drawing

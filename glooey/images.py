@@ -59,6 +59,16 @@ class Image(Widget):
     def del_image(self):
         self.set_image(None)
 
+    def get_appearance(self):
+        return {'image': self._image}
+
+    def set_appearance(self, *, image=None):
+        self.set_image(image)
+
+    @property
+    def is_empty(self):
+        return self._image is None
+
 
 @autoprop
 class Background(Widget):
@@ -168,41 +178,42 @@ class Frame(Widget):
     custom_alignment = 'center'
     custom_bin_layer = 2
     custom_decoration_layer = 1
+    custom_autoadd_foreground = True
 
     def __init__(self):
         super().__init__()
 
-        self._bin = self.Bin()
-        self._decoration = self.Decoration()
+        self.__bin = self.Bin()
+        self.__decoration = self.Decoration()
 
-        self._attach_child(self._bin)
-        self._attach_child(self._decoration)
+        self._attach_child(self.__bin)
+        self._attach_child(self.__decoration)
 
-        if self.Foreground:
+        if self.Foreground and self.custom_autoadd_foreground:
             self.add(self.Foreground())
 
-    def add(self, child):
-        self._bin.add(child)
+    def add(self, widget):
+        self.bin.add(widget)
 
     def clear(self):
-        self._bin.clear()
+        self.bin.clear()
 
     def do_claim(self):
-        return claim_stacked_widgets(self._bin, self._decoration)
+        return claim_stacked_widgets(self.bin, self.decoration)
 
     def do_regroup_children(self):
-        self._bin.regroup(pyglet.graphics.OrderedGroup(
+        self.bin.regroup(pyglet.graphics.OrderedGroup(
             self.custom_bin_layer, self.group))
-        self._decoration.regroup(pyglet.graphics.OrderedGroup(
+        self.decoration.regroup(pyglet.graphics.OrderedGroup(
             self.custom_decoration_layer, self.group))
 
     def get_bin(self):
-        return self._bin
+        return self.__bin
 
-    def get_child(self):
-        return self._bin.child
+    def get_foreground(self):
+        return self.__bin.child
 
     def get_decoration(self):
-        return self._decoration
+        return self.__decoration
 
 

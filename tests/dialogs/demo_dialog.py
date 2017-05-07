@@ -16,7 +16,7 @@ class TestDialog(glooey.Dialog):
                 down_color='purple',
         )
         button.push_handlers(on_click=lambda w: self.close())
-        self._attach_child(button)
+        self.add(button)
 
 
 

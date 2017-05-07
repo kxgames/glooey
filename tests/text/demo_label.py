@@ -4,11 +4,14 @@ import pyglet
 import glooey
 import run_demos
 
+class TestLabel(glooey.Label): #
+    custom_text = 'Lorem ipsum'
+
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
 stack = glooey.Stack()
 stack.alignment = 'center'
-label = glooey.Label()
+label = TestLabel()
 outline = glooey.Placeholder(color='purple')
 stack.add(outline)
 stack.add(label)
@@ -16,7 +19,6 @@ gui.add(stack)
 
 @run_demos.on_space(gui) #
 def test_label():
-    label.set_text('Lorem ipsum', 0)
     yield "Display \"lorem ipsum\"."
     
     label.text = ''
@@ -50,10 +52,11 @@ def test_label():
 
     label.color = 'orange'
     yield "Make the text orange."
-    label.color = 'green'
 
-    label.background_color = 'orange'
-    yield "Make the background orange."
+    label.color = 'black'
+    label.background_color = 'green'
+    yield "Make the background green."
+    label.color = 'green'
     del label.background_color
 
     label.text_alignment = 'center'
@@ -70,6 +73,8 @@ def test_label():
     label.kerning = 2
     yield "Increase the kerning to 2px."
     del label.kerning
+
+    label.set_text('Lorem ipsum', 0)
 
 pyglet.app.run()
 
