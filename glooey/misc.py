@@ -9,6 +9,18 @@ from glooey.images import Background
 from glooey.helpers import *
 
 @autoprop
+class Spacer(Widget):
+
+    def __init__(self, min_width=0, min_height=0):
+        super().__init__()
+        self._min_width = min_width
+        self._min_height = min_height
+
+    def do_claim(self):
+        return self._min_width, self._min_height
+
+
+@autoprop
 class Placeholder(Clickable):
     custom_color = 'green'
     custom_alignment = 'fill'
