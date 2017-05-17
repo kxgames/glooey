@@ -255,16 +255,4 @@ class PanningGui(Gui):
 
 PanningGui.register_event_type('on_mouse_pan')
 
-class Dialog(Widget):
-    custom_alignment = 'center'
-
-    def open(self, gui):
-        self.close()
-        gui.add(self)
-
-    def close(self):
-        if self.root is not None:
-            self.root.remove(self)
-
-
 
