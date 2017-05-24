@@ -79,9 +79,20 @@ def bottom_right(child_rect, parent_rect):
 
 
 def align(key_or_function, child_rect, parent_rect):
-    try:
-        alignment_func = alignments[key_or_function]
-    except KeyError:
+    if isinstance(key_or_function, str):
+        try:
+            alignment_func = alignments[key_or_function]
+        except KeyError:
+            newline = '\n'
+            raise UsageError(f"""\
+{repr(key_or_function)} is not an alignment.  Did you mean:
+
+{newline.join('  ' + repr(k) for k in alignments)}
+
+You can also use a function to specify an alignment, and you can register a new 
+alignment string using the ``@glooey.drawing.alignment`` decorator.""")
+
+    else:
         alignment_func = key_or_function
 
     alignment_func(child_rect, parent_rect)
