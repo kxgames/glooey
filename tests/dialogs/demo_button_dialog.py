@@ -24,7 +24,7 @@ class TestOkDialog(glooey.OkDialog):
     Foreground = glooey.Placeholder
     custom_size_hint = 300, 200
 
-    class Bin(glooey.VBox): #
+    class Bin(glooey.Grid): #
         custom_padding = 5
 
     class Decoration(glooey.Background): #
@@ -38,7 +38,7 @@ class TestYesNoDialog(glooey.YesNoDialog):
     Foreground = glooey.Placeholder
     custom_size_hint = 300, 200
 
-    class Bin(glooey.VBox): #
+    class Bin(glooey.Grid): #
         custom_padding = 5
 
     class Decoration(glooey.Background): #

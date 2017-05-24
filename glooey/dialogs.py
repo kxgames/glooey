@@ -6,7 +6,7 @@ import autoprop
 from glooey.text import Label
 from glooey.images import Background, Frame
 from glooey.buttons import Button
-from glooey.containers import Bin, HBox, VBox
+from glooey.containers import Grid, HBox
 from glooey.misc import Spacer
 from glooey.helpers import *
 
@@ -27,7 +27,7 @@ Dialog.register_event_type('on_close')
 
 @autoprop
 class ButtonDialog(Dialog):
-    Bin = VBox
+    Bin = Grid
     Foreground = Label
     custom_autoadd_foreground = False
 
@@ -40,15 +40,16 @@ class ButtonDialog(Dialog):
         self.__foreground = self.Foreground(*args, **kwargs)
         self.__buttons = self.Buttons()
 
-        self.bin.add(self.__foreground)
-        self.bin.pack(self.__buttons)
+        self.bin.add(0, 0, self.__foreground)
+        self.bin.add(1, 0, self.__buttons)
+        self.bin.set_row_height(1, 0)
 
     def add(self, widget):
-        self.bin.replace(self.__foreground, widget)
+        self.bin.add(0, 0, widget)
         self.__foreground = widget
 
     def clear(self):
-        self.add(Spacer())
+        self.remove(0, 0)
 
     def get_foreground(self):
         return self.__foreground
@@ -56,7 +57,7 @@ class ButtonDialog(Dialog):
     def get_buttons(self):
         return self.__buttons
 
-    def _swap_buttons(self, old_button, new_button, on_click):
+    def _replace_button(self, old_button, new_button, on_click):
         old_button.remove_handlers(on_click)
         new_button.push_handlers(on_click=on_click)
         self.__buttons.replace(old_button, new_button)
@@ -82,7 +83,7 @@ class OkDialog(ButtonDialog):
         return self._ok_button
 
     def set_ok_button(self, button):
-        self._swap_button(self._ok_button, button, self.on_click_ok)
+        self._replace_button(self._ok_button, button, self.on_click_ok)
         self._ok_button = button
 
 
@@ -125,14 +126,14 @@ class YesNoDialog(ButtonDialog):
         return self._yes_button
 
     def set_yes_button(self, button):
-        self._swap_button(self._yes_button, button, self.on_click_yes)
+        self._replace_button(self._yes_button, button, self.on_click_yes)
         self._yes_button = button
 
     def get_no_button(self):
         return self._no_button
 
     def set_no_button(self, button):
-        self._swap_button(self._no_button, button, self.on_click_no)
+        self._replace_button(self._no_button, button, self.on_click_no)
         self._no_button = button
 
     def get_response(self):
