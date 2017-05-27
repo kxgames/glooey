@@ -81,7 +81,7 @@ class Form(glooey.Form):
 class Frame(glooey.Frame):
     custom_color = 'grey'
 
-    class Bin(glooey.Bin):
+    class Box(glooey.Bin):
         custom_padding = 18
 
     def __init__(self):

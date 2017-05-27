@@ -8,7 +8,7 @@ colors = 'grey', 'blue', 'red', 'green', 'yellow'
 
 window = pyglet.window.Window()
 gui = kenney.Gui(window)
-label = kenney.Paragraph(kenney.drawing.lorem_ipsum(5), 300)
+label = kenney.Label(kenney.drawing.lorem_ipsum(5), 300)
 
 @run_demos.on_space(gui) #
 def test_frame():

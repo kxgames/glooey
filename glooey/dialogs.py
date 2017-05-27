@@ -22,12 +22,12 @@ class Dialog(Frame):
             self.root.remove(self)
             self.dispatch_event('on_close', self)
 
-Dialog.register_event_type('on_close')
 
+Dialog.register_event_type('on_close')
 
 @autoprop
 class ButtonDialog(Dialog):
-    Bin = Grid
+    Box = Grid
     Foreground = Label
     custom_autoadd_foreground = False
 
@@ -40,12 +40,12 @@ class ButtonDialog(Dialog):
         self.__foreground = self.Foreground(*args, **kwargs)
         self.__buttons = self.Buttons()
 
-        self.bin.add(0, 0, self.__foreground)
-        self.bin.add(1, 0, self.__buttons)
-        self.bin.set_row_height(1, 0)
+        self.box.add(0, 0, self.__foreground)
+        self.box.add(1, 0, self.__buttons)
+        self.box.set_row_height(1, 0)
 
     def add(self, widget):
-        self.bin.add(0, 0, widget)
+        self.box.add(0, 0, widget)
         self.__foreground = widget
 
     def clear(self):

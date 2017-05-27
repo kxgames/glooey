@@ -6,6 +6,7 @@ from glooey import drawing
 from glooey.widget import Widget
 from glooey.buttons import Clickable
 from glooey.images import Background
+from glooey.text import Label
 from glooey.helpers import *
 
 @autoprop
@@ -155,6 +156,14 @@ class EventLogger(Placeholder):
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         super().on_mouse_scroll(x, y, scroll_x, scroll_y)
         print(f'{self}.on_mouse_scroll(x={x}, y={y}, scroll_x={scroll_x}, scroll_y={scroll_y})')
+
+
+@autoprop
+class LoremIpsum(Label):
+
+    def __init__(self, num_sentences=None, num_paragraphs=None, line_wrap=300, **style):
+        text = drawing.lorem_ipsum(num_sentences, num_paragraphs)
+        super().__init__(text, line_wrap=line_wrap, **style)
 
 
 @autoprop

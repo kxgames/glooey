@@ -4,7 +4,12 @@
 Run individual demos.  
 
 Usage:
-    ./run_demo.py <demo_paths>...
+    ./run_demo.py [-v] <demo_paths>...
+
+Options:
+    -v --verbose
+        Print the path to each test that runs.  This can be useful if you have 
+        a test that's crashing right away but you can't tell which one it is.
 
 You could also directly run the demos (they're all standalone python scripts), 
 but you'd have to be in the same directory as the demo (otherwise some imports 
@@ -88,6 +93,8 @@ if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
     for path in args['<demo_paths>']:
+        if args['--verbose']:
+            print(path)
         run_demo(path)
 
 

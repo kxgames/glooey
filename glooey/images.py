@@ -172,46 +172,46 @@ class Background(Widget):
 
 @autoprop
 class Frame(Widget):
-    Bin = Bin
+    Box = Bin
     Foreground = None
     Decoration = Background
     custom_alignment = 'center'
-    custom_bin_layer = 2
+    custom_box_layer = 2
     custom_decoration_layer = 1
     custom_autoadd_foreground = True
 
     def __init__(self):
         super().__init__()
 
-        self.__bin = self.Bin()
+        self.__box = self.Box()
         self.__decoration = self.Decoration()
 
-        self._attach_child(self.__bin)
+        self._attach_child(self.__box)
         self._attach_child(self.__decoration)
 
         if self.Foreground and self.custom_autoadd_foreground:
             self.add(self.Foreground())
 
     def add(self, widget):
-        self.bin.add(widget)
+        self.box.add(widget)
 
     def clear(self):
-        self.bin.clear()
+        self.box.clear()
 
     def do_claim(self):
-        return claim_stacked_widgets(self.bin, self.decoration)
+        return claim_stacked_widgets(self.box, self.decoration)
 
     def do_regroup_children(self):
-        self.bin.regroup(pyglet.graphics.OrderedGroup(
-            self.custom_bin_layer, self.group))
+        self.box.regroup(pyglet.graphics.OrderedGroup(
+            self.custom_box_layer, self.group))
         self.decoration.regroup(pyglet.graphics.OrderedGroup(
             self.custom_decoration_layer, self.group))
 
-    def get_bin(self):
-        return self.__bin
+    def get_box(self):
+        return self.__box
 
     def get_foreground(self):
-        return self.__bin.child
+        return self.__box.child
 
     def get_decoration(self):
         return self.__decoration

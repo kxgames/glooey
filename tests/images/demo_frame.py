@@ -10,7 +10,7 @@ class TestFrame(glooey.Frame): #
     class Decoration(glooey.Background): #
         custom_center = pyglet.image.load('assets/64x64/green.png')
 
-    class Bin(glooey.Bin): #
+    class Box(glooey.Bin): #
         custom_padding = 16
 
 class TestBackground(glooey.Background): #
@@ -30,11 +30,11 @@ def test_image():
     frame.padding = 32
     yield "Pad around the frame."
 
-    frame.bin.padding = 48
+    frame.box.padding = 48
     yield "Pad inside the frame."
 
     frame.padding = 0
-    frame.bin.padding = 16
+    frame.box.padding = 16
 
 pyglet.app.run()
 

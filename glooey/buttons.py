@@ -131,6 +131,7 @@ class Button(Clickable):
     Down = Background
     Off = Background
 
+    custom_text = None
     custom_label_layer = 3
     custom_image_layer = 2
     custom_background_layer = 1
@@ -139,7 +140,7 @@ class Button(Clickable):
     def __init__(self, text=None, image=None):
         super().__init__()
         self._stack = Stack()
-        self._label = self.Label(text)
+        self._label = self.Label(text or self.custom_text)
         self._image = self.Image(image)
         self._backgrounds = {
                 'base': self.Base(),

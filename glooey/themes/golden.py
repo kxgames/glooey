@@ -151,7 +151,7 @@ class BigFrame(glooey.Frame):
         custom_center = assets.texture('frames/big/center.png')
         custom_right = assets.image('frames/big/right.png')
 
-    class Bin(glooey.Bin):
+    class Box(glooey.Bin):
         custom_vert_padding = 16
         custom_horz_padding = 24
 
@@ -169,7 +169,7 @@ class SmallFrame(glooey.Frame):
         custom_bottom_left = assets.image('frames/small/bottom_left.png')
         custom_bottom_right = assets.image('frames/small/bottom_right.png')
 
-    class Bin(glooey.Bin):
+    class Box(glooey.Bin):
         custom_padding = 10
 
 
@@ -185,7 +185,7 @@ class SubFrame(glooey.Frame):
         custom_bottom_left = assets.image('frames/sub/bottom_left.png')
         custom_bottom_right = assets.image('frames/sub/bottom_right.png')
 
-    class Bin(glooey.Bin):
+    class Box(glooey.Bin):
         custom_padding = 6
 
 
@@ -300,23 +300,29 @@ class ScrollBox(glooey.ScrollBox):
 
     class Frame(SmallFrame):
 
-        class Bin(SmallFrame.Bin):
+        class Box(SmallFrame.Box):
             custom_top_padding = 6
             custom_bottom_padding = 5
 
 
+@autoprop
 class PopUp(glooey.Dialog):
+
+    class Decoration(glooey.Background):
+        custom_left = assets.image('frames/big/left.png')
+        custom_center = assets.texture('frames/big/center.png')
+        custom_right_padding = 69
+
+    class Box(glooey.Grid):
+        custom_default_col_width = 0
+
 
     def __init__(self, text=None, line_wrap=None):
         super().__init__()
 
-        self._frame = glooey.Frame()
-        self._frame.bin.vert_padding = 16
-        self._frame.bin.left_padding = 24
-        self._frame.decoration.set_appearance(
-                left=assets.image('frames/big/left.png'),
-                center=assets.texture('frames/big/center.png'),
-        )
+        self._bin = glooey.Bin()
+        self._bin.vert_padding = 16
+        self._bin.left_padding = 24
 
         self._button = glooey.Button()
         self._button.set_background(
@@ -327,21 +333,22 @@ class PopUp(glooey.Dialog):
         )
         self._button.push_handlers(on_click=lambda w: self.close())
 
-        self._hbox = glooey.HBox()
-        self._hbox.add(self._frame, 0)
-        self._hbox.add(self._button, 0)
-
-        self._attach_child(self._hbox)
+        self.box.add(0, 0, self._bin)
+        self.box.add(0, 1, self._button)
 
         if text is not None:
             self.set_text(text, line_wrap)
 
     def add(self, widget):
-        self._frame.add(widget)
+        self._bin.add(widget)
 
-    def clear(self, widget):
-        self._frame.add(widget)
+    def clear(self):
+        self._bin.clear()
+
+    def get_button(self):
+        return self._button
 
     def set_text(self, text, line_wrap=None):
         self.add(Label(text, line_wrap))
+
 
