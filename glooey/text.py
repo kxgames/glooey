@@ -422,6 +422,7 @@ class EditableLabel(Label):
 EditableLabel.register_event_type('on_focus')
 EditableLabel.register_event_type('on_unfocus')
 
+@autoprop
 class Form(Widget):
     Label = EditableLabel
     Base = Background
@@ -432,7 +433,12 @@ class Form(Widget):
         super().__init__()
 
         self._stack = Stack()
+
         self._label = self.Label(text)
+        self._label.push_handlers(
+                on_focus=lambda w: self.dispatch_event('on_focus', self),
+                on_unfocus=lambda w: self.dispatch_event('on_unfocus', self),
+        )
 
         # If there are two backgrounds, create a deck to switch between them.  
         # Otherwise skip the extra layer of hierarchy.
