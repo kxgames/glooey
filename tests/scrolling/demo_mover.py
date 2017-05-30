@@ -23,22 +23,11 @@ def interactive_mover_tests():
     padded.padding = 20
 
     for widget in unpadded, padded:
+        widget.alignment = 'top right'
         mover.add(widget)
-        yield f"Add the {'padded' if widget is padded else 'unpadded'} widget to the mover."
+        yield f"Add the {'padded' if widget is padded else 'unpadded'} widget to the top right corner of the mover."
 
         # Test panning by distance.
-
-        mover.pan(25, 0)
-        yield "Pan right 25 px."
-
-        mover.pan(1000, 0)
-        yield "Pan past the right edge."
-
-        mover.pan(0, 25)
-        yield "Pan up 25 px."
-
-        mover.pan(0, 1000)
-        yield "Pan past the top edge."
 
         mover.pan(-25, 0)
         yield "Pan left 25 px."
@@ -52,19 +41,19 @@ def interactive_mover_tests():
         mover.pan(0, -1000)
         yield "Pan past the bottom edge."
 
-        # Test panning by percent.
+        mover.pan(25, 0)
+        yield "Pan right 25 px."
 
-        mover.pan_percent(0.5, 0)
-        yield "Pan 50% to the right."
-
-        mover.pan_percent(10.0, 0)
+        mover.pan(1000, 0)
         yield "Pan past the right edge."
 
-        mover.pan_percent(0, 0.5)
-        yield "Pan 50% to the top."
+        mover.pan(0, 25)
+        yield "Pan up 25 px."
 
-        mover.pan_percent(0, 1.0)
+        mover.pan(0, 1000)
         yield "Pan past the top edge."
+
+        # Test panning by percent.
 
         mover.pan_percent(-0.5, 0)
         yield "Pan 50% to the left."
@@ -78,22 +67,34 @@ def interactive_mover_tests():
         mover.pan_percent(0, -1.0)
         yield "Pan past the bottom edge."
 
+        mover.pan_percent(0.5, 0)
+        yield "Pan 50% to the right."
+
+        mover.pan_percent(10.0, 0)
+        yield "Pan past the right edge."
+
+        mover.pan_percent(0, 0.5)
+        yield "Pan 50% to the top."
+
+        mover.pan_percent(0, 1.0)
+        yield "Pan past the top edge."
+
         # Test jumping by distance.
 
         mover.jump(75, 75)
         yield "Jump to the center."
-
-        mover.jump(140, 140)
-        yield "Jump 10 px from the top-right corner."
-
-        mover.jump(1000, 1000)
-        yield "Jump past the top-right corner."
 
         mover.jump(10, 10)
         yield "Jump 10 px from the bottom-left corner."
 
         mover.jump(-1000, -1000)
         yield "Jump past the bottom-left corner."
+
+        mover.jump(140, 140)
+        yield "Jump 10 px from the top-right corner."
+
+        mover.jump(1000, 1000)
+        yield "Jump past the top-right corner."
 
         mover.jump(140, 10)
         yield "Jump 10 px from the bottom-right corner."

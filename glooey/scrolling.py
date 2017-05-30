@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import math
 import pyglet
 import vecrec
 import autoprop
@@ -32,10 +33,15 @@ class Mover(Bin):
 
     def __init__(self):
         super().__init__()
-        # child_position is the displacement between the bottom-left corners of 
-        # the mover and it child widget.
+
+        # ``child_position`` is the vector between the bottom left corner of 
+        # the child's physical position (i.e. it position in it's own 
+        # coordinates) and it's apparent position (i.e. the position it seems 
+        # to be in after the translation is performed).
         self._child_position = Vector.null()
         self._translate_group = None
+        self._expand_horz = True
+        self._expand_vert = True
 
     @vecrec.accept_anything_as_vector
     def pan(self, step):
@@ -49,7 +55,7 @@ class Mover(Bin):
     @vecrec.accept_anything_as_vector
     def jump(self, new_position):
         self._require_rects()
-        self._child_position = new_position
+        self._child_position = new_position - self.child.padded_rect.bottom_left
         self._keep_child_in_rect()
         self.dispatch_event('on_translate', self)
 
@@ -63,8 +69,28 @@ class Mover(Bin):
         self.jump(new_percent * self.unoccupied_size)
 
     def do_resize_children(self):
-        # Make the child whatever size it wants to be.
-        self.child.resize(self.child.claimed_rect)
+        # Consult the ``expand_horz`` and ``expand_vert`` member variables to 
+        # decide how much space to give the child.  If expansion is enabled, 
+        # the child can occupy the whole mover depending on its alignment.  The 
+        # advantage of this is that the child can control its initial position 
+        # using alignment.  The downside is that widgets with the default 
+        # "fill" alignment can't move, which is a gotcha.  If expansion is 
+        # disabled, the child is made as small as possible.
+        if self.expand_horz:
+            child_width = self.rect.width
+        else:
+            child_width = self.child.claimed_width
+
+        if self.expand_vert:
+            child_height = self.rect.height
+        else:
+            child_height = self.child.claimed_height
+
+        # Put the bottom left corner of the child's rectangle at the origin.  
+        # This simplifies the offset calculations, relative to having the 
+        # child's rectangle where the parent's is.
+        child_rect = Rect.from_size(child_width, child_height)
+        self.child.resize(child_rect)
         self._keep_child_in_rect()
 
     def do_regroup_children(self):
@@ -111,7 +137,7 @@ class Mover(Bin):
         super().on_mouse_scroll(x, y, scroll_x, scroll_y)
 
     def get_position(self):
-        return self._child_position
+        return self.child.padded_rect.bottom_left + self._child_position
 
     def get_position_percent(self):
         percent = Vector.null()
@@ -123,7 +149,21 @@ class Mover(Bin):
         return percent
 
     def get_unoccupied_size(self):
-        return self.rect.size - self.child.claimed_rect.size
+        return self.rect.size - self.child.padded_rect.size
+
+    def get_expand_horz(self):
+        return self._expand_horz
+
+    def set_expand_horz(self, new_bool):
+        self._expand_horz = new_bool
+        self.repack()
+
+    def get_expand_vert(self):
+        return self._expand_vert
+
+    def set_expand_vert(self, new_bool):
+        self._expand_vert = new_bool
+        self.repack()
 
     @vecrec.accept_anything_as_vector
     def pixels_to_percent(self, pixels):
@@ -143,28 +183,30 @@ class Mover(Bin):
     def screen_to_child_coords(self, screen_coords):
         mover_origin = self.rect.bottom_left
         mover_coords = screen_coords - mover_origin
-        child_origin = self.child.claimed_rect.bottom_left
-        child_coords = child_origin - self._child_position + mover_coords
+        child_coords = mover_coords - self._child_position
         return child_coords
 
     @vecrec.accept_anything_as_vector
     def child_to_screen_coords(self, child_coords):
-        child_origin = self.child.claimed_rect.bottom_left
-        pane_origin = self.rect.bottom_left
-        pane_coords = child_coords - child_origin - self._child_position
+        mover_origin = self.padded_rect.bottom_left
+        mover_coords = child_coords + self._child_position
         screen_coords = pane_coords + pane_origin
         return screen_coords
 
     def _keep_child_in_rect(self):
+        """
+        Update the child position vector to make sure the child can't translate 
+        outside the mover.
+        """
         self._child_position.x = clamp(
                 self._child_position.x,
-                0, 
-                self.rect.width - self.child.claimed_rect.width,
+                -self.child.padded_rect.left,
+                self.rect.width - self.child.padded_rect.right,
         )
         self._child_position.y = clamp(
                 self._child_position.y,
-                0,
-                self.rect.height - self.child.claimed_rect.height,
+                -self.child.padded_rect.bottom,
+                self.rect.height - self.child.padded_rect.top,
         )
 
     def _require_rects(self):
@@ -182,6 +224,22 @@ Mover.register_event_type('on_translate')
 
 @autoprop
 class ScrollPane(Widget):
+    """
+    Provide basic support for scrolling.
+
+    ScrollPane implements scrolling using a Mover and a scissor box.  This 
+    approach is a little counter-intuitive at first, but it builds really well 
+    on the tools and features that already exist.  First, the pane creates a 
+    mover that's much bigger than the region that will be visible.  The size of 
+    the mover is carefully calculated so that when it's child is all the way at 
+    the bottom, it's top is flush with the top of the visible region, and vice 
+    versa for the bottom.  The scissor box is then used to clip everything 
+    outside the visible region.
+
+    This widget isn't really meant to be used directly.  Instead, it's meant to 
+    be a building block for widgets that need scrolling, like ScrollBox and 
+    Viewport.
+    """
     Mover = Mover
     custom_initial_view = 'top left'
     custom_horz_scrolling = False
@@ -197,8 +255,8 @@ class ScrollPane(Widget):
         self._scissor_group = None
         self._apply_initial_view = False
         self._initial_view = self.custom_initial_view
-        self._horz_scrolling = self.custom_horz_scrolling
-        self._vert_scrolling = self.custom_vert_scrolling
+        self.horz_scrolling = self.custom_horz_scrolling
+        self.vert_scrolling = self.custom_vert_scrolling
 
     def add(self, child):
         self._mover.add(child)
@@ -250,8 +308,8 @@ class ScrollPane(Widget):
         # space it wants in the dimension being scrolled.  The scroll pane 
         # itself doesn't need to claim any space in that dimension, because it 
         # can be as small as it needs to be.
-        min_width = 0 if self._horz_scrolling else self._mover.claimed_width
-        min_height = 0 if self._vert_scrolling else self._mover.claimed_height
+        min_width = 0 if self.horz_scrolling else self._mover.claimed_width
+        min_height = 0 if self.vert_scrolling else self._mover.claimed_height
         return min_width, min_height
 
     def do_resize(self):
@@ -264,18 +322,19 @@ class ScrollPane(Widget):
         if not self.child:
             return
 
-        mover_rect = self._mover.claimed_rect
-        mover_rect.bottom_left = self.rect.bottom_left
+        mover_rect = self.rect.copy()
 
-        if self._horz_scrolling:
-            extra_width = max(mover_rect.width - self.rect.width, 0)
-            mover_rect.width += extra_width
-            mover_rect.left = self.rect.left - extra_width
+        if self.horz_scrolling:
+            pane_width = self.rect.width
+            content_width = self._mover.claimed_width 
+            mover_rect.width = max(2 * content_width - pane_width, pane_width)
 
-        if self._vert_scrolling:
-            extra_height = max(mover_rect.height - self.rect.height, 0)
-            mover_rect.height += extra_height
-            mover_rect.bottom = self.rect.bottom - extra_height
+        if self.vert_scrolling:
+            pane_height = self.rect.height
+            content_height = self._mover.claimed_height 
+            mover_rect.height = max(2 * content_height - pane_height, pane_height)
+
+        mover_rect.center = self.rect.center
 
         self._mover.resize(mover_rect)
 
@@ -326,17 +385,27 @@ class ScrollPane(Widget):
         self._initial_view = new_view
 
     def get_horz_scrolling(self):
-        return self._horz_scrolling
+        # This is a bit of a hack.  The mover already has two boolean flags 
+        # that indicate whether or not its child should be given the full 
+        # amount of space available to the mover.  We can reuse these as 
+        # scrolling flags, because we want to give the child the full space in 
+        # the dimensions that don't scroll (so that they fill in all the space 
+        # allocated to the scroll pane) and not in those that do (so widgets 
+        # with alignment='fill' can still be scrolled).
+        return not self._mover.expand_horz
 
     def set_horz_scrolling(self, new_bool):
-        self._horz_scrolling = new_bool
+        # This is a bit of a hack.  See get_horz_scrolling() for more info.
+        self._mover.expand_horz = not new_bool
         self.repack()
 
     def get_vert_scrolling(self):
-        return self._vert_scrolling
+        # This is a bit of a hack.  See get_horz_scrolling() for more info.
+        return not self._mover.expand_vert
 
     def set_vert_scrolling(self, new_bool):
-        self._vert_scrolling = new_bool
+        # This is a bit of a hack.  See get_horz_scrolling() for more info.
+        self._mover.expand_vert = not new_bool
         self.repack()
 
     def _require_rects(self):
@@ -357,9 +426,11 @@ class ScrollGripMixin:
     """
     A widget that is capable of controlling a scroll pane.
 
-    This class cannot be used on its own.  You have to create a new class that 
-    inherits from this class and a widget class, and this class has to be at 
-    the front of the method resolution order (MRO).  For example:
+    More specifically, this class provides the event-handling methods necessary 
+    to make a widget behave like a scroll grip.  This class cannot be used on 
+    its own.  You have to create a new class that inherits from this class and 
+    a widget class, and this class has to be at the front of the method 
+    resolution order (MRO).  For example:
 
         class MyGrip(ScrollGripMixin, Button):
             pass
@@ -422,6 +493,7 @@ class HVScrollBar(Frame):
             self._hvbox.add(self._backward, 0)
 
         self._mover = Mover()
+        self._mover.push_handlers(on_mouse_release=self.on_click)
         self._grip = self.Grip(self._mover, self._pane)
         self._mover.add(self._grip)
         self._hvbox.add(self._mover)
@@ -433,11 +505,26 @@ class HVScrollBar(Frame):
 
         self.add(self._hvbox)
 
+    def on_click(self, x, y, button, modifiers):
+        x, y = self._mover.screen_to_child_coords(x,y)
+
+        # Ignore the click if it's on the grip.
+        if self._grip.is_under_mouse(x, y):
+            return
+
+        # Jump to where the mouse was clicked.
+        offset = (x,y) - self._grip.rect.center
+        step = offset.dot(self.orientation)
+        size = abs(self._mover.unoccupied_size.dot(self.orientation))
+        self._pane.scroll_percent(self.orientation * step / size)
+
     def on_forward_click(self, dt):
         self._pane.scroll(dt * self.button_speed * self.orientation)
+        return True
 
     def on_backward_click(self, dt):
         self._pane.scroll(dt * self.button_speed * -self.orientation)
+        return True
 
     def get_orientation(self):
         if isinstance(self._hvbox, HBox):
@@ -515,9 +602,6 @@ class ScrollBox(Widget):
 
     def clear(self):
         self._pane.clear()
-
-    def do_claim(self):
-        return self._grid.claimed_size
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         self._pane.scroll(self.mouse_sensitivity * Vector(scroll_x, scroll_y))

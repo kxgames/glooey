@@ -107,6 +107,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # assigned rect.
         self._rect = None
 
+        # The rect the widget will actually show, plus any padding.  This is 
+        # basically the claimed rect, but with meaningful coordinates.
+        self._padded_rect = None
+
         self._is_hidden = False
         self._is_parent_hidden = False
         self._is_claim_stale = True
@@ -223,10 +227,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Subtract padding from the full amount of space assigned to this 
         # widget.
         padded_rect = self._assigned_rect.copy()
-        padded_rect.left += self._left_padding
-        padded_rect.bottom += self._bottom_padding
-        padded_rect.width -= self._left_padding + self._right_padding
-        padded_rect.height -= self._top_padding + self._bottom_padding
+        padded_rect.left += self.left_padding
+        padded_rect.bottom += self.bottom_padding
+        padded_rect.width -= self.total_horz_padding
+        padded_rect.height -= self.total_vert_padding
 
         # Align this widget within the space available to it (i.e. the assigned 
         # space minus the padding).
@@ -244,6 +248,11 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # do_resize() less to worry about.
         if self._rect is None or self._rect != content_rect:
             self._rect = content_rect
+            self._padded_rect = content_rect.copy()
+            self._padded_rect.left -= self.left_padding
+            self._padded_rect.bottom -= self.bottom_padding
+            self._padded_rect.width += self.total_horz_padding
+            self._padded_rect.height += self.total_vert_padding
             self.do_resize()
 
         # The children may need to be resized even if this widget doesn't.  For 
@@ -624,6 +633,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def get_claimed_height(self):
         return self._claimed_height
 
+    def get_padded_rect(self):
+        return self._padded_rect
+
     def get_padding(self):
         return (self._left_padding, self._right_padding,
                 self._top_padding, self._bottom_padding)
@@ -678,6 +690,15 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def set_bottom_padding(self, new_padding):
         self._bottom_padding = new_padding
         self.repack()
+
+    def get_total_padding(self):
+        return self.total_horz_padding, self.total_vert_padding
+
+    def get_total_horz_padding(self):
+        return self._left_padding + self._right_padding
+
+    def get_total_vert_padding(self):
+        return self._top_padding + self._bottom_padding
 
     def get_alignment(self):
         return self._alignment
@@ -779,7 +800,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         for diagnosis, sep in join(diagnoses, '\n'):
             print(diagnosis.format(**locals()) + sep, flush=True)
 
-    def debug_placement_problems(self, claimed='red', assigned='green', content='blue'):
+    def debug_placement_problems(self, claimed='red', assigned='green',
+            content='blue'):
         """
         Draw boxes showing the widgets assigned, claimed, and content rects.
         """
