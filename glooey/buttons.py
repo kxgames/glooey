@@ -131,17 +131,21 @@ class Button(Clickable):
     Down = Background
     Off = Background
 
-    custom_text = None
     custom_label_layer = 3
     custom_image_layer = 2
     custom_background_layer = 1
     custom_alignment = 'center'
 
+    # These attributes are redundant, strictly speaking, because they could 
+    # also be set using inner classes.  They're provided just for convenience.
+    custom_text = None
+    custom_image = None
+
     def __init__(self, text=None, image=None):
         super().__init__()
         self._stack = Stack()
         self._label = self.Label(text or self.custom_text)
-        self._image = self.Image(image)
+        self._image = self.Image(image or self.custom_image)
         self._backgrounds = {
                 'base': self.Base(),
                 'over': self.Over(),
