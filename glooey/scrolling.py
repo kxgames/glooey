@@ -493,7 +493,7 @@ class HVScrollBar(Frame):
             self._hvbox.add(self._backward, 0)
 
         self._mover = Mover()
-        self._mover.push_handlers(on_mouse_release=self.on_click)
+        self._mover.push_handlers(on_mouse_press=self.on_click)
         self._grip = self.Grip(self._mover, self._pane)
         self._mover.add(self._grip)
         self._hvbox.add(self._mover)
