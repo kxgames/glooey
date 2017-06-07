@@ -80,14 +80,6 @@ class Label(Widget):
                 'batch': self.batch,
                 'group': self.group
         }
-        # Enable line wrapping, if the user requested it.  The width of the 
-        # label is set to the value given by the user when line-wrapping was 
-        # enabled.  This will be overwritten a few lines later if the widget 
-        # has been given a rectangle.
-        if self._line_wrap_width:
-            kwargs['width'] = self._line_wrap_width
-            kwargs['wrap_lines'] = True
-        
         # Usually self.rect is guaranteed to be set by the time this method is 
         # called, but that is not the case for this widget.  The do_claim() 
         # method needs to call do_draw() to see how much space the text will 
@@ -97,6 +89,18 @@ class Label(Widget):
             kwargs['width'] = self.rect.width
             kwargs['height'] = self.rect.height
 
+        # Enable line wrapping, if the user requested it.  The width of the 
+        # label is set to the value given by the user when line-wrapping was 
+        # enabled.  This is done after the size of the assigned rect is 
+        # considered, so the text will wrap at the specified line width no 
+        # matter how much space is available to it.  This ensures that the text 
+        # takes up all of the height it requested.  It would be better if the 
+        # text could update its height claim after knowing how much width it 
+        # got, but that's a non-trivial change.
+        if self._line_wrap_width:
+            kwargs['width'] = self._line_wrap_width
+            kwargs['wrap_lines'] = True
+        
         # It's best to make a fresh document each time.  Previously I was 
         # storing the document as a member variable, but I ran into corner 
         # cases where the document would have an old style that wouldn't be 

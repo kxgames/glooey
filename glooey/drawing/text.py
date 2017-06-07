@@ -24,7 +24,7 @@ def lorem_ipsum(num_sentences=None, num_paragraphs=None):
         'Nam diam sapien, lacinia vel sollicitudin interdum, faucibus aliquam enim. Mauris tristique iaculis purus eu lacinia. Suspendisse condimentum, dolor a euismod lacinia, leo orci pellentesque orci, non rhoncus turpis lorem sed lacus. Integer velit nisl, rutrum sit amet posuere at, vulputate ultrices tortor. Nullam pharetra, orci tempor dapibus elementum, felis nulla lacinia nunc, quis ultricies dui lectus dictum diam. Praesent eu velit magna, eu lacinia leo. Duis sit amet bibendum dui. Duis tincidunt vulputate dolor eu euismod. Pellentesque nisl sem, mollis ac venenatis a, facilisis vitae ligula. Vivamus sem leo, vestibulum tincidunt iaculis nec, tristique tincidunt mi. Suspendisse imperdiet elit vitae turpis ullamcorper luctus. Aenean in augue mauris. Vivamus nisi libero, dignissim non consectetur sodales, fermentum at sem. Nulla tincidunt fringilla justo quis pulvinar. Nam ac sem sed diam pellentesque egestas vitae ac nisi. Praesent scelerisque dapibus mi vitae tempor.',
         'Donec tempor, massa non pulvinar suscipit, justo dolor pharetra nisl, ut semper libero lorem non tortor. Integer dapibus arcu viverra nisi hendrerit mattis et ut mauris. Maecenas pulvinar, orci vitae ultricies egestas, orci nisi rutrum justo, eu volutpat nibh odio ac purus. Nulla pellentesque sem eget arcu imperdiet ullamcorper. Curabitur nec magna massa. Morbi lobortis urna sed ligula commodo viverra. Pellentesque molestie, ipsum nec faucibus mollis, neque purus sodales sapien, in convallis nisi libero et lorem. Ut sed rutrum leo. Aliquam eleifend, felis quis ullamcorper consequat, dolor mi vulputate ipsum, lobortis ultricies felis nulla at augue.',
         'Ut gravida porttitor arcu, malesuada mollis urna vehicula nec. Suspendisse sagittis nulla condimentum libero lacinia sed dapibus dui egestas. Etiam convallis congue ipsum, eu fermentum turpis rutrum id. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Ut nunc eros, sagittis a venenatis et, interdum in leo. Curabitur urna magna, volutpat in mattis ut, adipiscing et ligula. Nam dignissim mattis accumsan. Nulla vehicula felis vel turpis tempus hendrerit. Phasellus rhoncus vulputate massa, tincidunt euismod dui porttitor ac. Sed ut sapien quam, ac egestas odio. Pellentesque at aliquet ante. Donec rhoncus ornare lacus eu ullamcorper. Vestibulum sit amet hendrerit magna. Nulla sed diam nulla.',
-        'Nulla vestibulum sagittis arcu in egestas. Aliquam sed ante justo. Quisque nec dolor nibh, sed feugiat mi. Etiam lorem elit, interdum eu tempor nec, tincidunt eu risus. Fusce id libero augue. Curabitur ultrices, lorem eget mollis fringilla, dolor leo euismod tellus, congue luctus nisi purus vitae urna. Suspendisse tempor orci accumsan sem pretium at accumsan augue tristique. Proin sed turpis at mi feugiat lacinia a nec sem. Suspendisse vel facilisis leo. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Duis ornare enim nec ante adipiscing tincidunt. Maecenas ut justo iaculis leo vestibulum blandit quis vitae mauris. Proin in vestibulum massa. ',
+        'Nulla vestibulum sagittis arcu in egestas. Aliquam sed ante justo. Quisque nec dolor nibh, sed feugiat mi. Etiam lorem elit, interdum eu tempor nec, tincidunt eu risus. Fusce id libero augue. Curabitur ultrices, lorem eget mollis fringilla, dolor leo euismod tellus, congue luctus nisi purus vitae urna. Suspendisse tempor orci accumsan sem pretium at accumsan augue tristique. Proin sed turpis at mi feugiat lacinia a nec sem. Suspendisse vel facilisis leo. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Duis ornare enim nec ante adipiscing tincidunt. Maecenas ut justo iaculis leo vestibulum blandit quis vitae mauris. Proin in vestibulum massa.',
     ]
 
     if num_paragraphs:
@@ -36,7 +36,12 @@ def lorem_ipsum(num_sentences=None, num_paragraphs=None):
     if num_sentences:
         sentences = sentences[:num_sentences]
 
-    return '.'.join(sentences) + '.'
+    lorem = '.'.join(sentences).strip()
+    if not lorem.endswith('.'):
+        lorem += '.'
+
+    return lorem
+
 
 
 

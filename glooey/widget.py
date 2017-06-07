@@ -176,6 +176,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             self.realign()
 
     def claim(self):
+        """
+        Update ``self._claimed_width`` and ``self._claimed_height``, and return 
+        whether or not the claim has changed since the last repack.
+        """
         # Only calculate the claim once during each repack.
         if not self._is_claim_stale:
             return False
