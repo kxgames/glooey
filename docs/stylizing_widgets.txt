@@ -23,20 +23,16 @@ superclasses can anticipate and facilitate common tweaks) and the complex ones
 possible (because subclasses can override any aspect of their base class).
 
 This tutorial focuses on the simplest and easiest customizations, which 
-typically amount to changing the appearance of existing widgets.  Later 
-tutorials focus on more powerful ways to customize widgets:
-
-- :doc:`composing_widgets`: How to make a new widget from one or more existing 
-  widgets.
-- :doc:`making_widgets_from_scratch`: How to make a new widget that doesn't 
-  look or behave like any existing widget.
+typically amount to changing the appearance of existing widgets.  The 
+:doc:`composing_widgets` and :doc:`making_widgets_from_scratch` tutorials will 
+cover more powerful ways to customize widgets.
 
 .. note::
 
-    These tutorials will use the Wesnoth theme as an example.  In case you're 
-    not aware, Wesnoth is a popular open-source, fantasy-themed, turned based 
-    strategy game [1]_.  Recapitulating parts of its user interface is a good 
-    real-world demonstration of what glooey can do.
+    These tutorials will use the Wesnoth theme as an example.  Wesnoth is a 
+    popular open-source, fantasy-themed, turned based strategy game.  Although 
+    Wesnoth itself does not use glooey, recapitulating parts of its user 
+    interface is a good real-world demonstration of what glooey can do.
 
 "Custom" attributes
 ===================
@@ -136,5 +132,3 @@ It's perhaps more common to derive Base, Over, and Down from Background (which
 allows the button to grow and shrink with the text), but we use Image here 
 because the Wesnoth theme has fixed-size buttons.
 
-.. [1] Wesnoth itself doesn't use glooey (or pyglet), but glooey comes with a 
-   theme based on the Wesnoth assets.  

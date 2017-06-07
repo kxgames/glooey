@@ -101,6 +101,24 @@ The label widget displays text::
 
     :download:`especially_useful_widgets/label.py`
 
+By default, the label widget will only put line breaks where you tell it to 
+(i.e. where there are ``\n`` characters in the text).  However, you can have it 
+wrap text to fit a particular width by specifying the ``line_wrap`` option::
+
+   text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam justo sem, malesuada ut ultricies ac, bibendum eu neque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean at tellus ut velit dignissim tincidunt.  Curabitur euismod laoreet orci semper dignissim. Suspendisse potenti. Vivamus sed enim quis dui pulvinar pharetra. Duis condimentum ultricies ipsum, sed ornare leo vestibulum vitae. Sed ut justo massa, varius molestie diam. Sed lacus quam, tempor in dictum sed, posuere et diam. Maecenas tincidunt enim elementum turpis blandit tempus. Nam lectus justo, adipiscing vitae ultricies egestas, porta nec diam. Aenean ac neque tortor. Cras tempus lacus nec leo ultrices suscipit. Etiam sed aliquam tortor. Duis lacus metus, euismod ut viverra sit amet, pulvinar sed urna.\n\nAenean ut metus in arcu mattis iaculis quis eu nisl. Donec ornare, massa ut vestibulum vestibulum, metus sapien pretium ante, eu vulputate lorem augue vestibulum orci. Donec consequat aliquam sagittis. Sed in tellus pretium tortor hendrerit cursus congue sit amet turpis. Sed neque lacus, lacinia ut consectetur eget, faucibus vitae lacus. Integer eu purus ac purus tempus mollis non sed dui. Vestibulum volutpat erat magna. Etiam nisl eros, eleifend a viverra sed, interdum sollicitudin erat. Integer a orci in dolor suscipit cursus. Maecenas hendrerit neque odio. Nulla orci orci, varius id viverra in, molestie vel lacus. Donec at odio quis augue bibendum lobortis nec ac urna. Ut lacinia hendrerit tortor mattis rhoncus. Proin nunc tortor, congue ac adipiscing sit amet, aliquet in lorem. Nulla blandit tempor arcu, ut tempus quam posuere eu. In magna neque, venenatis nec tincidunt vitae, lobortis eget nulla."
+   label = glooey.Label(text, line_wrap=640)
+   gui.add(label)
+
+.. figure:: especially_useful_widgets/wrapped_label.png
+
+    :download:`especially_useful_widgets/wrapped_label.py`
+
+This feature has one big caveat: the text will not fill more than the specified 
+width, even if there is free space available to it.  In other words, there's no 
+way to say "wrap to fill the whole screen".  Instead, like in this example, you 
+have to say something like "wrap to fill 640 px".  This caveat is due to a 
+limitation in how glooey assigns space to widgets [2]_.
+
 Background --- tile images
 ==========================
 The background widget fills in space using tiled images.  You can think of it 
@@ -170,4 +188,11 @@ __ http://pyglet.readthedocs.io/en/pyglet-1.2-maintenance/programming_guide/even
 .. [1] You might wonder why all the built-in widgets are green by default.  
    This is because they have to be some color, and green shows up well against 
    both dark and light backgrounds.
+
+.. [2] Wrapped text is unique in that it's height depends on its width.  The 
+   limitation in question is that glooey assigns width and height to widgets in 
+   one step, so wrapped text never get an opportunity to update its height to 
+   reflect to the full width made available to it.  That said, assigning space 
+   like this isn't a problem for any other widget, and it keeps the repacking 
+   framework nice and simple, so I'm not sure whether or not it'll be fixed.
 
