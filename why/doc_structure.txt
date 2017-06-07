@@ -22,8 +22,6 @@ I remember reading somewhere that documentation should have three sections:
    - Installation
       "Glooey is easy to install"
 
-   - Widget comparison
-
    - Getting started
       - imports
       - pyglet
@@ -69,24 +67,26 @@ I remember reading somewhere that documentation should have three sections:
       - Widget.__init__()
       - nested classes
 
-   - The widget hierarchy
+   - Under the hood
 
-   - How drawing works
-      - In order to be drawn, a widget needs:
-         - rect (see "How repacking works")
-         - group (see "How regrouping works")
-         - batch (comes from the root of the widget hierarchy)
+     - The widget hierarchy
 
-      - draw()
-      - undraw()
-      - hide()
-      - unhide()
+     - How drawing works
+        - In order to be drawn, a widget needs:
+           - rect (see "How repacking works")
+           - group (see "How regrouping works")
+           - batch (comes from the root of the widget hierarchy)
 
-   - How repacking works
+        - draw()
+        - undraw()
+        - hide()
+        - unhide()
 
-   - How regrouping works
+     - How repacking works
 
-   - How mouse events work
+     - How regrouping works
+
+     - How mouse events work
 
    - Making widgets from scratch
 
