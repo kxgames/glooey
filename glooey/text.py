@@ -4,11 +4,11 @@ import pyglet
 import autoprop
 
 from vecrec import Vector, Rect
-from debugtools import p, pp, pv
 from glooey import drawing
 from glooey.widget import Widget
 from glooey.images import Background
 from glooey.containers import Stack, Deck
+from glooey.helpers import *
 
 @autoprop
 class Label(Widget):

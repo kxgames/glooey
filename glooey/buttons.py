@@ -12,101 +12,27 @@ from glooey.images import Image, Background
 from glooey.helpers import *
 
 @autoprop
-class Clickable(Widget):
-
-    def __init__(self):
-        super().__init__()
-        self._last_rollover_event = 'base'
-        self._mouse_state = 'base'
-        self._active_state = True
-        self._double_click_timer = 0
-
-    def deactivate(self):
-        self._active_state = False
-        self._dispatch_rollover_event()
-
-    def reactivate(self):
-        self._active_state = True
-        self._dispatch_rollover_event()
-
-    def on_mouse_press(self, x, y, button, modifiers):
-        super().on_mouse_press(x, y, button, modifiers)
-        self._mouse_state = 'down'
-        self._dispatch_rollover_event()
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        import time
-        super().on_mouse_release(x, y, button, modifiers)
-
-        if self._active_state and self._mouse_state == 'down':
-            self.dispatch_event('on_click', self)
-
-            # Two clicks within 500 ms triggers a double-click.
-            if time.perf_counter() - self._double_click_timer < 0.5:
-                self.dispatch_event('on_double_click', self)
-                self._double_click_timer = 0
-            else:
-                self._double_click_timer = time.perf_counter()
-
-        self._mouse_state = 'over'
-        self._dispatch_rollover_event()
-
-    def on_mouse_enter(self, x, y):
-        super().on_mouse_enter(x, y)
-        self._mouse_state = 'over'
-        self._dispatch_rollover_event()
-
-    def on_mouse_leave(self, x, y):
-        super().on_mouse_leave(x, y)
-        self._mouse_state = 'base'
-        self._dispatch_rollover_event()
-
-    def on_mouse_drag_leave(self, x, y):
-        super().on_mouse_drag_leave(x, y)
-        self._mouse_state = 'base'
-        self._dispatch_rollover_event()
-    
-    @property
-    def is_active(self):
-        return self._active_state
-
-    def get_last_rollover_event(self):
-        return self._last_rollover_event
-
-    def _dispatch_rollover_event(self):
-        rollover_event = self._mouse_state if self._active_state else 'off'
-        if rollover_event != self._last_rollover_event:
-            self.dispatch_event('on_rollover', rollover_event, self._last_rollover_event)
-            self._last_rollover_event = rollover_event
-
-
-Clickable.register_event_type('on_click')
-Clickable.register_event_type('on_double_click')
-Clickable.register_event_type('on_rollover')
-
-@autoprop
 class Rollover(Deck):
     custom_predicate = lambda self, w: True
 
-    def __init__(self, clickable, initial_state, predicate=None, **widgets):
-        super().__init__(initial_state, **widgets)
+    def __init__(self, widget, initial_state, predicate=None, **states):
+        super().__init__(initial_state, **states)
+        self._widget = widget or self
         self._predicate = predicate or self.custom_predicate
-        self._clickable = clickable
 
     def do_attach(self):
-        self._clickable.push_handlers(self.on_rollover)
+        self._widget.push_handlers(
+                on_rollover=self._update_state,
+                on_enable=self._update_state,
+                on_disable=self._update_state,
+        )
 
     def do_detach(self):
-        self._clickable.remove_handlers(self.on_rollover)
-
-    def on_rollover(self, new_state, old_state):
-        if self.is_state_missing(new_state) and new_state == 'down':
-            new_state = 'over'
-
-        if self.is_state_missing(new_state) and new_state == 'over':
-            new_state = 'base'
-
-        self.set_state(new_state)
+        self._widget.remove_handlers(
+                on_rollover=self._update_state,
+                on_enable=self._update_state,
+                on_disable=self._update_state,
+        )
 
     def get_predicate(self):
         return self._predicate
@@ -121,9 +47,28 @@ class Rollover(Deck):
             widget = self.get_widget(state)
             return not self.predicate(widget)
 
+    def get_best_available_rollover_state(self):
+        mouse = self._widget.rollover_state
+
+        if self.is_state_missing(mouse) and mouse == 'down':
+            mouse = 'over'
+
+        if self.is_state_missing(mouse) and mouse == 'over':
+            mouse = 'base'
+
+        return mouse
+
+    def _update_state(self, *ignored_event_args):
+        if self._widget.is_enabled:
+            state = self.best_available_rollover_state
+        else:
+            state = 'off'
+
+        self.set_state(state)
+
 
 @autoprop
-class Button(Clickable):
+class Button(Widget):
     Label = Label
     Image = Image
     Base = Background
@@ -136,8 +81,8 @@ class Button(Clickable):
     custom_background_layer = 1
     custom_alignment = 'center'
 
-    # These attributes are redundant, strictly speaking, because they could 
-    # also be set using inner classes.  They're provided just for convenience.
+    # These attributes are just provided for convenience.  They're redundant, 
+    # strictly speaking, because they could also be set using inner classes.  
     custom_text = None
     custom_image = None
 
@@ -154,11 +99,16 @@ class Button(Clickable):
         }
         self._rollover = Rollover(self, 'base', lambda w: not w.is_empty)
         self._rollover.add_states(**self._backgrounds)
+        self._is_enabled = True
 
         self._attach_child(self._stack)
         self._stack.insert(self._label, self.custom_label_layer)
         self._stack.insert(self._image, self.custom_image_layer)
         self._stack.insert(self._rollover, self.custom_background_layer)
+
+    def click(self):
+        if self.is_enabled:
+            self.dispatch_event('on_click')
 
     def do_claim(self):
         return self._stack.claimed_size
@@ -214,7 +164,7 @@ class Button(Clickable):
 
 
 @autoprop
-class Checkbox(Clickable):
+class Checkbox(Widget):
     custom_checked_base = None; custom_unchecked_base = None
     custom_checked_over = None; custom_unchecked_over = None
     custom_checked_down = None; custom_unchecked_down = None
@@ -225,6 +175,7 @@ class Checkbox(Clickable):
         super().__init__()
         self._deck = Deck(is_checked)
         self._attach_child(self._deck)
+        self._is_enabled = True
         self.set_images(
                 checked_base=self.custom_checked_base,
                 checked_over=self.custom_checked_over,
@@ -243,8 +194,9 @@ class Checkbox(Clickable):
         self.toggle()
 
     def toggle(self):
-        self._deck.state = not self._deck.state
-        self.dispatch_event('on_toggle', self)
+        if self.is_enabled:
+            self._deck.state = not self._deck.state
+            self.dispatch_event('on_toggle', self)
 
     def check(self):
         if not self.is_checked:

@@ -4,7 +4,10 @@ import functools
 import contextlib
 import more_itertools
 
-from debugtools import p, pp, pv
+# If `debugtools` is installed, import some functions into the global namespace 
+# that can make debugging a little easier.  If it isn't, no big deal.
+try: from debugtools import p, pp, pv
+except ImportError: pass
 
 class UsageError (Exception):
     pass

@@ -27,9 +27,9 @@ def on_toggle(widget):
 @run_demos.on_space(gui) #
 def test_checkbox():
     yield "Green button with orange over and purple down states."
-    button.deactivate()
+    button.disable()
     yield "Grey inactive button (no rollover)."
-    button.reactivate()
+    button.enable()
 
 pyglet.app.run()
 

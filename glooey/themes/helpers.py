@@ -6,7 +6,7 @@ import contextlib
 import yaml
 
 from pathlib import Path
-from debugtools import p, pp, pv
+from glooey.helpers import *
 
 class ResourceLoader(pyglet.resource.Loader):
 

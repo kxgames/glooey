@@ -47,9 +47,9 @@ def test_button():
     gui.clear(); gui.add(button)
     yield "Different button text."
 
-    button.deactivate()
+    button.disable()
     yield "Grey inactive button (no rollover)."
-    button.reactivate()
+    button.enable()
 
 pyglet.app.run()
 

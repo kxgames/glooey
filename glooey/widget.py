@@ -1,3 +1,4 @@
+import time
 import pyglet
 import autoprop
 
@@ -97,6 +98,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # widget.  This is just the size of the content plus any padding.
         self._claimed_width = 0
         self._claimed_height = 0
+        self._is_claim_stale = True
 
         # The space assigned to the widget by it's parent.  This cannot be 
         # smaller than self.claimed_rect, but it can be larger.
@@ -113,7 +115,13 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         self._is_hidden = False
         self._is_parent_hidden = False
-        self._is_claim_stale = True
+        self._is_enabled = True
+
+        # Attributes for keeping track of the mouse-event related information, 
+        # e.g. the rollover state and the double-click timer.
+        self._rollover_state = 'base'
+        self._last_rollover_state = 'base'
+        self._double_click_timer = 0
 
         # Take care to avoid calling any potentially polymorphic methods, such 
         # as set_padding() or repack().  When these methods are overridden, 
@@ -302,6 +310,14 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             self.draw()
         self._unhide_children(draw)
 
+    def enable(self):
+        self._is_enabled = True
+        self.dispatch_event('on_enable', self)
+
+    def disable(self):
+        self._is_enabled = False
+        self.dispatch_event('on_disable', self)
+
     def draw(self):
         """
         In order for a widget to be drawn, four conditions need to be met:
@@ -485,20 +501,46 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         yield from (w for w in self.__children if w.is_under_mouse(x, y))
 
     def on_mouse_press(self, x, y, button, modifiers):
+        # Propagate the "on_mouse_press" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
         for child in children_under_mouse.current:
             child.dispatch_event('on_mouse_press', x, y, button, modifiers)
 
+        # Start firing "on_mouse_hold" events every frame.
         self.start_event('on_mouse_hold')
 
+        # Update the widget's rollover state.
+        self._rollover_state = 'down'
+        self._dispatch_rollover_event()
+
     def on_mouse_release(self, x, y, button, modifiers):
+        # Propagate the "on_mouse_release" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
         for child in children_under_mouse.current:
             child.dispatch_event('on_mouse_release', x, y, button, modifiers)
 
+        # Stop firing "on_mouse_hold" events every frame.
         self.stop_event('on_mouse_hold')
+        
+        # Decide whether to emit 'on_click' or 'on_double_click' events.  A 
+        # click requires that the widget is enabled (i.e. not greyed out) and 
+        # that user user pressed and released the mouse without leaving the 
+        # widget.  A double click requires that the user do all of that twice 
+        # within 500 ms.
+        if self._is_enabled and self._rollover_state == 'down':
+            self.dispatch_event('on_click', self)
+
+            if time.perf_counter() - self._double_click_timer < 0.5:
+                self.dispatch_event('on_double_click', self)
+                self._double_click_timer = 0
+            else:
+                self._double_click_timer = time.perf_counter()
+
+        # Update the widget's rollover state.
+        self._rollover_state = 'over'
+        self._dispatch_rollover_event()
 
     def on_mouse_motion(self, x, y, dx, dy):
         children_under_mouse = self._find_children_under_mouse(x, y)
@@ -513,21 +555,33 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             child.dispatch_event('on_mouse_motion', x, y, dx, dy)
 
     def on_mouse_enter(self, x, y):
+        # Propagate the "on_mouse_enter" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
         for child in children_under_mouse.entered:
             child.dispatch_event('on_mouse_enter', x, y)
 
+        # Update the widget's rollover state.
+        self._rollover_state = 'over'
+        self._dispatch_rollover_event()
+        
     def on_mouse_leave(self, x, y):
-        # We have to actually check which widgets are still "under the mouse" 
-        # to correctly handle widgets that are grabbing the mouse when the 
-        # mouse leaves the window.
+        # Propagate the "on_mouse_leave" event to the relevant children.  We 
+        # have to actually check which widgets are still "under the mouse" to 
+        # correctly handle widgets that are grabbing the mouse when the mouse 
+        # leaves the window.  (Previously I thought it was safe to assume that 
+        # no children were under the mouse here, but it's not.)
         children_under_mouse = self._find_children_under_mouse_after_leave()
 
         for child in children_under_mouse.exited:
             child.dispatch_event('on_mouse_leave', x, y)
 
+        # Stop firing "on_mouse_hold" events every frame.
         self.stop_event('on_mouse_hold')
+
+        # Update the widget's rollover state.
+        self._rollover_state = 'base'
+        self._dispatch_rollover_event()
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         children_under_mouse = self._find_children_under_mouse(x, y)
@@ -548,6 +602,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             child.dispatch_event('on_mouse_drag_enter', x, y)
 
     def on_mouse_drag_leave(self, x, y):
+        # Propagate the "on_mouse_drag_leave" event to the relevant children.  
         # We have to actually check which widgets are still "under the mouse" 
         # to correctly handle widgets that are grabbing the mouse when the 
         # mouse leaves the window.
@@ -556,7 +611,13 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         for child in children_under_mouse.exited:
             child.dispatch_event('on_mouse_drag_leave', x, y)
 
+        # Stop firing "on_mouse_hold" events every frame.
         self.stop_event('on_mouse_hold')
+
+        # Reset the rollover to its base state if the user drags the mouse 
+        # outside of the widget.
+        self._rollover_state = 'base'
+        self._dispatch_rollover_event()
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         children_under_mouse = self._find_children_under_mouse(x, y)
@@ -711,6 +772,12 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self._alignment = new_alignment
         self.repack()
 
+    def get_rollover_state(self):
+        return self._rollover_state
+
+    def get_last_rollover_state(self):
+        return self._last_rollover_state
+
     @property
     def is_hidden(self):
         return self._is_hidden or self._is_parent_hidden
@@ -718,6 +785,14 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     @property
     def is_visible(self):
         return not self.is_hidden
+
+    @property
+    def is_enabled(self):
+        return self._is_enabled
+
+    @property
+    def is_disabled(self):
+        return not self.is_enabled
 
     @property
     def is_attached_to_gui(self):
@@ -937,6 +1012,12 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             if self._num_children > 0:
                 self.do_regroup_children()
 
+    def _dispatch_rollover_event(self):
+        if self._rollover_state != self._last_rollover_state:
+            self.dispatch_event('on_rollover',
+                    self, self._rollover_state, self._last_rollover_state)
+            self._last_rollover_state = self._rollover_state
+
     def _hide_children(self):
         for child in self._yield_all_children():
             if child.is_visible:
@@ -1075,4 +1156,9 @@ Widget.register_event_type('on_mouse_drag')
 Widget.register_event_type('on_mouse_drag_enter')
 Widget.register_event_type('on_mouse_drag_leave')
 Widget.register_event_type('on_mouse_scroll')
+Widget.register_event_type('on_click')
+Widget.register_event_type('on_double_click')
+Widget.register_event_type('on_rollover')
+Widget.register_event_type('on_enable')
+Widget.register_event_type('on_disable')
 

@@ -36,11 +36,11 @@ gui.add(hbox)
 @run_demos.on_space(gui) #
 def test_radio_buttons():
     for button in buttons:
-        button.reactivate()
+        button.enable()
     yield "Three green radio buttons with orange over and purple down states."
 
     for button in buttons:
-        button.deactivate()
+        button.disable()
     yield "Grey inactive buttons (no rollover)."
 
 pyglet.app.run()

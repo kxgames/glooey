@@ -4,7 +4,6 @@ import autoprop
 from vecrec import Vector, Rect
 from glooey import drawing
 from glooey.widget import Widget
-from glooey.buttons import Clickable
 from glooey.images import Background
 from glooey.text import Label
 from glooey.helpers import *
@@ -22,7 +21,7 @@ class Spacer(Widget):
 
 
 @autoprop
-class Placeholder(Clickable):
+class Placeholder(Widget):
     custom_color = 'green'
     custom_alignment = 'fill'
 
