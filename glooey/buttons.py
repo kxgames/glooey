@@ -14,25 +14,33 @@ from glooey.helpers import *
 @autoprop
 class Rollover(Deck):
     custom_predicate = lambda self, w: True
+    custom_rollover_state_priorities = {
+            'base': 0,
+            'over': 1,
+            'down': 2,
+            'off': 3,
+    }
 
-    def __init__(self, widget, initial_state, predicate=None, **states):
+    def __init__(self, controller, initial_state, predicate=None, **states):
         super().__init__(initial_state, **states)
-        self._widget = widget or self
+        self._controllers = [controller]
         self._predicate = predicate or self.custom_predicate
 
     def do_attach(self):
-        self._widget.push_handlers(
-                on_rollover=self._update_state,
-                on_enable=self._update_state,
-                on_disable=self._update_state,
-        )
+        for widget in self._controllers:
+            self._add_handlers(widget)
 
     def do_detach(self):
-        self._widget.remove_handlers(
-                on_rollover=self._update_state,
-                on_enable=self._update_state,
-                on_disable=self._update_state,
-        )
+        for widget in self._controllers:
+            self._remove_handlers(widget)
+
+    def add_controller(self, widget):
+        self._controllers.append(widget)
+        self._add_handlers(widget)
+
+    def remove_controller(self, widget):
+        self._controllers.remove(widget)
+        self._remove_handlers(widget)
 
     def get_predicate(self):
         return self._predicate
@@ -47,24 +55,41 @@ class Rollover(Deck):
             widget = self.get_widget(state)
             return not self.predicate(widget)
 
-    def get_best_available_rollover_state(self):
-        mouse = self._widget.rollover_state
-
-        if self.is_state_missing(mouse) and mouse == 'down':
-            mouse = 'over'
-
-        if self.is_state_missing(mouse) and mouse == 'over':
-            mouse = 'base'
-
-        return mouse
-
     def _update_state(self, *ignored_event_args):
-        if self._widget.is_enabled:
-            state = self.best_available_rollover_state
-        else:
-            state = 'off'
+        state = 'base'
+        priority = self.custom_rollover_state_priorities
 
+        for widget in self._controllers:
+            controller_state = \
+                    widget.rollover_state if widget.is_enabled else 'off'
+            if priority[controller_state] > priority[state]:
+                state = controller_state
+
+        state = self._substitute_missing_states(state)
         self.set_state(state)
+
+    def _substitute_missing_states(self, state):
+        if self.is_state_missing(state) and state == 'down':
+            state = 'over'
+
+        if self.is_state_missing(state) and state == 'over':
+            state = 'base'
+
+        return state
+
+    def _add_handlers(self, widget):
+        widget.push_handlers(
+                on_rollover=self._update_state,
+                on_enable=self._update_state,
+                on_disable=self._update_state,
+        )
+
+    def _remove_handlers(self, widget):
+        widget.remove_handlers(
+                on_rollover=self._update_state,
+                on_enable=self._update_state,
+                on_disable=self._update_state,
+        )
 
 
 @autoprop
@@ -97,7 +122,7 @@ class Button(Widget):
                 'down': self.Down(),
                 'off': self.Off(),
         }
-        self._rollover = Rollover(self, 'base', lambda w: not w.is_empty)
+        self._rollover = Rollover(self, 'base', predicate=lambda w: not w.is_empty)
         self._rollover.add_states(**self._backgrounds)
         self._is_enabled = True
 
@@ -175,7 +200,7 @@ class Checkbox(Widget):
         super().__init__()
         self._deck = Deck(is_checked)
         self._attach_child(self._deck)
-        self._is_enabled = True
+        self._extensions = []
         self.set_images(
                 checked_base=self.custom_checked_base,
                 checked_over=self.custom_checked_over,
@@ -233,11 +258,21 @@ class Checkbox(Widget):
                 off=Image(unchecked_off),
         )
         with self._deck.hold_updates():
-            self._deck.add_state(True, checked)
-            self._deck.add_state(False, unchecked)
+            self._deck[True] = checked
+            self._deck[False] = unchecked
 
     def del_images(self):
         self._deck.clear_states()
+
+    def add_proxy(self, widget):
+        widget.push_handlers(on_click=self.on_click)
+        self._deck[True].add_controller(widget)
+        self._deck[False].add_controller(widget)
+
+    def remove_proxy(self, widget):
+        widget.remove_handlers(on_click=self.on_click)
+        self._deck[True].remove_controller(widget)
+        self._deck[False].remove_controller(widget)
 
 
 Checkbox.register_event_type('on_toggle')

@@ -547,6 +547,12 @@ class Deck(Widget):
         self._states = {}
         self.add_states(**states)
 
+    def __getitem__(self, state):
+        return self._states[state]
+
+    def __setitem__(self, state, widget):
+        return self.add_state(state, widget)
+
     def do_claim(self):
         # Claim enough space for the biggest child, so that we won't need to 
         # repack when we change states.  (Also, I can't think of any reason why 
@@ -633,7 +639,7 @@ class Deck(Widget):
             self.state = new_state
 
     def get_widget(self, state):
-        return self._states[state]
+        return self[state]
 
     def get_previous_state(self):
         return self._previous_state
