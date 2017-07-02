@@ -2,15 +2,24 @@
 ``glooey`` --- An object-oriented GUI library for pyglet
 ********************************************************
 
-Every game needs a user interface that matches its look and feel.  The 
-philosophy behind ``glooey`` is that deriving subclasses from a basic set of 
-widgets with no default style is the most elegant way to achieve this.  This 
-approach is flexible because subclasses can customize or override most aspects 
-of the basic widgets.  But it's also surprisingly succinct and powerful: 
-specifying a style is usually as simple as setting a class variable, and styles 
-can be easily composed using either inner classes or previously defined 
-widgets.  This philosophy makes ``glooey`` easy to get started with, and 
-powerful enough to support even the most complicated games.  
+Every game needs a user interface that matches its look and feel.  The purpose 
+of ``glooey`` is to help you make such an interface.  Towards this end, 
+``glooey`` provides 7 powerful placement widgets, a label widget, an image 
+widget, 3 different button widgets, a text entry widget, a variety of scroll 
+boxes and bars, 4 different dialog box widgets, and a variety of other 
+miscellaneous widgets.  The appearance of any widget can be trivially changed, 
+and ``glooey`` comes with built-in fantasy, puzzle, and 8-bit themes to prove 
+it (and to help you hit the ground running if you're game fits one of those 
+genres).  
+
+The philosophy behind ``glooey`` is that deriving subclasses from a basic set 
+of widgets with no default style is the most elegant way to control how widgets 
+look.  This approach is flexible because subclasses can customize or override 
+most aspects of the basic widgets.  But it's also surprisingly succinct and 
+powerful: specifying a style is usually as simple as setting a class variable, 
+and styles can be easily composed using either inner classes or previously 
+defined widgets.  This philosophy makes ``glooey`` easy to get started with, 
+and powerful enough to support even the most complicated games.  
 
 .. image:: https://img.shields.io/pypi/v/glooey.svg
    :target: https://pypi.python.org/pypi/glooey
@@ -21,20 +30,12 @@ powerful enough to support even the most complicated games.
 .. image:: https://readthedocs.org/projects/glooey/badge/?version=latest
    :target: http://glooey.readthedocs.io/en/latest/
 
-Also, talk about:
-
-- Large widget set.  I should look for as many pyglet gui packages as I can 
-  find and make a list of widgets each one supports.  I could even make a 
-  widget comparison page.
-
-- Built-in themes.
-
 A quick example
 ===============
 The documentation thoroughly explains what ``glooey`` can do and how to use it, 
 but here's a quick example to give a feel for what it looks like in action::
 
-   $ pip install glooey
+   $ pip3 install glooey
 
 .. code:: python
 
