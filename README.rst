@@ -7,10 +7,10 @@ of ``glooey`` is to help you make such an interface.  Towards this end,
 ``glooey`` provides 7 powerful placement widgets, a label widget, an image 
 widget, 3 different button widgets, a text entry widget, a variety of scroll 
 boxes and bars, 4 different dialog box widgets, and a variety of other 
-miscellaneous widgets.  The appearance of any widget can be trivially changed, 
-and ``glooey`` comes with built-in fantasy, puzzle, and 8-bit themes to prove 
-it (and to help you hit the ground running if you're game fits one of those 
-genres).  
+miscellaneous widgets.  The appearance of any widget can be trivially 
+customized, and ``glooey`` comes with built-in fantasy, puzzle, and 8-bit 
+themes to prove it (and to help you hit the ground running if your game fits 
+one of those genres).  
 
 The philosophy behind ``glooey`` is that deriving subclasses from a basic set 
 of widgets with no default style is the most elegant way to control how widgets 
