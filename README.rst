@@ -29,7 +29,7 @@ and powerful enough to support even the most complicated games.
    :target: https://travis-ci.org/kxgames/glooey
 .. image:: https://readthedocs.org/projects/glooey/badge/?version=latest
    :target: http://glooey.readthedocs.io/en/latest/
-
+|
 A quick example
 ===============
 The documentation thoroughly explains what ``glooey`` can do and how to use it, 
