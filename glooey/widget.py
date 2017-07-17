@@ -956,6 +956,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             for widget in child._yield_self_and_all_children():
                 widget._root = self.root
                 widget.do_attach()
+                widget.dispatch_event('on_attach', widget)
 
         if self.is_hidden:
             self._hide_children()
@@ -982,6 +983,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         for widget in child._yield_self_and_all_children():
             widget.do_detach()
+            widget.dispatch_event('on_detach', widget)
             widget.ungrab_mouse()
             widget.undraw()
             widget._root = None
@@ -1165,6 +1167,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             return self.previous - self.current
 
 
+Widget.register_event_type('on_attach')
+Widget.register_event_type('on_detach')
 Widget.register_event_type('on_add_child')
 Widget.register_event_type('on_remove_child')
 Widget.register_event_type('on_mouse_press')

@@ -200,7 +200,7 @@ class Checkbox(Widget):
         super().__init__()
         self._deck = Deck(is_checked)
         self._attach_child(self._deck)
-        self._extensions = []
+        self._defer_clicks_to_proxies = {}
         self.set_images(
                 checked_base=self.custom_checked_base,
                 checked_over=self.custom_checked_over,
@@ -216,7 +216,10 @@ class Checkbox(Widget):
         return self._deck.claimed_size
 
     def on_click(self, widget):
-        self.toggle()
+        if self._defer_clicks_to_proxies and widget is self:
+            return
+        else:
+            self.toggle()
 
     def toggle(self):
         if self.is_enabled:
@@ -264,15 +267,19 @@ class Checkbox(Widget):
     def del_images(self):
         self._deck.clear_states()
 
-    def add_proxy(self, widget):
+    def add_proxy(self, widget, exclusive=False):
         widget.push_handlers(on_click=self.on_click)
+        widget.push_handlers(on_detach=self.remove_proxy)
         self._deck[True].add_controller(widget)
         self._deck[False].add_controller(widget)
+        self._defer_clicks_to_proxies = exclusive
 
-    def remove_proxy(self, widget):
+    def remove_proxy(self, widget, exclusive=False):
         widget.remove_handlers(on_click=self.on_click)
+        widget.remove_handlers(on_detach=self.remove_proxy)
         self._deck[True].remove_controller(widget)
         self._deck[False].remove_controller(widget)
+        self._defer_clicks_to_proxies = exclusive
 
 
 Checkbox.register_event_type('on_toggle')
