@@ -242,6 +242,15 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         This method should not be called outside of a repack, because it 
         assumes that the claims have already been updated.
         """
+
+        # Make sure the new size is still at least as big as the widget's 
+        # claim.  Round down all the sizes when doing this comparison, because 
+        # the new rect may also be rounded down.
+        if int(new_rect.width) < int(self.claimed_width):
+            raise UsageError(f"cannot assign {self} a smaller width ({new_rect.width} px) than it claimed ({self.claimed_width} px).")
+        if int(new_rect.height) < int(self.claimed_height):
+            raise UsageError(f"cannot assign {self} a smaller height ({new_rect.height} px) than it claimed ({self.claimed_height} px).")
+
         self._assigned_rect = new_rect
         self.realign()
 
