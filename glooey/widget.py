@@ -12,6 +12,14 @@ class EventDispatcher(pyglet.event.EventDispatcher):
         super().__init__()
         self.__timers = {}
 
+    def relay_events_from(self, originator, event_name, *more_event_names):
+        handlers = {
+                event_name: lambda *args, **kwargs: \
+                    self.dispatch_event(event_name, *args, **kwargs)
+                for event_name in (event_name,) + more_event_names
+        }
+        originator.set_handlers(**handlers)
+
     def start_event(self, event_type, *args, dt=1/60):
         # Don't bother scheduling a timer if nobody's listening.  This isn't 
         # great from a general-purpose perspective, because a long-lived event 
