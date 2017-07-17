@@ -49,9 +49,7 @@ class EventDispatcher(pyglet.event.EventDispatcher):
 
 @autoprop
 class Widget(EventDispatcher, HoldUpdatesMixin):
-    custom_size_hint = 0, 0
-    custom_width_hint = None
-    custom_height_hint = None
+    custom_alignment = 'fill'
 
     custom_padding = None
     custom_horz_padding = None
@@ -61,7 +59,11 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     custom_top_padding = None
     custom_bottom_padding = None
 
-    custom_alignment = 'fill'
+    custom_size_hint = 0, 0
+    custom_width_hint = None
+    custom_height_hint = None
+
+    custom_propogate_mouse_events = True
 
     def __init__(self):
         EventDispatcher.__init__(self)
@@ -116,6 +118,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self._is_hidden = False
         self._is_parent_hidden = False
         self._is_enabled = True
+
+        # Attribute controlling mouse events.
+        self._propogate_mouse_events = self.custom_propogate_mouse_events
 
         # Attributes for keeping track of the mouse-event related information, 
         # e.g. the rollover state and the double-click timer.
@@ -504,8 +509,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Propagate the "on_mouse_press" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        for child in children_under_mouse.current:
-            child.dispatch_event('on_mouse_press', x, y, button, modifiers)
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.current:
+                child.dispatch_event('on_mouse_press', x, y, button, modifiers)
 
         # Start firing "on_mouse_hold" events every frame.
         self.start_event('on_mouse_hold')
@@ -518,8 +524,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Propagate the "on_mouse_release" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        for child in children_under_mouse.current:
-            child.dispatch_event('on_mouse_release', x, y, button, modifiers)
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.current:
+                child.dispatch_event('on_mouse_release', x, y, button, modifiers)
 
         # Stop firing "on_mouse_hold" events every frame.
         self.stop_event('on_mouse_hold')
@@ -545,21 +552,23 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def on_mouse_motion(self, x, y, dx, dy):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        for child in children_under_mouse.exited:
-            child.dispatch_event('on_mouse_leave', x, y)
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.exited:
+                child.dispatch_event('on_mouse_leave', x, y)
 
-        for child in children_under_mouse.entered:
-            child.dispatch_event('on_mouse_enter', x, y)
+            for child in children_under_mouse.entered:
+                child.dispatch_event('on_mouse_enter', x, y)
 
-        for child in children_under_mouse.current:
-            child.dispatch_event('on_mouse_motion', x, y, dx, dy)
+            for child in children_under_mouse.current:
+                child.dispatch_event('on_mouse_motion', x, y, dx, dy)
 
     def on_mouse_enter(self, x, y):
         # Propagate the "on_mouse_enter" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        for child in children_under_mouse.entered:
-            child.dispatch_event('on_mouse_enter', x, y)
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.entered:
+                child.dispatch_event('on_mouse_enter', x, y)
 
         # Update the widget's rollover state.
         self._rollover_state = 'over'
@@ -573,8 +582,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # no children were under the mouse here, but it's not.)
         children_under_mouse = self._find_children_under_mouse_after_leave()
 
-        for child in children_under_mouse.exited:
-            child.dispatch_event('on_mouse_leave', x, y)
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.exited:
+                child.dispatch_event('on_mouse_leave', x, y)
 
         # Stop firing "on_mouse_hold" events every frame.
         self.stop_event('on_mouse_hold')
@@ -586,20 +596,22 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        for child in children_under_mouse.exited:
-            child.dispatch_event('on_mouse_drag_leave', x, y)
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.exited:
+                child.dispatch_event('on_mouse_drag_leave', x, y)
 
-        for child in children_under_mouse.entered:
-            child.dispatch_event('on_mouse_drag_enter', x, y)
+            for child in children_under_mouse.entered:
+                child.dispatch_event('on_mouse_drag_enter', x, y)
 
-        for child in children_under_mouse.current:
-            child.dispatch_event('on_mouse_drag', x, y, dx, dy, buttons, modifiers)
+            for child in children_under_mouse.current:
+                child.dispatch_event('on_mouse_drag', x, y, dx, dy, buttons, modifiers)
 
     def on_mouse_drag_enter(self, x, y):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        for child in children_under_mouse.entered:
-            child.dispatch_event('on_mouse_drag_enter', x, y)
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.entered:
+                child.dispatch_event('on_mouse_drag_enter', x, y)
 
     def on_mouse_drag_leave(self, x, y):
         # Propagate the "on_mouse_drag_leave" event to the relevant children.  
@@ -608,8 +620,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # mouse leaves the window.
         children_under_mouse = self._find_children_under_mouse_after_leave()
 
-        for child in children_under_mouse.exited:
-            child.dispatch_event('on_mouse_drag_leave', x, y)
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.exited:
+                child.dispatch_event('on_mouse_drag_leave', x, y)
 
         # Stop firing "on_mouse_hold" events every frame.
         self.stop_event('on_mouse_hold')
@@ -621,8 +634,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         children_under_mouse = self._find_children_under_mouse(x, y)
-        for child in children_under_mouse.current:
-            child.dispatch_event('on_mouse_scroll', x, y, scroll_x, scroll_y)
+
+        if self.propogate_mouse_events:
+            for child in children_under_mouse.current:
+                child.dispatch_event('on_mouse_scroll', x, y, scroll_x, scroll_y)
 
     def grab_mouse(self):
         if self.parent is self:
@@ -777,6 +792,12 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     def get_last_rollover_state(self):
         return self._last_rollover_state
+
+    def get_propogate_mouse_events(self):
+        return self._propogate_mouse_events
+
+    def set_propogate_mouse_events(self, new_setting):
+        self._propogate_mouse_events = new_setting
 
     @property
     def is_hidden(self):
