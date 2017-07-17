@@ -114,7 +114,7 @@ class EventLogger(Placeholder):
     def on_double_click(self, widget):
         print(f'{self}.on_double_click(widget={widget})')
 
-    def on_rollover(self, new_state, old_state):
+    def on_rollover(self, widget, new_state, old_state):
         print(f'{self}.on_rollover(new_state={new_state}, old_state={old_state})')
 
     def on_mouse_press(self, x, y, button, modifiers):
