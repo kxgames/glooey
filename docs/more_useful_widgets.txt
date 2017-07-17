@@ -80,7 +80,7 @@ alignment and padding of the buttons in the dialog box.  Typically Buttons is
 an HBox, but anything with an add() method will work.  Third, there are inner 
 classes for each button in the dialog box. For OkDialog, this is OkButton; for 
 YesNoDialog, this is YesButton and NoButton.  Finally, unlike every other 
-widget, dialog boxes do not need to be added to parent widget.  Instead, they 
+widget, dialog boxes do not need to be added to a parent widget.  Instead, they 
 are displayed by calling their open() method with the root GUI widget as the 
 argument.
 
