@@ -6,7 +6,7 @@ import pyglet
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
 
-grid = glooey.Grid()
+grid = glooey.Grid(2, 2)
 grid.padding = 10
 
 grid.add(0, 0, glooey.Placeholder())

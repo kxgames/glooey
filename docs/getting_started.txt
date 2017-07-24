@@ -7,9 +7,7 @@ down to importing everything, initializing the GUI, making a widget, then
 running the event loop.  In the end, we'll have a GUI that fills the screen 
 with a single "placeholder" widget:
 
-.. figure:: getting_started.png
-
-    :download:`getting_started.py`
+.. demo:: getting_started.py
 
 As you can see, a placeholder widget just draws a box with a cross through it.  
 It's useful for quickly visualizing what a GUI looks like, and it will come up 

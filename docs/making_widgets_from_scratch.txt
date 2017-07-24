@@ -1,3 +1,41 @@
 ***************************
 Making widgets from scratch
 ***************************
+
+Sometimes you need a widget that is totally unlike any of the built-in ones.  
+This scenario comes up fairly often in game programming, which lends itself to 
+non-standard user interfaces.  
+
+non-standard user interfaces.  interfaces with custom-built elements.
+
+In this tutorial, we will make a "Star Scale" widget.  
+
+- Useful widget attributes
+   - parent
+   - root
+   - window
+   - batch
+   - group
+   - rect
+   - claimed_rect
+
+- Composite widgets
+
+   - __init__
+   - _attach_child
+   - _detach_child
+   - _repack_and_regroup_children
+
+- Overriding `do_` methods
+ 
+   - Claiming space
+   - Drawing
+   - Regrouping
+
+- Reacting to changes
+
+   - repack()/redraw()
+   - hold_updates
+   
+- Dispatching events
+

@@ -12,7 +12,9 @@ while a level is loading, etc).
 
 We'll focus specifically on the example of making a checkbox with a label next 
 to it.  To begin, here is how you would make such a checkbox without creating a 
-new widget:: 
+new widget:
+
+.. demo:: composing_widgets/separate_widgets.py
 
    class WesnothLabel(glooey.Label):
        custom_font_name = 'Lato Regular'
@@ -37,11 +39,6 @@ new widget::
    hbox.alignment = 'center'
    hbox.padding = 6
 
-.. figure:: composing_widgets/separate_widgets.png
-
-   :download:`composing_widgets/separate_widgets.py` |br|
-   :download:`composing_widgets/separate_widgets_assets.zip`
-
 Basic implementation
 ====================
 To make this into a self-contained widget, we need to derive a new class from 
@@ -50,8 +47,7 @@ configure the HBox, Checkbox, and Label widgets the same way as before.  Then
 we just need to use the  ``self._attach_child()`` method to attach the HBox to 
 our new widget (rather than to the GUI):
 
-.. code::
-   :class: no-margin
+.. demo:: composing_widgets/labeled_checkbox.py
 
    class WesnothLabeledCheckbox(glooey.Widget):
       custom_alignment = 'center'
@@ -73,11 +69,6 @@ our new widget (rather than to the GUI):
    gui = glooey.Gui(window)
    checkbox = WesnothLabeledCheckbox('Toggle something')
    gui.add(checkbox)
-
-.. caption::
-
-   :download:`composing_widgets/labeled_checkbox.py` |br|
-   :download:`composing_widgets/labeled_checkbox_assets.zip`
 
 The most unfamiliar part of this code is the call to ``self._attach_child()``.  
 You can think of this method as the behind-the-scenes version of the ``add()`` 
@@ -106,8 +97,7 @@ the checkbox interface, so users wouldn't need to know about the underlying
 checkbox.  None of these improvements are really central to the topic of how to 
 make a composite widget, but I think it's worth seeing a more polished widget:
 
-.. code::
-   :class: no-margin
+.. demo:: composing_widgets/polished_labeled_checkbox.py
 
    class WesnothLabeledCheckbox(glooey.Widget):
        Label = WesnothLabel
@@ -150,11 +140,6 @@ make a composite widget, but I think it's worth seeing a more polished widget:
 
    WesnothLabeledCheckbox.register_event_type('on_toggle')
 
-.. caption::
-
-   :download:`composing_widgets/polished_labeled_checkbox.py` |br|
-   :download:`composing_widgets/polished_labeled_checkbox_assets.zip`
-   
 Why not inherit from HBox?
 ==========================
 Another tempting way to create a LabeledCheckbox widget is to inherit from 
@@ -206,8 +191,7 @@ poor-man's version of HBox.  But we're going to do it anyway, and hopefully
 you'll find it easy to apply the ideas in this example to widgets that might 
 need them more:
 
-.. code::
-   :class: no-margin
+.. demo:: composing_widgets/multiple_children.py
 
    class WesnothLabeledCheckbox(glooey.Widget):
        custom_alignment = 'center'
@@ -245,11 +229,6 @@ need them more:
 
            self.checkbox.resize(checkbox_rect)
            self.label.resize(label_rect)
-
-.. caption::
-   
-   :download:`composing_widgets/multiple_children.py` |br|
-   :download:`composing_widgets/multiple_children_assets.zip`
 
 The constructor is a little simpler than before.  Now we just have to create 
 the label and the checkbox and attach them both to the new widget.  The work of 

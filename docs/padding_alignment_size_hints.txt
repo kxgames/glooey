@@ -15,10 +15,7 @@ this the "max rect".  Each widget also internally keeps track of the minimum
 amount space it needs for itself and its children.  We'll call this the "min 
 rect".  These two rectangles are illustrated below:
 
-.. figure:: padding_alignment_size_hints/ok_dialog.png
-
-    :download:`padding_alignment_size_hints/ok_dialog.py` |br|
-    :download:`padding_alignment_size_hints/ok_dialog_assets.zip`
+.. demo:: padding_alignment_size_hints/ok_dialog.py
 
 In this example, an "Ok" button is positioned near the bottom right corner of a 
 dialog box.  The button's min rect (orange) is the same size as the images 
@@ -36,14 +33,12 @@ Padding
 =======
 Padding creates space around a widget.  More precisely, it determines how close 
 a widget can get to the edges of its max rect.  The most common way to set the 
-padding is to use custom attributes::
+padding is to use custom attributes:
+
+.. demo:: padding_alignment_size_hints/padding.py
 
     class MyPlaceholder(glooey.Placeholder):
         custom_padding = 10
-
-.. figure:: padding_alignment_size_hints/padding.png
-
-    :download:`padding_alignment_size_hints/padding.py`
 
 In this example, the placeholder is being added directly to the gui, so the max 
 rect is the whole screen.  The min rect is actually zero by zero, because 
@@ -76,14 +71,17 @@ these attributes::
 The Grid, HBox, and VBox widgets use the ``padding`` attribute to determine how 
 much space to put between their cells.  They also have a ``cell_padding`` 
 attribute (not shown in this example) that controls inter-cell spacing without 
-affecting normal padding::
+affecting normal padding:
 
-    grid = Grid(2, 2)
+.. demo:: padding_alignment_size_hints/grid_padding.py
+
+    grid = glooey.Grid(2, 2)
     grid.padding = 10
 
-.. figure:: padding_alignment_size_hints/grid_padding.png
-
-    :download:`padding_alignment_size_hints/grid_padding.py`
+    grid.add(0, 0, glooey.Placeholder())
+    grid.add(0, 1, glooey.Placeholder())
+    grid.add(1, 0, glooey.Placeholder())
+    grid.add(1, 1, glooey.Placeholder())
 
 The example is somewhat conceptually different from the first one in that the 
 grid is using padding to make smaller max rects for its placeholder children.  
@@ -159,17 +157,13 @@ strings are understood by default:
     Move the widget to the bottom right corner of the space available to it, and keep it as 
     small as possible.
 
-.. code::
+.. demo:: padding_alignment_size_hints/alignment.py
 
     class MyPlaceholder(glooey.Placeholder):
         custom_alignment = 'center'
 
     widget = MyPlaceholder(300, 200)
     gui.add(widget)
-
-.. figure:: padding_alignment_size_hints/alignment.png
-
-    :download:`padding_alignment_size_hints/alignment.py`
 
 Note that we specified a size for our placeholder (300x200) by passing 
 arguments to its constructor.  If we hadn't done this, our placeholder would've 
@@ -209,7 +203,9 @@ widget's min rect must be at least as big as its size hint, so you can use size
 hints to make a widget bigger than it would be otherwise.  You can't use size 
 hints to make a widget smaller, because that would undermine the guarantee that 
 widgets will always have enough space to render themselves and their children.  
-Here's an example showing how to give a size hint using custom attributes::
+Here's an example showing how to give a size hint using custom attributes:
+
+.. demo:: padding_alignment_size_hints/size_hints.py
 
     class MyPlaceholder(glooey.Placeholder):
         custom_size_hint = 300, 200  # width, height
@@ -217,10 +213,6 @@ Here's an example showing how to give a size hint using custom attributes::
 
     widget = MyPlaceholder()
     gui.add(widget)
-
-.. figure:: padding_alignment_size_hints/size_hints.png
-
-    :download:`padding_alignment_size_hints/size_hints.py`
 
 You can see that the placeholder is 300x200.  We had to center-align the widget 
 to prevent it from filling up the whole window (the default alignment for 
@@ -248,9 +240,3 @@ demonstrates this usage::
     widget.width_hint = ...
     widget.height_hint = ...
 
-.. Another useful widget that depends on this kind of configuration is Frame.  
-   It's purpose is to put borders around other widgets, and to do that it needs 
-   both a background widget and a...
-
-.. Wait, customizing the bin is exclusively to control padding, and I hven't 
-   talked about that yet.  Maybe I should hold off on this example...

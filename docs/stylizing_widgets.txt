@@ -39,7 +39,9 @@ cover more powerful ways to customize widgets.
 The easiest way to stylize a widget is to override its "custom" attributes.  
 These are class-wide attributes --- conventionally prefixed with ``custom_`` 
 --- that control basic properties like colors, images, fonts, etc.  The label 
-widget is a good example::
+widget is a good example:
+
+.. demo:: stylizing_widgets/label.py
 
     class WesnothLabel(glooey.Label):
         custom_font_name = 'Lato Regular'
@@ -50,11 +52,6 @@ widget is a good example::
     label = WesnothLabel('Hello world!')
     gui.add(label)
 
-.. figure:: stylizing_widgets/label.png
-
-    :download:`stylizing_widgets/label.py` |br|
-    :download:`stylizing_widgets/label_assets.zip`
-
 Here ``custom_font_name``, ``custom_font_size``, ``custom_colors``, and 
 ``custom_alignment`` are all attributes defined in the Label class (or one of 
 its superclasses) for the explicit purpose of being overridden in subclasses.  
@@ -62,7 +59,9 @@ The Label class has a lot more of these attributes too, check the :doc:`API
 documentation <widgets/button>` for a complete list.
 
 The background widget is another good example.  The more idiomatic way to write 
-the demo from the :doc:`stylizing_widgets` tutorial is like this::
+the demo from the :doc:`stylizing_widgets` tutorial is like this:
+
+.. demo:: stylizing_widgets/background.py
 
     class WesnothBorder(glooey.Background):
         custom_center = pyglet.resource.texture('center.png')
@@ -78,11 +77,6 @@ the demo from the :doc:`stylizing_widgets` tutorial is like this::
     border = WesnothBorder()
     gui.add(border)
 
-.. figure:: stylizing_widgets/background.png
-
-    :download:`stylizing_widgets/background.py` |br|
-    :download:`stylizing_widgets/background_assets.zip`
-
 Inner classes
 =============
 It's also common to stylize widgets with other widgets.  For example, you can 
@@ -91,7 +85,9 @@ various mouse rollover states.  The syntax for doing this is analogous to the
 "custom" attributes defined above: just override a class variable with the 
 widget class you want to use.  The trick is that you can also create that 
 widget class *in place* (i.e. by defining an inner class).  This provides a 
-very succinct way to customize composite widgets::
+very succinct way to customize composite widgets:
+
+.. demo:: stylizing_widgets/button.py
 
     class WesnothButton(glooey.Button):
         Label = WesnothLabel
@@ -107,11 +103,6 @@ very succinct way to customize composite widgets::
 
     button = WesnothButton('Click me!')
     gui.add(button)
-
-.. figure:: stylizing_widgets/button.png
-
-    :download:`stylizing_widgets/button.py` |br|
-    :download:`stylizing_widgets/button_assets.zip` |br|
 
 The Button class has four widget classes we can override: Label, Base, Over, 
 Down.  The first is used to format any text associated with the button.  The 

@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+
+from docutils import nodes
+from docutils.parsers.rst import Directive
+from sphinx import addnodes
+from pathlib import Path
+
+class linebreak(nodes.General, nodes.Element):
+
+    @staticmethod
+    def visit_html(translator, node):
+        translator.body.append('<br/>')
+
+    @staticmethod
+    def visit_latex(translator, node):
+        translator.body.append(r'\linebreak')
+
+    @staticmethod
+    def visit_text(translator, node):
+        translator.body.append('\n\n')
+
+    @staticmethod
+    def depart(translator, node):
+        pass
+
+
+
+class ShowNodes(Directive):
+    has_content = True
+
+    def run(self): #
+        wrapper = nodes.paragraph()
+        self.state.nested_parse(self.content, self.content_offset, wrapper)
+
+        for node in wrapper.children:
+            print(node.pformat())
+
+        return wrapper.children
+
+class Caption(Directive):
+    has_content = True
+
+    def run(self): #
+        caption = nodes.caption()
+        self.state.nested_parse(self.content, self.content_offset, caption)
+        return [caption]
+
+class Demo(Directive):
+    has_content = True
+    required_arguments = 1
+
+    def run(self):
+        figure = nodes.figure()
+
+        # Figure out what the show for this demo
+        
+        py_path = Path(self.arguments[0])
+        zip_path = py_path.parent / (py_path.stem + '_assets.zip')
+        png_path = py_path.parent / (py_path.stem + '.png')
+
+        # Error out if the given python script doesn't exist.
+        if py_path.suffix != '.py':
+            raise self.error(f"'{py_path}' must be a python script.")
+
+        if not py_path.exists():
+            raise self.error(f"'{py_path}' doesn't exist.")
+        
+        if self.content:
+
+            # Make sure the content is present in the given file.  Complain if 
+            # there are differences.
+
+            from textwrap import dedent
+
+            with open(py_path) as py_file:
+                py_code = py_file.readlines()
+
+                for py_line in self.content:
+                    if py_line + '\n' not in py_code:
+                        raise self.error(f"""\
+Error in \"demo\" directive: The following line isn't present in '{py_path}':
+{py_line}""")
+
+            # Add a node for the code snippet
+
+            from sphinx.directives.code import CodeBlock
+            figure += self.make_snippet(self.content, png_path.exists())
+
+        # Add a node for the screenshot
+
+        if png_path.exists():
+            figure += self.make_screenshot(png_path)
+
+        # Add a node for the download links.
+        
+        caption = nodes.caption()
+        caption += self.make_download_link(py_path)
+
+        if zip_path.exists():
+            caption += linebreak()
+            caption += self.make_download_link(zip_path)
+
+        figure += caption
+        
+        return [figure]
+
+    def make_snippet(self, code, have_screenshot):
+        code = '\n'.join(code)
+        return nodes.literal_block(
+                code, code,
+                language='python',
+                classes=['thin-margin' if have_screenshot else 'no-margin'],
+        )
+
+    def make_screenshot(self, path):
+        return nodes.image(uri=str(path))
+
+    def make_download_link(self, path):
+        node = addnodes.download_reference(
+                refdoc=self.state.document.settings.env.docname,
+                refdomain='',
+                refexplicit=False,
+                reftarget=str(path),
+                reftype='download',
+                refwarn=True,
+        )
+        node += nodes.literal(
+                '', str(path),
+                classes=['xref', 'download'],
+        )
+        return node
+
+
+
+def setup(app): 
+    app.add_directive('show-nodes', ShowNodes)
+    app.add_directive('caption', Caption)
+    app.add_directive('demo', Demo)
+
+    app.add_node(
+            linebreak,
+            html=(linebreak.visit_html, linebreak.depart),
+            latex=(linebreak.visit_latex, linebreak.depart),
+            text=(linebreak.visit_text, linebreak.depart),
+    )
+
+    app.add_stylesheet('css/custom.css')
+

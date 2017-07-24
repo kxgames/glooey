@@ -16,58 +16,10 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
 
-## Ideas
-
-# Add a screenshot directive.  This would basically be the same as `figure`, 
-# but it would automatically add the download link as a caption.
-
-# .. demo:: <path/to/demo_script.py>
-#
-#    <code snippet>
-
-# - The path to the script would be a required argument.
-# - The directive would see if a screenshot or an assets zip is associated with 
-#   the script.
-# - It would generate nodes according to what's available.
-
-## Customizations
-
-from docutils import nodes
-from docutils.parsers.rst import Directive
-
-class ShowNodesDirective(Directive): #
-    has_content = True
-
-    def run(self): #
-        wrapper = nodes.paragraph()
-        self.state.nested_parse(self.content, self.content_offset, wrapper)
-
-        for node in wrapper.children:
-            print(node.pformat())
-
-        return wrapper.children
-        
-class CaptionDirective(Directive): #
-    has_content = True
-
-    def run(self):
-        caption = nodes.caption()
-        self.state.nested_parse(self.content, self.content_offset, caption)
-        return [caption]
-
-
-
-def setup(app): 
-    app.add_directive('show-nodes', ShowNodesDirective)
-    app.add_directive('caption', CaptionDirective)
-
-    app.add_stylesheet('css/custom.css')
-
+import os
+import sys
+sys.path.insert(0, os.path.abspath('.'))
 
 ## General configuration
 
@@ -79,6 +31,7 @@ def setup(app):
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [ #
+    'glooey',
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
