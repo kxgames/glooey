@@ -27,6 +27,7 @@ class Image(Widget):
 
     def do_regroup(self):
         if self._sprite is not None:
+            self._sprite.batch = self.batch
             self._sprite.group = self.group
 
     def do_draw(self):
@@ -120,7 +121,7 @@ class Background(Widget):
         self._artist.group = self.group
 
     def do_draw(self):
-        self._artist.unhide()
+        self._artist.show()
 
     def do_undraw(self):
         self._artist.hide()

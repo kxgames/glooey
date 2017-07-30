@@ -56,7 +56,7 @@ class Artist(HoldUpdatesMixin):
         self._vertex_list.delete()
         self._vertex_list = None
 
-    def unhide(self):
+    def show(self):
         if not self._vertex_list:
             self._create_vertex_list()
             self._update_vertex_list()
@@ -679,7 +679,7 @@ frame.  The only difference is that, if 'htile' or 'vtile' are set to 'auto'
         self._tile_artists = {}
         self._hidden = True
 
-    def unhide(self):
+    def show(self):
         if self._hidden:
             self._hidden = False
             self._update_tiles()
