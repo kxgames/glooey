@@ -97,7 +97,7 @@ class Mover(Bin):
         self._translate_group = self.TranslateGroup(self, self.group)
         self.child.regroup(self._translate_group)
 
-    def on_remove_child(self, child):
+    def on_detach_child(self, parent, child):
         self._child_position = Vector.null()
 
     def on_mouse_press(self, x, y, button, modifiers):

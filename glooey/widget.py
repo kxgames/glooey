@@ -980,7 +980,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         else:
             self._unhide_children(False)
 
-        self.dispatch_event('on_add_child', child)
+        self.dispatch_event('on_attach_child', self, child)
         return child
 
     def _detach_child(self, child):
@@ -1015,7 +1015,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         child._rect = None
 
         # Let the user react to a child being attached.
-        self.dispatch_event('on_remove_child', child)
+        self.dispatch_event('on_detach_child', self, child)
 
         # Derived classes are expected to call _repack_and_regroup_children() 
         # after this method.
@@ -1186,8 +1186,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
 Widget.register_event_type('on_attach')
 Widget.register_event_type('on_detach')
-Widget.register_event_type('on_add_child')
-Widget.register_event_type('on_remove_child')
+Widget.register_event_type('on_attach_child')
+Widget.register_event_type('on_detach_child')
 Widget.register_event_type('on_mouse_press')
 Widget.register_event_type('on_mouse_release')
 Widget.register_event_type('on_mouse_hold')
