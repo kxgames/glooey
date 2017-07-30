@@ -61,7 +61,7 @@ class Color:
 
     @staticmethod
     def from_floats(red, green, blue, alpha=1.0):
-        return Color(255 * red, 255 * green, 255 * blue)
+        return Color(255 * red, 255 * green, 255 * blue, 255 * alpha)
 
     @staticmethod
     def from_float_tuple(rgba):
