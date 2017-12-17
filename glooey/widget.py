@@ -917,7 +917,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         for diagnosis, sep in join(diagnoses, '\n'):
             print(diagnosis.format(**locals()) + sep, flush=True)
 
-    def debug_placement_problems(self, claimed='red', assigned='green',
+    def debug_placement_problems(self, claimed='red', assigned='yellow',
             content='blue'):
         """
         Draw boxes showing the widgets assigned, claimed, and content rects.
@@ -925,25 +925,25 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         if not self.is_attached_to_gui:
             raise UsageError("the widget must be attached to the GUI to debug placement problems.")
 
-        group = pyglet.graphics.OrderedGroup(1)
+        layer = pyglet.graphics.OrderedGroup(1)
 
         drawing.Outline(
             rect=self.claimed_rect,
             color=claimed,
             batch=self.batch,
-            group=group,
-        )
-        drawing.Outline(
-            rect=self._assigned_rect,
-            color=assigned,
-            batch=self.batch,
-            group=group,
+            group=pyglet.graphics.OrderedGroup(1, layer),
         )
         drawing.Outline(
             rect=self.rect,
             color=content,
             batch=self.batch,
-            group=group,
+            group=pyglet.graphics.OrderedGroup(2, layer),
+        )
+        drawing.Outline(
+            rect=self._assigned_rect,
+            color=assigned,
+            batch=self.batch,
+            group=pyglet.graphics.OrderedGroup(3, layer),
         )
 
     def _attach_child(self, child):
