@@ -53,8 +53,9 @@ class Artist(HoldUpdatesMixin):
         return self._vertex_list
 
     def hide(self):
-        self._vertex_list.delete()
-        self._vertex_list = None
+        if self._vertex_list:
+            self._vertex_list.delete()
+            self._vertex_list = None
 
     def show(self):
         if not self._vertex_list:
