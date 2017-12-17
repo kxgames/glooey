@@ -681,3 +681,34 @@ def test_real_examples():
             (0,3): Rect(530, 0, 110, 480),
     }
 
+def test_no_shared_state():
+    """
+    See issue #11.
+    """
+    grid_1 = drawing.Grid()
+    grid_2 = drawing.Grid()
+    i, j = 0, 0
+
+    grid_1.set_row_height(i, 1)
+    grid_2.set_row_height(i, 2)
+
+    assert grid_1.get_requested_row_height(i) == 1
+    assert grid_2.get_requested_row_height(i) == 2
+
+    grid_1.set_col_width(j, 1)
+    grid_2.set_col_width(j, 2)
+
+    assert grid_1.get_requested_col_width(j) == 1
+    assert grid_2.get_requested_col_width(j) == 2
+
+    rect_1, rect_2 = Rect.from_size(1, 1), Rect.from_size(2, 2)
+    assert rect_1 is not rect_2
+
+    grid_1.set_min_cell_rect(i, j, rect_1)
+    grid_2.set_min_cell_rect(i, j, rect_2)
+
+    assert grid_1.get_min_cell_rect(i, j) is rect_1
+    assert grid_2.get_min_cell_rect(i, j) is rect_2
+
+    
+

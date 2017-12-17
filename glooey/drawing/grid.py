@@ -8,20 +8,20 @@ from glooey.helpers import *
 @autoprop
 class Grid:
 
-    def __init__(self, *, bounding_rect=None, min_cell_rects={},
+    def __init__(self, *, bounding_rect=None, min_cell_rects=None,
             num_rows=0, num_cols=0, padding=None, inner_padding=None, 
-            outer_padding=None, row_heights={}, col_widths={},
+            outer_padding=None, row_heights=None, col_widths=None,
             default_row_height='expand', default_col_width='expand'):
 
         # Attributes that the user can set to affect the shape of the grid.  
         self._bounding_rect = bounding_rect or Rect.null()
-        self._min_cell_rects = min_cell_rects
+        self._min_cell_rects = min_cell_rects or {}
         self._requested_num_rows = num_rows
         self._requested_num_cols = num_cols
         self._inner_padding = first_not_none((inner_padding, padding, 0))
         self._outer_padding = first_not_none((outer_padding, padding, 0))
-        self._requested_row_heights = row_heights
-        self._requested_col_widths = col_widths
+        self._requested_row_heights = row_heights or {}
+        self._requested_col_widths = col_widths or {}
         self._default_row_height = default_row_height
         self._default_col_width = default_col_width
 
@@ -355,6 +355,9 @@ class Grid:
             raise UsageError("not enough columns requested")
 
     def _find_max_cell_dimensions(self):
+        """
+        Find the tallest and widest cell in each dimension.
+        """
         self._max_cell_heights = {}
         self._max_cell_widths = {}
 
