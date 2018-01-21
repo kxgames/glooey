@@ -54,8 +54,8 @@ class WesnothLabeledCheckbox(glooey.Widget):
         label_rect.left = checkbox_rect.right + self.custom_label_padding
         label_rect.center_y = self.rect.center_y
 
-        self.checkbox.resize(checkbox_rect)
-        self.label.resize(label_rect)
+        self.checkbox._resize(checkbox_rect)
+        self.label._resize(label_rect)
 
 
 window = pyglet.window.Window()

@@ -227,12 +227,13 @@ need them more:
            label_rect.left = checkbox_rect.right + self.custom_label_padding
            label_rect.center_y = self.rect.center_y
 
-           self.checkbox.resize(checkbox_rect)
-           self.label.resize(label_rect)
+           self.checkbox._resize(checkbox_rect)
+           self.label._resize(label_rect)
 
 The constructor is a little simpler than before.  Now we just have to create 
 the label and the checkbox and attach them both to the new widget.  The work of 
-positioning those two widgets falls to the new ``do_...()`` methods.
+positioning those two widgets falls to ``do_claim()`` and 
+``do_resize_children()``.
 
 The ``do_claim()`` method returns the minimum width and height our widget needs 
 to fit all of its children.  This example needs enough width to fit label and 
@@ -242,7 +243,7 @@ calculation, can be accessed via their ``claimed_rect``, ``claimed_width``, and
 ``claimed_height`` attributes.
 
 The ``do_resize_children()`` method actually sets the sizes and positions of 
-all the children.  It does this by calling the ``resize()`` method on each one.  
-This method expects a rectangle in the form of a ``vecrec.Rect`` object (the 
-same type of object returned by ``Widget.claimed_rect``).  This rectangle may 
-be larger than the widget's claimed size, but it cannot be smaller.
+all the children.  It does this by calling the ``_resize()`` method on each 
+one.  This method expects a rectangle in the form of a ``vecrec.Rect`` object 
+(the same type of object returned by ``Widget.claimed_rect``).  This rectangle 
+may be larger than the widget's claimed size, but it cannot be smaller.

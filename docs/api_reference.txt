@@ -2,3 +2,13 @@
 API reference
 *************
 
+.. autoclass:: glooey.Widget
+   :member-order: bysource
+   :members:
+   :private-members:
+   :special-members:
+   :undoc-members:
+
+.. autoclass:: glooey.drawing.Rectangle
+
+.. autoclass:: glooey.drawing.Background

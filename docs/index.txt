@@ -17,8 +17,9 @@
     padding_alignment_size_hints
     more_useful_widgets
     composing_widgets
-    under_the_hood
+    how_it_all_works
     making_widgets_from_scratch
+    troubleshooting
     api_reference
     widgets/index
     themes/index

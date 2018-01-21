@@ -37,14 +37,6 @@ class ShowNodes(Directive):
 
         return wrapper.children
 
-class Caption(Directive):
-    has_content = True
-
-    def run(self): #
-        caption = nodes.caption()
-        self.state.nested_parse(self.content, self.content_offset, caption)
-        return [caption]
-
 class Demo(Directive):
     has_content = True
     required_arguments = 1
@@ -73,10 +65,10 @@ class Demo(Directive):
             from textwrap import dedent
 
             with open(py_path) as py_file:
-                py_code = py_file.readlines()
+                py_code = [l.strip() for l in py_file.readlines()]
 
                 for py_line in self.content:
-                    if py_line + '\n' not in py_code:
+                    if py_line.strip() not in py_code:
                         raise self.error(f"""\
 Error in \"demo\" directive: The following line isn't present in '{py_path}':
 {py_line}""")
@@ -134,7 +126,6 @@ Error in \"demo\" directive: The following line isn't present in '{py_path}':
 
 def setup(app): 
     app.add_directive('show-nodes', ShowNodes)
-    app.add_directive('caption', Caption)
     app.add_directive('demo', Demo)
 
     app.add_node(
