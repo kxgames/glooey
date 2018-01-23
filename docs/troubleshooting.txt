@@ -68,7 +68,9 @@ the blue and yellow rectangles overlap, and that the yellow one is on top.
 It's not uncommon for the blue rectangle to be completely covered by the yellow 
 one, so don't be alarmed if you can't see it.
 
-If neither of these tools is helping to solve your problem, make an `issue`__ 
-on Github and I'll try to help you out.
+If neither of these tools solve your problem, make an `issue`__ on Github and 
+I'll try to help you out.
+
+__ https://github.com/kxgames/glooey/issues
 
 .. [#] If one of the parents is the problem, it'll even tell you which one!
