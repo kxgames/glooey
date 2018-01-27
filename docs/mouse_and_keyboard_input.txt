@@ -2,19 +2,21 @@
 Mouse and keyboard input
 ************************
 
-Input handling in glooey builds on the pyglet event framework.  You can read 
+Input handling in glooey is built on the pyglet event framework.  You can read 
 all about this framework `here`__, but the basic idea is that events are 
 triggered when input occurs, and your code can react to these events however it 
-likes.  Glooey uses the same system, but events are triggered by every widget 
-affected the input in question.  Another way to say this is that each widget is 
-an `EventDispatcher`.  So while pyglet lets you react when the mouse is 
-clicked, glooey lets you react when the mouse is clicked *on a particular 
-widget*.
+likes.  Glooey works the same way, but events are triggered by every widget 
+that's affected by the input in question.  Another way to say this is that 
+every widget is an `EventDispatcher`.  So while pyglet lets you react when the 
+mouse is clicked, glooey lets you react when the mouse is clicked on a 
+particular widget.
+
+__ https://pyglet.readthedocs.io/en/latest/programming_guide/events.html
 
 The following sections will describe the user-input-related events that widgets 
 can trigger, but the first thing to know is how to react to an event.  You do 
 this by attaching a handler (which is a function with the same name and 
-signature as the event) the event.  There are two prominent ways to do this.  
+signature as the event) to a widget.  There are two prominent ways to do this.  
 The first is to use the `event()` decorator::
 
    @widget.event
@@ -31,12 +33,6 @@ Handlers that have been pushed can also be popped, which is sometimes useful::
 
    widget.pop_handlers()
 
-This should be enough to get you started, but if you want to know more about 
-the nuances of pyglet's event handling framework, the `documentation`__ should 
-have answers.
-
-__ https://pyglet.readthedocs.io/en/latest/programming_guide/events.html
-
 Mouse input
 ===========
 Every widget can dispatch the following events in response to mouse input:
@@ -45,21 +41,16 @@ Every widget can dispatch the following events in response to mouse input:
    Triggered when the user clicks on a widget.  This is pretty similar to 
    `on_mouse_release()`, but there are a few differences.  First, a widget 
    cannot be clicked if it's not "enabled", i.e. via `enable()` and 
-   `disable()`.  (A disabled widget should be thought of as "greyed-out", 
+   `disable()`.  (You can think of a disabled widget as being "greyed-out", 
    although it's up to the widget itself to actually change it's appearance 
    when it's been disabled.)  Second, a widget cannot be clicked if the click 
    didn't begin within the widget.  In other words, if you were to drag the 
-   mouse over a widget and then release it, that would not trigger a click.
+   mouse over a widget and then release it, that would not be a click.
 
 `on_double_click(widget)`
    Triggered when the user clicks the same widget twice within 500 ms.  The 
    second click triggers both `on_click()` and `on_double_click()` events.
 
-`on_hold(widget, dt)`
-   Triggered 60 times a second whenever the mouse is being pressed on a widget 
-   (if the press began on the widget).  The `dt` argument gives the amount of 
-   time that passed between triggers.
-   
 `on_rollover(widget, current_state, previous_state)`
    Triggered whenever a widget's rollover state changes.  There are three 
    possible states: 'base' (the mouse is not interacting with the widget), 
@@ -72,6 +63,11 @@ Every widget can dispatch the following events in response to mouse input:
 `on_mouse_release(x, y, button, modifiers)`
    Triggered when the mouse is released while over a widget.
 
+`on_mouse_hold(dt)`
+   Triggered 60 times a second whenever the mouse is being pressed on a widget 
+   (if the press began on the widget).  The `dt` argument gives the amount of 
+   time that passed between triggers.
+   
 `on_mouse_motion(x, y, dx, dy)`
    Triggered when the mouse moves around inside a widget.
 
@@ -116,7 +112,7 @@ following events can be triggered only by certain widgets:
 
 Keyboard input
 ==============
-This section is actually a misnomer; glooey doesn't affect how keyboard events 
+This section should really be empty; glooey doesn't affect how keyboard events 
 are handled at all.  If you want to react to keyboard input (e.g. to make a 
 hotkey), just attach a `on_key_press` and/or `on_key_release` handlers to the 
 window just like you would in any pyglet program.  Certain widgets (like Form) 
