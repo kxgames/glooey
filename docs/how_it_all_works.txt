@@ -47,8 +47,8 @@ widget (or ``None`` if it isn't attached to the hierarchy):
 .. figure:: how_it_all_works/hierarchy.svg
    :align: center
 
-To be clear, a widget is only attached to the hierarchy if one of its 
-grandparents is the root.  For example, in the previous snippet::
+To be clear, a widget is only attached to the hierarchy if it, its parent, or 
+one of its grandparents is the root.  For example, in the previous snippet::
 
    hbox.add(left)
    hbox.add(right)  # Nothing is attached to the hierarchy...
@@ -326,7 +326,128 @@ repacking process:
 
 How regrouping works
 ====================
+As discussed in the `How drawing works`_ section, every widget needs to have a 
+pyglet graphics group before it can be drawn.  Regrouping is the process by 
+which this happens.  More specifically, it's the process by which widgets are 
+assigned groups by their parents.
+
+The process begins when the `_regroup()` method is called on a widget to assign 
+it a new group.  This would have to be internally triggered by a widget or its 
+parent --- most often when it's attached to the GUI --- because `_regroup()` is 
+not a public method.  The `_regroup()` method does three things.  First, it 
+calls `do_regroup()` to give the widget a chance to react to its new group.  
+For the most part, only widgets that are managing vertex lists should need to 
+react, and they should react by migrating those vertex lists to the new group 
+(which is already available as `self.group`).  Second, it calls 
+`do_regroup_children()` to give the widget a chance to call `_regroup()` on 
+each of its children to assign them new groups.  The default implementation 
+simply assigns each child to the same group as the parent.  Most widgets should 
+accept the default, but widgets that rely on more sophisticated OpenGL states, 
+like `ScrollBox` does to translate and clip its content, need to reimplement 
+this method to put their children in groups that have the right function and 
+that are themselves children of the widget's new group.  Third and finally, 
+`_regroup()` attempts to redraw the widget, so that any changes to the group 
+will be immediately reflected.
+
+.. note::
+
+   I mention above that regrouping is usually triggered internally by glooey 
+   when a widget is added to the GUI.  You only need to worry about this if you 
+   are writing a custom container widget.  That is, a widget that uses 
+   `_attach_child()` and `remove_child()` to add and remove children after it's 
+   been constructed.  If you're doing this, make sure to always call 
+   `_repack_and_regroup_children()` afterwards to trigger a repack and a 
+   regroup if necessary.
 
 How mouse events work
 =====================
+Pyglet emits a mouse event whenever the user moves, clicks, or drags the mouse.  
+These events need to propagate through the widget hierarchy in order for each 
+widget to react properly when the mouse interacts with it.  This process begins 
+with the root widget (which is automatically configured to receive every mouse 
+event that pyglet emits) but is ultimately handled in the same way by every 
+widget:
 
+First, the event handler corresponding to the particular mouse event is called, 
+either by pyglet (if the widget in question is the root) or by the widget's 
+parent (if not).  Each widget has a handler corresponding to each type of mouse 
+events that pyglet can generate, which are listed here:
+
+- `on_mouse_press(x, y, button, modifiers)`
+- `on_mouse_release(x, y, button, modifiers)`
+- `on_mouse_motion(x, y, dx, dy)`
+- `on_mouse_enter(x, y)`
+- `on_mouse_leave(x, y)`
+- `on_mouse_drag(x, y, dx, dy, buttons, modifiers)`
+- `on_mouse_drag_enter(x, y)`
+- `on_mouse_drag_leave(x, y)`
+- `on_mouse_scroll(x, y, scroll_x, scroll_y)`
+
+Each of these handlers do different things, of course, but they all share the 
+same basic structure.  First, the handler calls `_find_children_under_mouse()` 
+to figure out both which of its children are under the mouse now and which were 
+under the mouse the last time a mouse event was triggered.  With this 
+information, the handler propagates the mouse event to any children affected by 
+it.  Most of the time this just means triggering the same event for the 
+children under the mouse, but the "motion" and "drag" handlers will also 
+trigger "enter" and "exit" events when they notice the mouse moving between 
+their children.  Once the event is done propagating, the handler may trigger 
+one or more new events.  This is where different handlers behave the most 
+differently.  For example, `on_mouse_release()` triggers ``on_click`` if the 
+widget is "enabled" and the click began in the widget.  Likewise, almost all of 
+the handlers play a role in triggering ``on_rollover`` events at the right 
+times.
+
+There are a number of ways for widget subclasses affect how mouse events are 
+propagated.  The first is to reimplement `is_under_mouse()`.  This method takes 
+a mouse coordinate and returns true if that coordinate is touching the widget.  
+The default implementation returns true if the coordinate is within the 
+widget's rectangle, but you can imagine reimplementing this for widgets 
+irregular shapes.  Circular widgets are common, for example, and it's easy to 
+calculate if a point is within a circle.  You could also support arbitrary 
+outlines by using a bitmap to determine which pixels are inside a widget.  
+
+The second way to affect how mouse events are propagated is to reimplement 
+`do_find_children_near_mouse()`.  This method's job is to yield which of the 
+widget's children could be under the given mouse coordinate (`is_under_mouse() 
+will subsequently be called on each one to figure out which really are under 
+the mouse).  The default is to yield all of the widget's children, which is 
+always correct, but not always efficient.  Containers like Grid, HBox, and VBox 
+know where their children are located, so they can yield the right widgets in 
+constant time rather than linear time.  This efficiency matters, because 
+``on_mouse_motion`` events are triggered almost every frame, and often need to 
+be propagated through several layers of containers.
+
+The third way to affect how mouse events are propagated is to set 
+`custom_propagate_mouse_events = False`.  This instructs the widget to simply 
+not propagate mouse events, which can be useful if you're making a composite 
+widget and want to take complete responsibility for interacting with the mouse, 
+or if you just know that nothing it the widget should interact with the mouse 
+and you want to save some time.
+
+The fourth way to affect how mouse events are propagated is to call 
+`_grab_mouse()` and (subsequently) `_ungrab_mouse()`.  The first method breaks 
+the normal manner is which mouse events are propagated and forces them all to 
+be directed towards the widget that grabbed the mouse, and the second method 
+restores undoes this.  The grips inside scroll bars are a good example of when 
+these methods are useful.  When you click the grip, it grabs the mouse so that 
+even if the mouse leaves the scroll bar as you're dragging, the grip keeps 
+moving with the mouse.  Then when you release the grip, it ungrabs the mouse 
+and everything goes back to normal.  Only one widget can grab the mouse at a 
+time.  If you try to grab it twice, and exception will be raised.
+
+The last way to affect how mouse events are propagated is to overwrite the 
+handlers, e.g. `on_mouse_press()` and friends.  This is the nuclear option, so 
+to speak, but it lets you propagate events in any way you like.  For example, 
+the Mover widget --- one of the fundamental building blocks of the scrolling 
+widgets --- is responsible for efficiently moving a child around.  But under 
+the hood, the child isn't really moving; Mover is just using `glTranslate()` in 
+order to change where it's drawn.  In order for this trick to work, Mover also 
+needs to reimplement the mouse handlers to apply the inverse translation to the 
+mouse coordinates, otherwise there would be a mismatch between where the child 
+appeared and where it could be clicked on.  Another example is the PanningGui 
+widget, which reimplements these methods so it can take responsibility for 
+tracking the position of the mouse (i.e. by adding up dx and dy every time the 
+mouse moves).  This allows it to trigger ``on_mouse_pan`` events when the mouse 
+appears to move off the screen, which can then be used to scroll around a 
+larger scene in the way that many games do.

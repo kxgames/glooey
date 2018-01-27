@@ -106,9 +106,10 @@ following events can be triggered only by certain widgets:
    user clicked on it.
 
 `on_mouse_pan(direction, dt)`
-   Triggered by PanningGui when the mouse is at the edge of the screen, 
-   indicating that the display should pan in the direction of the mouse.  This 
-   is very useful for making fullscreen games.
+   Triggered by PanningGui when the mouse is at the edge of the screen.  The 
+   Viewport widget can listen for these events and use them to pan around a 
+   larger widget, so together these widgets are useful for making fullscreen 
+   games.
 
 Keyboard input
 ==============

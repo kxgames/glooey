@@ -15,12 +15,13 @@ retro/arcade style in classes like these::
         ...
 
 There are several advantages to stylizing widgets by subclassing them like 
-this.  First, it's very easy to create multiple variants of the same widget.  
-This comes in handy because most GUIs need several different kinds of button, 
-header and body text, heavier and lighter borders or frames, etc.  Second, 
-subclassing does a great job of making the simple customizations easy (because 
-superclasses can anticipate and facilitate common tweaks) and the complex ones 
-possible (because subclasses can override any aspect of their base class).
+this.  First, it's very easy to create multiple variants of the same widget 
+type.  This comes in handy because most GUIs need several different kinds of 
+button, header and body text, heavier and lighter borders or frames, etc.  
+Second, subclassing does a great job of making the simple customizations easy 
+(because superclasses can anticipate and facilitate common tweaks) and the 
+complex ones possible (because subclasses can override any aspect of their base 
+class).
 
 This tutorial focuses on the simplest and easiest customizations, which 
 typically amount to changing the appearance of existing widgets.  The 
@@ -59,7 +60,7 @@ The Label class has a lot more of these attributes too, check the :doc:`API
 documentation <widgets/button>` for a complete list.
 
 The background widget is another good example.  The more idiomatic way to write 
-the demo from the :doc:`stylizing_widgets` tutorial is like this:
+the demo from the :doc:`especially_useful_widgets` tutorial is like this:
 
 .. demo:: stylizing_widgets/background.py
 

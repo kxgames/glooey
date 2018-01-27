@@ -87,15 +87,16 @@ what to do with them.
 
 Polished implementation
 =======================
-Although the basic implementation does a good job of making labeled checkboxes 
-reusable, there are a few ways it could be idiomatic and user-friendly.  First, 
-it could allow subclasses to control the specific Checkbox and Label widgets 
-that it uses, and the spacing between them.  We can accomplish this by making 
-HBox, Label, and Checkbox inner classes.  Second, it could toggle the checkbox 
-in response to clicks anywhere in the widget.  Third, it could mimic more of 
-the checkbox interface, so users wouldn't need to know about the underlying 
-checkbox.  None of these improvements are really central to the topic of how to 
-make a composite widget, but I think it's worth seeing a more polished widget:
+Although the basic implementation achieves its goal of making labeled 
+checkboxes reusable, there are a few ways it could be more idiomatic and 
+user-friendly.  First, it could allow subclasses to control the specific 
+Checkbox and Label widgets that it uses, and the spacing between them.  We can 
+accomplish this by making HBox, Label, and Checkbox inner classes.  Second, it 
+could toggle the checkbox in response to clicks anywhere in the widget.  Third, 
+it could mimic more of the checkbox interface, so users wouldn't need to know 
+about the underlying checkbox.  None of these improvements are really central 
+to the topic of how to make a composite widget, but I think it's worth seeing a 
+more polished widget:
 
 .. demo:: composing_widgets/polished_labeled_checkbox.py
 
