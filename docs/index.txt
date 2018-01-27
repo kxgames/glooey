@@ -16,6 +16,7 @@
     stylizing_widgets
     padding_alignment_size_hints
     more_useful_widgets
+    mouse_and_keyboard_input
     composing_widgets
     how_it_all_works
     making_widgets_from_scratch

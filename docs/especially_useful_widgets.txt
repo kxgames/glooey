@@ -154,10 +154,11 @@ texture with extra space around the edges.
 
 Button --- react to clicks
 ==========================
-The button widget reacts to being clicked by emitting an ``on_click`` event via 
-the `event framework`__ provided by pyglet.  In this example, we connect the 
-event to a simple handler that just prints a message to stdout.  The event has 
-one argument, which is the widget that generated the event:
+The button widget can display text or an image, and can also have a rollover 
+background.  You can tell when the button has been clicked because it will emit 
+an `on_click` event via the `event framework`__ provided by pyglet.  In this 
+example, we connect the event to a simple handler that just prints a message to 
+stdout.  The event has one argument, which is the widget that generated the it:
 
 .. demo:: especially_useful_widgets/button.py
 
