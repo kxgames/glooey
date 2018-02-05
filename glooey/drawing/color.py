@@ -114,19 +114,25 @@ class Color:
 
 
     def get_red(self):
-        return self._red
+        return self.r
 
     def get_green(self):
-        return self._green
+        return self.g
 
     def get_blue(self):
-        return self._blue
+        return self.b
 
     def get_alpha(self):
-        return self._alpha
+        return self.a
+
+    def get_rgb(self):
+        return self.r, self.g, self.b
+
+    def get_rgba(self):
+        return self.r, self.g, self.b, self.a
 
     def get_tuple(self):
-        return self.r, self.g, self.b, self.a
+        return self.rgba
     
     def get_float(self):
         return (self.r / 255,
@@ -134,23 +140,27 @@ class Color:
                 self.b / 255,
                 self.a / 255)
 
-    def get_rgba(self):
-        return 
 
     def set_red(self, red):
-        self._red = int(min(max(red, 0), 255))
+        self.r = int(min(max(red, 0), 255))
 
     def set_green(self, green):
-        self._green = int(min(max(green, 0), 255))
+        self.g = int(min(max(green, 0), 255))
 
     def set_blue(self, blue):
-        self._blue = int(min(max(blue, 0), 255))
+        self.b = int(min(max(blue, 0), 255))
 
     def set_alpha(self, alpha):
-        self._alpha = int(min(max(alpha, 0), 255))
+        self.a = int(min(max(alpha, 0), 255))
+
+    def set_rgb(self, red, green, blue):
+        self.r, self.g, self.b = red, green, blue
+
+    def set_rgba(self, red, green, blue, alpha):
+        self.r, self.g, self.b, self.a = red, green, blue, alpha
 
     def set_tuple(self, red, green, blue, alpha):
-        self.r, self.g, self.b, self.a = red, green, blue, alpha
+        self.set_rgba(red, green, blue, alpha)
 
     def set_float(self, red, green, blue, alpha):
         self.r = int(255 * red)
