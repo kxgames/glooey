@@ -36,11 +36,11 @@ gui.add(grid)
 def test_mouse_events():
     yield "Move the mouse and make sure the correct events are printed."
 
-    loggers[0].grab_mouse()
+    loggers[0]._grab_mouse()
     yield f"{loggers[0]} should print every event."
-    loggers[0].ungrab_mouse()
+    loggers[0]._ungrab_mouse()
 
-    loggers[1].grab_mouse()
+    loggers[1]._grab_mouse()
     yield f"{loggers[1]} should print every event."
 
     loggers[1].hide()

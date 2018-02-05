@@ -73,8 +73,8 @@ def test_background():
     bg.hide()
     yield "Hide the background."
 
-    bg.unhide()
-    yield "Unhide the background."
+    bg.show()
+    yield "Show the background."
 
     # Make sure tiling scales with size properly.
     vrect = rect.copy()

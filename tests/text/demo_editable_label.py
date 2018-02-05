@@ -6,7 +6,7 @@ import run_demos
 
 class TestOutline(glooey.Frame):
 
-    class Bin(glooey.Bin):
+    class Box(glooey.Bin):
         custom_padding = 2
         custom_width_hint = 200
 

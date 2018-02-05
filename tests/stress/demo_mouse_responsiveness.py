@@ -29,16 +29,18 @@ from pprint import pprint
 
 print(__doc__)
 
-class TestButton(glooey.Clickable):
+UNIT = 5
+
+class TestButton(glooey.Widget):
 
     def __init__(self):
         super().__init__()
         self.rectangle = None
 
     def do_claim(self):
-        return 4, 4
+        return UNIT, UNIT
 
-    def draw(self):
+    def _draw(self):
         if self.rectangle is None:
             self.rectangle = glooey.drawing.Rectangle(
                     rect=self.rect,
@@ -48,13 +50,13 @@ class TestButton(glooey.Clickable):
                     usage='dynamic',
             )
         else:
-            self.rectangle.unhide()
+            self.rectangle.show()
 
-    def undraw(self):
+    def _undraw(self):
         if self.rectangle is not None:
             self.rectangle.hide()
 
-    def on_rollover(self, new_state, old_state):
+    def on_rollover(self, widget, new_state, old_state):
         if new_state == 'base':
             self.rectangle.color = 'green'
         if new_state == 'over':
@@ -68,9 +70,11 @@ window = pyglet.window.Window()
 gui = glooey.Gui(window)
 grid = glooey.Grid()
 
-for i in range(window.height//4):
-    for j in range(window.width//4):
+print()
+for i in range(window.height // UNIT):
+    for j in range(window.width // UNIT):
         grid.add(i, j, TestButton())
+        print(f"\rAdding row [{i+1}/{window.height // UNIT}]", end='')
 
 cursor = pyglet.image.load('assets/misc/cursor_green_circle.png')
 hotspot = 8, 8

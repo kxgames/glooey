@@ -13,19 +13,19 @@ gui = glooey.Gui(window)
 
 @run_demos.on_space(gui) #
 def test_lorem_ipsum():
-    lorem = glooey.LoremIpsum(num_paragraphs=1)
+    lorem = glooey.LoremIpsum(num_paragraphs=1, line_wrap=640)
     gui.clear(); gui.add(lorem)
     yield "Display 1 paragraph of \"lorem ipsum\"."
     
-    lorem = glooey.LoremIpsum(num_paragraphs=2)
+    lorem = glooey.LoremIpsum(num_paragraphs=2, line_wrap=640)
     gui.clear(); gui.add(lorem)
     yield "Display 2 paragraphs of \"lorem ipsum\"."
 
-    lorem = glooey.LoremIpsum(num_sentences=1)
+    lorem = glooey.LoremIpsum(num_sentences=1, line_wrap=640)
     gui.clear(); gui.add(lorem)
     yield "Display 1 sentence of \"lorem ipsum\"."
 
-    lorem = glooey.LoremIpsum(num_sentences=10)
+    lorem = glooey.LoremIpsum(num_sentences=10, line_wrap=640)
     gui.clear(); gui.add(lorem)
     yield "Display 10 sentences of \"lorem ipsum\"."
 

@@ -249,7 +249,7 @@ class Button(glooey.Button):
 
         self.label.color = self.custom_font_color
 
-    def on_rollover(self, new_state, old_state):
+    def on_rollover(self, widget, new_state, old_state):
         if new_state == 'down':
             self.label.top_padding = 2 * 4
         if old_state == 'down':

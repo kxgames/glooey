@@ -22,30 +22,6 @@ class Root(Stack):
 
         window.push_handlers(self)
 
-    @update_function
-    def repack(self):
-        self.claim()
-
-        too_narrow = self.territory.width < self.claimed_width
-        too_short = self.territory.height < self.claimed_height
-
-        # Complain if the root widget needs more space than it claimed.
-        if too_narrow or too_short:
-            message = "{} is only {}x{}, but its children are {}x{}."
-            raise RuntimeError(
-                    message.format(
-                        self,
-                        self.territory.width, self.territory.height,
-                        self.claimed_width, self.claimed_height,
-            ))
-
-        self.resize(self.territory)
-
-    def regroup(self, group):
-        # We need to replace None with an actual group, because glooey 
-        # interprets None as "my parent hasn't given me a group yet."
-        super().regroup(group or pyglet.graphics.Group())
-
     def on_mouse_enter(self, x, y):
         # For some reason, whenever the mouse is clicked, X11 generates a 
         # on_mouse_leave event followed by a on_mouse_enter event.  There's no 
@@ -92,6 +68,30 @@ class Root(Stack):
     @property
     def is_hidden(self):
         return self._is_hidden
+
+    @update_function
+    def _repack(self):
+        self._claim()
+
+        too_narrow = self.territory.width < self.claimed_width
+        too_short = self.territory.height < self.claimed_height
+
+        # Complain if the root widget needs more space than it claimed.
+        if too_narrow or too_short:
+            message = "{} is only {}x{}, but its children are {}x{}."
+            raise RuntimeError(
+                    message.format(
+                        self,
+                        self.territory.width, self.territory.height,
+                        self.claimed_width, self.claimed_height,
+            ))
+
+        self._resize(self.territory)
+
+    def _regroup(self, group):
+        # We need to replace None with an actual group, because glooey 
+        # interprets None as "my parent hasn't given me a group yet."
+        super()._regroup(group or pyglet.graphics.Group())
 
 
 @autoprop
@@ -155,7 +155,6 @@ class PanningGui(Gui):
 
     def do_undraw(self):
         self.cursor.visible = False
-
 
     def on_mouse_press(self, x, y, button, modifiers):
         super().on_mouse_press(self.mouse.x, self.mouse.y, button, modifiers)
@@ -238,7 +237,7 @@ class PanningGui(Gui):
 
         # Update the mouse sprite.
 
-        self.draw()
+        self._draw()
 
     def _start_mouse_pan(self):
         self.shadow_mouse = self.mouse.copy()

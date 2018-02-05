@@ -88,21 +88,21 @@ class Placeholder(Widget):
 
     def set_color(self, new_color):
         self._color = new_color
-        self.draw()
+        self._draw()
 
     def get_min_width(self):
         return self._min_width
 
     def set_min_width(self, new_width):
         self._min_width = new_width
-        self.repack()
+        self._repack()
 
     def get_min_height(self):
         return self._min_height
 
     def set_min_height(self, new_height):
         self._min_height = new_height
-        self.repack()
+        self._repack()
 
 
 @autoprop
@@ -196,8 +196,8 @@ class FillBar(Widget):
         self._fill_group = drawing.ScissorGroup(parent=fill_layer)
         self._update_fill()
 
-        self._base.regroup(base_layer)
-        self._fill.regroup(self._fill_group)
+        self._base._regroup(base_layer)
+        self._fill._regroup(self._fill_group)
 
     def do_draw(self):
         self._update_fill()

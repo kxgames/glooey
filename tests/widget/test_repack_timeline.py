@@ -7,25 +7,25 @@ TIMELINE = []
 
 class RepackObserver:
 
-    def repack(self):
-        TIMELINE.append(self.repack)
-        return super().repack()
+    def _repack(self):
+        TIMELINE.append(self._repack)
+        return super()._repack()
 
-    def claim(self):
-        TIMELINE.append(self.claim)
-        return super().claim()
+    def _claim(self):
+        TIMELINE.append(self._claim)
+        return super()._claim()
 
-    def realign(self):
-        TIMELINE.append(self.realign)
-        return super().realign()
+    def _realign(self):
+        TIMELINE.append(self._realign)
+        return super()._realign()
 
-    def regroup(self, new_group):
-        TIMELINE.append(self.regroup)
-        return super().regroup(new_group)
+    def _regroup(self, new_group):
+        TIMELINE.append(self._regroup)
+        return super()._regroup(new_group)
 
-    def draw(self):
-        TIMELINE.append(self.draw)
-        return super().draw()
+    def _draw(self):
+        TIMELINE.append(self._draw)
+        return super()._draw()
 
 
 class DummyWindow:
@@ -78,20 +78,20 @@ def test_add_bin_to_gui(dummy_widgets):
     gui.add(bin)
     assert TIMELINE == [
             gui.add,
-            gui.repack,
-            gui.claim,
-              bin.claim,
-                widget.claim,
-            gui.realign,
-              bin.realign,
-                widget.realign,
-                widget.draw,
-              bin.draw,
-            gui.draw,
-              bin.regroup,
-                widget.regroup,
-                widget.draw,
-              bin.draw,
+            gui._repack,
+            gui._claim,
+              bin._claim,
+                widget._claim,
+            gui._realign,
+            gui._draw,
+              bin._realign,
+              bin._draw,
+                widget._realign,
+                widget._draw,
+              bin._regroup,
+              bin._draw,
+                widget._regroup,
+                widget._draw,
     ]
 
 def test_repack_gui(dummy_widgets):
@@ -99,18 +99,18 @@ def test_repack_gui(dummy_widgets):
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    gui.repack()
+    gui._repack()
     assert TIMELINE == [
-            gui.repack,
-            gui.claim,
-              bin.claim,
-                widget.claim,
-            gui.realign,
-              bin.realign,
-                widget.realign,
-                widget.draw,
-              bin.draw,
-            gui.draw,
+            gui._repack,
+            gui._claim,
+              bin._claim,
+                widget._claim,
+            gui._realign,
+            gui._draw,
+              bin._realign,
+              bin._draw,
+                widget._realign,
+                widget._draw,
     ]
 
 def test_repack_bin(dummy_widgets):
@@ -118,15 +118,15 @@ def test_repack_bin(dummy_widgets):
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    bin.repack()
+    bin._repack()
     assert TIMELINE == [
-            bin.repack,
-            bin.claim,
-              widget.claim,
-            bin.realign,
-              widget.realign,
-              widget.draw,
-            bin.draw,
+            bin._repack,
+            bin._claim,
+              widget._claim,
+            bin._realign,
+            bin._draw,
+              widget._realign,
+              widget._draw,
     ]
     
 def test_repack_widget(dummy_widgets):
@@ -134,28 +134,28 @@ def test_repack_widget(dummy_widgets):
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    widget.repack()
+    widget._repack()
     from pprint import pprint
     pprint(TIMELINE)
     assert TIMELINE == [
-            widget.repack,
-            widget.claim,
-            widget.realign,
-            widget.draw,
+            widget._repack,
+            widget._claim,
+            widget._realign,
+            widget._draw,
     ]
 def test_regroup_gui(dummy_widgets):
     gui, bin, widget = dummy_widgets
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    gui.regroup(None)
+    gui._regroup(None)
     assert TIMELINE == [
-            gui.regroup,
-              bin.regroup,
-                widget.regroup,
-                widget.draw,
-              bin.draw,
-            gui.draw,
+            gui._regroup,
+            gui._draw,
+              bin._regroup,
+              bin._draw,
+                widget._regroup,
+                widget._draw,
     ]
 
 def test_regroup_bin(dummy_widgets):
@@ -163,12 +163,12 @@ def test_regroup_bin(dummy_widgets):
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    bin.regroup(None)
+    bin._regroup(None)
     assert TIMELINE == [
-            bin.regroup,
-              widget.regroup,
-              widget.draw,
-            bin.draw,
+            bin._regroup,
+            bin._draw,
+              widget._regroup,
+              widget._draw,
     ]
 
 def test_regroup_widget(dummy_widgets):
@@ -176,9 +176,9 @@ def test_regroup_widget(dummy_widgets):
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    widget.regroup(None)
+    widget._regroup(None)
     assert TIMELINE == [
-            widget.regroup,
-            widget.draw,
+            widget._regroup,
+            widget._draw,
     ]
 

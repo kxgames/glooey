@@ -90,12 +90,12 @@ class Mover(Bin):
         # This simplifies the offset calculations, relative to having the 
         # child's rectangle where the parent's is.
         child_rect = Rect.from_size(child_width, child_height)
-        self.child.resize(child_rect)
+        self.child._resize(child_rect)
         self._keep_child_in_rect()
 
     def do_regroup_children(self):
         self._translate_group = self.TranslateGroup(self, self.group)
-        self.child.regroup(self._translate_group)
+        self.child._regroup(self._translate_group)
 
     def on_detach_child(self, parent, child):
         self._child_position = Vector.null()
@@ -156,14 +156,14 @@ class Mover(Bin):
 
     def set_expand_horz(self, new_bool):
         self._expand_horz = new_bool
-        self.repack()
+        self._repack()
 
     def get_expand_vert(self):
         return self._expand_vert
 
     def set_expand_vert(self, new_bool):
         self._expand_vert = new_bool
-        self.repack()
+        self._repack()
 
     @vecrec.accept_anything_as_vector
     def pixels_to_percent(self, pixels):
@@ -336,11 +336,11 @@ class ScrollPane(Widget):
 
         mover_rect.center = self.rect.center
 
-        self._mover.resize(mover_rect)
+        self._mover._resize(mover_rect)
 
     def do_regroup_children(self):
         self._scissor_group = drawing.ScissorGroup(self.rect, self.group)
-        self._mover.regroup(self._scissor_group)
+        self._mover._regroup(self._scissor_group)
 
     def on_translate(self, mover):
         self.dispatch_event('on_scroll', self)
@@ -397,7 +397,7 @@ class ScrollPane(Widget):
     def set_horz_scrolling(self, new_bool):
         # This is a bit of a hack.  See get_horz_scrolling() for more info.
         self._mover.expand_horz = not new_bool
-        self.repack()
+        self._repack()
 
     def get_vert_scrolling(self):
         # This is a bit of a hack.  See get_horz_scrolling() for more info.
@@ -406,7 +406,7 @@ class ScrollPane(Widget):
     def set_vert_scrolling(self, new_bool):
         # This is a bit of a hack.  See get_horz_scrolling() for more info.
         self._mover.expand_vert = not new_bool
-        self.repack()
+        self._repack()
 
     def _require_rects(self):
         if self.child is None:
@@ -445,7 +445,7 @@ class ScrollGripMixin:
 
     def on_mouse_press(self, x, y, button, modifiers):
         super().on_mouse_press(x, y, button, modifiers)
-        self.grab_mouse()
+        self._grab_mouse()
         self.reference_point = Vector(x, y)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
@@ -458,7 +458,7 @@ class ScrollGripMixin:
         
     def on_mouse_release(self, x, y, button, modifiers):
         super().on_mouse_release(x, y, button, modifiers)
-        self.ungrab_mouse()
+        self._ungrab_mouse()
 
     def on_scroll(self, pane):
         self.mover.jump_percent(pane.position_percent)
@@ -493,7 +493,7 @@ class HVScrollBar(Frame):
             self._hvbox.add(self._backward, 0)
 
         self._mover = Mover()
-        self._mover.push_handlers(on_mouse_press=self.on_click)
+        self._mover.push_handlers(on_mouse_press=self.on_bar_click)
         self._grip = self.Grip(self._mover, self._pane)
         self._mover.add(self._grip)
         self._hvbox.add(self._mover)
@@ -505,7 +505,7 @@ class HVScrollBar(Frame):
 
         self.add(self._hvbox)
 
-    def on_click(self, x, y, button, modifiers):
+    def on_bar_click(self, x, y, button, modifiers):
         x, y = self._mover.screen_to_child_coords(x,y)
 
         # Ignore the click if it's on the grip.

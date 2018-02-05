@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import time
 import pyglet
 import autoprop
@@ -31,7 +33,7 @@ class EventDispatcher(pyglet.event.EventDispatcher):
         if not any(self.__yield_handlers(event_type)):
             return
 
-        def on_time_interval(dt):
+        def on_time_interval(dt): #
             self.dispatch_event(event_type, *args, dt)
 
         pyglet.clock.schedule_interval(on_time_interval, dt)
@@ -71,7 +73,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     custom_width_hint = None
     custom_height_hint = None
 
-    custom_propogate_mouse_events = True
+    custom_propagate_mouse_events = True
 
     def __init__(self):
         EventDispatcher.__init__(self)
@@ -128,7 +130,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self._is_enabled = True
 
         # Attribute controlling mouse events.
-        self._propogate_mouse_events = self.custom_propogate_mouse_events
+        self._propagate_mouse_events = self.custom_propagate_mouse_events
 
         # Attributes for keeping track of the mouse-event related information, 
         # e.g. the rollover state and the double-click timer.
@@ -137,7 +139,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self._double_click_timer = 0
 
         # Take care to avoid calling any potentially polymorphic methods, such 
-        # as set_padding() or repack().  When these methods are overridden, 
+        # as set_padding() or _repack().  When these methods are overridden, 
         # they often become dependent on the overriding subclass being properly
         # initialized.  Since that hasn't happened by the time this constructor 
         # is called, these polymorphic methods can cause headaches.
@@ -178,158 +180,17 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def __contains__(self, child):
         return child in self.__children
 
-    @update_function
-    def repack(self):
-        if not self.is_attached_to_gui:
-            return
-
-        has_claim_changed = self.claim()
-
-        # If the widget is a different size than it used to be, give its parent 
-        # a chance to repack it.
-        if has_claim_changed:
-            self._is_claim_stale = False
-            self.parent.repack()
-            self._is_claim_stale = True
-
-        # Otherwise, stop recursing and resize the widget's children.
-        else:
-            self.realign()
-
-    def claim(self):
-        """
-        Update ``self._claimed_width`` and ``self._claimed_height``, and return 
-        whether or not the claim has changed since the last repack.
-        """
-        # Only calculate the claim once during each repack.
-        if not self._is_claim_stale:
-            return False
-
-        # Have each child widget claim space for itself, so this widget can 
-        # take those space requirements into account.
-        for child in self.__children:
-            child.claim()
-
-        # Make note of the previous claim, so we can say whether or not it has 
-        # changed.
-        previous_claim = self._claimed_width, self._claimed_height
-
-        # Keep track of the amount of space the widget needs for itself (min_*) 
-        # and for itself in addition to its padding (claimed_*).
-        min_width, min_height = self.do_claim()
-
-        self._min_width = max(min_width, self._width_hint)
-        self._min_height = max(min_height, self._height_hint)
-
-        horz_padding = self._left_padding + self._right_padding
-        vert_padding = self._top_padding + self._bottom_padding
-
-        self._claimed_width = self._min_width + horz_padding
-        self._claimed_height = self._min_height + vert_padding
-
-        # Return whether or not the claim has changed since the last repack.  
-        # This determines whether the widget's parent needs to be repacked.
-        return previous_claim != (self._claimed_width, self._claimed_height)
-
-    def resize(self, new_rect):
-        """
-        Change the size or shape of this widget.
-
-        This method is triggered by repack(), which recursively climbs the 
-        widget hierarchy to make space for the widgets that need it, then calls 
-        resize() on any widget that need to adapt to the new space allocation.
-
-        This method should not be called outside of a repack, because it 
-        assumes that the claims have already been updated.
-        """
-
-        # Make sure the new size is still at least as big as the widget's 
-        # claim.  Round down all the sizes when doing this comparison, because 
-        # the new rect may also be rounded down.
-        if int(new_rect.width) < int(self.claimed_width):
-            raise UsageError(f"cannot assign {self} a smaller width ({new_rect.width} px) than it claimed ({self.claimed_width} px).")
-        if int(new_rect.height) < int(self.claimed_height):
-            raise UsageError(f"cannot assign {self} a smaller height ({new_rect.height} px) than it claimed ({self.claimed_height} px).")
-
-        self._assigned_rect = new_rect
-        self.realign()
-
-    def realign(self):
-        # This method should not be called outside of a repack, because it 
-        # assumes that the claims have already been updated.
-
-        # Subtract padding from the full amount of space assigned to this 
-        # widget.
-        padded_rect = self._assigned_rect.copy()
-        padded_rect.left += self.left_padding
-        padded_rect.bottom += self.bottom_padding
-        padded_rect.width -= self.total_horz_padding
-        padded_rect.height -= self.total_vert_padding
-
-        # Align this widget within the space available to it (i.e. the assigned 
-        # space minus the padding).
-        content_rect = Rect.from_size(self._min_width, self._min_height)
-        drawing.align(self._alignment, content_rect, padded_rect)
-
-        # Round the rectangle to the nearest integer pixel, because sometimes 
-        # images can't line up right (e.g. in Background widgets) if the widget 
-        # has fractional coordinates.
-        content_rect.round()
-
-        # Guarantee that do_resize() is only called if the size of the widget 
-        # actually changed.  This is probably doesn't have a significant effect 
-        # on performance, but hopefully it gives people reimplementing 
-        # do_resize() less to worry about.
-        if self._rect is None or self._rect != content_rect:
-            self._rect = content_rect
-            self._padded_rect = content_rect.copy()
-            self._padded_rect.left -= self.left_padding
-            self._padded_rect.bottom -= self.bottom_padding
-            self._padded_rect.width += self.total_horz_padding
-            self._padded_rect.height += self.total_vert_padding
-            self.do_resize()
-
-        # The children may need to be resized even if this widget doesn't.  For 
-        # example, consider a container that takes up the whole window.  It's 
-        # size won't change when a widget is added or removed from it, but it's 
-        # children will still need to be resized.
-        if self._num_children > 0:
-            self.do_resize_children()
-
-        # Try to redraw the widget.  This won't do anything if the widget isn't 
-        # ready to draw.
-        self.draw()
-
-    def regroup(self, new_group):
-        """
-        Change the pyglet graphics group associated with this widget.
-        """
-        # Changing the group is often an expensive operation, so don't do 
-        # anything unless we have to.  It is assumed that do_regroup_children() 
-        # depends only of self._group, so if self._group doesn't change, 
-        # self.do_regroup_children() doesn't need to be called.
-        if self._group is None or self._group != new_group:
-            self._group = new_group
-            self.do_regroup()
-
-            if self._num_children > 0:
-                self.do_regroup_children()
-
-        # Try to redraw the widget.  This won't do anything if the widget 
-        # isn't ready to draw.
-        self.draw()
-
     def hide(self):
         if self.is_visible:
-            self.ungrab_mouse()
-            self.undraw()
+            self._ungrab_mouse()
+            self._undraw()
         self._is_hidden = True
         self._hide_children()
 
     def unhide(self, draw=True):
         self._is_hidden = False
         if self.is_visible and draw:
-            self.draw()
+            self._draw()
         self._unhide_children(draw)
 
     def enable(self):
@@ -339,46 +200,6 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def disable(self):
         self._is_enabled = False
         self.dispatch_event('on_disable', self)
-
-    def draw(self):
-        """
-        In order for a widget to be drawn, four conditions need to be met:
-
-        1. The widget must be connected to the root of the widget hierarchy.  
-           Widgets get their pyglet batch object from the root widget, so 
-           without this connection they cannot be drawn.
-
-        2. The widget must have a size specified by its ``rect`` attribute.  
-           This attribute is set when the widget is attached to the hierarchy 
-           and its parent calls its ``resize()`` method.
-
-        3. The widget must be associated with a pyglet graphics group, which 
-           controls things like how the widget will be stacked or scrolled.  A 
-           group is set when the widget is attached to the hierarchy and its 
-           parent calls its ``regroup()`` method.
-
-        4. The widget must not be hidden.
-        """
-        if self.root is None: return
-        if self.rect is None: return
-        if self.group is None: return
-        if self.is_hidden: return
-
-        self.do_draw()
-
-    def draw_all(self):
-        self.draw()
-        for child in self.__children:
-            child.draw_all()
-
-    def undraw(self):
-        self.do_undraw()
-
-    def undraw_all(self):
-        self.undraw()
-
-        for child in self.__children:
-            child.undraw_all()
 
     def do_attach(self):
         """
@@ -428,7 +249,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         drawn and may be called after it's been undrawn, so any vertex lists 
         created in the draw function may or may not exist yet/anymore.  If 
         those vertex lists don't exist yet, there's nothing this function needs 
-        to do.  The ``draw()`` function will be called when the widget's ready 
+        to do.  The ``_draw()`` function will be called when the widget's ready 
         to draw, and at that point the vertex lists should be created with the 
         right size and shape.
         """
@@ -442,10 +263,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         This method is called when the widget's own size is changed or when 
         children are attached to or detached from the widget.  A typical 
         implementation would iterate through all the children attached to the 
-        widget and call ``resize()`` on each one.
+        widget and call ``_resize()`` on each one.
         """
         for child in self.__children:
-            child.resize(self.rect)
+            child._resize(self.rect)
 
     def do_regroup(self):
         """
@@ -474,10 +295,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         may be called after it's been undrawn, so any vertex lists created in 
         the draw function may or may not exist yet/anymore.  If those vertex 
         lists don't exist yet, there's nothing this function needs to do.  The 
-        ``draw()`` function will be called when the widget's ready to draw, and 
+        ``_draw()`` function will be called when the widget's ready to draw, and 
         at that point the vertex lists should be created with the right group.
         """
-        self.undraw()
+        self._undraw()
 
     def do_regroup_children(self):
         """
@@ -487,17 +308,17 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         This method is called when the widget's own group is changed or when 
         children are attached to or detached from the widget.  A typical 
         implementation would iterate through all the children attached to the 
-        widget and call ``regroup()`` on each one.  The default implementation 
+        widget and call ``_regroup()`` on each one.  The default implementation 
         puts all the children in the same group as the widget itself.
         """
         for child in self.__children:
-            child.regroup(self.group)
+            child._regroup(self.group)
 
     def do_draw(self):
         """
         Draw any shapes or images associated with this widget.
 
-        This method is called by ``draw()`` after it checks to make sure the 
+        This method is called by ``_draw()`` after it checks to make sure the 
         widget is attached to the root of the GUI hierarchy and that the 
         ``rect``, ``group``, and ``batch`` attributes have all been set.  
 
@@ -509,7 +330,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     def do_undraw(self):
         """
-        This method may be called before draw().
+        This method may be called before _draw().
         """
         pass
 
@@ -526,7 +347,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Propagate the "on_mouse_press" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.current:
                 child.dispatch_event('on_mouse_press', x, y, button, modifiers)
 
@@ -541,7 +362,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Propagate the "on_mouse_release" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.current:
                 child.dispatch_event('on_mouse_release', x, y, button, modifiers)
 
@@ -569,7 +390,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def on_mouse_motion(self, x, y, dx, dy):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.exited:
                 child.dispatch_event('on_mouse_leave', x, y)
 
@@ -583,7 +404,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Propagate the "on_mouse_enter" event to the relevant children.
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.entered:
                 child.dispatch_event('on_mouse_enter', x, y)
 
@@ -599,7 +420,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # no children were under the mouse here, but it's not.)
         children_under_mouse = self._find_children_under_mouse_after_leave()
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.exited:
                 child.dispatch_event('on_mouse_leave', x, y)
 
@@ -613,7 +434,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.exited:
                 child.dispatch_event('on_mouse_drag_leave', x, y)
 
@@ -626,7 +447,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def on_mouse_drag_enter(self, x, y):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.entered:
                 child.dispatch_event('on_mouse_drag_enter', x, y)
 
@@ -637,7 +458,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # mouse leaves the window.
         children_under_mouse = self._find_children_under_mouse_after_leave()
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.exited:
                 child.dispatch_event('on_mouse_drag_leave', x, y)
 
@@ -652,28 +473,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         children_under_mouse = self._find_children_under_mouse(x, y)
 
-        if self.propogate_mouse_events:
+        if self.propagate_mouse_events:
             for child in children_under_mouse.current:
                 child.dispatch_event('on_mouse_scroll', x, y, scroll_x, scroll_y)
-
-    def grab_mouse(self):
-        if self.parent is self:
-            return
-
-        if self.parent._mouse_grabber is not None:
-            grabber = self.root._find_mouse_grabber()
-            raise UsageError(f"{grabber} is already grabbing the mouse, {self} can't grab it.")
-
-        self.parent._mouse_grabber = self
-        self.parent.grab_mouse()
-
-    def ungrab_mouse(self):
-        if self.parent is None: return
-        if self.parent is self: return
-
-        if self.parent._mouse_grabber is self:
-            self.parent._mouse_grabber = None
-            self.parent.ungrab_mouse()
 
     def get_parent(self):
         return self._parent
@@ -699,7 +501,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def set_size_hint(self, new_width, new_height):
         self._width_hint = new_width
         self._height_hint = new_height
-        self.repack()
+        self._repack()
 
     size_hint = property(
             get_size_hint, lambda self, size: self.set_size_hint(*size))
@@ -709,14 +511,14 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     def set_width_hint(self, new_width):
         self._width_hint = new_width
-        self.repack()
+        self._repack()
 
     def get_height_hint(self):
         return self._height_hint
 
     def set_height_hint(self, new_height):
         self._height_hint = new_height
-        self.repack()
+        self._repack()
 
     def get_claimed_rect(self):
         return Rect.from_size(self._claimed_width, self._claimed_height)
@@ -740,7 +542,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def set_padding(self, all=None, *, horz=None, vert=None,
             left=None, right=None, top=None, bottom=None):
         self._set_padding(all, horz, vert, left, right, top, bottom)
-        self.repack()
+        self._repack()
 
     padding = late_binding_property(get_padding, set_padding)
 
@@ -750,7 +552,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def set_horz_padding(self, new_padding):
         self._left_padding = new_padding
         self._right_padding = new_padding
-        self.repack()
+        self._repack()
 
     def get_vert_padding(self):
         return self._top_padding, self._bottom_padding
@@ -758,35 +560,35 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def set_vert_padding(self, new_padding):
         self._top_padding = new_padding
         self._bottom_padding = new_padding
-        self.repack()
+        self._repack()
 
     def get_left_padding(self):
         return self._left_padding
 
     def set_left_padding(self, new_padding):
         self._left_padding = new_padding
-        self.repack()
+        self._repack()
 
     def get_right_padding(self):
         return self._right_padding
 
     def set_right_padding(self, new_padding):
         self._right_padding = new_padding
-        self.repack()
+        self._repack()
 
     def get_top_padding(self):
         return self._top_padding
 
     def set_top_padding(self, new_padding):
         self._top_padding = new_padding
-        self.repack()
+        self._repack()
 
     def get_bottom_padding(self):
         return self._bottom_padding
 
     def set_bottom_padding(self, new_padding):
         self._bottom_padding = new_padding
-        self.repack()
+        self._repack()
 
     def get_total_padding(self):
         return self.total_horz_padding, self.total_vert_padding
@@ -802,7 +604,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     def set_alignment(self, new_alignment):
         self._alignment = new_alignment
-        self.repack()
+        self._repack()
 
     def get_rollover_state(self):
         return self._rollover_state
@@ -810,11 +612,11 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     def get_last_rollover_state(self):
         return self._last_rollover_state
 
-    def get_propogate_mouse_events(self):
-        return self._propogate_mouse_events
+    def get_propagate_mouse_events(self):
+        return self._propagate_mouse_events
 
-    def set_propogate_mouse_events(self, new_setting):
-        self._propogate_mouse_events = new_setting
+    def set_propagate_mouse_events(self, new_setting):
+        self._propagate_mouse_events = new_setting
 
     @property
     def is_hidden(self):
@@ -856,7 +658,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         if not self.is_attached_to_gui:
 
-            def find_unattached_parent(widget, level=0):
+            def find_unattached_parent(widget, level=0): #
                 if widget.parent is None: return widget, level
                 if widget.parent is self.root: return widget, level
                 else: return find_unattached_parent(widget.parent, level + 1)
@@ -889,7 +691,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
             if self.is_hidden:
 
-                def find_hidden_parent(widget, level=0):
+                def find_hidden_parent(widget, level=0): #
                     if widget._hidden: return widget, level
                     else: return find_hidden_parent(widget.parent, level + 1)
 
@@ -907,7 +709,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         # Print out the diagnoses.
 
-        def join(items, sep):
+        def join(items, sep): #
             for i, item in enumerate(items):
                 if i < len(items) - 1:
                     yield item, sep
@@ -945,6 +747,178 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             batch=self.batch,
             group=pyglet.graphics.OrderedGroup(3, layer),
         )
+
+    @update_function
+    def _repack(self):
+        if not self.is_attached_to_gui:
+            return
+
+        has_claim_changed = self._claim()
+
+        # If the widget is a different size than it used to be, give its parent 
+        # a chance to repack it.
+        if has_claim_changed:
+            self._is_claim_stale = False
+            self.parent._repack()
+            self._is_claim_stale = True
+
+        # Otherwise, stop recursing and resize the widget's children.
+        else:
+            self._realign()
+
+    def _claim(self):
+        """
+        Update ``self._claimed_width`` and ``self._claimed_height``, and return 
+        whether or not the claim has changed since the last repack.
+        """
+        # Only calculate the claim once during each repack.
+        if not self._is_claim_stale:
+            return False
+
+        # Have each child widget claim space for itself, so this widget can 
+        # take those space requirements into account.
+        for child in self.__children:
+            child._claim()
+
+        # Make note of the previous claim, so we can say whether or not it has 
+        # changed.
+        previous_claim = self._claimed_width, self._claimed_height
+
+        # Keep track of the amount of space the widget needs for itself (min_*) 
+        # and for itself in addition to its padding (claimed_*).
+        min_width, min_height = self.do_claim()
+
+        self._min_width = max(min_width, self._width_hint)
+        self._min_height = max(min_height, self._height_hint)
+
+        horz_padding = self._left_padding + self._right_padding
+        vert_padding = self._top_padding + self._bottom_padding
+
+        self._claimed_width = self._min_width + horz_padding
+        self._claimed_height = self._min_height + vert_padding
+
+        # Return whether or not the claim has changed since the last repack.  
+        # This determines whether the widget's parent needs to be repacked.
+        return previous_claim != (self._claimed_width, self._claimed_height)
+
+    def _resize(self, new_rect):
+        """
+        Change the size or shape of this widget.
+
+        This method is triggered by _repack(), which recursively climbs the 
+        widget hierarchy to make space for the widgets that need it, then calls 
+        _resize() on any widget that need to adapt to the new space allocation.
+
+        This method should not be called outside of a repack, because it 
+        assumes that the claims have already been updated.
+        """
+
+        # Make sure the new size is still at least as big as the widget's 
+        # claim.  Round down all the sizes when doing this comparison, because 
+        # the new rect may also be rounded down.
+        if int(new_rect.width) < int(self.claimed_width):
+            raise UsageError(f"cannot assign {self} a smaller width ({new_rect.width} px) than it claimed ({self.claimed_width} px).")
+        if int(new_rect.height) < int(self.claimed_height):
+            raise UsageError(f"cannot assign {self} a smaller height ({new_rect.height} px) than it claimed ({self.claimed_height} px).")
+
+        self._assigned_rect = new_rect
+        self._realign()
+
+    def _realign(self):
+        # This method should not be called outside of a repack, because it 
+        # assumes that the claims have already been updated.
+
+        # Subtract padding from the full amount of space assigned to this 
+        # widget.
+        padded_rect = self._assigned_rect.copy()
+        padded_rect.left += self.left_padding
+        padded_rect.bottom += self.bottom_padding
+        padded_rect.width -= self.total_horz_padding
+        padded_rect.height -= self.total_vert_padding
+
+        # Align this widget within the space available to it (i.e. the assigned 
+        # space minus the padding).
+        content_rect = Rect.from_size(self._min_width, self._min_height)
+        drawing.align(self._alignment, content_rect, padded_rect)
+
+        # Round the rectangle to the nearest integer pixel, because sometimes 
+        # images can't line up right (e.g. in Background widgets) if the widget 
+        # has fractional coordinates.
+        content_rect.round()
+
+        # Guarantee that do_resize() is only called if the size of the widget 
+        # actually changed.  This is probably doesn't have a significant effect 
+        # on performance, but hopefully it gives people reimplementing 
+        # do_resize() less to worry about.
+        if self._rect is None or self._rect != content_rect:
+            self._rect = content_rect
+            self._padded_rect = content_rect.copy()
+            self._padded_rect.left -= self.left_padding
+            self._padded_rect.bottom -= self.bottom_padding
+            self._padded_rect.width += self.total_horz_padding
+            self._padded_rect.height += self.total_vert_padding
+            self.do_resize()
+
+        # Try to redraw the widget.  This won't do anything if the widget isn't 
+        # ready to draw.
+        self._draw()
+
+        # The children may need to be resized even if this widget doesn't.  For 
+        # example, consider a container that takes up the whole window.  It's 
+        # size won't change when a widget is added or removed from it, but it's 
+        # children will still need to be resized.
+        if self._num_children > 0:
+            self.do_resize_children()
+
+    def _regroup(self, new_group):
+        """
+        Change the pyglet graphics group associated with this widget.
+        """
+        # Changing the group is often an expensive operation, so don't do 
+        # anything unless we have to.  It is assumed that do_regroup_children() 
+        # depends only on self._group, so if self._group doesn't change, 
+        # self.do_regroup_children() doesn't need to be called.
+        if self._group is None or self._group != new_group:
+            self._group = new_group
+            self.do_regroup()
+
+            # Try to redraw the widget.  This won't do anything if the widget 
+            # isn't ready to draw.
+            self._draw()
+
+            if self._num_children > 0:
+                self.do_regroup_children()
+
+    @update_function
+    def _repack_and_regroup_children(self):
+        """
+        Resize and regroup the children of this widget if this widget is 
+        already attached to the GUI.  Otherwise, don't do anything.
+
+        Container widgets should call this method whenever a new child widget 
+        is attached.  
+
+        Before a widget is attached to the GUI, it can't have a size or a group 
+        because these attributes derive from a parent widget.  If any children 
+        are attached to the widget at this point, they cannot be given sizes or 
+        groups for the same reason.  Once the widget is attached to the GUI, it 
+        will be given a size and a group by its parent, then it will give sizes 
+        and groups to the children already attached to it.  If any children are 
+        attached after this point, they should be given a size and group right 
+        away.
+
+        Note that what happens when a child widget is attached to its parent 
+        depends on whether the parent is already attached to the GUI or not.  
+        If it is, the child is resized and regrouped (other children may be 
+        resized and regrouped at the same time).  Otherwise, nothing happens.  
+        This method handles this logic.  As long as container subclasses call 
+        this method each time a child is added or removed, their children will 
+        be properly sized and grouped no matter when they were attached.
+        """
+        if self.is_attached_to_gui:
+            self._repack()
+            if self._num_children > 0:
+                self.do_regroup_children()
 
     def _attach_child(self, child):
         """
@@ -1001,8 +975,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         for widget in child._yield_self_and_all_children():
             widget.do_detach()
             widget.dispatch_event('on_detach', widget)
-            widget.ungrab_mouse()
-            widget.undraw()
+            widget._ungrab_mouse()
+            widget._undraw()
             widget._root = None
 
         self.__children.discard(child)
@@ -1022,53 +996,76 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         return child
 
     @update_function
-    def _repack_and_regroup_children(self):
+    def _draw(self):
         """
-        Resize and regroup the children of this widget if this widget is 
-        already attached to the GUI.  Otherwise, don't do anything.
+        In order for a widget to be drawn, four conditions need to be met:
 
-        Container widgets should call this method whenever a new child widget 
-        is attached.  
+        1. The widget must be connected to the root of the widget hierarchy.  
+           Widgets get their pyglet batch object from the root widget, so 
+           without this connection they cannot be drawn.
 
-        Before a widget is attached to the GUI, it can't have a size or a group 
-        because these attributes derive from a parent widget.  If any children 
-        are attached to the widget at this point, they cannot be given sizes or 
-        groups for the same reason.  Once the widget is attached to the GUI, it 
-        will be given a size and a group by its parent, then it will give sizes 
-        and groups to the children already attached to it.  If any children are 
-        attached after this point, they should be given a size and group right 
-        away.
+        2. The widget must have a size specified by its ``rect`` attribute.  
+           This attribute is set when the widget is attached to the hierarchy 
+           and its parent calls its ``_resize()`` method.
 
-        Note that what happens when a child widget is attached to its parent 
-        depends on whether the parent is already attached to the GUI or not.  
-        If it is, the child is resized and regrouped (other children may be 
-        resized and regrouped at the same time).  Otherwise, nothing happens.  
-        This method handles this logic.  As long as container subclasses call 
-        this method each time a child is added or removed, their children will 
-        be properly sized and grouped no matter when they were attached.
+        3. The widget must be associated with a pyglet graphics group, which 
+           controls things like how the widget will be stacked or scrolled.  A 
+           group is set when the widget is attached to the hierarchy and its 
+           parent calls its ``_regroup()`` method.
+
+        4. The widget must not be hidden.
         """
-        if self.is_attached_to_gui:
-            self.repack()
-            if self._num_children > 0:
-                self.do_regroup_children()
+        if self.root is None: return
+        if self.rect is None: return
+        if self.group is None: return
+        if self.is_hidden: return
 
-    def _dispatch_rollover_event(self):
-        if self._rollover_state != self._last_rollover_state:
-            self.dispatch_event('on_rollover',
-                    self, self._rollover_state, self._last_rollover_state)
-            self._last_rollover_state = self._rollover_state
+        self.do_draw()
+
+    def _draw_all(self):
+        self._draw()
+        for child in self.__children:
+            child._draw_all()
+
+    def _undraw(self):
+        self.do_undraw()
+
+    def _undraw_all(self):
+        self._undraw()
+
+        for child in self.__children:
+            child._undraw_all()
+
+    def _grab_mouse(self):
+        if self.parent is self:
+            return
+
+        if self.parent._mouse_grabber is not None:
+            grabber = self.root._find_mouse_grabber()
+            raise UsageError(f"{grabber} is already grabbing the mouse, {self} can't grab it.")
+
+        self.parent._mouse_grabber = self
+        self.parent._grab_mouse()
+
+    def _ungrab_mouse(self):
+        if self.parent is None: return
+        if self.parent is self: return
+
+        if self.parent._mouse_grabber is self:
+            self.parent._mouse_grabber = None
+            self.parent._ungrab_mouse()
 
     def _hide_children(self):
         for child in self._yield_all_children():
             if child.is_visible:
-                child.ungrab_mouse()
-                child.undraw()
+                child._ungrab_mouse()
+                child._undraw()
 
             child._is_parent_hidden = True
 
     def _unhide_children(self, draw=True):
 
-        def unhide_child(child):
+        def unhide_child(child): #
             # Indicate that this child's parent is no longer hidden.
             child._is_parent_hidden = False
 
@@ -1077,7 +1074,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
                 # Draw the widget unless the caller asked not to.
                 if draw:
-                    child.draw()
+                    child._draw()
 
                 # Recursively unhide the child's children.
                 for grandchild in child.__children:
@@ -1138,6 +1135,12 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         return recursive_find(self)
 
+    def _dispatch_rollover_event(self):
+        if self._rollover_state != self._last_rollover_state:
+            self.dispatch_event('on_rollover',
+                    self, self._rollover_state, self._last_rollover_state)
+            self._last_rollover_state = self._rollover_state
+
     def _get_num_children(self):
         return len(self.__children)
 
@@ -1160,8 +1163,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     class _ChildrenUnderMouse:
 
         def __init__(self, previous, current):
-            self._previous = previous
-            self._current = current
+            self._previous = set(previous)
+            self._current = set(current)
 
         @property
         def previous(self):

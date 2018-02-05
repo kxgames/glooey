@@ -257,7 +257,7 @@ class Label(Widget):
 
     def enable_line_wrap(self, width):
         self._line_wrap_width = width
-        self.repack()
+        self._repack()
 
     def disable_line_wrap(self):
         self.enable_line_wrap(0)
@@ -296,7 +296,7 @@ class Label(Widget):
             else:
                 self._style['underline'] = self.color
 
-        self.repack()
+        self._repack()
 
 
 Label.register_event_type('on_edit_text')
@@ -407,14 +407,14 @@ class EditableLabel(Label):
 
     def set_selection_color(self, new_color):
         self._selection_color = new_color
-        self.draw()
+        self._draw()
 
     def get_selection_background_color(self):
         return self._selection_background_color
 
     def set_selection_background_color(self, new_color):
         self._selection_background_color = new_color
-        self.draw()
+        self._draw()
 
     def get_unfocus_on_enter(self):
         return self._unfocus_on_enter

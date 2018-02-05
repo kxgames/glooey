@@ -17,7 +17,7 @@ def align_widget_in_box(widget, box_rect, alignment='fill', widget_rect=None):
     if widget_rect is None:
         widget_rect = widget.claimed_rect
     drawing.align(alignment, widget_rect, box_rect)
-    widget.resize(widget_rect)
+    widget._resize(widget_rect)
 
 def claim_stacked_widgets(*widgets):
     max_widget_width = 0
@@ -60,7 +60,7 @@ class Bin(Widget):
 
     def do_resize_children(self):
         if self.child is not None:
-            self.child.resize(self.rect)
+            self.child._resize(self.rect)
 
     def get_child(self):
         return self._child
@@ -150,14 +150,14 @@ class Grid(Widget):
 
     def set_num_rows(self, new_num):
         self._grid.num_rows = new_num
-        self.repack()
+        self._repack()
 
     def get_num_cols(self):
         return self._grid.num_cols
 
     def set_num_cols(self, new_num):
         self._grid.num_cols = new_num
-        self.repack()
+        self._repack()
 
     def get_cell_indices(self):
         return [(i,j) for i in range(self.num_rows)
@@ -172,21 +172,21 @@ class Grid(Widget):
                 all=all, horz=horz, vert=vert, left=left, right=right,
                 top=top, bottom=bottom)
         self._grid.inner_padding = first_not_none((cell, all, 0))
-        self.repack()
+        self._repack()
 
     def get_cell_padding(self):
         return self._grid.inner_padding
 
     def set_cell_padding(self, new_padding):
         self._grid.inner_padding = new_padding
-        self.repack()
+        self._repack()
 
     def get_cell_alignment(self):
         return self._cell_alignment
 
     def set_cell_alignment(self, new_alignment):
         self._cell_alignment = new_alignment
-        self.repack()
+        self._repack()
 
     def get_row_height(self, row):
         return self._grid.row_heights[row]
@@ -208,7 +208,7 @@ class Grid(Widget):
         be divided evenly between them.
         """
         self._grid.set_row_height(row, new_height)
-        self.repack()
+        self._repack()
 
     def del_row_height(self, row):
         """
@@ -216,7 +216,7 @@ class Grid(Widget):
         used for that row instead.
         """
         self._grid.del_row_height(row)
-        self.repack()
+        self._repack()
 
     def get_col_width(self, col):
         return self._grid.col_widths[col]
@@ -238,7 +238,7 @@ class Grid(Widget):
         be divided evenly between them.
         """
         self._grid.set_col_width(col, new_width)
-        self.repack()
+        self._repack()
 
     def del_col_width(self, col):
         """
@@ -246,7 +246,7 @@ class Grid(Widget):
         used for that column instead.
         """
         self._grid.del_col_width(col)
-        self.repack()
+        self._repack()
 
     def get_default_row_height(self):
         return self._grid.default_row_height
@@ -258,7 +258,7 @@ class Grid(Widget):
         is the same as for set_row_height().
         """
         self._grid.default_row_height = new_height
-        self.repack()
+        self._repack()
 
     def get_default_col_width(self):
         return self._grid.default_col_width
@@ -270,7 +270,7 @@ class Grid(Widget):
         the same as for set_col_width().
         """
         self._grid.default_col_width = new_width
-        self.repack()
+        self._repack()
 
 
 @autoprop
@@ -310,23 +310,23 @@ class HVBox(Widget):
     def pack_back(self, widget):
         self.add_back(widget, size=0)
 
-    def insert(self, child, index, size=None):
-        self._attach_child(child)
-        self._children.insert(index, child)
-        self._sizes[child] = size
+    def insert(self, widget, index, size=None):
+        self._attach_child(widget)
+        self._children.insert(index, widget)
+        self._sizes[widget] = size
         self._repack_and_regroup_children()
 
-    def replace(self, old_child, new_child):
-        old_index = self._children.index(old_child)
-        old_size = self._sizes[old_child]
+    def replace(self, old_widget, new_widget):
+        old_index = self._children.index(old_widget)
+        old_size = self._sizes[old_widget]
         with self.hold_updates():
-            self.remove(old_child)
-            self.insert(new_child, old_index, old_size)
+            self.remove(old_widget)
+            self.insert(new_widget, old_index, old_size)
 
-    def remove(self, child):
-        self._detach_child(child)
-        self._children.remove(child)
-        del self._sizes[child]
+    def remove(self, widget):
+        self._detach_child(widget)
+        self._children.remove(widget)
+        del self._sizes[widget]
         self._repack_and_regroup_children()
 
     def clear(self):
@@ -388,21 +388,21 @@ class HVBox(Widget):
                 all=all, horz=horz, vert=vert, left=left, right=right,
                 top=top, bottom=bottom)
         self._grid.inner_padding = first_not_none((cell, all, 0))
-        self.repack()
+        self._repack()
 
     def get_cell_padding(self):
         return self._grid.inner_padding
 
     def set_cell_padding(self, new_padding):
         self._grid.inner_padding = new_padding
-        self.repack()
+        self._repack()
 
     def get_cell_alignment(self):
         return self._cell_alignment
 
     def set_cell_alignment(self, new_alignment):
         self._cell_alignment = new_alignment
-        self.repack()
+        self._repack()
 
     def get_default_cell_size(self):
         raise NotImplementedError
@@ -507,10 +507,10 @@ class Stack(Widget):
 
         if len(self) == 1:
             child = next(iter(self.children))
-            child.regroup(self.group)
+            child._regroup(self.group)
         else:
             for child, layer in self._children.items():
-                child.regroup(pyglet.graphics.OrderedGroup(layer, self.group))
+                child._regroup(pyglet.graphics.OrderedGroup(layer, self.group))
 
     def do_find_children_under_mouse(self, x, y):
         for child in self.children:
@@ -741,7 +741,7 @@ class Board(Widget):
             rect.left += self.rect.left
             rect.bottom += self.rect.bottom
 
-            child.resize(rect)
+            child._resize(rect)
 
     def do_regroup_children(self):
         for child, pin in self._pins.items():
@@ -750,7 +750,7 @@ class Board(Widget):
             else:
                 group = self.group
 
-            child.regroup(group)
+            child._regroup(group)
 
     def _make_pin(self, kwargs):
 
@@ -758,13 +758,13 @@ class Board(Widget):
         # keys have been used, so we can give a nice error if we find an 
         # unexpected (i.e. misspelled) argument.
 
-        class argdict(dict):
+        class argdict(dict): #
 
-            def __init__(self, kwargs):
+            def __init__(self, kwargs): #
                 self.update(kwargs)
                 self.unused_keys = set(kwargs.keys())
 
-            def __getitem__(self, key):
+            def __getitem__(self, key): #
                 self.unused_keys.discard(key)
                 return super().__getitem__(key)
 
@@ -908,7 +908,7 @@ class Board(Widget):
         # These checks obviate the need for a number of divide-by-zero checks 
         # in do_claim() and do_resize_children().
 
-        def sanity_check(pin, field, *bounds):
+        def sanity_check(pin, field, *bounds): #
             if field in pin:
                 if pin[field] in bounds:
                     raise UsageError(f"{field} cannot be {pin[field]}")

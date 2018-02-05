@@ -55,7 +55,7 @@ class Image(Widget):
     def set_image(self, new_image):
         if self._image is not new_image:
             self._image = new_image
-            self.repack()
+            self._repack()
 
     def del_image(self):
         self.set_image(None)
@@ -140,7 +140,7 @@ class Background(Widget):
 
     def set_image(self, image):
         self._artist.set_image(image)
-        self.repack()
+        self._repack()
 
     def get_appearance(self):
         return self._artist.appearance
@@ -164,7 +164,7 @@ class Background(Widget):
                 vtile=vtile,
                 htile=htile,
         )
-        self.repack()
+        self._repack()
 
     @property
     def is_empty(self):
@@ -203,9 +203,9 @@ class Frame(Widget):
         return claim_stacked_widgets(self.box, self.decoration)
 
     def do_regroup_children(self):
-        self.box.regroup(pyglet.graphics.OrderedGroup(
+        self.box._regroup(pyglet.graphics.OrderedGroup(
             self.custom_box_layer, self.group))
-        self.decoration.regroup(pyglet.graphics.OrderedGroup(
+        self.decoration._regroup(pyglet.graphics.OrderedGroup(
             self.custom_decoration_layer, self.group))
 
     def get_box(self):

@@ -5,8 +5,6 @@ import glooey
 import run_demos
 from vecrec import Vector, Rect
 
-print(__doc__)
-
 window = pyglet.window.Window()
 batch = pyglet.graphics.Batch()
 

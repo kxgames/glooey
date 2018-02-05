@@ -31,5 +31,24 @@ def test_checkbox():
     yield "Grey inactive button (no rollover)."
     button.enable()
 
+    gui.clear()
+    hbox = glooey.HBox()
+    proxy = glooey.Placeholder(100, 10)
+
+    hbox.pack(button)
+    hbox.pack(proxy)
+
+    hbox.alignment = 'center'
+    hbox.padding = 10
+
+    gui.add(hbox)
+    button.add_proxy(proxy)
+
+    yield "Rollover or click the placeholder to control the button."
+
+    gui.clear()
+    hbox.remove(button)
+    gui.add(button)
+
 pyglet.app.run()
 
