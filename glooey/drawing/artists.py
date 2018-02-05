@@ -21,7 +21,7 @@ class Artist(HoldUpdatesMixin):
         self._data = data
         self._vertex_list = None
 
-        if not hidden:
+        if batch and not hidden:
             self._create_vertex_list()
             self._update_vertex_list()
 
