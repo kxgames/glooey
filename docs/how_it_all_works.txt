@@ -361,17 +361,17 @@ will be immediately reflected.
 
 How mouse events work
 =====================
-Pyglet emits a mouse event whenever the user moves, clicks, or drags the mouse.  
+Pyglet emits mouse events whenever the user moves, clicks, or drags the mouse.  
 These events need to propagate through the widget hierarchy in order for each 
 widget to react properly when the mouse interacts with it.  This process begins 
 with the root widget (which is automatically configured to receive every mouse 
 event that pyglet emits) but is ultimately handled in the same way by every 
 widget:
 
-First, the event handler corresponding to the particular mouse event is called, 
-either by pyglet (if the widget in question is the root) or by the widget's 
-parent (if not).  Each widget has a handler corresponding to each type of mouse 
-events that pyglet can generate, which are listed here:
+First, the event handler corresponding to the particular mouse event is 
+triggered, either by pyglet (if the widget in question is the root) or by the 
+widget's parent (if not).  Each widget has a handler for each type of mouse 
+event that pyglet can generate:
 
 - `on_mouse_press(x, y, button, modifiers)`
 - `on_mouse_release(x, y, button, modifiers)`
@@ -383,20 +383,20 @@ events that pyglet can generate, which are listed here:
 - `on_mouse_drag_leave(x, y)`
 - `on_mouse_scroll(x, y, scroll_x, scroll_y)`
 
-Each of these handlers do different things, of course, but they all share the 
-same basic structure.  First, the handler calls `_find_children_under_mouse()` 
-to figure out both which of its children are under the mouse now and which were 
+All of these handlers do different things, of course, but they share the same 
+basic structure.  First, the handler calls `_find_children_under_mouse()` to 
+figure out both which of its children are under the mouse now and which were 
 under the mouse the last time a mouse event was triggered.  With this 
 information, the handler propagates the mouse event to any children affected by 
 it.  Most of the time this just means triggering the same event for the 
-children under the mouse, but the "motion" and "drag" handlers will also 
-trigger "enter" and "exit" events when they notice the mouse moving between 
-their children.  Once the event is done propagating, the handler may trigger 
-one or more new events.  This is where different handlers behave the most 
+children which are under the mouse, but the "motion" and "drag" handlers will 
+also trigger "enter" and "exit" events when they notice the mouse moving 
+between their children.  Once the event is done propagating, the handler may 
+trigger one or more new events.  This is where different handlers behave 
 differently.  For example, `on_mouse_release()` triggers ``on_click`` if the 
-widget is "enabled" and the click began in the widget.  Likewise, almost all of 
-the handlers play a role in triggering ``on_rollover`` events at the right 
-times.
+widget is "enabled" and the click began in the widget, and ``on_double_click`` 
+if this is the second click in the last 500 ms.  Likewise, many of the handlers 
+play a role in triggering ``on_rollover`` events at the right times.
 
 There are a number of ways for widget subclasses affect how mouse events are 
 propagated.  The first is to reimplement `is_under_mouse()`.  This method takes 
@@ -409,7 +409,7 @@ outlines by using a bitmap to determine which pixels are inside a widget.
 
 The second way to affect how mouse events are propagated is to reimplement 
 `do_find_children_near_mouse()`.  This method's job is to yield which of the 
-widget's children could be under the given mouse coordinate (`is_under_mouse() 
+widget's children could be under the given mouse coordinate (`is_under_mouse()` 
 will subsequently be called on each one to figure out which really are under 
 the mouse).  The default is to yield all of the widget's children, which is 
 always correct, but not always efficient.  Containers like Grid, HBox, and VBox 
