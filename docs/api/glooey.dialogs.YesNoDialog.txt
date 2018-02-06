@@ -1,0 +1,189 @@
+glooey.dialogs.YesNoDialog
+==========================
+
+.. currentmodule:: glooey.dialogs
+
+.. autoclass:: YesNoDialog
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~YesNoDialog.__init__
+         ~YesNoDialog.add
+         ~YesNoDialog.clear
+         ~YesNoDialog.close
+         ~YesNoDialog.debug_drawing_problems
+         ~YesNoDialog.debug_placement_problems
+         ~YesNoDialog.disable
+         ~YesNoDialog.discard_updates
+         ~YesNoDialog.dispatch_event
+         ~YesNoDialog.do_attach
+         ~YesNoDialog.do_claim
+         ~YesNoDialog.do_detach
+         ~YesNoDialog.do_draw
+         ~YesNoDialog.do_find_children_under_mouse
+         ~YesNoDialog.do_regroup
+         ~YesNoDialog.do_regroup_children
+         ~YesNoDialog.do_resize
+         ~YesNoDialog.do_resize_children
+         ~YesNoDialog.do_undraw
+         ~YesNoDialog.enable
+         ~YesNoDialog.event
+         ~YesNoDialog.get_alignment
+         ~YesNoDialog.get_batch
+         ~YesNoDialog.get_bottom_padding
+         ~YesNoDialog.get_box
+         ~YesNoDialog.get_buttons
+         ~YesNoDialog.get_claimed_height
+         ~YesNoDialog.get_claimed_rect
+         ~YesNoDialog.get_claimed_size
+         ~YesNoDialog.get_claimed_width
+         ~YesNoDialog.get_decoration
+         ~YesNoDialog.get_foreground
+         ~YesNoDialog.get_group
+         ~YesNoDialog.get_height_hint
+         ~YesNoDialog.get_horz_padding
+         ~YesNoDialog.get_last_rollover_state
+         ~YesNoDialog.get_left_padding
+         ~YesNoDialog.get_no_button
+         ~YesNoDialog.get_padded_rect
+         ~YesNoDialog.get_padding
+         ~YesNoDialog.get_parent
+         ~YesNoDialog.get_propagate_mouse_events
+         ~YesNoDialog.get_rect
+         ~YesNoDialog.get_response
+         ~YesNoDialog.get_right_padding
+         ~YesNoDialog.get_rollover_state
+         ~YesNoDialog.get_root
+         ~YesNoDialog.get_size_hint
+         ~YesNoDialog.get_top_padding
+         ~YesNoDialog.get_total_horz_padding
+         ~YesNoDialog.get_total_padding
+         ~YesNoDialog.get_total_vert_padding
+         ~YesNoDialog.get_vert_padding
+         ~YesNoDialog.get_width_hint
+         ~YesNoDialog.get_window
+         ~YesNoDialog.get_yes_button
+         ~YesNoDialog.hide
+         ~YesNoDialog.hold_updates
+         ~YesNoDialog.is_under_mouse
+         ~YesNoDialog.on_click_no
+         ~YesNoDialog.on_click_yes
+         ~YesNoDialog.on_mouse_drag
+         ~YesNoDialog.on_mouse_drag_enter
+         ~YesNoDialog.on_mouse_drag_leave
+         ~YesNoDialog.on_mouse_enter
+         ~YesNoDialog.on_mouse_leave
+         ~YesNoDialog.on_mouse_motion
+         ~YesNoDialog.on_mouse_press
+         ~YesNoDialog.on_mouse_release
+         ~YesNoDialog.on_mouse_scroll
+         ~YesNoDialog.open
+         ~YesNoDialog.pause_updates
+         ~YesNoDialog.pop_handlers
+         ~YesNoDialog.push_handlers
+         ~YesNoDialog.register_event_type
+         ~YesNoDialog.relay_events_from
+         ~YesNoDialog.remove_handler
+         ~YesNoDialog.remove_handlers
+         ~YesNoDialog.resume_updates
+         ~YesNoDialog.set_alignment
+         ~YesNoDialog.set_bottom_padding
+         ~YesNoDialog.set_handler
+         ~YesNoDialog.set_handlers
+         ~YesNoDialog.set_height_hint
+         ~YesNoDialog.set_horz_padding
+         ~YesNoDialog.set_left_padding
+         ~YesNoDialog.set_no_button
+         ~YesNoDialog.set_padding
+         ~YesNoDialog.set_propagate_mouse_events
+         ~YesNoDialog.set_right_padding
+         ~YesNoDialog.set_size_hint
+         ~YesNoDialog.set_top_padding
+         ~YesNoDialog.set_vert_padding
+         ~YesNoDialog.set_width_hint
+         ~YesNoDialog.set_yes_button
+         ~YesNoDialog.start_event
+         ~YesNoDialog.stop_event
+         ~YesNoDialog.suppress_updates
+         ~YesNoDialog.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~YesNoDialog.alignment
+         ~YesNoDialog.batch
+         ~YesNoDialog.bottom_padding
+         ~YesNoDialog.box
+         ~YesNoDialog.buttons
+         ~YesNoDialog.claimed_height
+         ~YesNoDialog.claimed_rect
+         ~YesNoDialog.claimed_size
+         ~YesNoDialog.claimed_width
+         ~YesNoDialog.custom_alignment
+         ~YesNoDialog.custom_autoadd_foreground
+         ~YesNoDialog.custom_bottom_padding
+         ~YesNoDialog.custom_box_layer
+         ~YesNoDialog.custom_decoration_layer
+         ~YesNoDialog.custom_height_hint
+         ~YesNoDialog.custom_horz_padding
+         ~YesNoDialog.custom_left_padding
+         ~YesNoDialog.custom_padding
+         ~YesNoDialog.custom_propagate_mouse_events
+         ~YesNoDialog.custom_right_padding
+         ~YesNoDialog.custom_size_hint
+         ~YesNoDialog.custom_top_padding
+         ~YesNoDialog.custom_vert_padding
+         ~YesNoDialog.custom_width_hint
+         ~YesNoDialog.decoration
+         ~YesNoDialog.event_types
+         ~YesNoDialog.foreground
+         ~YesNoDialog.group
+         ~YesNoDialog.height_hint
+         ~YesNoDialog.horz_padding
+         ~YesNoDialog.is_attached_to_gui
+         ~YesNoDialog.is_disabled
+         ~YesNoDialog.is_enabled
+         ~YesNoDialog.is_hidden
+         ~YesNoDialog.is_visible
+         ~YesNoDialog.last_rollover_state
+         ~YesNoDialog.left_padding
+         ~YesNoDialog.no_button
+         ~YesNoDialog.padded_rect
+         ~YesNoDialog.padding
+         ~YesNoDialog.parent
+         ~YesNoDialog.propagate_mouse_events
+         ~YesNoDialog.rect
+         ~YesNoDialog.response
+         ~YesNoDialog.right_padding
+         ~YesNoDialog.rollover_state
+         ~YesNoDialog.root
+         ~YesNoDialog.size_hint
+         ~YesNoDialog.top_padding
+         ~YesNoDialog.total_horz_padding
+         ~YesNoDialog.total_padding
+         ~YesNoDialog.total_vert_padding
+         ~YesNoDialog.vert_padding
+         ~YesNoDialog.width_hint
+         ~YesNoDialog.window
+         ~YesNoDialog.yes_button
+   
+   

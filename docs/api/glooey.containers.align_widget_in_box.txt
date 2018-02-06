@@ -1,0 +1,6 @@
+glooey.containers.align_widget_in_box
+=====================================
+
+.. currentmodule:: glooey.containers
+
+.. autofunction:: align_widget_in_box

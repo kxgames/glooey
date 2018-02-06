@@ -1,0 +1,176 @@
+glooey.images.Frame
+===================
+
+.. currentmodule:: glooey.images
+
+.. autoclass:: Frame
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Frame.__init__
+         ~Frame.add
+         ~Frame.clear
+         ~Frame.debug_drawing_problems
+         ~Frame.debug_placement_problems
+         ~Frame.disable
+         ~Frame.discard_updates
+         ~Frame.dispatch_event
+         ~Frame.do_attach
+         ~Frame.do_claim
+         ~Frame.do_detach
+         ~Frame.do_draw
+         ~Frame.do_find_children_under_mouse
+         ~Frame.do_regroup
+         ~Frame.do_regroup_children
+         ~Frame.do_resize
+         ~Frame.do_resize_children
+         ~Frame.do_undraw
+         ~Frame.enable
+         ~Frame.event
+         ~Frame.get_alignment
+         ~Frame.get_batch
+         ~Frame.get_bottom_padding
+         ~Frame.get_box
+         ~Frame.get_claimed_height
+         ~Frame.get_claimed_rect
+         ~Frame.get_claimed_size
+         ~Frame.get_claimed_width
+         ~Frame.get_decoration
+         ~Frame.get_foreground
+         ~Frame.get_group
+         ~Frame.get_height_hint
+         ~Frame.get_horz_padding
+         ~Frame.get_last_rollover_state
+         ~Frame.get_left_padding
+         ~Frame.get_padded_rect
+         ~Frame.get_padding
+         ~Frame.get_parent
+         ~Frame.get_propagate_mouse_events
+         ~Frame.get_rect
+         ~Frame.get_right_padding
+         ~Frame.get_rollover_state
+         ~Frame.get_root
+         ~Frame.get_size_hint
+         ~Frame.get_top_padding
+         ~Frame.get_total_horz_padding
+         ~Frame.get_total_padding
+         ~Frame.get_total_vert_padding
+         ~Frame.get_vert_padding
+         ~Frame.get_width_hint
+         ~Frame.get_window
+         ~Frame.hide
+         ~Frame.hold_updates
+         ~Frame.is_under_mouse
+         ~Frame.on_mouse_drag
+         ~Frame.on_mouse_drag_enter
+         ~Frame.on_mouse_drag_leave
+         ~Frame.on_mouse_enter
+         ~Frame.on_mouse_leave
+         ~Frame.on_mouse_motion
+         ~Frame.on_mouse_press
+         ~Frame.on_mouse_release
+         ~Frame.on_mouse_scroll
+         ~Frame.pause_updates
+         ~Frame.pop_handlers
+         ~Frame.push_handlers
+         ~Frame.register_event_type
+         ~Frame.relay_events_from
+         ~Frame.remove_handler
+         ~Frame.remove_handlers
+         ~Frame.resume_updates
+         ~Frame.set_alignment
+         ~Frame.set_bottom_padding
+         ~Frame.set_handler
+         ~Frame.set_handlers
+         ~Frame.set_height_hint
+         ~Frame.set_horz_padding
+         ~Frame.set_left_padding
+         ~Frame.set_padding
+         ~Frame.set_propagate_mouse_events
+         ~Frame.set_right_padding
+         ~Frame.set_size_hint
+         ~Frame.set_top_padding
+         ~Frame.set_vert_padding
+         ~Frame.set_width_hint
+         ~Frame.start_event
+         ~Frame.stop_event
+         ~Frame.suppress_updates
+         ~Frame.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Frame.Foreground
+         ~Frame.alignment
+         ~Frame.batch
+         ~Frame.bottom_padding
+         ~Frame.box
+         ~Frame.claimed_height
+         ~Frame.claimed_rect
+         ~Frame.claimed_size
+         ~Frame.claimed_width
+         ~Frame.custom_alignment
+         ~Frame.custom_autoadd_foreground
+         ~Frame.custom_bottom_padding
+         ~Frame.custom_box_layer
+         ~Frame.custom_decoration_layer
+         ~Frame.custom_height_hint
+         ~Frame.custom_horz_padding
+         ~Frame.custom_left_padding
+         ~Frame.custom_padding
+         ~Frame.custom_propagate_mouse_events
+         ~Frame.custom_right_padding
+         ~Frame.custom_size_hint
+         ~Frame.custom_top_padding
+         ~Frame.custom_vert_padding
+         ~Frame.custom_width_hint
+         ~Frame.decoration
+         ~Frame.event_types
+         ~Frame.foreground
+         ~Frame.group
+         ~Frame.height_hint
+         ~Frame.horz_padding
+         ~Frame.is_attached_to_gui
+         ~Frame.is_disabled
+         ~Frame.is_enabled
+         ~Frame.is_hidden
+         ~Frame.is_visible
+         ~Frame.last_rollover_state
+         ~Frame.left_padding
+         ~Frame.padded_rect
+         ~Frame.padding
+         ~Frame.parent
+         ~Frame.propagate_mouse_events
+         ~Frame.rect
+         ~Frame.right_padding
+         ~Frame.rollover_state
+         ~Frame.root
+         ~Frame.size_hint
+         ~Frame.top_padding
+         ~Frame.total_horz_padding
+         ~Frame.total_padding
+         ~Frame.total_vert_padding
+         ~Frame.vert_padding
+         ~Frame.width_hint
+         ~Frame.window
+   
+   

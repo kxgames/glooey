@@ -1,0 +1,24 @@
+glooey.widget
+=============
+
+.. automodule:: glooey.widget
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree: .
+   
+      EventDispatcher
+      Widget
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+glooey.helpers.late_binding_property
+====================================
+
+.. currentmodule:: glooey.helpers
+
+.. autofunction:: late_binding_property

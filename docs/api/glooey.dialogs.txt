@@ -1,0 +1,26 @@
+glooey.dialogs
+==============
+
+.. automodule:: glooey.dialogs
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree: .
+   
+      ButtonDialog
+      Dialog
+      OkDialog
+      YesNoDialog
+   
+   
+
+   
+   
+   
+
+   
+   
+   

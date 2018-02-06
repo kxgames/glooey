@@ -1,0 +1,199 @@
+glooey.containers.Grid
+======================
+
+.. currentmodule:: glooey.containers
+
+.. autoclass:: Grid
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Grid.__init__
+         ~Grid.add
+         ~Grid.clear
+         ~Grid.debug_drawing_problems
+         ~Grid.debug_placement_problems
+         ~Grid.del_col_width
+         ~Grid.del_row_height
+         ~Grid.disable
+         ~Grid.discard_updates
+         ~Grid.dispatch_event
+         ~Grid.do_attach
+         ~Grid.do_claim
+         ~Grid.do_detach
+         ~Grid.do_draw
+         ~Grid.do_find_children_under_mouse
+         ~Grid.do_regroup
+         ~Grid.do_regroup_children
+         ~Grid.do_resize
+         ~Grid.do_resize_children
+         ~Grid.do_undraw
+         ~Grid.enable
+         ~Grid.event
+         ~Grid.get_alignment
+         ~Grid.get_batch
+         ~Grid.get_bottom_padding
+         ~Grid.get_cell_alignment
+         ~Grid.get_cell_indices
+         ~Grid.get_cell_padding
+         ~Grid.get_claimed_height
+         ~Grid.get_claimed_rect
+         ~Grid.get_claimed_size
+         ~Grid.get_claimed_width
+         ~Grid.get_col_width
+         ~Grid.get_default_col_width
+         ~Grid.get_default_row_height
+         ~Grid.get_group
+         ~Grid.get_height_hint
+         ~Grid.get_horz_padding
+         ~Grid.get_last_rollover_state
+         ~Grid.get_left_padding
+         ~Grid.get_num_cols
+         ~Grid.get_num_rows
+         ~Grid.get_padded_rect
+         ~Grid.get_padding
+         ~Grid.get_parent
+         ~Grid.get_propagate_mouse_events
+         ~Grid.get_rect
+         ~Grid.get_right_padding
+         ~Grid.get_rollover_state
+         ~Grid.get_root
+         ~Grid.get_row_height
+         ~Grid.get_size_hint
+         ~Grid.get_top_padding
+         ~Grid.get_total_horz_padding
+         ~Grid.get_total_padding
+         ~Grid.get_total_vert_padding
+         ~Grid.get_vert_padding
+         ~Grid.get_width_hint
+         ~Grid.get_window
+         ~Grid.hide
+         ~Grid.hold_updates
+         ~Grid.is_under_mouse
+         ~Grid.on_mouse_drag
+         ~Grid.on_mouse_drag_enter
+         ~Grid.on_mouse_drag_leave
+         ~Grid.on_mouse_enter
+         ~Grid.on_mouse_leave
+         ~Grid.on_mouse_motion
+         ~Grid.on_mouse_press
+         ~Grid.on_mouse_release
+         ~Grid.on_mouse_scroll
+         ~Grid.pause_updates
+         ~Grid.pop_handlers
+         ~Grid.push_handlers
+         ~Grid.register_event_type
+         ~Grid.relay_events_from
+         ~Grid.remove
+         ~Grid.remove_handler
+         ~Grid.remove_handlers
+         ~Grid.resume_updates
+         ~Grid.set_alignment
+         ~Grid.set_bottom_padding
+         ~Grid.set_cell_alignment
+         ~Grid.set_cell_padding
+         ~Grid.set_col_width
+         ~Grid.set_default_col_width
+         ~Grid.set_default_row_height
+         ~Grid.set_handler
+         ~Grid.set_handlers
+         ~Grid.set_height_hint
+         ~Grid.set_horz_padding
+         ~Grid.set_left_padding
+         ~Grid.set_num_cols
+         ~Grid.set_num_rows
+         ~Grid.set_padding
+         ~Grid.set_propagate_mouse_events
+         ~Grid.set_right_padding
+         ~Grid.set_row_height
+         ~Grid.set_size_hint
+         ~Grid.set_top_padding
+         ~Grid.set_vert_padding
+         ~Grid.set_width_hint
+         ~Grid.start_event
+         ~Grid.stop_event
+         ~Grid.suppress_updates
+         ~Grid.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Grid.alignment
+         ~Grid.batch
+         ~Grid.bottom_padding
+         ~Grid.cell_alignment
+         ~Grid.cell_indices
+         ~Grid.cell_padding
+         ~Grid.claimed_height
+         ~Grid.claimed_rect
+         ~Grid.claimed_size
+         ~Grid.claimed_width
+         ~Grid.custom_alignment
+         ~Grid.custom_bottom_padding
+         ~Grid.custom_cell_alignment
+         ~Grid.custom_cell_padding
+         ~Grid.custom_default_col_width
+         ~Grid.custom_default_row_height
+         ~Grid.custom_height_hint
+         ~Grid.custom_horz_padding
+         ~Grid.custom_left_padding
+         ~Grid.custom_num_cols
+         ~Grid.custom_num_rows
+         ~Grid.custom_padding
+         ~Grid.custom_propagate_mouse_events
+         ~Grid.custom_right_padding
+         ~Grid.custom_size_hint
+         ~Grid.custom_top_padding
+         ~Grid.custom_vert_padding
+         ~Grid.custom_width_hint
+         ~Grid.default_col_width
+         ~Grid.default_row_height
+         ~Grid.event_types
+         ~Grid.group
+         ~Grid.height_hint
+         ~Grid.horz_padding
+         ~Grid.is_attached_to_gui
+         ~Grid.is_disabled
+         ~Grid.is_enabled
+         ~Grid.is_hidden
+         ~Grid.is_visible
+         ~Grid.last_rollover_state
+         ~Grid.left_padding
+         ~Grid.num_cols
+         ~Grid.num_rows
+         ~Grid.padded_rect
+         ~Grid.padding
+         ~Grid.parent
+         ~Grid.propagate_mouse_events
+         ~Grid.rect
+         ~Grid.right_padding
+         ~Grid.rollover_state
+         ~Grid.root
+         ~Grid.size_hint
+         ~Grid.top_padding
+         ~Grid.total_horz_padding
+         ~Grid.total_padding
+         ~Grid.total_vert_padding
+         ~Grid.vert_padding
+         ~Grid.width_hint
+         ~Grid.window
+   
+   

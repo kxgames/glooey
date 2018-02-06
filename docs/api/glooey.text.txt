@@ -1,0 +1,25 @@
+glooey.text
+===========
+
+.. automodule:: glooey.text
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree: .
+   
+      EditableLabel
+      Form
+      Label
+   
+   
+
+   
+   
+   
+
+   
+   
+   

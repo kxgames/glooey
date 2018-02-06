@@ -1,0 +1,187 @@
+glooey.scrolling.HScrollBar
+===========================
+
+.. currentmodule:: glooey.scrolling
+
+.. autoclass:: HScrollBar
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~HScrollBar.__init__
+         ~HScrollBar.add
+         ~HScrollBar.clear
+         ~HScrollBar.debug_drawing_problems
+         ~HScrollBar.debug_placement_problems
+         ~HScrollBar.disable
+         ~HScrollBar.discard_updates
+         ~HScrollBar.dispatch_event
+         ~HScrollBar.do_attach
+         ~HScrollBar.do_claim
+         ~HScrollBar.do_detach
+         ~HScrollBar.do_draw
+         ~HScrollBar.do_find_children_under_mouse
+         ~HScrollBar.do_regroup
+         ~HScrollBar.do_regroup_children
+         ~HScrollBar.do_resize
+         ~HScrollBar.do_resize_children
+         ~HScrollBar.do_undraw
+         ~HScrollBar.enable
+         ~HScrollBar.event
+         ~HScrollBar.get_alignment
+         ~HScrollBar.get_batch
+         ~HScrollBar.get_bottom_padding
+         ~HScrollBar.get_box
+         ~HScrollBar.get_button_speed
+         ~HScrollBar.get_claimed_height
+         ~HScrollBar.get_claimed_rect
+         ~HScrollBar.get_claimed_size
+         ~HScrollBar.get_claimed_width
+         ~HScrollBar.get_decoration
+         ~HScrollBar.get_foreground
+         ~HScrollBar.get_group
+         ~HScrollBar.get_height_hint
+         ~HScrollBar.get_horz_padding
+         ~HScrollBar.get_last_rollover_state
+         ~HScrollBar.get_left_padding
+         ~HScrollBar.get_orientation
+         ~HScrollBar.get_padded_rect
+         ~HScrollBar.get_padding
+         ~HScrollBar.get_parent
+         ~HScrollBar.get_propagate_mouse_events
+         ~HScrollBar.get_rect
+         ~HScrollBar.get_right_padding
+         ~HScrollBar.get_rollover_state
+         ~HScrollBar.get_root
+         ~HScrollBar.get_size_hint
+         ~HScrollBar.get_top_padding
+         ~HScrollBar.get_total_horz_padding
+         ~HScrollBar.get_total_padding
+         ~HScrollBar.get_total_vert_padding
+         ~HScrollBar.get_vert_padding
+         ~HScrollBar.get_width_hint
+         ~HScrollBar.get_window
+         ~HScrollBar.hide
+         ~HScrollBar.hold_updates
+         ~HScrollBar.is_under_mouse
+         ~HScrollBar.on_backward_click
+         ~HScrollBar.on_bar_click
+         ~HScrollBar.on_forward_click
+         ~HScrollBar.on_mouse_drag
+         ~HScrollBar.on_mouse_drag_enter
+         ~HScrollBar.on_mouse_drag_leave
+         ~HScrollBar.on_mouse_enter
+         ~HScrollBar.on_mouse_leave
+         ~HScrollBar.on_mouse_motion
+         ~HScrollBar.on_mouse_press
+         ~HScrollBar.on_mouse_release
+         ~HScrollBar.on_mouse_scroll
+         ~HScrollBar.pause_updates
+         ~HScrollBar.pop_handlers
+         ~HScrollBar.push_handlers
+         ~HScrollBar.register_event_type
+         ~HScrollBar.relay_events_from
+         ~HScrollBar.remove_handler
+         ~HScrollBar.remove_handlers
+         ~HScrollBar.resume_updates
+         ~HScrollBar.set_alignment
+         ~HScrollBar.set_bottom_padding
+         ~HScrollBar.set_button_speed
+         ~HScrollBar.set_handler
+         ~HScrollBar.set_handlers
+         ~HScrollBar.set_height_hint
+         ~HScrollBar.set_horz_padding
+         ~HScrollBar.set_left_padding
+         ~HScrollBar.set_padding
+         ~HScrollBar.set_propagate_mouse_events
+         ~HScrollBar.set_right_padding
+         ~HScrollBar.set_size_hint
+         ~HScrollBar.set_top_padding
+         ~HScrollBar.set_vert_padding
+         ~HScrollBar.set_width_hint
+         ~HScrollBar.start_event
+         ~HScrollBar.stop_event
+         ~HScrollBar.suppress_updates
+         ~HScrollBar.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~HScrollBar.Backward
+         ~HScrollBar.Foreground
+         ~HScrollBar.Forward
+         ~HScrollBar.alignment
+         ~HScrollBar.batch
+         ~HScrollBar.bottom_padding
+         ~HScrollBar.box
+         ~HScrollBar.button_speed
+         ~HScrollBar.claimed_height
+         ~HScrollBar.claimed_rect
+         ~HScrollBar.claimed_size
+         ~HScrollBar.claimed_width
+         ~HScrollBar.custom_alignment
+         ~HScrollBar.custom_autoadd_foreground
+         ~HScrollBar.custom_bottom_padding
+         ~HScrollBar.custom_box_layer
+         ~HScrollBar.custom_button_speed
+         ~HScrollBar.custom_decoration_layer
+         ~HScrollBar.custom_height_hint
+         ~HScrollBar.custom_horz_padding
+         ~HScrollBar.custom_left_padding
+         ~HScrollBar.custom_padding
+         ~HScrollBar.custom_propagate_mouse_events
+         ~HScrollBar.custom_right_padding
+         ~HScrollBar.custom_size_hint
+         ~HScrollBar.custom_top_padding
+         ~HScrollBar.custom_vert_padding
+         ~HScrollBar.custom_width_hint
+         ~HScrollBar.decoration
+         ~HScrollBar.event_types
+         ~HScrollBar.foreground
+         ~HScrollBar.group
+         ~HScrollBar.height_hint
+         ~HScrollBar.horz_padding
+         ~HScrollBar.is_attached_to_gui
+         ~HScrollBar.is_disabled
+         ~HScrollBar.is_enabled
+         ~HScrollBar.is_hidden
+         ~HScrollBar.is_visible
+         ~HScrollBar.last_rollover_state
+         ~HScrollBar.left_padding
+         ~HScrollBar.orientation
+         ~HScrollBar.padded_rect
+         ~HScrollBar.padding
+         ~HScrollBar.parent
+         ~HScrollBar.propagate_mouse_events
+         ~HScrollBar.rect
+         ~HScrollBar.right_padding
+         ~HScrollBar.rollover_state
+         ~HScrollBar.root
+         ~HScrollBar.size_hint
+         ~HScrollBar.top_padding
+         ~HScrollBar.total_horz_padding
+         ~HScrollBar.total_padding
+         ~HScrollBar.total_vert_padding
+         ~HScrollBar.vert_padding
+         ~HScrollBar.width_hint
+         ~HScrollBar.window
+   
+   

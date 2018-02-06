@@ -1,0 +1,199 @@
+glooey.scrolling.Viewport
+=========================
+
+.. currentmodule:: glooey.scrolling
+
+.. autoclass:: Viewport
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Viewport.__init__
+         ~Viewport.add
+         ~Viewport.clear
+         ~Viewport.debug_drawing_problems
+         ~Viewport.debug_placement_problems
+         ~Viewport.disable
+         ~Viewport.discard_updates
+         ~Viewport.dispatch_event
+         ~Viewport.do_attach
+         ~Viewport.do_claim
+         ~Viewport.do_detach
+         ~Viewport.do_draw
+         ~Viewport.do_find_children_under_mouse
+         ~Viewport.do_regroup
+         ~Viewport.do_regroup_children
+         ~Viewport.do_resize
+         ~Viewport.do_resize_children
+         ~Viewport.do_undraw
+         ~Viewport.enable
+         ~Viewport.event
+         ~Viewport.get_alignment
+         ~Viewport.get_batch
+         ~Viewport.get_bottom_padding
+         ~Viewport.get_child
+         ~Viewport.get_claimed_height
+         ~Viewport.get_claimed_rect
+         ~Viewport.get_claimed_size
+         ~Viewport.get_claimed_width
+         ~Viewport.get_group
+         ~Viewport.get_height_hint
+         ~Viewport.get_horz_padding
+         ~Viewport.get_horz_scrolling
+         ~Viewport.get_initial_view
+         ~Viewport.get_last_rollover_state
+         ~Viewport.get_left_padding
+         ~Viewport.get_padded_rect
+         ~Viewport.get_padding
+         ~Viewport.get_parent
+         ~Viewport.get_position
+         ~Viewport.get_position_percent
+         ~Viewport.get_propagate_mouse_events
+         ~Viewport.get_rect
+         ~Viewport.get_right_padding
+         ~Viewport.get_rollover_state
+         ~Viewport.get_root
+         ~Viewport.get_sensitivity
+         ~Viewport.get_size_hint
+         ~Viewport.get_top_padding
+         ~Viewport.get_total_horz_padding
+         ~Viewport.get_total_padding
+         ~Viewport.get_total_vert_padding
+         ~Viewport.get_vert_padding
+         ~Viewport.get_vert_scrolling
+         ~Viewport.get_view
+         ~Viewport.get_width_hint
+         ~Viewport.get_window
+         ~Viewport.hide
+         ~Viewport.hold_updates
+         ~Viewport.is_under_mouse
+         ~Viewport.jump
+         ~Viewport.jump_percent
+         ~Viewport.on_mouse_drag
+         ~Viewport.on_mouse_drag_enter
+         ~Viewport.on_mouse_drag_leave
+         ~Viewport.on_mouse_enter
+         ~Viewport.on_mouse_leave
+         ~Viewport.on_mouse_motion
+         ~Viewport.on_mouse_pan
+         ~Viewport.on_mouse_press
+         ~Viewport.on_mouse_release
+         ~Viewport.on_mouse_scroll
+         ~Viewport.on_translate
+         ~Viewport.pause_updates
+         ~Viewport.pop_handlers
+         ~Viewport.push_handlers
+         ~Viewport.register_event_type
+         ~Viewport.relay_events_from
+         ~Viewport.remove_handler
+         ~Viewport.remove_handlers
+         ~Viewport.resume_updates
+         ~Viewport.scroll
+         ~Viewport.scroll_percent
+         ~Viewport.set_alignment
+         ~Viewport.set_bottom_padding
+         ~Viewport.set_center_of_view
+         ~Viewport.set_handler
+         ~Viewport.set_handlers
+         ~Viewport.set_height_hint
+         ~Viewport.set_horz_padding
+         ~Viewport.set_horz_scrolling
+         ~Viewport.set_initial_view
+         ~Viewport.set_left_padding
+         ~Viewport.set_padding
+         ~Viewport.set_propagate_mouse_events
+         ~Viewport.set_right_padding
+         ~Viewport.set_sensitivity
+         ~Viewport.set_size_hint
+         ~Viewport.set_top_padding
+         ~Viewport.set_vert_padding
+         ~Viewport.set_vert_scrolling
+         ~Viewport.set_view
+         ~Viewport.set_width_hint
+         ~Viewport.start_event
+         ~Viewport.stop_event
+         ~Viewport.suppress_updates
+         ~Viewport.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Viewport.alignment
+         ~Viewport.batch
+         ~Viewport.bottom_padding
+         ~Viewport.center_of_view
+         ~Viewport.child
+         ~Viewport.claimed_height
+         ~Viewport.claimed_rect
+         ~Viewport.claimed_size
+         ~Viewport.claimed_width
+         ~Viewport.custom_alignment
+         ~Viewport.custom_bottom_padding
+         ~Viewport.custom_height_hint
+         ~Viewport.custom_horz_padding
+         ~Viewport.custom_horz_scrolling
+         ~Viewport.custom_initial_view
+         ~Viewport.custom_left_padding
+         ~Viewport.custom_padding
+         ~Viewport.custom_propagate_mouse_events
+         ~Viewport.custom_right_padding
+         ~Viewport.custom_sensitivity
+         ~Viewport.custom_size_hint
+         ~Viewport.custom_top_padding
+         ~Viewport.custom_vert_padding
+         ~Viewport.custom_vert_scrolling
+         ~Viewport.custom_width_hint
+         ~Viewport.event_types
+         ~Viewport.group
+         ~Viewport.height_hint
+         ~Viewport.horz_padding
+         ~Viewport.horz_scrolling
+         ~Viewport.initial_view
+         ~Viewport.is_attached_to_gui
+         ~Viewport.is_disabled
+         ~Viewport.is_enabled
+         ~Viewport.is_hidden
+         ~Viewport.is_visible
+         ~Viewport.last_rollover_state
+         ~Viewport.left_padding
+         ~Viewport.padded_rect
+         ~Viewport.padding
+         ~Viewport.parent
+         ~Viewport.position
+         ~Viewport.position_percent
+         ~Viewport.propagate_mouse_events
+         ~Viewport.rect
+         ~Viewport.right_padding
+         ~Viewport.rollover_state
+         ~Viewport.root
+         ~Viewport.sensitivity
+         ~Viewport.size_hint
+         ~Viewport.top_padding
+         ~Viewport.total_horz_padding
+         ~Viewport.total_padding
+         ~Viewport.total_vert_padding
+         ~Viewport.vert_padding
+         ~Viewport.vert_scrolling
+         ~Viewport.view
+         ~Viewport.width_hint
+         ~Viewport.window
+   
+   

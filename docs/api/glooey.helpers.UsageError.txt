@@ -1,0 +1,6 @@
+glooey.helpers.UsageError
+=========================
+
+.. currentmodule:: glooey.helpers
+
+.. autoexception:: UsageError

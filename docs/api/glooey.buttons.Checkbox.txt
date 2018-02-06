@@ -1,0 +1,182 @@
+glooey.buttons.Checkbox
+=======================
+
+.. currentmodule:: glooey.buttons
+
+.. autoclass:: Checkbox
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Checkbox.__init__
+         ~Checkbox.add_proxy
+         ~Checkbox.check
+         ~Checkbox.debug_drawing_problems
+         ~Checkbox.debug_placement_problems
+         ~Checkbox.del_images
+         ~Checkbox.disable
+         ~Checkbox.discard_updates
+         ~Checkbox.dispatch_event
+         ~Checkbox.do_attach
+         ~Checkbox.do_claim
+         ~Checkbox.do_detach
+         ~Checkbox.do_draw
+         ~Checkbox.do_find_children_under_mouse
+         ~Checkbox.do_regroup
+         ~Checkbox.do_regroup_children
+         ~Checkbox.do_resize
+         ~Checkbox.do_resize_children
+         ~Checkbox.do_undraw
+         ~Checkbox.enable
+         ~Checkbox.event
+         ~Checkbox.get_alignment
+         ~Checkbox.get_batch
+         ~Checkbox.get_bottom_padding
+         ~Checkbox.get_claimed_height
+         ~Checkbox.get_claimed_rect
+         ~Checkbox.get_claimed_size
+         ~Checkbox.get_claimed_width
+         ~Checkbox.get_group
+         ~Checkbox.get_height_hint
+         ~Checkbox.get_horz_padding
+         ~Checkbox.get_last_rollover_state
+         ~Checkbox.get_left_padding
+         ~Checkbox.get_padded_rect
+         ~Checkbox.get_padding
+         ~Checkbox.get_parent
+         ~Checkbox.get_propagate_mouse_events
+         ~Checkbox.get_rect
+         ~Checkbox.get_right_padding
+         ~Checkbox.get_rollover_state
+         ~Checkbox.get_root
+         ~Checkbox.get_size_hint
+         ~Checkbox.get_top_padding
+         ~Checkbox.get_total_horz_padding
+         ~Checkbox.get_total_padding
+         ~Checkbox.get_total_vert_padding
+         ~Checkbox.get_vert_padding
+         ~Checkbox.get_width_hint
+         ~Checkbox.get_window
+         ~Checkbox.hide
+         ~Checkbox.hold_updates
+         ~Checkbox.is_under_mouse
+         ~Checkbox.on_click
+         ~Checkbox.on_mouse_drag
+         ~Checkbox.on_mouse_drag_enter
+         ~Checkbox.on_mouse_drag_leave
+         ~Checkbox.on_mouse_enter
+         ~Checkbox.on_mouse_leave
+         ~Checkbox.on_mouse_motion
+         ~Checkbox.on_mouse_press
+         ~Checkbox.on_mouse_release
+         ~Checkbox.on_mouse_scroll
+         ~Checkbox.pause_updates
+         ~Checkbox.pop_handlers
+         ~Checkbox.push_handlers
+         ~Checkbox.register_event_type
+         ~Checkbox.relay_events_from
+         ~Checkbox.remove_handler
+         ~Checkbox.remove_handlers
+         ~Checkbox.remove_proxy
+         ~Checkbox.resume_updates
+         ~Checkbox.set_alignment
+         ~Checkbox.set_bottom_padding
+         ~Checkbox.set_handler
+         ~Checkbox.set_handlers
+         ~Checkbox.set_height_hint
+         ~Checkbox.set_horz_padding
+         ~Checkbox.set_images
+         ~Checkbox.set_left_padding
+         ~Checkbox.set_padding
+         ~Checkbox.set_propagate_mouse_events
+         ~Checkbox.set_right_padding
+         ~Checkbox.set_size_hint
+         ~Checkbox.set_top_padding
+         ~Checkbox.set_vert_padding
+         ~Checkbox.set_width_hint
+         ~Checkbox.start_event
+         ~Checkbox.stop_event
+         ~Checkbox.suppress_updates
+         ~Checkbox.toggle
+         ~Checkbox.uncheck
+         ~Checkbox.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Checkbox.alignment
+         ~Checkbox.batch
+         ~Checkbox.bottom_padding
+         ~Checkbox.claimed_height
+         ~Checkbox.claimed_rect
+         ~Checkbox.claimed_size
+         ~Checkbox.claimed_width
+         ~Checkbox.custom_alignment
+         ~Checkbox.custom_bottom_padding
+         ~Checkbox.custom_checked_base
+         ~Checkbox.custom_checked_down
+         ~Checkbox.custom_checked_off
+         ~Checkbox.custom_checked_over
+         ~Checkbox.custom_height_hint
+         ~Checkbox.custom_horz_padding
+         ~Checkbox.custom_left_padding
+         ~Checkbox.custom_padding
+         ~Checkbox.custom_propagate_mouse_events
+         ~Checkbox.custom_right_padding
+         ~Checkbox.custom_size_hint
+         ~Checkbox.custom_top_padding
+         ~Checkbox.custom_unchecked_base
+         ~Checkbox.custom_unchecked_down
+         ~Checkbox.custom_unchecked_off
+         ~Checkbox.custom_unchecked_over
+         ~Checkbox.custom_vert_padding
+         ~Checkbox.custom_width_hint
+         ~Checkbox.event_types
+         ~Checkbox.group
+         ~Checkbox.height_hint
+         ~Checkbox.horz_padding
+         ~Checkbox.images
+         ~Checkbox.is_attached_to_gui
+         ~Checkbox.is_checked
+         ~Checkbox.is_disabled
+         ~Checkbox.is_enabled
+         ~Checkbox.is_hidden
+         ~Checkbox.is_visible
+         ~Checkbox.last_rollover_state
+         ~Checkbox.left_padding
+         ~Checkbox.padded_rect
+         ~Checkbox.padding
+         ~Checkbox.parent
+         ~Checkbox.propagate_mouse_events
+         ~Checkbox.rect
+         ~Checkbox.right_padding
+         ~Checkbox.rollover_state
+         ~Checkbox.root
+         ~Checkbox.size_hint
+         ~Checkbox.top_padding
+         ~Checkbox.total_horz_padding
+         ~Checkbox.total_padding
+         ~Checkbox.total_vert_padding
+         ~Checkbox.vert_padding
+         ~Checkbox.width_hint
+         ~Checkbox.window
+   
+   

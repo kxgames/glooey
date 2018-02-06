@@ -1,0 +1,232 @@
+glooey.text.Label
+=================
+
+.. currentmodule:: glooey.text
+
+.. autoclass:: Label
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Label.__init__
+         ~Label.debug_drawing_problems
+         ~Label.debug_placement_problems
+         ~Label.del_background_color
+         ~Label.del_baseline
+         ~Label.del_bold
+         ~Label.del_color
+         ~Label.del_font_name
+         ~Label.del_font_size
+         ~Label.del_italic
+         ~Label.del_kerning
+         ~Label.del_line_spacing
+         ~Label.del_style
+         ~Label.del_text
+         ~Label.del_text_alignment
+         ~Label.del_underline
+         ~Label.disable
+         ~Label.disable_line_wrap
+         ~Label.discard_updates
+         ~Label.dispatch_event
+         ~Label.do_attach
+         ~Label.do_claim
+         ~Label.do_detach
+         ~Label.do_draw
+         ~Label.do_find_children_under_mouse
+         ~Label.do_make_new_layout
+         ~Label.do_regroup
+         ~Label.do_regroup_children
+         ~Label.do_resize
+         ~Label.do_resize_children
+         ~Label.do_undraw
+         ~Label.enable
+         ~Label.enable_line_wrap
+         ~Label.event
+         ~Label.get_alignment
+         ~Label.get_background_color
+         ~Label.get_baseline
+         ~Label.get_batch
+         ~Label.get_bold
+         ~Label.get_bottom_padding
+         ~Label.get_claimed_height
+         ~Label.get_claimed_rect
+         ~Label.get_claimed_size
+         ~Label.get_claimed_width
+         ~Label.get_color
+         ~Label.get_font_name
+         ~Label.get_font_size
+         ~Label.get_group
+         ~Label.get_height_hint
+         ~Label.get_horz_padding
+         ~Label.get_italic
+         ~Label.get_kerning
+         ~Label.get_last_rollover_state
+         ~Label.get_left_padding
+         ~Label.get_line_spacing
+         ~Label.get_padded_rect
+         ~Label.get_padding
+         ~Label.get_parent
+         ~Label.get_propagate_mouse_events
+         ~Label.get_rect
+         ~Label.get_right_padding
+         ~Label.get_rollover_state
+         ~Label.get_root
+         ~Label.get_size_hint
+         ~Label.get_style
+         ~Label.get_text
+         ~Label.get_text_alignment
+         ~Label.get_top_padding
+         ~Label.get_total_horz_padding
+         ~Label.get_total_padding
+         ~Label.get_total_vert_padding
+         ~Label.get_underline
+         ~Label.get_vert_padding
+         ~Label.get_width_hint
+         ~Label.get_window
+         ~Label.hide
+         ~Label.hold_updates
+         ~Label.is_under_mouse
+         ~Label.on_delete_text
+         ~Label.on_insert_text
+         ~Label.on_mouse_drag
+         ~Label.on_mouse_drag_enter
+         ~Label.on_mouse_drag_leave
+         ~Label.on_mouse_enter
+         ~Label.on_mouse_leave
+         ~Label.on_mouse_motion
+         ~Label.on_mouse_press
+         ~Label.on_mouse_release
+         ~Label.on_mouse_scroll
+         ~Label.pause_updates
+         ~Label.pop_handlers
+         ~Label.push_handlers
+         ~Label.register_event_type
+         ~Label.relay_events_from
+         ~Label.remove_handler
+         ~Label.remove_handlers
+         ~Label.resume_updates
+         ~Label.set_alignment
+         ~Label.set_background_color
+         ~Label.set_baseline
+         ~Label.set_bold
+         ~Label.set_bottom_padding
+         ~Label.set_color
+         ~Label.set_font_name
+         ~Label.set_font_size
+         ~Label.set_handler
+         ~Label.set_handlers
+         ~Label.set_height_hint
+         ~Label.set_horz_padding
+         ~Label.set_italic
+         ~Label.set_kerning
+         ~Label.set_left_padding
+         ~Label.set_line_spacing
+         ~Label.set_padding
+         ~Label.set_propagate_mouse_events
+         ~Label.set_right_padding
+         ~Label.set_size_hint
+         ~Label.set_style
+         ~Label.set_text
+         ~Label.set_text_alignment
+         ~Label.set_top_padding
+         ~Label.set_underline
+         ~Label.set_vert_padding
+         ~Label.set_width_hint
+         ~Label.start_event
+         ~Label.stop_event
+         ~Label.suppress_updates
+         ~Label.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Label.alignment
+         ~Label.background_color
+         ~Label.baseline
+         ~Label.batch
+         ~Label.bold
+         ~Label.bottom_padding
+         ~Label.claimed_height
+         ~Label.claimed_rect
+         ~Label.claimed_size
+         ~Label.claimed_width
+         ~Label.color
+         ~Label.custom_alignment
+         ~Label.custom_background_color
+         ~Label.custom_baseline
+         ~Label.custom_bold
+         ~Label.custom_bottom_padding
+         ~Label.custom_color
+         ~Label.custom_font_name
+         ~Label.custom_font_size
+         ~Label.custom_height_hint
+         ~Label.custom_horz_padding
+         ~Label.custom_italic
+         ~Label.custom_kerning
+         ~Label.custom_left_padding
+         ~Label.custom_line_spacing
+         ~Label.custom_padding
+         ~Label.custom_propagate_mouse_events
+         ~Label.custom_right_padding
+         ~Label.custom_size_hint
+         ~Label.custom_text
+         ~Label.custom_text_alignment
+         ~Label.custom_top_padding
+         ~Label.custom_underline
+         ~Label.custom_vert_padding
+         ~Label.custom_width_hint
+         ~Label.event_types
+         ~Label.font_name
+         ~Label.font_size
+         ~Label.group
+         ~Label.height_hint
+         ~Label.horz_padding
+         ~Label.is_attached_to_gui
+         ~Label.is_disabled
+         ~Label.is_enabled
+         ~Label.is_hidden
+         ~Label.is_visible
+         ~Label.italic
+         ~Label.kerning
+         ~Label.last_rollover_state
+         ~Label.left_padding
+         ~Label.line_spacing
+         ~Label.padded_rect
+         ~Label.padding
+         ~Label.parent
+         ~Label.propagate_mouse_events
+         ~Label.rect
+         ~Label.right_padding
+         ~Label.rollover_state
+         ~Label.root
+         ~Label.size_hint
+         ~Label.text
+         ~Label.text_alignment
+         ~Label.top_padding
+         ~Label.total_horz_padding
+         ~Label.total_padding
+         ~Label.total_vert_padding
+         ~Label.underline
+         ~Label.vert_padding
+         ~Label.width_hint
+         ~Label.window
+   
+   

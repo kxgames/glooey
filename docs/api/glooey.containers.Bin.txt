@@ -1,0 +1,168 @@
+glooey.containers.Bin
+=====================
+
+.. currentmodule:: glooey.containers
+
+.. autoclass:: Bin
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Bin.__init__
+         ~Bin.add
+         ~Bin.clear
+         ~Bin.debug_drawing_problems
+         ~Bin.debug_placement_problems
+         ~Bin.disable
+         ~Bin.discard_updates
+         ~Bin.dispatch_event
+         ~Bin.do_attach
+         ~Bin.do_claim
+         ~Bin.do_detach
+         ~Bin.do_draw
+         ~Bin.do_find_children_under_mouse
+         ~Bin.do_regroup
+         ~Bin.do_regroup_children
+         ~Bin.do_resize
+         ~Bin.do_resize_children
+         ~Bin.do_undraw
+         ~Bin.enable
+         ~Bin.event
+         ~Bin.get_alignment
+         ~Bin.get_batch
+         ~Bin.get_bottom_padding
+         ~Bin.get_child
+         ~Bin.get_claimed_height
+         ~Bin.get_claimed_rect
+         ~Bin.get_claimed_size
+         ~Bin.get_claimed_width
+         ~Bin.get_group
+         ~Bin.get_height_hint
+         ~Bin.get_horz_padding
+         ~Bin.get_last_rollover_state
+         ~Bin.get_left_padding
+         ~Bin.get_padded_rect
+         ~Bin.get_padding
+         ~Bin.get_parent
+         ~Bin.get_propagate_mouse_events
+         ~Bin.get_rect
+         ~Bin.get_right_padding
+         ~Bin.get_rollover_state
+         ~Bin.get_root
+         ~Bin.get_size_hint
+         ~Bin.get_top_padding
+         ~Bin.get_total_horz_padding
+         ~Bin.get_total_padding
+         ~Bin.get_total_vert_padding
+         ~Bin.get_vert_padding
+         ~Bin.get_width_hint
+         ~Bin.get_window
+         ~Bin.hide
+         ~Bin.hold_updates
+         ~Bin.is_under_mouse
+         ~Bin.on_mouse_drag
+         ~Bin.on_mouse_drag_enter
+         ~Bin.on_mouse_drag_leave
+         ~Bin.on_mouse_enter
+         ~Bin.on_mouse_leave
+         ~Bin.on_mouse_motion
+         ~Bin.on_mouse_press
+         ~Bin.on_mouse_release
+         ~Bin.on_mouse_scroll
+         ~Bin.pause_updates
+         ~Bin.pop_handlers
+         ~Bin.push_handlers
+         ~Bin.register_event_type
+         ~Bin.relay_events_from
+         ~Bin.remove_handler
+         ~Bin.remove_handlers
+         ~Bin.resume_updates
+         ~Bin.set_alignment
+         ~Bin.set_bottom_padding
+         ~Bin.set_handler
+         ~Bin.set_handlers
+         ~Bin.set_height_hint
+         ~Bin.set_horz_padding
+         ~Bin.set_left_padding
+         ~Bin.set_padding
+         ~Bin.set_propagate_mouse_events
+         ~Bin.set_right_padding
+         ~Bin.set_size_hint
+         ~Bin.set_top_padding
+         ~Bin.set_vert_padding
+         ~Bin.set_width_hint
+         ~Bin.start_event
+         ~Bin.stop_event
+         ~Bin.suppress_updates
+         ~Bin.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Bin.alignment
+         ~Bin.batch
+         ~Bin.bottom_padding
+         ~Bin.child
+         ~Bin.claimed_height
+         ~Bin.claimed_rect
+         ~Bin.claimed_size
+         ~Bin.claimed_width
+         ~Bin.custom_alignment
+         ~Bin.custom_bottom_padding
+         ~Bin.custom_height_hint
+         ~Bin.custom_horz_padding
+         ~Bin.custom_left_padding
+         ~Bin.custom_padding
+         ~Bin.custom_propagate_mouse_events
+         ~Bin.custom_right_padding
+         ~Bin.custom_size_hint
+         ~Bin.custom_top_padding
+         ~Bin.custom_vert_padding
+         ~Bin.custom_width_hint
+         ~Bin.event_types
+         ~Bin.group
+         ~Bin.height_hint
+         ~Bin.horz_padding
+         ~Bin.is_attached_to_gui
+         ~Bin.is_disabled
+         ~Bin.is_enabled
+         ~Bin.is_hidden
+         ~Bin.is_visible
+         ~Bin.last_rollover_state
+         ~Bin.left_padding
+         ~Bin.padded_rect
+         ~Bin.padding
+         ~Bin.parent
+         ~Bin.propagate_mouse_events
+         ~Bin.rect
+         ~Bin.right_padding
+         ~Bin.rollover_state
+         ~Bin.root
+         ~Bin.size_hint
+         ~Bin.top_padding
+         ~Bin.total_horz_padding
+         ~Bin.total_padding
+         ~Bin.total_vert_padding
+         ~Bin.vert_padding
+         ~Bin.width_hint
+         ~Bin.window
+   
+   

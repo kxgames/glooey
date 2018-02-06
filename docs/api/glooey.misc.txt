@@ -1,0 +1,27 @@
+glooey.misc
+===========
+
+.. automodule:: glooey.misc
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree: .
+   
+      EventLogger
+      FillBar
+      LoremIpsum
+      Placeholder
+      Spacer
+   
+   
+
+   
+   
+   
+
+   
+   
+   

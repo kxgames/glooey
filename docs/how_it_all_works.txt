@@ -243,7 +243,7 @@ called previously.
            self.artist.hide()
 
 Glooey comes with a handful of other artists as well.  All are described in the 
-`api_reference`, but one that's worth briefly highlighting is 
+`api`, but one that's worth briefly highlighting is 
 `glooey.drawing.Background`.  This artist can draw rectangles, images, and 
 outlines, and can also tile images along any edge.  In short, it's the artist 
 behind the `Background` widget, so it can do everything that widget can do.

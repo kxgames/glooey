@@ -1,0 +1,190 @@
+glooey.images.Background
+========================
+
+.. currentmodule:: glooey.images
+
+.. autoclass:: Background
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Background.__init__
+         ~Background.debug_drawing_problems
+         ~Background.debug_placement_problems
+         ~Background.disable
+         ~Background.discard_updates
+         ~Background.dispatch_event
+         ~Background.do_attach
+         ~Background.do_claim
+         ~Background.do_detach
+         ~Background.do_draw
+         ~Background.do_find_children_under_mouse
+         ~Background.do_regroup
+         ~Background.do_regroup_children
+         ~Background.do_resize
+         ~Background.do_resize_children
+         ~Background.do_undraw
+         ~Background.enable
+         ~Background.event
+         ~Background.get_alignment
+         ~Background.get_appearance
+         ~Background.get_batch
+         ~Background.get_bottom_padding
+         ~Background.get_claimed_height
+         ~Background.get_claimed_rect
+         ~Background.get_claimed_size
+         ~Background.get_claimed_width
+         ~Background.get_color
+         ~Background.get_group
+         ~Background.get_height_hint
+         ~Background.get_horz_padding
+         ~Background.get_last_rollover_state
+         ~Background.get_left_padding
+         ~Background.get_outline
+         ~Background.get_padded_rect
+         ~Background.get_padding
+         ~Background.get_parent
+         ~Background.get_propagate_mouse_events
+         ~Background.get_rect
+         ~Background.get_right_padding
+         ~Background.get_rollover_state
+         ~Background.get_root
+         ~Background.get_size_hint
+         ~Background.get_top_padding
+         ~Background.get_total_horz_padding
+         ~Background.get_total_padding
+         ~Background.get_total_vert_padding
+         ~Background.get_vert_padding
+         ~Background.get_width_hint
+         ~Background.get_window
+         ~Background.hide
+         ~Background.hold_updates
+         ~Background.is_under_mouse
+         ~Background.on_mouse_drag
+         ~Background.on_mouse_drag_enter
+         ~Background.on_mouse_drag_leave
+         ~Background.on_mouse_enter
+         ~Background.on_mouse_leave
+         ~Background.on_mouse_motion
+         ~Background.on_mouse_press
+         ~Background.on_mouse_release
+         ~Background.on_mouse_scroll
+         ~Background.pause_updates
+         ~Background.pop_handlers
+         ~Background.push_handlers
+         ~Background.register_event_type
+         ~Background.relay_events_from
+         ~Background.remove_handler
+         ~Background.remove_handlers
+         ~Background.resume_updates
+         ~Background.set_alignment
+         ~Background.set_appearance
+         ~Background.set_bottom_padding
+         ~Background.set_color
+         ~Background.set_handler
+         ~Background.set_handlers
+         ~Background.set_height_hint
+         ~Background.set_horz_padding
+         ~Background.set_image
+         ~Background.set_left_padding
+         ~Background.set_outline
+         ~Background.set_padding
+         ~Background.set_propagate_mouse_events
+         ~Background.set_right_padding
+         ~Background.set_size_hint
+         ~Background.set_top_padding
+         ~Background.set_vert_padding
+         ~Background.set_width_hint
+         ~Background.start_event
+         ~Background.stop_event
+         ~Background.suppress_updates
+         ~Background.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Background.alignment
+         ~Background.appearance
+         ~Background.batch
+         ~Background.bottom_padding
+         ~Background.claimed_height
+         ~Background.claimed_rect
+         ~Background.claimed_size
+         ~Background.claimed_width
+         ~Background.color
+         ~Background.custom_alignment
+         ~Background.custom_bottom
+         ~Background.custom_bottom_left
+         ~Background.custom_bottom_padding
+         ~Background.custom_bottom_right
+         ~Background.custom_center
+         ~Background.custom_color
+         ~Background.custom_height_hint
+         ~Background.custom_horz_padding
+         ~Background.custom_htile
+         ~Background.custom_image
+         ~Background.custom_left
+         ~Background.custom_left_padding
+         ~Background.custom_outline
+         ~Background.custom_padding
+         ~Background.custom_propagate_mouse_events
+         ~Background.custom_right
+         ~Background.custom_right_padding
+         ~Background.custom_size_hint
+         ~Background.custom_top
+         ~Background.custom_top_left
+         ~Background.custom_top_padding
+         ~Background.custom_top_right
+         ~Background.custom_vert_padding
+         ~Background.custom_vtile
+         ~Background.custom_width_hint
+         ~Background.event_types
+         ~Background.group
+         ~Background.height_hint
+         ~Background.horz_padding
+         ~Background.image
+         ~Background.is_attached_to_gui
+         ~Background.is_disabled
+         ~Background.is_empty
+         ~Background.is_enabled
+         ~Background.is_hidden
+         ~Background.is_visible
+         ~Background.last_rollover_state
+         ~Background.left_padding
+         ~Background.outline
+         ~Background.padded_rect
+         ~Background.padding
+         ~Background.parent
+         ~Background.propagate_mouse_events
+         ~Background.rect
+         ~Background.right_padding
+         ~Background.rollover_state
+         ~Background.root
+         ~Background.size_hint
+         ~Background.top_padding
+         ~Background.total_horz_padding
+         ~Background.total_padding
+         ~Background.total_vert_padding
+         ~Background.vert_padding
+         ~Background.width_hint
+         ~Background.window
+   
+   

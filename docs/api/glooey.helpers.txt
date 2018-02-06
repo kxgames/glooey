@@ -1,0 +1,41 @@
+glooey.helpers
+==============
+
+.. automodule:: glooey.helpers
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree: .
+   
+      HoldUpdatesMixin
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree: .
+   
+      clamp
+      first_not_none
+      late_binding_property
+      update_function
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+      :toctree: .
+   
+      NoParentError
+      UsageError
+   
+   

@@ -22,20 +22,13 @@ import glooey
 
 ## General configuration
 
-# If your documentation needs a minimal Sphinx version, state it here.
-#
-# needs_sphinx = '1.0'
+# General information about the project.
+project = 'Glooey'
+copyright = '2014, Kale Kundert'
+author = 'Kale Kundert'
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
-extensions = [ #
-    'glooey_ext',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.coverage',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.intersphinx',
-]
+# If your documentation needs a minimal Sphinx version, state it here.
+# needs_sphinx = '1.0'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
@@ -46,11 +39,6 @@ source_suffix = '.txt'
 
 # The master toctree document.
 master_doc = 'index'
-
-# General information about the project.
-project = 'Glooey'
-copyright = '2014, Kale Kundert'
-author = 'Kale Kundert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -73,10 +61,31 @@ language = None
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['.build', 'Thumbs.db', '.DS_Store']
 
+default_role = 'any'
+
+## Extension configuration
+
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
+extensions = [ #
+    'glooey_ext',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.coverage',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
+]
+
+# The default flags to use for auto-documented members.  These defaults can be 
+# disable on an individual basis by putting :no-XXX: in autodoc directives.
+autodoc_default_flags = [ #
+]
+
+autodoc_member_order = 'bysource'
+
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-
-default_role = 'any'
 
 intersphinx_mapping = { #
         'pyglet': ('http://pyglet.readthedocs.io/en/latest', None),

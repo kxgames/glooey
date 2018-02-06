@@ -1,0 +1,178 @@
+glooey.dialogs.Dialog
+=====================
+
+.. currentmodule:: glooey.dialogs
+
+.. autoclass:: Dialog
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Dialog.__init__
+         ~Dialog.add
+         ~Dialog.clear
+         ~Dialog.close
+         ~Dialog.debug_drawing_problems
+         ~Dialog.debug_placement_problems
+         ~Dialog.disable
+         ~Dialog.discard_updates
+         ~Dialog.dispatch_event
+         ~Dialog.do_attach
+         ~Dialog.do_claim
+         ~Dialog.do_detach
+         ~Dialog.do_draw
+         ~Dialog.do_find_children_under_mouse
+         ~Dialog.do_regroup
+         ~Dialog.do_regroup_children
+         ~Dialog.do_resize
+         ~Dialog.do_resize_children
+         ~Dialog.do_undraw
+         ~Dialog.enable
+         ~Dialog.event
+         ~Dialog.get_alignment
+         ~Dialog.get_batch
+         ~Dialog.get_bottom_padding
+         ~Dialog.get_box
+         ~Dialog.get_claimed_height
+         ~Dialog.get_claimed_rect
+         ~Dialog.get_claimed_size
+         ~Dialog.get_claimed_width
+         ~Dialog.get_decoration
+         ~Dialog.get_foreground
+         ~Dialog.get_group
+         ~Dialog.get_height_hint
+         ~Dialog.get_horz_padding
+         ~Dialog.get_last_rollover_state
+         ~Dialog.get_left_padding
+         ~Dialog.get_padded_rect
+         ~Dialog.get_padding
+         ~Dialog.get_parent
+         ~Dialog.get_propagate_mouse_events
+         ~Dialog.get_rect
+         ~Dialog.get_right_padding
+         ~Dialog.get_rollover_state
+         ~Dialog.get_root
+         ~Dialog.get_size_hint
+         ~Dialog.get_top_padding
+         ~Dialog.get_total_horz_padding
+         ~Dialog.get_total_padding
+         ~Dialog.get_total_vert_padding
+         ~Dialog.get_vert_padding
+         ~Dialog.get_width_hint
+         ~Dialog.get_window
+         ~Dialog.hide
+         ~Dialog.hold_updates
+         ~Dialog.is_under_mouse
+         ~Dialog.on_mouse_drag
+         ~Dialog.on_mouse_drag_enter
+         ~Dialog.on_mouse_drag_leave
+         ~Dialog.on_mouse_enter
+         ~Dialog.on_mouse_leave
+         ~Dialog.on_mouse_motion
+         ~Dialog.on_mouse_press
+         ~Dialog.on_mouse_release
+         ~Dialog.on_mouse_scroll
+         ~Dialog.open
+         ~Dialog.pause_updates
+         ~Dialog.pop_handlers
+         ~Dialog.push_handlers
+         ~Dialog.register_event_type
+         ~Dialog.relay_events_from
+         ~Dialog.remove_handler
+         ~Dialog.remove_handlers
+         ~Dialog.resume_updates
+         ~Dialog.set_alignment
+         ~Dialog.set_bottom_padding
+         ~Dialog.set_handler
+         ~Dialog.set_handlers
+         ~Dialog.set_height_hint
+         ~Dialog.set_horz_padding
+         ~Dialog.set_left_padding
+         ~Dialog.set_padding
+         ~Dialog.set_propagate_mouse_events
+         ~Dialog.set_right_padding
+         ~Dialog.set_size_hint
+         ~Dialog.set_top_padding
+         ~Dialog.set_vert_padding
+         ~Dialog.set_width_hint
+         ~Dialog.start_event
+         ~Dialog.stop_event
+         ~Dialog.suppress_updates
+         ~Dialog.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Dialog.Foreground
+         ~Dialog.alignment
+         ~Dialog.batch
+         ~Dialog.bottom_padding
+         ~Dialog.box
+         ~Dialog.claimed_height
+         ~Dialog.claimed_rect
+         ~Dialog.claimed_size
+         ~Dialog.claimed_width
+         ~Dialog.custom_alignment
+         ~Dialog.custom_autoadd_foreground
+         ~Dialog.custom_bottom_padding
+         ~Dialog.custom_box_layer
+         ~Dialog.custom_decoration_layer
+         ~Dialog.custom_height_hint
+         ~Dialog.custom_horz_padding
+         ~Dialog.custom_left_padding
+         ~Dialog.custom_padding
+         ~Dialog.custom_propagate_mouse_events
+         ~Dialog.custom_right_padding
+         ~Dialog.custom_size_hint
+         ~Dialog.custom_top_padding
+         ~Dialog.custom_vert_padding
+         ~Dialog.custom_width_hint
+         ~Dialog.decoration
+         ~Dialog.event_types
+         ~Dialog.foreground
+         ~Dialog.group
+         ~Dialog.height_hint
+         ~Dialog.horz_padding
+         ~Dialog.is_attached_to_gui
+         ~Dialog.is_disabled
+         ~Dialog.is_enabled
+         ~Dialog.is_hidden
+         ~Dialog.is_visible
+         ~Dialog.last_rollover_state
+         ~Dialog.left_padding
+         ~Dialog.padded_rect
+         ~Dialog.padding
+         ~Dialog.parent
+         ~Dialog.propagate_mouse_events
+         ~Dialog.rect
+         ~Dialog.right_padding
+         ~Dialog.rollover_state
+         ~Dialog.root
+         ~Dialog.size_hint
+         ~Dialog.top_padding
+         ~Dialog.total_horz_padding
+         ~Dialog.total_padding
+         ~Dialog.total_vert_padding
+         ~Dialog.vert_padding
+         ~Dialog.width_hint
+         ~Dialog.window
+   
+   

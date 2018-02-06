@@ -1,0 +1,41 @@
+glooey.widget.EventDispatcher
+=============================
+
+.. currentmodule:: glooey.widget
+
+.. autoclass:: EventDispatcher
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~EventDispatcher.__init__
+         ~EventDispatcher.dispatch_event
+         ~EventDispatcher.event
+         ~EventDispatcher.pop_handlers
+         ~EventDispatcher.push_handlers
+         ~EventDispatcher.register_event_type
+         ~EventDispatcher.relay_events_from
+         ~EventDispatcher.remove_handler
+         ~EventDispatcher.remove_handlers
+         ~EventDispatcher.set_handler
+         ~EventDispatcher.set_handlers
+         ~EventDispatcher.start_event
+         ~EventDispatcher.stop_event
+   
+   
+
+   
+   
+   

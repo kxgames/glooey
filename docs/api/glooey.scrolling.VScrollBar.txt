@@ -1,0 +1,187 @@
+glooey.scrolling.VScrollBar
+===========================
+
+.. currentmodule:: glooey.scrolling
+
+.. autoclass:: VScrollBar
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~VScrollBar.__init__
+         ~VScrollBar.add
+         ~VScrollBar.clear
+         ~VScrollBar.debug_drawing_problems
+         ~VScrollBar.debug_placement_problems
+         ~VScrollBar.disable
+         ~VScrollBar.discard_updates
+         ~VScrollBar.dispatch_event
+         ~VScrollBar.do_attach
+         ~VScrollBar.do_claim
+         ~VScrollBar.do_detach
+         ~VScrollBar.do_draw
+         ~VScrollBar.do_find_children_under_mouse
+         ~VScrollBar.do_regroup
+         ~VScrollBar.do_regroup_children
+         ~VScrollBar.do_resize
+         ~VScrollBar.do_resize_children
+         ~VScrollBar.do_undraw
+         ~VScrollBar.enable
+         ~VScrollBar.event
+         ~VScrollBar.get_alignment
+         ~VScrollBar.get_batch
+         ~VScrollBar.get_bottom_padding
+         ~VScrollBar.get_box
+         ~VScrollBar.get_button_speed
+         ~VScrollBar.get_claimed_height
+         ~VScrollBar.get_claimed_rect
+         ~VScrollBar.get_claimed_size
+         ~VScrollBar.get_claimed_width
+         ~VScrollBar.get_decoration
+         ~VScrollBar.get_foreground
+         ~VScrollBar.get_group
+         ~VScrollBar.get_height_hint
+         ~VScrollBar.get_horz_padding
+         ~VScrollBar.get_last_rollover_state
+         ~VScrollBar.get_left_padding
+         ~VScrollBar.get_orientation
+         ~VScrollBar.get_padded_rect
+         ~VScrollBar.get_padding
+         ~VScrollBar.get_parent
+         ~VScrollBar.get_propagate_mouse_events
+         ~VScrollBar.get_rect
+         ~VScrollBar.get_right_padding
+         ~VScrollBar.get_rollover_state
+         ~VScrollBar.get_root
+         ~VScrollBar.get_size_hint
+         ~VScrollBar.get_top_padding
+         ~VScrollBar.get_total_horz_padding
+         ~VScrollBar.get_total_padding
+         ~VScrollBar.get_total_vert_padding
+         ~VScrollBar.get_vert_padding
+         ~VScrollBar.get_width_hint
+         ~VScrollBar.get_window
+         ~VScrollBar.hide
+         ~VScrollBar.hold_updates
+         ~VScrollBar.is_under_mouse
+         ~VScrollBar.on_backward_click
+         ~VScrollBar.on_bar_click
+         ~VScrollBar.on_forward_click
+         ~VScrollBar.on_mouse_drag
+         ~VScrollBar.on_mouse_drag_enter
+         ~VScrollBar.on_mouse_drag_leave
+         ~VScrollBar.on_mouse_enter
+         ~VScrollBar.on_mouse_leave
+         ~VScrollBar.on_mouse_motion
+         ~VScrollBar.on_mouse_press
+         ~VScrollBar.on_mouse_release
+         ~VScrollBar.on_mouse_scroll
+         ~VScrollBar.pause_updates
+         ~VScrollBar.pop_handlers
+         ~VScrollBar.push_handlers
+         ~VScrollBar.register_event_type
+         ~VScrollBar.relay_events_from
+         ~VScrollBar.remove_handler
+         ~VScrollBar.remove_handlers
+         ~VScrollBar.resume_updates
+         ~VScrollBar.set_alignment
+         ~VScrollBar.set_bottom_padding
+         ~VScrollBar.set_button_speed
+         ~VScrollBar.set_handler
+         ~VScrollBar.set_handlers
+         ~VScrollBar.set_height_hint
+         ~VScrollBar.set_horz_padding
+         ~VScrollBar.set_left_padding
+         ~VScrollBar.set_padding
+         ~VScrollBar.set_propagate_mouse_events
+         ~VScrollBar.set_right_padding
+         ~VScrollBar.set_size_hint
+         ~VScrollBar.set_top_padding
+         ~VScrollBar.set_vert_padding
+         ~VScrollBar.set_width_hint
+         ~VScrollBar.start_event
+         ~VScrollBar.stop_event
+         ~VScrollBar.suppress_updates
+         ~VScrollBar.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~VScrollBar.Backward
+         ~VScrollBar.Foreground
+         ~VScrollBar.Forward
+         ~VScrollBar.alignment
+         ~VScrollBar.batch
+         ~VScrollBar.bottom_padding
+         ~VScrollBar.box
+         ~VScrollBar.button_speed
+         ~VScrollBar.claimed_height
+         ~VScrollBar.claimed_rect
+         ~VScrollBar.claimed_size
+         ~VScrollBar.claimed_width
+         ~VScrollBar.custom_alignment
+         ~VScrollBar.custom_autoadd_foreground
+         ~VScrollBar.custom_bottom_padding
+         ~VScrollBar.custom_box_layer
+         ~VScrollBar.custom_button_speed
+         ~VScrollBar.custom_decoration_layer
+         ~VScrollBar.custom_height_hint
+         ~VScrollBar.custom_horz_padding
+         ~VScrollBar.custom_left_padding
+         ~VScrollBar.custom_padding
+         ~VScrollBar.custom_propagate_mouse_events
+         ~VScrollBar.custom_right_padding
+         ~VScrollBar.custom_size_hint
+         ~VScrollBar.custom_top_padding
+         ~VScrollBar.custom_vert_padding
+         ~VScrollBar.custom_width_hint
+         ~VScrollBar.decoration
+         ~VScrollBar.event_types
+         ~VScrollBar.foreground
+         ~VScrollBar.group
+         ~VScrollBar.height_hint
+         ~VScrollBar.horz_padding
+         ~VScrollBar.is_attached_to_gui
+         ~VScrollBar.is_disabled
+         ~VScrollBar.is_enabled
+         ~VScrollBar.is_hidden
+         ~VScrollBar.is_visible
+         ~VScrollBar.last_rollover_state
+         ~VScrollBar.left_padding
+         ~VScrollBar.orientation
+         ~VScrollBar.padded_rect
+         ~VScrollBar.padding
+         ~VScrollBar.parent
+         ~VScrollBar.propagate_mouse_events
+         ~VScrollBar.rect
+         ~VScrollBar.right_padding
+         ~VScrollBar.rollover_state
+         ~VScrollBar.root
+         ~VScrollBar.size_hint
+         ~VScrollBar.top_padding
+         ~VScrollBar.total_horz_padding
+         ~VScrollBar.total_padding
+         ~VScrollBar.total_vert_padding
+         ~VScrollBar.vert_padding
+         ~VScrollBar.width_hint
+         ~VScrollBar.window
+   
+   

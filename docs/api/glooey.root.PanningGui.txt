@@ -1,0 +1,180 @@
+glooey.root.PanningGui
+======================
+
+.. currentmodule:: glooey.root
+
+.. autoclass:: PanningGui
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~PanningGui.__init__
+         ~PanningGui.add
+         ~PanningGui.add_back
+         ~PanningGui.add_front
+         ~PanningGui.clear
+         ~PanningGui.debug_drawing_problems
+         ~PanningGui.debug_placement_problems
+         ~PanningGui.disable
+         ~PanningGui.discard_updates
+         ~PanningGui.dispatch_event
+         ~PanningGui.do_attach
+         ~PanningGui.do_claim
+         ~PanningGui.do_detach
+         ~PanningGui.do_draw
+         ~PanningGui.do_find_children_under_mouse
+         ~PanningGui.do_regroup
+         ~PanningGui.do_regroup_children
+         ~PanningGui.do_resize
+         ~PanningGui.do_resize_children
+         ~PanningGui.do_undraw
+         ~PanningGui.enable
+         ~PanningGui.event
+         ~PanningGui.get_alignment
+         ~PanningGui.get_batch
+         ~PanningGui.get_bottom_padding
+         ~PanningGui.get_children
+         ~PanningGui.get_claimed_height
+         ~PanningGui.get_claimed_rect
+         ~PanningGui.get_claimed_size
+         ~PanningGui.get_claimed_width
+         ~PanningGui.get_group
+         ~PanningGui.get_height_hint
+         ~PanningGui.get_horz_padding
+         ~PanningGui.get_last_rollover_state
+         ~PanningGui.get_layers
+         ~PanningGui.get_left_padding
+         ~PanningGui.get_padded_rect
+         ~PanningGui.get_padding
+         ~PanningGui.get_parent
+         ~PanningGui.get_propagate_mouse_events
+         ~PanningGui.get_rect
+         ~PanningGui.get_right_padding
+         ~PanningGui.get_rollover_state
+         ~PanningGui.get_root
+         ~PanningGui.get_size_hint
+         ~PanningGui.get_territory
+         ~PanningGui.get_top_padding
+         ~PanningGui.get_total_horz_padding
+         ~PanningGui.get_total_padding
+         ~PanningGui.get_total_vert_padding
+         ~PanningGui.get_vert_padding
+         ~PanningGui.get_width_hint
+         ~PanningGui.get_window
+         ~PanningGui.hide
+         ~PanningGui.hold_updates
+         ~PanningGui.insert
+         ~PanningGui.is_under_mouse
+         ~PanningGui.on_draw
+         ~PanningGui.on_mouse_drag
+         ~PanningGui.on_mouse_drag_enter
+         ~PanningGui.on_mouse_drag_leave
+         ~PanningGui.on_mouse_enter
+         ~PanningGui.on_mouse_leave
+         ~PanningGui.on_mouse_motion
+         ~PanningGui.on_mouse_press
+         ~PanningGui.on_mouse_release
+         ~PanningGui.on_mouse_scroll
+         ~PanningGui.on_resize
+         ~PanningGui.pause_updates
+         ~PanningGui.pop_handlers
+         ~PanningGui.push_handlers
+         ~PanningGui.register_event_type
+         ~PanningGui.relay_events_from
+         ~PanningGui.remove
+         ~PanningGui.remove_handler
+         ~PanningGui.remove_handlers
+         ~PanningGui.resume_updates
+         ~PanningGui.set_alignment
+         ~PanningGui.set_bottom_padding
+         ~PanningGui.set_cursor
+         ~PanningGui.set_handler
+         ~PanningGui.set_handlers
+         ~PanningGui.set_height_hint
+         ~PanningGui.set_horz_padding
+         ~PanningGui.set_left_padding
+         ~PanningGui.set_padding
+         ~PanningGui.set_propagate_mouse_events
+         ~PanningGui.set_right_padding
+         ~PanningGui.set_size_hint
+         ~PanningGui.set_top_padding
+         ~PanningGui.set_vert_padding
+         ~PanningGui.set_width_hint
+         ~PanningGui.start_event
+         ~PanningGui.stop_event
+         ~PanningGui.suppress_updates
+         ~PanningGui.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~PanningGui.alignment
+         ~PanningGui.batch
+         ~PanningGui.bottom_padding
+         ~PanningGui.children
+         ~PanningGui.claimed_height
+         ~PanningGui.claimed_rect
+         ~PanningGui.claimed_size
+         ~PanningGui.claimed_width
+         ~PanningGui.custom_alignment
+         ~PanningGui.custom_bottom_padding
+         ~PanningGui.custom_height_hint
+         ~PanningGui.custom_horz_padding
+         ~PanningGui.custom_left_padding
+         ~PanningGui.custom_one_child_gets_mouse
+         ~PanningGui.custom_padding
+         ~PanningGui.custom_propagate_mouse_events
+         ~PanningGui.custom_right_padding
+         ~PanningGui.custom_size_hint
+         ~PanningGui.custom_top_padding
+         ~PanningGui.custom_vert_padding
+         ~PanningGui.custom_width_hint
+         ~PanningGui.event_types
+         ~PanningGui.group
+         ~PanningGui.height_hint
+         ~PanningGui.horz_padding
+         ~PanningGui.is_attached_to_gui
+         ~PanningGui.is_disabled
+         ~PanningGui.is_enabled
+         ~PanningGui.is_hidden
+         ~PanningGui.is_visible
+         ~PanningGui.last_rollover_state
+         ~PanningGui.layers
+         ~PanningGui.left_padding
+         ~PanningGui.padded_rect
+         ~PanningGui.padding
+         ~PanningGui.parent
+         ~PanningGui.propagate_mouse_events
+         ~PanningGui.rect
+         ~PanningGui.right_padding
+         ~PanningGui.rollover_state
+         ~PanningGui.root
+         ~PanningGui.size_hint
+         ~PanningGui.territory
+         ~PanningGui.top_padding
+         ~PanningGui.total_horz_padding
+         ~PanningGui.total_padding
+         ~PanningGui.total_vert_padding
+         ~PanningGui.vert_padding
+         ~PanningGui.width_hint
+         ~PanningGui.window
+   
+   

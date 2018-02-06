@@ -7,7 +7,7 @@ with just a few.  This tutorial introduces some of the most fundamental
 widgets to give you a feel for what's available and how to make GUIs that are 
 more "real" than the :doc:`getting_started` example.  These introductions are  
 very brief, but you can find complete documentation for every widget in the 
-:doc:`api_reference`.
+:doc:`api`.
 
 Keep in mind that the built-in widgets are unstyled, so they're all kinda ugly 
 and/or aggressively minimalist [1]_.  Glooey's philosophy is that subclassing 

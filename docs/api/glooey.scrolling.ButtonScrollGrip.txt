@@ -1,0 +1,191 @@
+glooey.scrolling.ButtonScrollGrip
+=================================
+
+.. currentmodule:: glooey.scrolling
+
+.. autoclass:: ButtonScrollGrip
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~ButtonScrollGrip.__init__
+         ~ButtonScrollGrip.click
+         ~ButtonScrollGrip.debug_drawing_problems
+         ~ButtonScrollGrip.debug_placement_problems
+         ~ButtonScrollGrip.del_background
+         ~ButtonScrollGrip.del_image
+         ~ButtonScrollGrip.del_text
+         ~ButtonScrollGrip.disable
+         ~ButtonScrollGrip.discard_updates
+         ~ButtonScrollGrip.dispatch_event
+         ~ButtonScrollGrip.do_attach
+         ~ButtonScrollGrip.do_claim
+         ~ButtonScrollGrip.do_detach
+         ~ButtonScrollGrip.do_draw
+         ~ButtonScrollGrip.do_find_children_under_mouse
+         ~ButtonScrollGrip.do_regroup
+         ~ButtonScrollGrip.do_regroup_children
+         ~ButtonScrollGrip.do_resize
+         ~ButtonScrollGrip.do_resize_children
+         ~ButtonScrollGrip.do_undraw
+         ~ButtonScrollGrip.enable
+         ~ButtonScrollGrip.event
+         ~ButtonScrollGrip.get_alignment
+         ~ButtonScrollGrip.get_base_background
+         ~ButtonScrollGrip.get_batch
+         ~ButtonScrollGrip.get_bottom_padding
+         ~ButtonScrollGrip.get_claimed_height
+         ~ButtonScrollGrip.get_claimed_rect
+         ~ButtonScrollGrip.get_claimed_size
+         ~ButtonScrollGrip.get_claimed_width
+         ~ButtonScrollGrip.get_group
+         ~ButtonScrollGrip.get_height_hint
+         ~ButtonScrollGrip.get_horz_padding
+         ~ButtonScrollGrip.get_image
+         ~ButtonScrollGrip.get_label
+         ~ButtonScrollGrip.get_last_rollover_state
+         ~ButtonScrollGrip.get_left_padding
+         ~ButtonScrollGrip.get_off_background
+         ~ButtonScrollGrip.get_over_background
+         ~ButtonScrollGrip.get_padded_rect
+         ~ButtonScrollGrip.get_padding
+         ~ButtonScrollGrip.get_parent
+         ~ButtonScrollGrip.get_propagate_mouse_events
+         ~ButtonScrollGrip.get_rect
+         ~ButtonScrollGrip.get_right_padding
+         ~ButtonScrollGrip.get_rollover_state
+         ~ButtonScrollGrip.get_root
+         ~ButtonScrollGrip.get_size_hint
+         ~ButtonScrollGrip.get_text
+         ~ButtonScrollGrip.get_top_padding
+         ~ButtonScrollGrip.get_total_horz_padding
+         ~ButtonScrollGrip.get_total_padding
+         ~ButtonScrollGrip.get_total_vert_padding
+         ~ButtonScrollGrip.get_vert_padding
+         ~ButtonScrollGrip.get_width_hint
+         ~ButtonScrollGrip.get_window
+         ~ButtonScrollGrip.hide
+         ~ButtonScrollGrip.hold_updates
+         ~ButtonScrollGrip.is_under_mouse
+         ~ButtonScrollGrip.on_mouse_drag
+         ~ButtonScrollGrip.on_mouse_drag_enter
+         ~ButtonScrollGrip.on_mouse_drag_leave
+         ~ButtonScrollGrip.on_mouse_enter
+         ~ButtonScrollGrip.on_mouse_leave
+         ~ButtonScrollGrip.on_mouse_motion
+         ~ButtonScrollGrip.on_mouse_press
+         ~ButtonScrollGrip.on_mouse_release
+         ~ButtonScrollGrip.on_mouse_scroll
+         ~ButtonScrollGrip.on_scroll
+         ~ButtonScrollGrip.pause_updates
+         ~ButtonScrollGrip.pop_handlers
+         ~ButtonScrollGrip.push_handlers
+         ~ButtonScrollGrip.register_event_type
+         ~ButtonScrollGrip.relay_events_from
+         ~ButtonScrollGrip.remove_handler
+         ~ButtonScrollGrip.remove_handlers
+         ~ButtonScrollGrip.resume_updates
+         ~ButtonScrollGrip.set_alignment
+         ~ButtonScrollGrip.set_background
+         ~ButtonScrollGrip.set_bottom_padding
+         ~ButtonScrollGrip.set_handler
+         ~ButtonScrollGrip.set_handlers
+         ~ButtonScrollGrip.set_height_hint
+         ~ButtonScrollGrip.set_horz_padding
+         ~ButtonScrollGrip.set_image
+         ~ButtonScrollGrip.set_label
+         ~ButtonScrollGrip.set_left_padding
+         ~ButtonScrollGrip.set_padding
+         ~ButtonScrollGrip.set_propagate_mouse_events
+         ~ButtonScrollGrip.set_right_padding
+         ~ButtonScrollGrip.set_size_hint
+         ~ButtonScrollGrip.set_text
+         ~ButtonScrollGrip.set_top_padding
+         ~ButtonScrollGrip.set_vert_padding
+         ~ButtonScrollGrip.set_width_hint
+         ~ButtonScrollGrip.start_event
+         ~ButtonScrollGrip.stop_event
+         ~ButtonScrollGrip.suppress_updates
+         ~ButtonScrollGrip.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~ButtonScrollGrip.alignment
+         ~ButtonScrollGrip.background
+         ~ButtonScrollGrip.base_background
+         ~ButtonScrollGrip.batch
+         ~ButtonScrollGrip.bottom_padding
+         ~ButtonScrollGrip.claimed_height
+         ~ButtonScrollGrip.claimed_rect
+         ~ButtonScrollGrip.claimed_size
+         ~ButtonScrollGrip.claimed_width
+         ~ButtonScrollGrip.custom_alignment
+         ~ButtonScrollGrip.custom_background_layer
+         ~ButtonScrollGrip.custom_bottom_padding
+         ~ButtonScrollGrip.custom_height_hint
+         ~ButtonScrollGrip.custom_horz_padding
+         ~ButtonScrollGrip.custom_image
+         ~ButtonScrollGrip.custom_image_layer
+         ~ButtonScrollGrip.custom_label_layer
+         ~ButtonScrollGrip.custom_left_padding
+         ~ButtonScrollGrip.custom_padding
+         ~ButtonScrollGrip.custom_propagate_mouse_events
+         ~ButtonScrollGrip.custom_right_padding
+         ~ButtonScrollGrip.custom_size_hint
+         ~ButtonScrollGrip.custom_text
+         ~ButtonScrollGrip.custom_top_padding
+         ~ButtonScrollGrip.custom_vert_padding
+         ~ButtonScrollGrip.custom_width_hint
+         ~ButtonScrollGrip.event_types
+         ~ButtonScrollGrip.group
+         ~ButtonScrollGrip.height_hint
+         ~ButtonScrollGrip.horz_padding
+         ~ButtonScrollGrip.image
+         ~ButtonScrollGrip.is_attached_to_gui
+         ~ButtonScrollGrip.is_disabled
+         ~ButtonScrollGrip.is_enabled
+         ~ButtonScrollGrip.is_hidden
+         ~ButtonScrollGrip.is_visible
+         ~ButtonScrollGrip.label
+         ~ButtonScrollGrip.last_rollover_state
+         ~ButtonScrollGrip.left_padding
+         ~ButtonScrollGrip.off_background
+         ~ButtonScrollGrip.over_background
+         ~ButtonScrollGrip.padded_rect
+         ~ButtonScrollGrip.padding
+         ~ButtonScrollGrip.parent
+         ~ButtonScrollGrip.propagate_mouse_events
+         ~ButtonScrollGrip.rect
+         ~ButtonScrollGrip.right_padding
+         ~ButtonScrollGrip.rollover_state
+         ~ButtonScrollGrip.root
+         ~ButtonScrollGrip.size_hint
+         ~ButtonScrollGrip.text
+         ~ButtonScrollGrip.top_padding
+         ~ButtonScrollGrip.total_horz_padding
+         ~ButtonScrollGrip.total_padding
+         ~ButtonScrollGrip.total_vert_padding
+         ~ButtonScrollGrip.vert_padding
+         ~ButtonScrollGrip.width_hint
+         ~ButtonScrollGrip.window
+   
+   

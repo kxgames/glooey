@@ -1,0 +1,190 @@
+glooey.buttons.Rollover
+=======================
+
+.. currentmodule:: glooey.buttons
+
+.. autoclass:: Rollover
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Rollover.__init__
+         ~Rollover.add_controller
+         ~Rollover.add_state
+         ~Rollover.add_states
+         ~Rollover.add_states_if
+         ~Rollover.clear
+         ~Rollover.custom_predicate
+         ~Rollover.debug_drawing_problems
+         ~Rollover.debug_placement_problems
+         ~Rollover.disable
+         ~Rollover.discard_updates
+         ~Rollover.dispatch_event
+         ~Rollover.do_attach
+         ~Rollover.do_claim
+         ~Rollover.do_detach
+         ~Rollover.do_draw
+         ~Rollover.do_find_children_under_mouse
+         ~Rollover.do_regroup
+         ~Rollover.do_regroup_children
+         ~Rollover.do_resize
+         ~Rollover.do_resize_children
+         ~Rollover.do_undraw
+         ~Rollover.enable
+         ~Rollover.event
+         ~Rollover.get_alignment
+         ~Rollover.get_batch
+         ~Rollover.get_bottom_padding
+         ~Rollover.get_claimed_height
+         ~Rollover.get_claimed_rect
+         ~Rollover.get_claimed_size
+         ~Rollover.get_claimed_width
+         ~Rollover.get_group
+         ~Rollover.get_height_hint
+         ~Rollover.get_horz_padding
+         ~Rollover.get_known_states
+         ~Rollover.get_last_rollover_state
+         ~Rollover.get_left_padding
+         ~Rollover.get_padded_rect
+         ~Rollover.get_padding
+         ~Rollover.get_parent
+         ~Rollover.get_predicate
+         ~Rollover.get_previous_state
+         ~Rollover.get_propagate_mouse_events
+         ~Rollover.get_rect
+         ~Rollover.get_right_padding
+         ~Rollover.get_rollover_state
+         ~Rollover.get_root
+         ~Rollover.get_size_hint
+         ~Rollover.get_state
+         ~Rollover.get_top_padding
+         ~Rollover.get_total_horz_padding
+         ~Rollover.get_total_padding
+         ~Rollover.get_total_vert_padding
+         ~Rollover.get_vert_padding
+         ~Rollover.get_widget
+         ~Rollover.get_width_hint
+         ~Rollover.get_window
+         ~Rollover.hide
+         ~Rollover.hold_updates
+         ~Rollover.is_state_missing
+         ~Rollover.is_under_mouse
+         ~Rollover.on_mouse_drag
+         ~Rollover.on_mouse_drag_enter
+         ~Rollover.on_mouse_drag_leave
+         ~Rollover.on_mouse_enter
+         ~Rollover.on_mouse_leave
+         ~Rollover.on_mouse_motion
+         ~Rollover.on_mouse_press
+         ~Rollover.on_mouse_release
+         ~Rollover.on_mouse_scroll
+         ~Rollover.pause_updates
+         ~Rollover.pop_handlers
+         ~Rollover.push_handlers
+         ~Rollover.register_event_type
+         ~Rollover.relay_events_from
+         ~Rollover.remove_controller
+         ~Rollover.remove_handler
+         ~Rollover.remove_handlers
+         ~Rollover.remove_state
+         ~Rollover.remove_states
+         ~Rollover.reset_states
+         ~Rollover.reset_states_if
+         ~Rollover.resume_updates
+         ~Rollover.set_alignment
+         ~Rollover.set_bottom_padding
+         ~Rollover.set_handler
+         ~Rollover.set_handlers
+         ~Rollover.set_height_hint
+         ~Rollover.set_horz_padding
+         ~Rollover.set_left_padding
+         ~Rollover.set_padding
+         ~Rollover.set_predicate
+         ~Rollover.set_propagate_mouse_events
+         ~Rollover.set_right_padding
+         ~Rollover.set_size_hint
+         ~Rollover.set_state
+         ~Rollover.set_state_if_known
+         ~Rollover.set_top_padding
+         ~Rollover.set_vert_padding
+         ~Rollover.set_width_hint
+         ~Rollover.start_event
+         ~Rollover.stop_event
+         ~Rollover.suppress_updates
+         ~Rollover.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Rollover.alignment
+         ~Rollover.batch
+         ~Rollover.bottom_padding
+         ~Rollover.claimed_height
+         ~Rollover.claimed_rect
+         ~Rollover.claimed_size
+         ~Rollover.claimed_width
+         ~Rollover.custom_alignment
+         ~Rollover.custom_bottom_padding
+         ~Rollover.custom_height_hint
+         ~Rollover.custom_horz_padding
+         ~Rollover.custom_left_padding
+         ~Rollover.custom_padding
+         ~Rollover.custom_propagate_mouse_events
+         ~Rollover.custom_right_padding
+         ~Rollover.custom_rollover_state_priorities
+         ~Rollover.custom_size_hint
+         ~Rollover.custom_top_padding
+         ~Rollover.custom_vert_padding
+         ~Rollover.custom_width_hint
+         ~Rollover.event_types
+         ~Rollover.group
+         ~Rollover.height_hint
+         ~Rollover.horz_padding
+         ~Rollover.is_attached_to_gui
+         ~Rollover.is_disabled
+         ~Rollover.is_enabled
+         ~Rollover.is_hidden
+         ~Rollover.is_visible
+         ~Rollover.known_states
+         ~Rollover.last_rollover_state
+         ~Rollover.left_padding
+         ~Rollover.padded_rect
+         ~Rollover.padding
+         ~Rollover.parent
+         ~Rollover.predicate
+         ~Rollover.previous_state
+         ~Rollover.propagate_mouse_events
+         ~Rollover.rect
+         ~Rollover.right_padding
+         ~Rollover.rollover_state
+         ~Rollover.root
+         ~Rollover.size_hint
+         ~Rollover.state
+         ~Rollover.state_if_known
+         ~Rollover.top_padding
+         ~Rollover.total_horz_padding
+         ~Rollover.total_padding
+         ~Rollover.total_vert_padding
+         ~Rollover.vert_padding
+         ~Rollover.width_hint
+         ~Rollover.window
+   
+   

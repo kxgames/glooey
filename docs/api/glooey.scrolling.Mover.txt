@@ -1,0 +1,189 @@
+glooey.scrolling.Mover
+======================
+
+.. currentmodule:: glooey.scrolling
+
+.. autoclass:: Mover
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~Mover.__init__
+         ~Mover.add
+         ~Mover.child_to_screen_coords
+         ~Mover.clear
+         ~Mover.debug_drawing_problems
+         ~Mover.debug_placement_problems
+         ~Mover.disable
+         ~Mover.discard_updates
+         ~Mover.dispatch_event
+         ~Mover.do_attach
+         ~Mover.do_claim
+         ~Mover.do_detach
+         ~Mover.do_draw
+         ~Mover.do_find_children_under_mouse
+         ~Mover.do_regroup
+         ~Mover.do_regroup_children
+         ~Mover.do_resize
+         ~Mover.do_resize_children
+         ~Mover.do_undraw
+         ~Mover.enable
+         ~Mover.event
+         ~Mover.get_alignment
+         ~Mover.get_batch
+         ~Mover.get_bottom_padding
+         ~Mover.get_child
+         ~Mover.get_claimed_height
+         ~Mover.get_claimed_rect
+         ~Mover.get_claimed_size
+         ~Mover.get_claimed_width
+         ~Mover.get_expand_horz
+         ~Mover.get_expand_vert
+         ~Mover.get_group
+         ~Mover.get_height_hint
+         ~Mover.get_horz_padding
+         ~Mover.get_last_rollover_state
+         ~Mover.get_left_padding
+         ~Mover.get_padded_rect
+         ~Mover.get_padding
+         ~Mover.get_parent
+         ~Mover.get_position
+         ~Mover.get_position_percent
+         ~Mover.get_propagate_mouse_events
+         ~Mover.get_rect
+         ~Mover.get_right_padding
+         ~Mover.get_rollover_state
+         ~Mover.get_root
+         ~Mover.get_size_hint
+         ~Mover.get_top_padding
+         ~Mover.get_total_horz_padding
+         ~Mover.get_total_padding
+         ~Mover.get_total_vert_padding
+         ~Mover.get_unoccupied_size
+         ~Mover.get_vert_padding
+         ~Mover.get_width_hint
+         ~Mover.get_window
+         ~Mover.hide
+         ~Mover.hold_updates
+         ~Mover.is_under_mouse
+         ~Mover.jump
+         ~Mover.jump_percent
+         ~Mover.on_detach_child
+         ~Mover.on_mouse_drag
+         ~Mover.on_mouse_drag_enter
+         ~Mover.on_mouse_drag_leave
+         ~Mover.on_mouse_enter
+         ~Mover.on_mouse_leave
+         ~Mover.on_mouse_motion
+         ~Mover.on_mouse_press
+         ~Mover.on_mouse_release
+         ~Mover.on_mouse_scroll
+         ~Mover.pan
+         ~Mover.pan_percent
+         ~Mover.pause_updates
+         ~Mover.percent_to_pixels
+         ~Mover.pixels_to_percent
+         ~Mover.pop_handlers
+         ~Mover.push_handlers
+         ~Mover.register_event_type
+         ~Mover.relay_events_from
+         ~Mover.remove_handler
+         ~Mover.remove_handlers
+         ~Mover.resume_updates
+         ~Mover.screen_to_child_coords
+         ~Mover.set_alignment
+         ~Mover.set_bottom_padding
+         ~Mover.set_expand_horz
+         ~Mover.set_expand_vert
+         ~Mover.set_handler
+         ~Mover.set_handlers
+         ~Mover.set_height_hint
+         ~Mover.set_horz_padding
+         ~Mover.set_left_padding
+         ~Mover.set_padding
+         ~Mover.set_propagate_mouse_events
+         ~Mover.set_right_padding
+         ~Mover.set_size_hint
+         ~Mover.set_top_padding
+         ~Mover.set_vert_padding
+         ~Mover.set_width_hint
+         ~Mover.start_event
+         ~Mover.stop_event
+         ~Mover.suppress_updates
+         ~Mover.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~Mover.alignment
+         ~Mover.batch
+         ~Mover.bottom_padding
+         ~Mover.child
+         ~Mover.claimed_height
+         ~Mover.claimed_rect
+         ~Mover.claimed_size
+         ~Mover.claimed_width
+         ~Mover.custom_alignment
+         ~Mover.custom_bottom_padding
+         ~Mover.custom_height_hint
+         ~Mover.custom_horz_padding
+         ~Mover.custom_left_padding
+         ~Mover.custom_padding
+         ~Mover.custom_propagate_mouse_events
+         ~Mover.custom_right_padding
+         ~Mover.custom_size_hint
+         ~Mover.custom_top_padding
+         ~Mover.custom_vert_padding
+         ~Mover.custom_width_hint
+         ~Mover.event_types
+         ~Mover.expand_horz
+         ~Mover.expand_vert
+         ~Mover.group
+         ~Mover.height_hint
+         ~Mover.horz_padding
+         ~Mover.is_attached_to_gui
+         ~Mover.is_disabled
+         ~Mover.is_enabled
+         ~Mover.is_hidden
+         ~Mover.is_visible
+         ~Mover.last_rollover_state
+         ~Mover.left_padding
+         ~Mover.padded_rect
+         ~Mover.padding
+         ~Mover.parent
+         ~Mover.position
+         ~Mover.position_percent
+         ~Mover.propagate_mouse_events
+         ~Mover.rect
+         ~Mover.right_padding
+         ~Mover.rollover_state
+         ~Mover.root
+         ~Mover.size_hint
+         ~Mover.top_padding
+         ~Mover.total_horz_padding
+         ~Mover.total_padding
+         ~Mover.total_vert_padding
+         ~Mover.unoccupied_size
+         ~Mover.vert_padding
+         ~Mover.width_hint
+         ~Mover.window
+   
+   

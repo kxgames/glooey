@@ -1,0 +1,191 @@
+glooey.containers.HVBox
+=======================
+
+.. currentmodule:: glooey.containers
+
+.. autoclass:: HVBox
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~HVBox.__init__
+         ~HVBox.add
+         ~HVBox.add_back
+         ~HVBox.add_front
+         ~HVBox.clear
+         ~HVBox.debug_drawing_problems
+         ~HVBox.debug_placement_problems
+         ~HVBox.disable
+         ~HVBox.discard_updates
+         ~HVBox.dispatch_event
+         ~HVBox.do_attach
+         ~HVBox.do_claim
+         ~HVBox.do_detach
+         ~HVBox.do_draw
+         ~HVBox.do_find_children_under_mouse
+         ~HVBox.do_get_index
+         ~HVBox.do_get_row_col
+         ~HVBox.do_regroup
+         ~HVBox.do_regroup_children
+         ~HVBox.do_resize
+         ~HVBox.do_resize_children
+         ~HVBox.do_set_row_col_sizes
+         ~HVBox.do_undraw
+         ~HVBox.enable
+         ~HVBox.event
+         ~HVBox.get_alignment
+         ~HVBox.get_batch
+         ~HVBox.get_bottom_padding
+         ~HVBox.get_cell_alignment
+         ~HVBox.get_cell_padding
+         ~HVBox.get_children
+         ~HVBox.get_claimed_height
+         ~HVBox.get_claimed_rect
+         ~HVBox.get_claimed_size
+         ~HVBox.get_claimed_width
+         ~HVBox.get_default_cell_size
+         ~HVBox.get_group
+         ~HVBox.get_height_hint
+         ~HVBox.get_horz_padding
+         ~HVBox.get_last_rollover_state
+         ~HVBox.get_left_padding
+         ~HVBox.get_padded_rect
+         ~HVBox.get_padding
+         ~HVBox.get_parent
+         ~HVBox.get_propagate_mouse_events
+         ~HVBox.get_rect
+         ~HVBox.get_right_padding
+         ~HVBox.get_rollover_state
+         ~HVBox.get_root
+         ~HVBox.get_size_hint
+         ~HVBox.get_top_padding
+         ~HVBox.get_total_horz_padding
+         ~HVBox.get_total_padding
+         ~HVBox.get_total_vert_padding
+         ~HVBox.get_vert_padding
+         ~HVBox.get_width_hint
+         ~HVBox.get_window
+         ~HVBox.hide
+         ~HVBox.hold_updates
+         ~HVBox.insert
+         ~HVBox.is_under_mouse
+         ~HVBox.on_mouse_drag
+         ~HVBox.on_mouse_drag_enter
+         ~HVBox.on_mouse_drag_leave
+         ~HVBox.on_mouse_enter
+         ~HVBox.on_mouse_leave
+         ~HVBox.on_mouse_motion
+         ~HVBox.on_mouse_press
+         ~HVBox.on_mouse_release
+         ~HVBox.on_mouse_scroll
+         ~HVBox.pack
+         ~HVBox.pack_back
+         ~HVBox.pack_front
+         ~HVBox.pause_updates
+         ~HVBox.pop_handlers
+         ~HVBox.push_handlers
+         ~HVBox.register_event_type
+         ~HVBox.relay_events_from
+         ~HVBox.remove
+         ~HVBox.remove_handler
+         ~HVBox.remove_handlers
+         ~HVBox.replace
+         ~HVBox.resume_updates
+         ~HVBox.set_alignment
+         ~HVBox.set_bottom_padding
+         ~HVBox.set_cell_alignment
+         ~HVBox.set_cell_padding
+         ~HVBox.set_default_cell_size
+         ~HVBox.set_handler
+         ~HVBox.set_handlers
+         ~HVBox.set_height_hint
+         ~HVBox.set_horz_padding
+         ~HVBox.set_left_padding
+         ~HVBox.set_padding
+         ~HVBox.set_propagate_mouse_events
+         ~HVBox.set_right_padding
+         ~HVBox.set_size_hint
+         ~HVBox.set_top_padding
+         ~HVBox.set_vert_padding
+         ~HVBox.set_width_hint
+         ~HVBox.start_event
+         ~HVBox.stop_event
+         ~HVBox.suppress_updates
+         ~HVBox.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~HVBox.alignment
+         ~HVBox.batch
+         ~HVBox.bottom_padding
+         ~HVBox.cell_alignment
+         ~HVBox.cell_padding
+         ~HVBox.children
+         ~HVBox.claimed_height
+         ~HVBox.claimed_rect
+         ~HVBox.claimed_size
+         ~HVBox.claimed_width
+         ~HVBox.custom_alignment
+         ~HVBox.custom_bottom_padding
+         ~HVBox.custom_cell_alignment
+         ~HVBox.custom_cell_padding
+         ~HVBox.custom_default_cell_size
+         ~HVBox.custom_height_hint
+         ~HVBox.custom_horz_padding
+         ~HVBox.custom_left_padding
+         ~HVBox.custom_padding
+         ~HVBox.custom_propagate_mouse_events
+         ~HVBox.custom_right_padding
+         ~HVBox.custom_size_hint
+         ~HVBox.custom_top_padding
+         ~HVBox.custom_vert_padding
+         ~HVBox.custom_width_hint
+         ~HVBox.default_cell_size
+         ~HVBox.event_types
+         ~HVBox.group
+         ~HVBox.height_hint
+         ~HVBox.horz_padding
+         ~HVBox.is_attached_to_gui
+         ~HVBox.is_disabled
+         ~HVBox.is_enabled
+         ~HVBox.is_hidden
+         ~HVBox.is_visible
+         ~HVBox.last_rollover_state
+         ~HVBox.left_padding
+         ~HVBox.padded_rect
+         ~HVBox.padding
+         ~HVBox.parent
+         ~HVBox.propagate_mouse_events
+         ~HVBox.rect
+         ~HVBox.right_padding
+         ~HVBox.rollover_state
+         ~HVBox.root
+         ~HVBox.size_hint
+         ~HVBox.top_padding
+         ~HVBox.total_horz_padding
+         ~HVBox.total_padding
+         ~HVBox.total_vert_padding
+         ~HVBox.vert_padding
+         ~HVBox.width_hint
+         ~HVBox.window
+   
+   

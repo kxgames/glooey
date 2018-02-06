@@ -21,6 +21,4 @@
     how_it_all_works
     making_widgets_from_scratch
     troubleshooting
-    api_reference
-    widgets/index
-    themes/index
+    api

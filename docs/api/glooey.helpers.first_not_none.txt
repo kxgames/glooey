@@ -1,0 +1,6 @@
+glooey.helpers.first_not_none
+=============================
+
+.. currentmodule:: glooey.helpers
+
+.. autofunction:: first_not_none

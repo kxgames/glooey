@@ -1,0 +1,232 @@
+glooey.misc.LoremIpsum
+======================
+
+.. currentmodule:: glooey.misc
+
+.. autoclass:: LoremIpsum
+   :members:
+   :undoc-members:
+   :private-members:
+   :show-inheritance:
+   :special-members:
+
+   ..
+      Comment out the autosummary blocks until Sphinx PR #4029 is merged.
+
+   
+   
+   ..
+      .. rubric:: Methods
+
+      .. autosummary::
+      
+         ~LoremIpsum.__init__
+         ~LoremIpsum.debug_drawing_problems
+         ~LoremIpsum.debug_placement_problems
+         ~LoremIpsum.del_background_color
+         ~LoremIpsum.del_baseline
+         ~LoremIpsum.del_bold
+         ~LoremIpsum.del_color
+         ~LoremIpsum.del_font_name
+         ~LoremIpsum.del_font_size
+         ~LoremIpsum.del_italic
+         ~LoremIpsum.del_kerning
+         ~LoremIpsum.del_line_spacing
+         ~LoremIpsum.del_style
+         ~LoremIpsum.del_text
+         ~LoremIpsum.del_text_alignment
+         ~LoremIpsum.del_underline
+         ~LoremIpsum.disable
+         ~LoremIpsum.disable_line_wrap
+         ~LoremIpsum.discard_updates
+         ~LoremIpsum.dispatch_event
+         ~LoremIpsum.do_attach
+         ~LoremIpsum.do_claim
+         ~LoremIpsum.do_detach
+         ~LoremIpsum.do_draw
+         ~LoremIpsum.do_find_children_under_mouse
+         ~LoremIpsum.do_make_new_layout
+         ~LoremIpsum.do_regroup
+         ~LoremIpsum.do_regroup_children
+         ~LoremIpsum.do_resize
+         ~LoremIpsum.do_resize_children
+         ~LoremIpsum.do_undraw
+         ~LoremIpsum.enable
+         ~LoremIpsum.enable_line_wrap
+         ~LoremIpsum.event
+         ~LoremIpsum.get_alignment
+         ~LoremIpsum.get_background_color
+         ~LoremIpsum.get_baseline
+         ~LoremIpsum.get_batch
+         ~LoremIpsum.get_bold
+         ~LoremIpsum.get_bottom_padding
+         ~LoremIpsum.get_claimed_height
+         ~LoremIpsum.get_claimed_rect
+         ~LoremIpsum.get_claimed_size
+         ~LoremIpsum.get_claimed_width
+         ~LoremIpsum.get_color
+         ~LoremIpsum.get_font_name
+         ~LoremIpsum.get_font_size
+         ~LoremIpsum.get_group
+         ~LoremIpsum.get_height_hint
+         ~LoremIpsum.get_horz_padding
+         ~LoremIpsum.get_italic
+         ~LoremIpsum.get_kerning
+         ~LoremIpsum.get_last_rollover_state
+         ~LoremIpsum.get_left_padding
+         ~LoremIpsum.get_line_spacing
+         ~LoremIpsum.get_padded_rect
+         ~LoremIpsum.get_padding
+         ~LoremIpsum.get_parent
+         ~LoremIpsum.get_propagate_mouse_events
+         ~LoremIpsum.get_rect
+         ~LoremIpsum.get_right_padding
+         ~LoremIpsum.get_rollover_state
+         ~LoremIpsum.get_root
+         ~LoremIpsum.get_size_hint
+         ~LoremIpsum.get_style
+         ~LoremIpsum.get_text
+         ~LoremIpsum.get_text_alignment
+         ~LoremIpsum.get_top_padding
+         ~LoremIpsum.get_total_horz_padding
+         ~LoremIpsum.get_total_padding
+         ~LoremIpsum.get_total_vert_padding
+         ~LoremIpsum.get_underline
+         ~LoremIpsum.get_vert_padding
+         ~LoremIpsum.get_width_hint
+         ~LoremIpsum.get_window
+         ~LoremIpsum.hide
+         ~LoremIpsum.hold_updates
+         ~LoremIpsum.is_under_mouse
+         ~LoremIpsum.on_delete_text
+         ~LoremIpsum.on_insert_text
+         ~LoremIpsum.on_mouse_drag
+         ~LoremIpsum.on_mouse_drag_enter
+         ~LoremIpsum.on_mouse_drag_leave
+         ~LoremIpsum.on_mouse_enter
+         ~LoremIpsum.on_mouse_leave
+         ~LoremIpsum.on_mouse_motion
+         ~LoremIpsum.on_mouse_press
+         ~LoremIpsum.on_mouse_release
+         ~LoremIpsum.on_mouse_scroll
+         ~LoremIpsum.pause_updates
+         ~LoremIpsum.pop_handlers
+         ~LoremIpsum.push_handlers
+         ~LoremIpsum.register_event_type
+         ~LoremIpsum.relay_events_from
+         ~LoremIpsum.remove_handler
+         ~LoremIpsum.remove_handlers
+         ~LoremIpsum.resume_updates
+         ~LoremIpsum.set_alignment
+         ~LoremIpsum.set_background_color
+         ~LoremIpsum.set_baseline
+         ~LoremIpsum.set_bold
+         ~LoremIpsum.set_bottom_padding
+         ~LoremIpsum.set_color
+         ~LoremIpsum.set_font_name
+         ~LoremIpsum.set_font_size
+         ~LoremIpsum.set_handler
+         ~LoremIpsum.set_handlers
+         ~LoremIpsum.set_height_hint
+         ~LoremIpsum.set_horz_padding
+         ~LoremIpsum.set_italic
+         ~LoremIpsum.set_kerning
+         ~LoremIpsum.set_left_padding
+         ~LoremIpsum.set_line_spacing
+         ~LoremIpsum.set_padding
+         ~LoremIpsum.set_propagate_mouse_events
+         ~LoremIpsum.set_right_padding
+         ~LoremIpsum.set_size_hint
+         ~LoremIpsum.set_style
+         ~LoremIpsum.set_text
+         ~LoremIpsum.set_text_alignment
+         ~LoremIpsum.set_top_padding
+         ~LoremIpsum.set_underline
+         ~LoremIpsum.set_vert_padding
+         ~LoremIpsum.set_width_hint
+         ~LoremIpsum.start_event
+         ~LoremIpsum.stop_event
+         ~LoremIpsum.suppress_updates
+         ~LoremIpsum.unhide
+   
+   
+
+   
+   
+   ..
+      .. rubric:: Attributes
+
+      .. autosummary::
+      
+         ~LoremIpsum.alignment
+         ~LoremIpsum.background_color
+         ~LoremIpsum.baseline
+         ~LoremIpsum.batch
+         ~LoremIpsum.bold
+         ~LoremIpsum.bottom_padding
+         ~LoremIpsum.claimed_height
+         ~LoremIpsum.claimed_rect
+         ~LoremIpsum.claimed_size
+         ~LoremIpsum.claimed_width
+         ~LoremIpsum.color
+         ~LoremIpsum.custom_alignment
+         ~LoremIpsum.custom_background_color
+         ~LoremIpsum.custom_baseline
+         ~LoremIpsum.custom_bold
+         ~LoremIpsum.custom_bottom_padding
+         ~LoremIpsum.custom_color
+         ~LoremIpsum.custom_font_name
+         ~LoremIpsum.custom_font_size
+         ~LoremIpsum.custom_height_hint
+         ~LoremIpsum.custom_horz_padding
+         ~LoremIpsum.custom_italic
+         ~LoremIpsum.custom_kerning
+         ~LoremIpsum.custom_left_padding
+         ~LoremIpsum.custom_line_spacing
+         ~LoremIpsum.custom_padding
+         ~LoremIpsum.custom_propagate_mouse_events
+         ~LoremIpsum.custom_right_padding
+         ~LoremIpsum.custom_size_hint
+         ~LoremIpsum.custom_text
+         ~LoremIpsum.custom_text_alignment
+         ~LoremIpsum.custom_top_padding
+         ~LoremIpsum.custom_underline
+         ~LoremIpsum.custom_vert_padding
+         ~LoremIpsum.custom_width_hint
+         ~LoremIpsum.event_types
+         ~LoremIpsum.font_name
+         ~LoremIpsum.font_size
+         ~LoremIpsum.group
+         ~LoremIpsum.height_hint
+         ~LoremIpsum.horz_padding
+         ~LoremIpsum.is_attached_to_gui
+         ~LoremIpsum.is_disabled
+         ~LoremIpsum.is_enabled
+         ~LoremIpsum.is_hidden
+         ~LoremIpsum.is_visible
+         ~LoremIpsum.italic
+         ~LoremIpsum.kerning
+         ~LoremIpsum.last_rollover_state
+         ~LoremIpsum.left_padding
+         ~LoremIpsum.line_spacing
+         ~LoremIpsum.padded_rect
+         ~LoremIpsum.padding
+         ~LoremIpsum.parent
+         ~LoremIpsum.propagate_mouse_events
+         ~LoremIpsum.rect
+         ~LoremIpsum.right_padding
+         ~LoremIpsum.rollover_state
+         ~LoremIpsum.root
+         ~LoremIpsum.size_hint
+         ~LoremIpsum.text
+         ~LoremIpsum.text_alignment
+         ~LoremIpsum.top_padding
+         ~LoremIpsum.total_horz_padding
+         ~LoremIpsum.total_padding
+         ~LoremIpsum.total_vert_padding
+         ~LoremIpsum.underline
+         ~LoremIpsum.vert_padding
+         ~LoremIpsum.width_hint
+         ~LoremIpsum.window
+   
+   
