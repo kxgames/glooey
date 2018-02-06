@@ -13,23 +13,6 @@ from glooey import drawing
 from glooey.widget import Widget
 from glooey.helpers import *
 
-def align_widget_in_box(widget, box_rect, alignment='fill', widget_rect=None):
-    if widget_rect is None:
-        widget_rect = widget.claimed_rect
-    drawing.align(alignment, widget_rect, box_rect)
-    widget._resize(widget_rect)
-
-def claim_stacked_widgets(*widgets):
-    max_widget_width = 0
-    max_widget_height = 0
-
-    for widget in widgets:
-        max_widget_width = max(max_widget_width, widget.claimed_width)
-        max_widget_height = max(max_widget_height, widget.claimed_height)
-
-    return max_widget_width, max_widget_height
-
-
 @autoprop
 class Bin(Widget):
 
@@ -64,6 +47,54 @@ class Bin(Widget):
 
     def get_child(self):
         return self._child
+
+
+@autoprop
+class Frame(Widget):
+    Box = Bin
+    Foreground = None
+    Decoration = None
+    custom_alignment = 'center'
+    custom_box_layer = 2
+    custom_decoration_layer = 1
+    custom_autoadd_foreground = True
+
+    def __init__(self):
+        from glooey.images import Background
+        super().__init__()
+
+        self.__box = self.Box()
+        self.__decoration = first_not_none((self.Decoration, Background))()
+
+        self._attach_child(self.__box)
+        self._attach_child(self.__decoration)
+
+        if self.Foreground and self.custom_autoadd_foreground:
+            self.add(self.Foreground())
+
+    def add(self, widget):
+        self.box.add(widget)
+
+    def clear(self):
+        self.box.clear()
+
+    def do_claim(self):
+        return claim_stacked_widgets(self.box, self.decoration)
+
+    def do_regroup_children(self):
+        self.box._regroup(pyglet.graphics.OrderedGroup(
+            self.custom_box_layer, self.group))
+        self.decoration._regroup(pyglet.graphics.OrderedGroup(
+            self.custom_decoration_layer, self.group))
+
+    def get_box(self):
+        return self.__box
+
+    def get_foreground(self):
+        return self.__box.child
+
+    def get_decoration(self):
+        return self.__decoration
 
 
 @autoprop
@@ -1026,5 +1057,23 @@ class Board(Widget):
 
         assert board_size > -1
         return board_size
+
+
+
+def align_widget_in_box(widget, box_rect, alignment='fill', widget_rect=None):
+    if widget_rect is None:
+        widget_rect = widget.claimed_rect
+    drawing.align(alignment, widget_rect, box_rect)
+    widget._resize(widget_rect)
+
+def claim_stacked_widgets(*widgets):
+    max_widget_width = 0
+    max_widget_height = 0
+
+    for widget in widgets:
+        max_widget_width = max(max_widget_width, widget.claimed_width)
+        max_widget_height = max(max_widget_height, widget.claimed_height)
+
+    return max_widget_width, max_widget_height
 
 

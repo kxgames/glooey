@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Widgets that react to being clicked on.
+"""
+
 import pyglet
 import autoprop
 

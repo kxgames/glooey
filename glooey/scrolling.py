@@ -8,9 +8,9 @@ import autoprop
 from vecrec import Vector, Rect
 from glooey import drawing
 from glooey.widget import Widget
-from glooey.containers import Bin, Grid, HVBox, HBox, VBox
+from glooey.containers import Bin, Frame, Grid, HVBox, HBox, VBox
 from glooey.buttons import Button
-from glooey.images import Image, Frame
+from glooey.images import Image
 from glooey.helpers import *
 
 @autoprop

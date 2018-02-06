@@ -4,9 +4,9 @@ import pyglet
 import autoprop
 
 from glooey.text import Label
-from glooey.images import Background, Frame
+from glooey.images import Background
 from glooey.buttons import Button
-from glooey.containers import Grid, HBox
+from glooey.containers import Grid, HBox, Frame
 from glooey.misc import Spacer
 from glooey.helpers import *
 

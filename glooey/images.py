@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Widgets that can display images
+"""
+
 import pyglet
 import autoprop
 
@@ -169,52 +173,5 @@ class Background(Widget):
     @property
     def is_empty(self):
         return self._artist.is_empty
-
-
-@autoprop
-class Frame(Widget):
-    Box = Bin
-    Foreground = None
-    Decoration = Background
-    custom_alignment = 'center'
-    custom_box_layer = 2
-    custom_decoration_layer = 1
-    custom_autoadd_foreground = True
-
-    def __init__(self):
-        super().__init__()
-
-        self.__box = self.Box()
-        self.__decoration = self.Decoration()
-
-        self._attach_child(self.__box)
-        self._attach_child(self.__decoration)
-
-        if self.Foreground and self.custom_autoadd_foreground:
-            self.add(self.Foreground())
-
-    def add(self, widget):
-        self.box.add(widget)
-
-    def clear(self):
-        self.box.clear()
-
-    def do_claim(self):
-        return claim_stacked_widgets(self.box, self.decoration)
-
-    def do_regroup_children(self):
-        self.box._regroup(pyglet.graphics.OrderedGroup(
-            self.custom_box_layer, self.group))
-        self.decoration._regroup(pyglet.graphics.OrderedGroup(
-            self.custom_decoration_layer, self.group))
-
-    def get_box(self):
-        return self.__box
-
-    def get_foreground(self):
-        return self.__box.child
-
-    def get_decoration(self):
-        return self.__decoration
 
 
