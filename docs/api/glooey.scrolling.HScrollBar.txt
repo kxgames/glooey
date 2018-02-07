@@ -126,6 +126,7 @@ glooey.scrolling.HScrollBar
       .. autosummary::
       
          ~HScrollBar.Backward
+         ~HScrollBar.Decoration
          ~HScrollBar.Foreground
          ~HScrollBar.Forward
          ~HScrollBar.alignment

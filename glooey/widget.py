@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+The base class from which all widgets derive.
+"""
+
 import time
 import pyglet
 import autoprop

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Widgets that can display and input text.
+"""
+
 import pyglet
 import autoprop
 

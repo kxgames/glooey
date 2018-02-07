@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""
+Widgets that allow the user to scroll through content that would otherwise be 
+too big to fit on the screen.
+"""
+
 import math
 import pyglet
 import vecrec

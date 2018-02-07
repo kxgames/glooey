@@ -126,6 +126,7 @@ glooey.scrolling.VScrollBar
       .. autosummary::
       
          ~VScrollBar.Backward
+         ~VScrollBar.Decoration
          ~VScrollBar.Foreground
          ~VScrollBar.Forward
          ~VScrollBar.alignment

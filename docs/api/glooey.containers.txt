@@ -13,6 +13,7 @@ glooey.containers
       Bin
       Board
       Deck
+      Frame
       Grid
       HBox
       HVBox

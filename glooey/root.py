@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+
+"""
+Top-level widgets that manages the interface between pyglet and glooey.
+"""
+
 import pyglet
 import vecrec
 import autoprop

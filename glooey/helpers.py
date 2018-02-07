@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+General-purpose utilities used throughout the project.
+"""
+
 import functools
 import contextlib
 import more_itertools

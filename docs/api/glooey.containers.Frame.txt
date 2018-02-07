@@ -1,7 +1,7 @@
-glooey.images.Frame
-===================
+glooey.containers.Frame
+=======================
 
-.. currentmodule:: glooey.images
+.. currentmodule:: glooey.containers
 
 .. autoclass:: Frame
    :members:
@@ -119,6 +119,7 @@ glooey.images.Frame
 
       .. autosummary::
       
+         ~Frame.Decoration
          ~Frame.Foreground
          ~Frame.alignment
          ~Frame.batch

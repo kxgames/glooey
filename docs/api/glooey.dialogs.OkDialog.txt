@@ -125,6 +125,7 @@ glooey.dialogs.OkDialog
 
       .. autosummary::
       
+         ~OkDialog.Decoration
          ~OkDialog.alignment
          ~OkDialog.batch
          ~OkDialog.bottom_padding

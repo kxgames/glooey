@@ -122,6 +122,7 @@ glooey.dialogs.ButtonDialog
 
       .. autosummary::
       
+         ~ButtonDialog.Decoration
          ~ButtonDialog.alignment
          ~ButtonDialog.batch
          ~ButtonDialog.bottom_padding

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""
+Widget that appear in front of everything else to quickly communicate something 
+to the user.
+"""
+
 import pyglet
 import autoprop
 

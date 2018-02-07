@@ -121,6 +121,7 @@ glooey.dialogs.Dialog
 
       .. autosummary::
       
+         ~Dialog.Decoration
          ~Dialog.Foreground
          ~Dialog.alignment
          ~Dialog.batch

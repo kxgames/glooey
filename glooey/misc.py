@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+
+"""
+Widgets that don't really fit into any of the other categories.
+"""
+
 import pyglet
 import autoprop
 

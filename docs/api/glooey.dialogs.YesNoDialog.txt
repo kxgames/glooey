@@ -129,6 +129,7 @@ glooey.dialogs.YesNoDialog
 
       .. autosummary::
       
+         ~YesNoDialog.Decoration
          ~YesNoDialog.alignment
          ~YesNoDialog.batch
          ~YesNoDialog.bottom_padding
