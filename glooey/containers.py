@@ -168,13 +168,12 @@ class Grid(Widget):
                     cell_rects[ij],
                     self.cell_alignment)
 
-    def do_find_children_under_mouse(self, x, y):
+    def do_find_children_near_mouse(self, x, y):
         cell = self._grid.find_cell_under_mouse(x, y)
         child = self._children.get(cell)
 
         if cell is None: return
         if child is None: return
-        if not child.is_under_mouse(x, y): return
 
         yield child
 
@@ -387,13 +386,12 @@ class HVBox(Widget):
             box = cell_rects[self.do_get_row_col(i)]
             align_widget_in_box(child, box, self.cell_alignment)
 
-    def do_find_children_under_mouse(self, x, y):
+    def do_find_children_near_mouse(self, x, y):
         cell = self._grid.find_cell_under_mouse(x, y)
         if cell is None: return
 
         child = self._children[self.do_get_index(*cell)]
         if child is None: return
-        if not child.is_under_mouse(x, y): return
 
         yield child
 
@@ -545,9 +543,9 @@ class Stack(Widget):
             for child, layer in self._children.items():
                 child._regroup(pyglet.graphics.OrderedGroup(layer, self.group))
 
-    def do_find_children_under_mouse(self, x, y):
+    def do_find_children_near_mouse(self, x, y):
         for child in self.children:
-            if child.is_under_mouse(x, y):
+            if child.is_visible and child.is_under_mouse(x, y):
                 yield child
                 if self.one_child_gets_mouse:
                     return
