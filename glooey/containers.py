@@ -3,6 +3,10 @@
 """ 
 Widgets whose primary role is to contain other widgets.  Most of these widgets 
 don't draw anything themselves, they just position children widgets.
+
+For conventional box-like layouts, see `Grid`, 'HBox`, and `VBox`.  For more 
+flexible and ad-hoc layouts, see `Board`.  For putting backgrounds and borders 
+around other widgets, see `Frame`.
 """
 
 import pyglet
@@ -17,12 +21,27 @@ from glooey.helpers import *
 
 @autoprop
 class Bin(Widget):
+    """
+    A container that can hold a single widget.
+
+    Bins are most often used to set limits on how big another widget can be.  
+    For example, you would use a Bin with some padding to keep the contents of 
+    a `Frame` from getting to close to the frame's edge.  Most often, bins are 
+    used as inner classes within more complicated widgets.  It's less common to 
+    see them used directly.
+    """
 
     def __init__(self):
         super().__init__()
         self._child = None
 
     def add(self, child):
+        """
+        Put a widget into the bin.
+
+        If the bin already had a child, it is removed and replaced by the new 
+        one.
+        """
         if self._child is not None:
             self._detach_child(self._child)
 
@@ -31,6 +50,11 @@ class Bin(Widget):
         self._repack_and_regroup_children()
 
     def clear(self):
+        """
+        Empty the bin.
+
+        It's OK to call this method if the bin is empty to begin with.
+        """
         if self._child is not None:
             self._detach_child(self._child)
         self._child = None
@@ -48,18 +72,62 @@ class Bin(Widget):
             self.child._resize(self.rect)
 
     def get_child(self):
+        """
+        Return the widget currently in the bin, or None if the bin is empty.
+        """
         return self._child
 
 
 @autoprop
 class Frame(Widget):
+    """
+    Visually offset a widget from its surroundings.
+
+    See the descriptions of the `Decoration`, `Box`, and `Content` inner 
+    classes for information on how to control the appearance of the frame.
+    """
+
     Box = Bin
-    Foreground = None
+    """
+    The container that will hold the content of the frame.  Often this is 
+    `Bin`, with the `custom_padding` attribute set to keep the content a 
+    reasonable distance from  the edge of the frame.
+    """
+
+    Content = None
+    """
+    The widget that will go inside the frame.  It's more common to add this 
+    widget after the frame has been created using the `add()` method, but 
+    sometimes it's convenient for a subclass to automatically fill in its
+    content.
+    """
+
     Decoration = None
-    custom_alignment = 'center'
+    """
+    The widget that will appear in the background of the frame.  Often this is 
+    either `Background` (for variably-sized frames) or `Image` (for fixed-size 
+    frames).
+    """
+
     custom_box_layer = 2
+    """
+    The z-order for the contents of the frame (i.e. the box and its children).  
+    By default this is on top of the decorations.
+    """
+
     custom_decoration_layer = 1
-    custom_autoadd_foreground = True
+    """
+    The z-order for the frame's decorations (i.e. the border and the 
+    background).  By default these are below the content.
+    """
+
+    custom_autoadd_content = True
+    """
+    If a `Content` inner class is specified, automatically instantiate it and 
+    add it to the frame.  This behavior in enabled by default.
+    """
+
+    custom_alignment = 'center'
 
     def __init__(self):
         from glooey.images import Background
@@ -71,13 +139,24 @@ class Frame(Widget):
         self._attach_child(self.__box)
         self._attach_child(self.__decoration)
 
-        if self.Foreground and self.custom_autoadd_foreground:
-            self.add(self.Foreground())
+        if self.Content and self.custom_autoadd_content:
+            self.add(self.Content())
 
     def add(self, widget):
+        """
+        Add a widget to the frame.
+
+        This method just calls `add()` on whatever widget the `Box` class is.  
+        Normally `Box` is a `Bin`, so this makes sense.  If you replace `Box` 
+        with something else, fro example `Grid`, you might want to also 
+        reimplement this method.
+        """
         self.box.add(widget)
 
     def clear(self):
+        """
+        Remove any widgets from the frame.
+        """
         self.box.clear()
 
     def do_claim(self):
@@ -90,20 +169,55 @@ class Frame(Widget):
             self.custom_decoration_layer, self.group))
 
     def get_box(self):
+        """
+        Return the widget holding the content of the frame.
+        """
         return self.__box
 
-    def get_foreground(self):
+    def get_content(self):
+        """
+        Return the widget being displayed in the frame.
+        """
         return self.__box.child
 
     def get_decoration(self):
+        """
+        Return the widget appearing in the background of the frame.
+        """
         return self.__decoration
 
 
 @autoprop
 class Grid(Widget):
+    """
+    Arrange widgets in a rectangular grid.
+
+    You can add widgets to the grid using either the `add()` method or the 
+    square-bracket operator (e.g. `grid[row, col] = widget`).  You don't need 
+    to specify the size of the grid in advance, it will automatically create 
+    enough rows and columns to fit all of its children.  The `set_row_height()` 
+    and `set_col_width()` methods are useful for controlling the dimensions of 
+    the grid.
+    """
+
     custom_num_rows = 0
+    """
+    The minimum number of rows for the grid to have.
+    """
+
     custom_num_cols = 0
+    """
+    The minimum number of columns for the grid to have.
+    """
+
     custom_cell_padding = None
+    """
+    The padding between the cells of the grid.
+
+    This is distinct from `custom_padding`, which is the padding around the 
+    edge of the grid.
+    """
+
     custom_cell_alignment = 'fill'
     custom_default_row_height = 'expand'
     custom_default_col_width = 'expand'
@@ -127,13 +241,30 @@ class Grid(Widget):
                 default_col_width, self.custom_default_col_width))
 
     def __getitem__(self, row_col):
+        """
+        Return the widget at the given position in the grid.
+
+        If no such child exists, a KeyError will be raised.
+        """
         return self._children[row_col]
 
     def __setitem__(self, row_col, child):
+        """
+        Add a widget to the grid at the given position.
+
+        See `add()` for more details.
+        """
         row, col = row_col
         self.add(row, col, child)
 
     def add(self, row, col, child):
+        """
+        Add a widget to the grid at the given position.
+
+        It's not an error to specify a cell that's not currently in the grid 
+        (i.e. 3,3 in a 2x2 grid).  The grid will simply be expanded to fit all 
+        of its children.
+        """
         if (row, col) in self._children:
             self._detach_child(self._children[row, col])
 
@@ -142,12 +273,22 @@ class Grid(Widget):
         self._repack_and_regroup_children()
 
     def remove(self, row, col):
+        """
+        Remove the widget at the given position in the grid.
+
+        If no such child exists, a KeyError will be raised.
+        """
         child = self._children[row, col]
         self._detach_child(child)
         del self._children[row, col]
         self._repack_and_regroup_children()
 
     def clear(self):
+        """
+        Remove all widgets from the grid.
+
+        It's ok to call this method on a grid that's already empty.
+        """
         for child in self._children.values():
             self._detach_child(child)
         self._children = {}
@@ -178,28 +319,61 @@ class Grid(Widget):
         yield child
 
     def get_num_rows(self):
+        """
+        Return the number of rows in the grid.
+        """
         return self._grid.num_rows
 
     def set_num_rows(self, new_num):
+        """
+        Set the minimum number of rows for the grid.
+
+        The grid could have more rows because it will grow to fit any cells 
+        added to it.
+        """
         self._grid.num_rows = new_num
         self._repack()
 
     def get_num_cols(self):
+        """
+        Return the number of columns in the grid.
+        """
         return self._grid.num_cols
 
     def set_num_cols(self, new_num):
+        """
+        Set the minimum number of columns for the grid.
+
+        The grid could have more columns because it will grow to fit any 
+        cells added to it.
+        """
         self._grid.num_cols = new_num
         self._repack()
 
     def get_cell_indices(self):
+        """
+        Return row and column indices for every cell in the grid.
+
+        This includes cells that aren't necessarily associated with any widget.  
+        For example, if a grid has a child in position (1,1) and none anywhere 
+        else, then it has 2 rows and columns and this method would return:
+        [(0,0), (0,1), (1,0), (1,1)]
+        """
         return [(i,j) for i in range(self.num_rows)
                       for j in range(self.num_cols)]
 
     def get_padding(self):
+        """
+        Return the padding on all sides of this widget, plus the padding 
+        between the cells, as a (left, right, top bottom, cell) tuple.
+        """
         return super().get_padding() + (self.cell_padding,)
 
     def set_padding(self, all=None, *, horz=None, vert=None,
             left=None, right=None, top=None, bottom=None, cell=None):
+        """
+        Set the padding for any or all sides of this widget.
+        """
         super().set_padding(
                 all=all, horz=horz, vert=vert, left=left, right=right,
                 top=top, bottom=bottom)
@@ -207,20 +381,35 @@ class Grid(Widget):
         self._repack()
 
     def get_cell_padding(self):
+        """
+        Return the padding between the cells of this widget.
+        """
         return self._grid.inner_padding
 
     def set_cell_padding(self, new_padding):
+        """
+        Set the padding between the cells of this widget.
+        """
         self._grid.inner_padding = new_padding
         self._repack()
 
     def get_cell_alignment(self):
+        """
+        Return how widgets are aligned within their cells.
+        """
         return self._cell_alignment
 
     def set_cell_alignment(self, new_alignment):
+        """
+        Specify how widgets should be aligned within their cells.
+        """
         self._cell_alignment = new_alignment
         self._repack()
 
     def get_row_height(self, row):
+        """
+        Return the height of the given row.
+        """
         return self._grid.row_heights[row]
 
     def set_row_height(self, row, new_height):
@@ -251,6 +440,9 @@ class Grid(Widget):
         self._repack()
 
     def get_col_width(self, col):
+        """
+        Return the width of the given column.
+        """
         return self._grid.col_widths[col]
 
     def set_col_width(self, col, new_width):
@@ -281,25 +473,35 @@ class Grid(Widget):
         self._repack()
 
     def get_default_row_height(self):
+        """
+        Get the default row height.
+        """
         return self._grid.default_row_height
 
     def set_default_row_height(self, new_height):
         """
-        Set the default row height.  This height will be used for any rows 
-        that haven't been given a specific height.  The meaning of the height 
-        is the same as for set_row_height().
+        Set the default row height.
+        
+        This height will be used for any rows that haven't been given a 
+        specific height.  The meaning of the height is the same as for 
+        `set_row_height()`.
         """
         self._grid.default_row_height = new_height
         self._repack()
 
     def get_default_col_width(self):
+        """
+        Get the default column width.
+        """
         return self._grid.default_col_width
 
     def set_default_col_width(self, new_width):
         """
-        Set the default column width.  This width will be used for any columns 
-        that haven't been given a specific width.  The meaning of the width is 
-        the same as for set_col_width().
+        Set the default column width.
+        
+        This width will be used for any columns that haven't been given a 
+        specific width.  The meaning of the width is the same as for 
+        `set_col_width()`.
         """
         self._grid.default_col_width = new_width
         self._repack()
@@ -307,6 +509,17 @@ class Grid(Widget):
 
 @autoprop
 class HVBox(Widget):
+    """
+    An abstract base class for containers that can pack widgets into either a 
+    single row or single column.
+
+    The two main `HVBox` subclasses are `HBox` and `VBox`.  The `add()` and 
+    `pack()` methods are the most convenient ways to add widgets to these 
+    containers.  You can decide how much space you want to allocate to each 
+    widget you add: e.g. as little space as possible, as much space as 
+    possible, or a specific size in pixels.  The `set_default_cell_size()`
+    method is also useful for controlling how space is allocated.
+    """
     custom_cell_padding = None
     custom_cell_alignment = 'fill'
     custom_default_cell_size = 'expand'
