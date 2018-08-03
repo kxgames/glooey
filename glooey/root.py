@@ -115,7 +115,7 @@ class Gui(Root):
         width -= self.left_padding + self.right_padding
         height -= self.top_padding + self.bottom_padding
         if self.rect and self.rect.size != (width, height):
-            self.repack()
+            self._repack()
 
     def get_territory(self):
         return Rect.from_pyglet_window(self.window)
