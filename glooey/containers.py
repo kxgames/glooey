@@ -700,11 +700,11 @@ class VBox(HVBox):
 @autoprop
 class Stack(Widget):
     """
-    Have any number of children, claim enough space for the biggest one, and 
-    just draw them all in vertical layers.
+    Display child widgets into vertical layers.
 
-    Use `add_front()`, `add_back()`, or `insert()` to control the order in 
-    which the children widgets are layered.  `add()` is an alias for 
+    A stack can contain any number of children.  It will claim enough space for 
+    the biggest one. Use `add_front()`, `add_back()`, or `insert()` to control 
+    the order in which the child widgets are layered.  `add()` is an alias for 
     `add_front()`.
 
     An interesting consideration with stacked widgets is whether they should be 
@@ -712,6 +712,11 @@ class Stack(Widget):
     words, should mouse events just go to the upper-most widget, or should they 
     go to all the widgets?  The latter is the default, but this can be changed 
     by setting `custom_one_child_gets_mouse = True`.
+
+    Under the hood, each child widget is associated with a "layer", which is 
+    just an integer.  Each widget is put in a `pyglet.graphics.OrderedGroup` 
+    according to it's layer number.  This means that it is possible for 
+    multiple widgets to occupy the same layer.
     """
 
     custom_one_child_gets_mouse = False
@@ -732,40 +737,83 @@ class Stack(Widget):
         self.one_child_gets_mouse = self.custom_one_child_gets_mouse
 
     def add(self, widget):
+        """
+        Add a widget to the top of the stack.
+
+        This is an alias for `add_front()`.
+        """
         self.add_front(widget)
 
     def add_front(self, widget):
+        """
+        Add a widget to the top of the stack.
+        """
         layer = max(self.layers) + 1 if self.layers else 0
         self.insert(widget, layer)
 
     def add_back(self, widget):
+        """
+        Add a widget to the bottom of the stack.
+        """
         layer = min(self.layers) - 1 if self.layers else 0
         self.insert(widget, layer)
 
     def insert(self, widget, layer):
+        """
+        Insert a widget into the given layer of the stack.
+
+        Smaller layer numbers (e.g. 0) will be displayed behind larger ones 
+        (e.g. 1), the same as with `pyglet.graphics.OrderedGroup`.  Note that 
+        this method does not update the layer of any other widget besides the 
+        one being inserted, and it is possible for multiple widgets to occupy 
+        the same layer.
+        """
         self._attach_child(widget)
         self._children[widget] = layer
         self._repack_and_regroup_children()
 
     def remove(self, widget):
+        """
+        Remove the given widget from the stack.
+        """
         self._detach_child(widget)
         del self._children[widget]
         self._repack_and_regroup_children()
 
     def clear(self):
+        """
+        Remove all widgets from the stack.
+        """
         for child in self.children:
             self._detach_child(child)
         self._children = {}
         self._repack_and_regroup_children()
 
     def do_claim(self):
+        """
+        Claim enough space for the largest of the child widgets.
+
+        Typically all the children would be the same size, but this is not 
+        required.
+        """
         return claim_stacked_widgets(*self.children)
 
     def do_resize_children(self):
+        """
+        Align each child widget in a box big enough for the largest one.
+
+        Typically all the children would be the same size, but this is not 
+        required.
+        """
         for child in self.children:
             align_widget_in_box(child, self.rect)
 
     def do_regroup_children(self):
+        """
+        Put each child widget into a `pyglet.graphics.OrderedGroup` based on 
+        its layer.
+        """
+
         # If there's only one child, don't bother making an ordered group.  As 
         # I understand it, it's best to use as few groups as possible because 
         # forcing OpenGL to change states is inefficient.
@@ -778,6 +826,13 @@ class Stack(Widget):
                 child._regroup(pyglet.graphics.OrderedGroup(layer, self.group))
 
     def do_find_children_near_mouse(self, x, y):
+        """
+        Return the visible children under the given mouse coordinate.
+
+        If `custom_one_child_gets_mouse == True`, only the first applicable 
+        widget will be returned.  Otherwise, all applicable widgets will be 
+        returned.
+        """
         for child in self.children:
             if child.is_visible and child.is_under_mouse(x, y):
                 yield child
@@ -795,6 +850,10 @@ class Stack(Widget):
                 key=lambda x: self._children[x], reverse=True)
 
     def get_layers(self):
+        """
+        Return the layer numbers of the widgets making up the stack, sorted so 
+        that the foreground layers come first.
+        """
         return sorted(self._children.values(), reverse=True)
 
 
@@ -804,31 +863,45 @@ class Deck(Widget):
     Display one of a number of child widgets depending on the state specified 
     by the user.
 
-    For example, a deck could be used to implement a roll-over effect.  (This 
-    is in fact its primary purpose.)  In this case, you would create three 
-    states: "base" (the default), "over" (for when the mouse is over the 
-    widget), and "down" (for when the mouse is being clicked on the widget).  
-    Each state would be associated with a different widget, for example an
-    `Image`.  To be clear, the "states" in this example are the names "base", 
-    "over", and "down".  Each of these "states" is then associated with a 
-    widget.
+    The mnemonic is to think of this container as a deck of cards, where each 
+    cards is called a "state".  There can be many cards in the deck, but only 
+    the top-most one is visible at any particular time.   
 
-    There are two ways to setup a deck.  The first (and most common) is via the 
-    constructor, which takes an initial state and keyword arguments linking any 
-    number of states with widgets.  The second is using the `add_state()` or 
-    `add_states()` methods.  The `add_states_if()` method is useful if you 
-    don't know a priori which states you will want to add.  For example, 
+    For example, one of the main purposes of decks is to implement roll-over 
+    effects.  In this case, you might create three states: "base" (the 
+    default), "over" (for when the mouse is over the widget), and "down" (for 
+    when the mouse is being clicked on the widget).  Each state would be 
+    associated with a different widget, for example an `Image`.  To be clear, 
+    the "states" in this example are the names "base", "over", and "down".  
+    Each of these "states" is then associated with a widget.
+
+    There are two ways to setup a deck.  The first is via the constructor, 
+    which is a good option if you know exactly which states you want include:
+
+    >>> d = glooey.Deck('base', 
+    ...         base=glooey.Image(...),
+    ...         over=glooey.Image(...),
+    ...         down=glooey.Image(...),
+    ... )
+
+    The alternative is to add states after the deck has been constructed using 
+    `add_state()`, `add_states()`, or `add_states_if()`.  This is the better 
+    option if the decision about which states to include might depend of things 
+    you don't know at construction time.  The `add_states_if()` method can be  
+    particularly useful in these cases.  Going back to the rollover example, 
     perhaps we wouldn't want a "down" state unless we have a "down" image:
-    
+
     >>> d = glooey.Deck('base')
     >>> d.add_states_if(
     ...         lambda w: w.image is not None,
-    ...         base=glooey.Image(path_or_none),
-    ...         over=glooey.Image(path_or_none),
-    ...         down=glooey.Image(path_or_none),
+    ...         base=glooey.Image(... or None),
+    ...         over=glooey.Image(... or None),
+    ...         down=glooey.Image(... or None),
     ... )
+    
+    Use the `set_state()` method to control which state is currently visible:
 
-    Use the `set_state()` method to control which state is currently visible.
+    >>> d.set_state('over')
     """
 
     def __init__(self, initial_state, **states):
@@ -1038,6 +1111,15 @@ class Deck(Widget):
 
 @autoprop
 class Board(Widget):
+    """
+    A container for relatively free-form positioning of child widgets.
+
+    The mnemonic is to imagine this container as a bulletin board onto which 
+    other widgets can be pinned.  The position of each widget can be specified 
+    either as an offset in absolute pixels or a fraction of the full board 
+    width, relative to any side of the board itself.  The width and height of 
+    each widget can be specified in the same way.
+    """
 
     def __init__(self):
         super().__init__()
