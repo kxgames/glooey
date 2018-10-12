@@ -81,6 +81,6 @@ class ScissorGroup(Group):
         )
 
     def unset_state(self):
-        glPopAttrib(GL_ENABLE_BIT)
+        glPopAttrib()
 
 
