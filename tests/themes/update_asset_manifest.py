@@ -8,12 +8,13 @@ Usage:
 """
 
 import docopt, json
+from fnmatch import fnmatch
 from pathlib import Path
 
 args = docopt.docopt(__doc__)
 ASSETS = Path(__file__).resolve().parents[2] / 'glooey/themes/assets'
 
-def make_manifest(theme, globs=('**/*.png',)):
+def make_manifest(theme, globs=('**/*.png',), exclude=()):
     theme_dir = ASSETS / theme
 
     paths = set()
@@ -23,8 +24,14 @@ def make_manifest(theme, globs=('**/*.png',)):
                 for x in theme_dir.glob(glob)
         )
 
+    for glob in exclude:
+        for path in sorted(paths):
+            if fnmatch(path, glob):
+                paths.discard(path)
+                break
+
     with open(f'{theme}_assets.json', 'w') as fp:
         json.dump(sorted(paths), fp)
 
-make_manifest('golden')
+make_manifest('golden', exclude=('heroes_and_villains.png',))
 make_manifest('kenney')
