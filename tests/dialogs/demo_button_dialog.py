@@ -21,7 +21,7 @@ class TestButton(glooey.Button):
         custom_color = 'purple'
 
 class TestOkDialog(glooey.OkDialog):
-    Foreground = glooey.Placeholder
+    Content = glooey.Placeholder
     custom_size_hint = 300, 200
 
     class Bin(glooey.Grid): #
@@ -35,7 +35,7 @@ class TestOkDialog(glooey.OkDialog):
             custom_text = 'Ok'
 
 class TestYesNoDialog(glooey.YesNoDialog):
-    Foreground = glooey.Placeholder
+    Content = glooey.Placeholder
     custom_size_hint = 300, 200
 
     class Bin(glooey.Grid): #

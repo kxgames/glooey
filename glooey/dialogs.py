@@ -33,8 +33,8 @@ Dialog.register_event_type('on_close')
 @autoprop
 class ButtonDialog(Dialog):
     Box = Grid
-    Foreground = Label
-    custom_autoadd_foreground = False
+    Content = Label
+    custom_autoadd_content = False
 
     class Buttons(HBox):
         custom_alignment = 'right'
@@ -42,22 +42,22 @@ class ButtonDialog(Dialog):
     def __init__(self, *args, **kwargs):
         super().__init__()
 
-        self.__foreground = self.Foreground(*args, **kwargs)
+        self.__content = self.Content(*args, **kwargs)
         self.__buttons = self.Buttons()
 
-        self.box.add(0, 0, self.__foreground)
+        self.box.add(0, 0, self.__content)
         self.box.add(1, 0, self.__buttons)
         self.box.set_row_height(1, 0)
 
     def add(self, widget):
         self.box.add(0, 0, widget)
-        self.__foreground = widget
+        self.__content = widget
 
     def clear(self):
         self.remove(0, 0)
 
-    def get_foreground(self):
-        return self.__foreground
+    def get_content(self):
+        return self.__content
 
     def get_buttons(self):
         return self.__buttons
