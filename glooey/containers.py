@@ -701,11 +701,32 @@ class VBox(HVBox):
 class Stack(Widget):
     """
     Have any number of children, claim enough space for the biggest one, and 
-    just draw them all in layers.
+    just draw them all in vertical layers.
+
+    Use `add_front()`, `add_back()`, or `insert()` to control the order in 
+    which the children widgets are layered.  `add()` is an alias for 
+    `add_front()`.
+
+    An interesting consideration with stacked widgets is whether they should be 
+    treated as "opaque" or "transparent" in terms of mouse events.  In other 
+    words, should mouse events just go to the upper-most widget, or should they 
+    go to all the widgets?  The latter is the default, but this can be changed 
+    by setting `custom_one_child_gets_mouse = True`.
     """
+
     custom_one_child_gets_mouse = False
+    """
+    If `True`, each mouse event will be propagated only to the upper-most 
+    widget under the mouse.  Note that if the stack contains widgets of 
+    different sizes, the "upper-most widget under the mouse" might not 
+    be the widget on the top of the stack.  If `False`, mouse-events will be 
+    propagated to all widgets.
+    """
 
     def __init__(self):
+        """
+        Initialize an empty stack.
+        """
         Widget.__init__(self)
         self._children = {} # {child: layer}
         self.one_child_gets_mouse = self.custom_one_child_gets_mouse
@@ -782,9 +803,50 @@ class Deck(Widget):
     """
     Display one of a number of child widgets depending on the state specified 
     by the user.
+
+    For example, a deck could be used to implement a roll-over effect.  (This 
+    is in fact its primary purpose.)  In this case, you would create three 
+    states: "base" (the default), "over" (for when the mouse is over the 
+    widget), and "down" (for when the mouse is being clicked on the widget).  
+    Each state would be associated with a different widget, for example an
+    `Image`.  To be clear, the "states" in this example are the names "base", 
+    "over", and "down".  Each of these "states" is then associated with a 
+    widget.
+
+    There are two ways to setup a deck.  The first (and most common) is via the 
+    constructor, which takes an initial state and keyword arguments linking any 
+    number of states with widgets.  The second is using the `add_state()` or 
+    `add_states()` methods.  The `add_states_if()` method is useful if you 
+    don't know a priori which states you will want to add.  For example, 
+    perhaps we wouldn't want a "down" state unless we have a "down" image:
+    
+    >>> d = glooey.Deck('base')
+    >>> d.add_states_if(
+    ...         lambda w: w.image is not None,
+    ...         base=glooey.Image(path_or_none),
+    ...         over=glooey.Image(path_or_none),
+    ...         down=glooey.Image(path_or_none),
+    ... )
+
+    Use the `set_state()` method to control which state is currently visible.
     """
 
     def __init__(self, initial_state, **states):
+        """
+        Initialize a deck.
+
+        The `initial_state` argument is the name of the state that the deck 
+        will begin in.  This can be changed at any time by calling 
+        `set_state()`.  Keyword arguments can be used to associate an initial 
+        set of states (keys) with widgets (values).  
+        
+        Note that while you must specify the initial state, you don't need to 
+        immediately provide a widget that state (or any other state).  For 
+        example:
+        
+        >>> d = glooey.Deck('base')
+        >>> d.add_state('base', widget)
+        """
         super().__init__()
         self._current_state = initial_state
         self._previous_state = initial_state
@@ -792,9 +854,17 @@ class Deck(Widget):
         self.add_states(**states)
 
     def __getitem__(self, state):
+        """
+        Get the widget associated with the given state.
+        """
         return self._states[state]
 
     def __setitem__(self, state, widget):
+        """
+        Add a state to the deck.
+
+        This is an alias for `self.add_state(state, widget)`
+        """
         return self.add_state(state, widget)
 
     def do_claim(self):
@@ -804,17 +874,46 @@ class Deck(Widget):
         return claim_stacked_widgets(*self._states.values())
 
     def add_state(self, state, widget):
+        """
+        Add a state to the deck.
+
+        If the given state already exists, it will be overwritten without error.
+        """
         self._remove_state(state)
         self._add_state(state, widget)
         self._repack_and_regroup_children()
 
     def add_states(self, **states):
+        """
+        Add the given states to the deck.
+
+        Keyword arguments map states (keys) to widgets (values).  For example:
+
+        >>> d = glooey.Deck('base')
+        >>> d.add_states(base=..., over=..., down=...)
+        """
         for state, widget in states.items():
             self._remove_state(state)
             self._add_state(state, widget)
         self._repack_and_regroup_children()
 
     def add_states_if(self, predicate, **states):
+        """
+        Add any of the given states that satisfy the given predicate.
+
+        The predicate should be callable (e.g. a function or lambda) that 
+        takes one of the given widgets as an argument, and returns a boolean 
+        indicating whether or not that widget should be added to the deck.  For 
+        example, this could be used to exclude widgets that don't have images:
+
+        >>> d = glooey.Deck('base')
+        >>> d.add_states_if(
+        ...         lambda w: w.image is not None,
+        ...         base=glooey.Image(path_or_none),
+        ...         over=glooey.Image(path_or_none),
+        ...         down=glooey.Image(path_or_none),
+        ... )
+        """
         filtered_states = {
                 k: w for k,w in states.items()
                 if predicate(w)
@@ -822,6 +921,12 @@ class Deck(Widget):
         self.add_states(**filtered_states)
 
     def reset_states(self, **states):
+        """
+        Remove any existing states and replace them with the ones specified in 
+        the keyword arguments.
+
+        Called without any arguments, this is an alias for `clear()`.
+        """
         for state in list(self.known_states):
             self._remove_state(state)
         for state, widget in states.items():
@@ -829,6 +934,12 @@ class Deck(Widget):
         self._repack_and_regroup_children()
 
     def reset_states_if(self, predicate, **states):
+        """
+        Remove any states associates with widgets that satisfy the given 
+        predicate.
+
+        See `add_states_if()` for a description of the predicate argument.
+        """
         filtered_states = {
                 k: w for k,w in states.items()
                 if predicate(w)
@@ -836,14 +947,23 @@ class Deck(Widget):
         self.reset_states(**filtered_states)
 
     def remove_state(self, state):
+        """
+        Remove the given state from the deck.
+        """
         self.remove_states(state)
 
     def remove_states(self, *states):
+        """
+        Remove the given states from the deck.
+        """
         for state in states:
             self._remove_state(state)
         self._repack_and_regroup_children()
 
     def clear(self):
+        """
+        Remove all states from the deck.
+        """
         self.remove_states(*self.known_states)
 
     def _add_state(self, state, widget):
@@ -860,9 +980,17 @@ class Deck(Widget):
             del self._states[state]
 
     def get_state(self):
+        """
+        Return the currently visible child widget.
+        """
         return self._current_state
 
     def set_state(self, new_state):
+        """
+        Set the state currently being displayed by the deck.
+
+        It is an error for the given state to not already be part of the deck.
+        """
         if new_state not in self.known_states:
             raise ValueError(f"unknown state '{new_state}'")
 
@@ -879,16 +1007,32 @@ class Deck(Widget):
             except KeyError: pass
 
     def set_state_if_known(self, new_state):
+        """
+        Set the state currently being displayed by the deck, but silently do 
+        nothing if that state doesn't exist.
+        """
         if new_state in self.known_states:
             self.state = new_state
 
     def get_widget(self, state):
+        """
+        Return the widget associated with the given state.
+        """
         return self[state]
 
     def get_previous_state(self):
+        """
+        Return the state that was visible before the current one.
+
+        If the current state is the only one that has ever been visible, the 
+        current state itself will be returned.
+        """
         return self._previous_state
 
     def get_known_states(self):
+        """
+        Return all the states currently available to the deck.
+        """
         return self._states.keys()
 
 
@@ -900,7 +1044,7 @@ class Board(Widget):
         self._pins = {}
 
     def add(self, widget, **kwargs):
-        # Make the pin could fail, so do it before attaching the child.
+        # Making the pin could fail, so do it before attaching the child.
         pin = self._make_pin(kwargs)
         # Attaching the child could also fail, so do it before updating the 
         # widget to the _pins data structure.
@@ -1270,8 +1414,6 @@ class Board(Widget):
 
         assert board_size > -1
         return board_size
-
-
 
 def align_widget_in_box(widget, box_rect, alignment='fill', widget_rect=None):
     if widget_rect is None:
