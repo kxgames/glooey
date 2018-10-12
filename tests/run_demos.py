@@ -82,7 +82,7 @@ def run_demo(path):
     demo_script = os.path.basename(path)
 
     try:
-        os.chdir(demo_dir)
+        if demo_dir: os.chdir(demo_dir)
         runpy.run_path(demo_script)
     finally:
         os.chdir(original_dir)
