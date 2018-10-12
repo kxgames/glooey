@@ -1,7 +1,7 @@
 include LICENSE.txt
 include README.rst
 
-recursive-include glooey/themes/assets
+recursive-include glooey/themes/assets *
 recursive-include tests *
 recursive-include docs *.rst conf.py Makefile
 recursive-exclude * __pycache__
