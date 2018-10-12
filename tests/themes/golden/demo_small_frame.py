@@ -19,7 +19,6 @@ def test_small_frame():
     label = golden.Label(lorem_ipsum)
     label.enable_line_wrap(200)
     frame.add(label)
-    label.debug_placement_problems()
     yield "Frame containing a paragraph."
 
 pyglet.app.run()
