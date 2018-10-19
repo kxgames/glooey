@@ -4,7 +4,7 @@
 Widgets whose primary role is to contain other widgets.  Most of these widgets 
 don't draw anything themselves, they just position children widgets.
 
-For conventional box-like layouts, see `Grid`, 'HBox`, and `VBox`.  For more 
+For conventional box-like layouts, see `Grid`, `HBox`, and `VBox`.  For more 
 flexible and ad-hoc layouts, see `Board`.  For putting backgrounds and borders 
 around other widgets, see `Frame`.
 """
@@ -198,6 +198,25 @@ class Grid(Widget):
     enough rows and columns to fit all of its children.  The `set_row_height()` 
     and `set_col_width()` methods are useful for controlling the dimensions of 
     the grid.
+
+    Example:
+
+    >>> grid = glooey.Grid()
+
+    Fill in a 2x2 grid with 4 widgets:
+
+    >>> grid[0,0] = w1
+    >>> grid[0,1] = w2
+    >>> grid[1,0] = w3
+    >>> grid[1,1] = w4
+
+    Make the first row as short as possible:
+
+    >>> grid.set_row_height(0, 0)
+
+    Note that `Grid` is a fairly thin wrapper around `drawing.Grid`.  If you're 
+    interested in implementing a custom widget with grid-like behavior, you 
+    might consider using `drawing.Grid` directly.
     """
 
     custom_num_rows = 0
@@ -219,8 +238,27 @@ class Grid(Widget):
     """
 
     custom_cell_alignment = 'fill'
+    """
+    How widgets are aligned within their cells.
+
+    See `set_alignment()` for more details about this option.
+    """
+
     custom_default_row_height = 'expand'
+    """
+    The default row height.
+
+    See `set_row_height()` and `set_default_row_height()` for more details 
+    about this option.
+    """
+
     custom_default_col_width = 'expand'
+    """
+    The default column width.
+
+    See `set_col_width()` and `set_default_col_width()` for more details 
+    about this option.
+    """
 
     def __init__(self, num_rows=None, num_cols=None, default_row_height=None, 
             default_col_width=None):
@@ -295,6 +333,10 @@ class Grid(Widget):
         self._repack_and_regroup_children()
 
     def do_claim(self):
+        """
+        Claim space considering the maximum width of each column, height of 
+        each row, and the padding between each cell.
+        """
         min_cell_rects = {
                 row_col: child.claimed_rect
                 for row_col, child in self._children.items()
@@ -302,6 +344,15 @@ class Grid(Widget):
         return self._grid.make_claim(min_cell_rects)
 
     def do_resize_children(self):
+        """
+        Align each child widget within the box made for its cell.
+
+        Its possible (and not uncommon) for a widget to be the same size as its 
+        cell.  In this case, the widget will simply fill its cell.  Any widgets 
+        that are smaller than their cells will be positioned according to the 
+        `cell_alignment` attribute.  `do_claim()` guarantees that no widget can 
+        be bigger than its cell.
+        """
         cell_rects = self._grid.make_cells(self.rect)
         for ij in self._children:
             align_widget_in_box(
@@ -310,6 +361,19 @@ class Grid(Widget):
                     self.cell_alignment)
 
     def do_find_children_near_mouse(self, x, y):
+        """
+        Find the cell under the mouse, then yield its widget (if it has one).
+
+        The default implementation of this function iterates through every 
+        child widget searching for the one(s) that are under the mouse.  This 
+        search is O(n).  Here we can do it in O(√n) by iterating through just 
+        the rows and columns, since that's enough to uniquely identify the cell 
+        under the mouse.
+
+        The widget in the identified cell may not be under the mouse, but that 
+        will be checked by `_find_children_under_mouse()`.  See also the 
+        documentation for the base class method.
+        """
         cell = self._grid.find_cell_under_mouse(x, y)
         child = self._children.get(cell)
 
@@ -382,13 +446,13 @@ class Grid(Widget):
 
     def get_cell_padding(self):
         """
-        Return the padding between the cells of this widget.
+        Return the padding between the cells of this widget, in pixels.
         """
         return self._grid.inner_padding
 
     def set_cell_padding(self, new_padding):
         """
-        Set the padding between the cells of this widget.
+        Set the padding between the cells of this widget, in pixels.
         """
         self._grid.inner_padding = new_padding
         self._repack()
@@ -402,6 +466,34 @@ class Grid(Widget):
     def set_cell_alignment(self, new_alignment):
         """
         Specify how widgets should be aligned within their cells.
+
+        See `set_alignment()` for information on the possible values for this 
+        setting.  Note that a widget's alignment value just applies to 
+        itself, but the "cell alignment" value applies to the grid's 
+        children.  This is unusual, and brings up the question of what happens 
+        when two alignment settings apply to the same child widget:
+
+        The answer is that the grid's cell alignment is applied before the 
+        alignments of any of its children.  This means that grid can limit the 
+        space available to the children, potentially making the children's 
+        alignment values irrelevant.  For example, if a grid has a cell 
+        alignment of:
+
+        - 'center': All children will be centered within their cells, 
+          regardless of their individual alignment values.  This is because the 
+          'center' alignment assigns the minimum possible space to a widget, so 
+          there is no room for further alignment.
+
+        - 'fill horz': All children will be centered vertically within their 
+          cells, but their horizontal alignments will depend on their 
+          individual alignment values.  For example, children with alignments of 'top 
+          left', 'left', and 'bottom left' would all end up centered vertically 
+          on the left sides of their cells.
+
+        - 'fill': Children will be aligned entirely according to their 
+          individual alignment values.  This is the default value (unless 
+          `custom_cell_alignment` has been changed) because it provides the 
+          most flexibility.
         """
         self._cell_alignment = new_alignment
         self._repack()
@@ -419,9 +511,8 @@ class Grid(Widget):
         
         If you provide an integer, the row will be that many pixels tall, so 
         long as all the cells in that row fit in that space.  If the cells 
-        don't fit, the row will be just tall enough to fit them.  For this 
-        reason, it is common to specify a height of "0" to make the row as 
-        short as possible.
+        don't fit, the row will be just tall enough to fit them.  It is common 
+        to specify a height of "0" to make the row as short as possible.
 
         If you provide the string 'expand', the row will grow to take up any 
         extra space allocated to the grid but not used by any of the other 
@@ -452,9 +543,9 @@ class Grid(Widget):
         
         If you provide an integer, the column will be that many pixels wide, so 
         long as all the cells in that column fit in that space.  If the cells 
-        don't fit, the column will be just wide enough to fit them.  For this 
-        reason, it is common to specify a width of "0" to make the column as 
-        narrow as possible.
+        don't fit, the column will be just wide enough to fit them.  It is 
+        common to specify a width of "0" to make the column as narrow as 
+        possible.
 
         If you provide the string 'expand', the column will grow to take up any 
         extra space allocated to the grid but not used by any of the other 
@@ -511,20 +602,54 @@ class Grid(Widget):
 class HVBox(Widget):
     """
     An abstract base class for containers that can pack widgets into either a 
-    single row or single column.
+    single row or single column, namely `HBox` and `VBox`.
 
-    The two main `HVBox` subclasses are `HBox` and `VBox`.  The `add()` and 
-    `pack()` methods are the most convenient ways to add widgets to these 
-    containers.  You can decide how much space you want to allocate to each 
-    widget you add: e.g. as little space as possible, as much space as 
-    possible, or a specific size in pixels.  The `set_default_cell_size()`
-    method is also useful for controlling how space is allocated.
+    .. warning::
+        `HVBox` is an abstract base class and cannot itself be used to organize 
+        widgets.  If you want to simultaneously organize widgets horizontally 
+        and vertically, consider `Grid`.
+
+    Except for being oriented in opposite directions, `HBox` and `VBox` are 
+    almost identical in terms of function and API.  To take advantage of this, 
+    `HVBox` organizes widgets using a 1-dimensional `drawing.Grid` such that 
+    both vertical and horizontal orientations can be achieved by simply  
+    overriding a handful of methods, namely:
+
+    - `do_get_index()`
+    - `do_get_row_col()`
+    - `do_set_row_col_sizes()`
+    - `get_default_cell_size()`
+    - `set_default_cell_size()`
     """
+
     custom_cell_padding = None
+    """
+    The padding between the cells of the grid.
+
+    This is distinct from `custom_padding`, which is the padding around the 
+    edge of the grid.
+    """
+
     custom_cell_alignment = 'fill'
+    """
+    How widgets are aligned within their cells.
+
+    See `set_alignment()` for more details about this option.
+    """
+
     custom_default_cell_size = 'expand'
+    """
+    How much space a cell will consume if no size is specified.
+
+    See `set_default_cell_size()` for more details about this option.  
+    """
 
     def __init__(self, default_cell_size=None):
+        """
+        Initialize the container.
+
+        See `add()` for more details about the `default_cell_size` argument.
+        """
         super().__init__()
         self._children = []
         self._children_can_overlap = False
@@ -538,30 +663,124 @@ class HVBox(Widget):
                 default_cell_size, self.custom_default_cell_size))
 
     def add(self, widget, size=None):
+        """
+        Add the given widget to the layout.
+
+        The widget will be added to the back of the layout (i.e. right for 
+        `HBox`, bottom for `VBox`).  The `size` argument specifies how much 
+        space (i.e. width for `HBox`, height for `VBox`) to allocate for the 
+        "cell" that will contain the widget (if you think of the hbox/vbox as a 
+        1-dimensional grid).  The size can either be an integer number of 
+        pixels or the string `'expand'`:
+
+        - number of pixels (int): The specified number of pixels will be 
+          allocated for the widget, unless that number is smaller than the 
+          widget's minimum size (i.e. its claim).  In that case, the widget's 
+          minimum size will be allocated instead (because a widget can't be 
+          smaller than its minimum size).  For this reason, `size=0` is a 
+          common setting meaning: "take as little space as possible".  Of 
+          course, you can also specify `size=100` to make a cell exactly 100px 
+          wide/tall, assuming that the widget in question is smaller than that.
+
+        - `'expand'` (str): A special value indicating that the widget should 
+          expand to fill any space available to the container but not used by 
+          any other cells.  For example, imagine you have a `HBox` that's 500px 
+          wide (or a `VBox that's 500 px tall).  If you add two widgets with 
+          `size='expand'`, each will get 250 px.  If you add one widget with `size=100` and two with `size='expand'`, the first will 
+
+        If no size is specified, a default is used.  The default can be set (in 
+        order of precedence) either via `set_default_cell_size()`, an argument 
+        to the constructor, or the `custom_default_cell_size` class variable.
+
+        Examples:
+        
+        These are with `HBox`, but could equivalently be with `VBox`.  Assume 
+        for the sake of simplicity that the `HBox` is 500px wide.  Further 
+        assume that `w1`, `w2`, and `w3` are arbitrary widgets with no minimum 
+        size (e.g. `Placeholder`).
+
+        In this example, `w1` and `w2` will both be 250px wide (i.e. half the 
+        width of the container):
+
+        >>> h1 = glooey.HBox()  # 500px wide
+        >>> h1.add(w1, size='expand')
+        >>> h1.add(w2, size='expand')
+
+        In this example, `w1` will be 100px wide and `w2` and `w3` will split 
+        the remaining space and be 200px each:
+
+        >>> h2 = glooey.HBox()  # 500px wide
+        >>> h2.add(w1, size=100)
+        >>> h2.add(w2, size='expand')
+        >>> h2.add(w3, size='expand')
+        """
         self.add_back(widget, size)
 
     def add_front(self, widget, size=None):
+        """
+        Add the given widget to the front of the layout.
+
+        The same as `add()`, except the widget will be added to the front of 
+        the layout (i.e. left for `HBox`, top for `VBox`).
+        """
         self.insert(widget, 0, size)
 
     def add_back(self, widget, size=None):
+        """
+        Add the given widget to the back of the layout.
+
+        This is an alias for `add()`.
+        """
         self.insert(widget, len(self._children), size)
 
     def pack(self, widget):
+        """
+        Add the given widget to the layout such that it takes as little space 
+        as possible.
+
+        This is an alias for `add(widget, size=0)`
+        """
         self.add(widget, size=0)
 
     def pack_front(self, widget):
+        """
+        Add the given widget to the front of layout such that it takes as 
+        little space as possible.
+
+        This is an alias for `add_front(widget, size=0)`
+        """
         self.add_front(widget, size=0)
 
     def pack_back(self, widget):
+        """
+        Add the given widget to the back of layout such that it takes as 
+        little space as possible.
+
+        This is an alias for `add_back(widget, size=0)`
+        """
         self.add_back(widget, size=0)
 
     def insert(self, widget, index, size=None):
+        """
+        Insert the given widget at the given position in the layout.
+
+        See `add()` for details about the `size` argument.
+        """
         self._attach_child(widget)
         self._children.insert(index, widget)
         self._sizes[widget] = size
         self._repack_and_regroup_children()
 
     def replace(self, old_widget, new_widget):
+        """
+        Remove the given old widget from the layout and replace it with the 
+        given new widget.
+
+        The new widget will be given the same size (e.g. the `size` argument to 
+        `add()`) as the old widget.  That said, the new widget could still take 
+        up a different amount of space, if it's claim is different.  The layout 
+        will be repacked automatically if this is the case.
+        """
         old_index = self._children.index(old_widget)
         old_size = self._sizes[old_widget]
         with self.hold_updates():
@@ -569,12 +788,18 @@ class HVBox(Widget):
             self.insert(new_widget, old_index, old_size)
 
     def remove(self, widget):
+        """
+        Remove the given widget from the layout.
+        """
         self._detach_child(widget)
         self._children.remove(widget)
         del self._sizes[widget]
         self._repack_and_regroup_children()
 
     def clear(self):
+        """
+        Remove every widget from the layout.
+        """
         for child in self._children:
             self._detach_child(child)
         self._children = []
@@ -582,6 +807,12 @@ class HVBox(Widget):
         self._repack_and_regroup_children()
 
     def do_claim(self):
+        """
+        Claim enough space for all the child widgets put together in the 
+        direction of the layout (e.g. horizontal for `HBox`, vertical for 
+        `VBox`) and just enough space for the largest child widget in the 
+        opposite direction.
+        """
         self.do_set_row_col_sizes({
                 i: self._sizes[child]
                 for i, child in enumerate(self._children)
@@ -594,12 +825,32 @@ class HVBox(Widget):
         return self._grid.make_claim(min_cell_rects)
 
     def do_resize_children(self):
+        """
+        Allocate space to the child widgets according to how much space they 
+        asked for when added to the layout (e.g. their "size") and how much 
+        space they need (e.g. their "claim").
+        """
         cell_rects = self._grid.make_cells(self.rect)
         for i, child in enumerate(self._children):
             box = cell_rects[self.do_get_row_col(i)]
             align_widget_in_box(child, box, self.cell_alignment)
 
     def do_find_children_near_mouse(self, x, y):
+        """
+        Speed up the search for the child widget under the mouse based
+
+        This reimplementation is faster than the default implementation, which 
+        simply checks every child widget for collisions with the given mouse 
+        coordinate, because it searches underlying the grid layout instead.  
+        This takes advantage of the following two facts:
+        
+        1. We know that only one widget can be under the mouse, so we can stop 
+           the search as soon as we find that widget.
+
+        2. We only need to check for collisions in the direction of the layout 
+           (i.e. horizontal for `HBox`, vertical for `VBox`), because we know 
+           that all the child widgets will overlap in the opposite direction.
+        """
         cell = self._grid.find_cell_under_mouse(x, y)
         if cell is None: return
 
@@ -609,25 +860,57 @@ class HVBox(Widget):
         yield child
 
     def do_get_index(self, row, col):
+        """
+        Given row and columns number of a child widget, return the index of 
+        that widget in the 1-dimensional `_children` data structure.
+
+        This would be the column for `HBox` and the row for `VBox`.
+        """
         raise NotImplementedError
 
     def do_get_row_col(self, index):
+        """
+        Given the index of a child widget, return its row and column numbers as 
+        a tuple.
+
+        The "on-axis" number (e.g. column for `Hbox`, row for `VBox`) should 
+        just be the given index.  The "off-axis" number should be 1.
+        """
         raise NotImplementedError
 
     def do_set_row_col_sizes(self, sizes):
+        """
+        Copy child size information into the underlying grid data structure.
+
+        The `sizes` argument is a dictionary mapping 1-dimensional child 
+        indices to the sizes provided by `add()` (e.g. 0, 'expand', etc).  This 
+        information either needs to be applied to the columns (`HBox`) or rows 
+        (`VBox`) of the underlying grid data structure.
+        """
         raise NotImplementedError
 
     def get_children(self):
-        # Return a tuple so the list of children won't be mutable, and so the 
-        # caller can't somehow inadvertently change the list of children held 
-        # by the HVBox.
+        """
+        Return the child widgets being organized by this container.
+
+        The return value is a tuple so that the list of children won't be 
+        mutable, and so the caller can't somehow inadvertently change the list 
+        of children held by the container.
+        """
         return tuple(self._children)
 
     def get_padding(self):
+        """
+        Return the padding on all sides of this widget, plus the padding 
+        between the cells, as a (left, right, top bottom, cell) tuple.
+        """
         return super().get_padding() + (self.cell_padding,)
 
     def set_padding(self, all=None, *, horz=None, vert=None,
             left=None, right=None, top=None, bottom=None, cell=None):
+        """
+        Set the padding for any or all sides of this widget.
+        """
         super().set_padding(
                 all=all, horz=horz, vert=vert, left=left, right=right,
                 top=top, bottom=bottom)
@@ -635,28 +918,103 @@ class HVBox(Widget):
         self._repack()
 
     def get_cell_padding(self):
+        """
+        Return the padding between the cells of this widget, in pixels.
+        """
         return self._grid.inner_padding
 
     def set_cell_padding(self, new_padding):
+        """
+        Set the padding between the cells of this widget, in pixels.
+        """
         self._grid.inner_padding = new_padding
         self._repack()
 
     def get_cell_alignment(self):
+        """
+        Return how widgets are aligned within their cells.
+        """
         return self._cell_alignment
 
     def set_cell_alignment(self, new_alignment):
+        """
+        Specify how widgets should be aligned within their cells.
+
+        See `set_alignment()` for information on the possible values for this 
+        setting.  Note that a widget's alignment value just applies to 
+        itself, but the "cell alignment" value applies to this container's 
+        children.  This is unusual, and brings up the question of what happens 
+        when two alignment settings apply to the same child widget:
+
+        The answer is that the container's cell alignment is applied before the 
+        alignments of any of its children.  This means that container can limit 
+        the space available to the children, potentially making the children's 
+        alignment values irrelevant.  For example, if the cell alignment is:
+
+        - 'center': All children will be centered within their cells, 
+          regardless of their individual alignment values.  This is because the 
+          'center' alignment assigns the minimum possible space to a widget, so 
+          there is no room for further alignment.
+
+        - 'fill horz': All children will be centered vertically within their 
+          cells, but their horizontal alignments will depend on their 
+          individual alignment values.  For example, children with alignments 
+          of 'top left', 'left', and 'bottom left' would all end up centered 
+          vertically on the left sides of their cells.
+
+        - 'fill': Children will be aligned entirely according to their 
+          individual alignment values.  This is the default value (unless 
+          `custom_cell_alignment` has been changed) because it provides the 
+          most flexibility.
+        """
         self._cell_alignment = new_alignment
         self._repack()
 
     def get_default_cell_size(self):
+        """
+        Return the default cell size (i.e. a number of pixels or the string 
+        `'expand'`).
+
+        Reimplement to either return the row or column widths of the underlying 
+        grid.
+        """
         raise NotImplementedError
 
     def set_default_cell_size(self, size):
+        """
+        Set the default cell size.
+
+        See `add()` for more details about this setting.
+        """
         raise NotImplementedError
 
 
 @autoprop
 class HBox(HVBox):
+    """
+    Organize widgets into a horizontal row.
+
+    The primary way to control the horizontal layout of an HBox is to specify a 
+    size for each widget.  Widgets can either take up as little space as 
+    possible (`size=0`), a specific number of pixels (`size=100`), or as much 
+    space as possible (`size='expand'`).  You can specify this size when adding 
+    a widget to the container.  The `add()` method lets you specify a size via 
+    an argument, with the default being to take as much space as possible.  The 
+    `pack()` method is simply an alias for `add()` with a size of 0 (i.e. take 
+    as little space as possible).  Refer to `add()` for more details.
+
+    The vertical layout is more simple: it is the same for each child widget, 
+    and is controlled by `set_cell_alignment()`.  
+
+    Below is an example of adding two widgets to an `HBox`.  The first will 
+    take as little space as possible, the second will expand to fill the rest 
+    of the space available to the `HBox`:
+
+    >>> hbox = glooey.HBox()
+    >>> hbox.pack(w1)
+    >>> hbox.add(w2)
+    """
+
     add_left = HVBox.add_front
     add_right = HVBox.add_back
 
@@ -678,6 +1036,30 @@ class HBox(HVBox):
 
 @autoprop
 class VBox(HVBox):
+    """
+    Organize widgets into a vertical column.
+
+    The primary way to control the vertical layout of an VBox is to specify a 
+    size for each widget.  Widgets can either take up as little space as 
+    possible (`size=0`), a specific number of pixels (`size=100`), or as much 
+    space as possible (`size='expand'`).  You can specify this size when adding 
+    a widget to the container.  The `add()` method lets you specify a size via 
+    an argument, with the default being to take as much space as possible.  The 
+    `pack()` method is simply an alias for `add()` with a size of 0 (i.e. take 
+    as little space as possible).  Refer to `add()` for more details.
+
+    The horizontal layout is more simple: it is the same for each child widget, 
+    and is controlled by `set_cell_alignment()`.  
+
+    Below is an example of adding two widgets to an `VBox`.  The first will 
+    take as little space as possible, the second will expand to fill the rest 
+    of the space available to the `VBox`:
+
+    >>> vbox = glooey.VBox()
+    >>> vbox.pack(w1)
+    >>> vbox.add(w2)
+    """
+
     add_top = HVBox.add_front
     add_bottom = HVBox.add_back
 
@@ -714,9 +1096,10 @@ class Stack(Widget):
     by setting `custom_one_child_gets_mouse = True`.
 
     Under the hood, each child widget is associated with a "layer", which is 
-    just an integer.  Each widget is put in a `pyglet.graphics.OrderedGroup` 
-    according to it's layer number.  This means that it is possible for 
-    multiple widgets to occupy the same layer.
+    just an integer.  The stacking effect is produced by putting each widget in 
+    a `pyglet.graphics.OrderedGroup` according to it's layer number.  It is 
+    possible for multiple widgets to occupy the same layer, which could lead to 
+    visual artifacts.
     """
 
     custom_one_child_gets_mouse = False
@@ -740,13 +1123,17 @@ class Stack(Widget):
         """
         Add a widget to the top of the stack.
 
-        This is an alias for `add_front()`.
+        Each child will be allowed to fill the entire stack.  As such, each 
+        widgets final size it determined entirely by its claim and alignment.  
+        This method is an alias for `add_front()`.
         """
         self.add_front(widget)
 
     def add_front(self, widget):
         """
         Add a widget to the top of the stack.
+
+        See `add()` for more details.
         """
         layer = max(self.layers) + 1 if self.layers else 0
         self.insert(widget, layer)
@@ -754,6 +1141,8 @@ class Stack(Widget):
     def add_back(self, widget):
         """
         Add a widget to the bottom of the stack.
+
+        See `add()` for more details.
         """
         layer = min(self.layers) - 1 if self.layers else 0
         self.insert(widget, layer)
@@ -767,6 +1156,8 @@ class Stack(Widget):
         this method does not update the layer of any other widget besides the 
         one being inserted, and it is possible for multiple widgets to occupy 
         the same layer.
+
+        See `add()` for more details.
         """
         self._attach_child(widget)
         self._children[widget] = layer
@@ -941,16 +1332,22 @@ class Deck(Widget):
         return self.add_state(state, widget)
 
     def do_claim(self):
-        # Claim enough space for the biggest child, so that we won't need to 
-        # repack when we change states.  (Also, I can't think of any reason why 
-        # you'd want states of different sizes.)
+        """
+        Claim enough space for the biggest child.
+
+        This eliminates the need to repack when changing state.
+        """
         return claim_stacked_widgets(*self._states.values())
 
     def add_state(self, state, widget):
         """
         Add a state to the deck.
 
-        If the given state already exists, it will be overwritten without error.
+        The given widget will be allowed to fill the entire space available to 
+        the deck, meaning that the widget's ultimate size is determined only by 
+        its claim and its alignment.  Typically every widget in the deck will 
+        be the same size, to allow for smooth transitions between states.  If 
+        the given state already exists, it will be overwritten without error.
         """
         self._remove_state(state)
         self._add_state(state, widget)
@@ -964,6 +1361,8 @@ class Deck(Widget):
 
         >>> d = glooey.Deck('base')
         >>> d.add_states(base=..., over=..., down=...)
+
+        See `add_state()` for more details.
         """
         for state, widget in states.items():
             self._remove_state(state)
@@ -986,6 +1385,8 @@ class Deck(Widget):
         ...         over=glooey.Image(path_or_none),
         ...         down=glooey.Image(path_or_none),
         ... )
+
+        See `add_state()` for more details.
         """
         filtered_states = {
                 k: w for k,w in states.items()
@@ -1112,13 +1513,28 @@ class Deck(Widget):
 @autoprop
 class Board(Widget):
     """
-    A container for relatively free-form positioning of child widgets.
+    A container for free-form positioning of child widgets.
 
     The mnemonic is to imagine this container as a bulletin board onto which 
     other widgets can be pinned.  The position of each widget can be specified 
     either as an offset in absolute pixels or a fraction of the full board 
-    width, relative to any side of the board itself.  The width and height of 
+    size, relative to any side of the board itself.  The width and height of 
     each widget can be specified in the same way.
+
+    While `Grid`, `HBox`, and `VBox` are typically the best containers for 
+    regular layout, `Board` is useful for less structured layouts.
+
+    Example:
+
+    >>> board = glooey.Board()
+
+    Position a widget 10px from the top left corner of the board:
+
+    >>> board.add(w1, left=10, top=10)
+
+    Position a widget in the center of the board:
+
+    >>> board.add(w2, center_percent=50)
     """
 
     def __init__(self):

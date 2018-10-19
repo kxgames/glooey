@@ -117,7 +117,6 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     `is_under_mouse()`, and `_grab_mouse()`.
     """
 
-    ## Custom attributes
     custom_alignment = 'fill'
     """
     How the widget should align itself within the space assigned to it.
@@ -528,10 +527,12 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         Yield all the children that could be under the given mouse coordinate.
         
-        The order in which the children are yielded is arbitrary.  It's ok to 
-        return children that are hidden or are not actually under the given 
-        coordinate; these things will be checked for every widget produced by 
-        this method.
+        The order in which the children are yielded has no significance.  It's 
+        ok to yield children that are hidden or are not actually under the 
+        given coordinate; `_find_children_under_mouse()` will check these 
+        things for every widget produced by this method.  However, failing to 
+        yield a child that actually is under the mouse will result in that 
+        child not responding to the mouse.
         
         The default implementation just yields all of the widgets children, but 
         subclasses may be able to use knowledge of their geometry to quickly 
@@ -1485,7 +1486,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         child to an internal list of children widgets.
 
         This method is only meant to be called in subclasses of Widget, which 
-        is why it's prefixed with an underscore.
+        is why it's prefixed with an underscore.  For example, you would use 
+        this method if implementing a 
         """
         if not isinstance(child, Widget):
             raise UsageError(f"{child} is not a widget, did you forget to inherit from something?")
