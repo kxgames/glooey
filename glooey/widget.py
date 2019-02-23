@@ -1378,29 +1378,29 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         # Subtract padding from the full amount of space assigned to this 
         # widget.
-        padded_rect = self._assigned_rect.copy()
-        padded_rect.left += self.left_padding
-        padded_rect.bottom += self.bottom_padding
-        padded_rect.width -= self.total_horz_padding
-        padded_rect.height -= self.total_vert_padding
+        max_rect = self._assigned_rect.copy()
+        max_rect.left += self.left_padding
+        max_rect.bottom += self.bottom_padding
+        max_rect.width -= self.total_horz_padding
+        max_rect.height -= self.total_vert_padding
 
         # Align this widget within the space available to it (i.e. the assigned 
         # space minus the padding).
-        content_rect = Rect.from_size(self._min_width, self._min_height)
-        drawing.align(self._alignment, content_rect, padded_rect)
+        aligned_rect = Rect.from_size(self._min_width, self._min_height)
+        drawing.align(self._alignment, aligned_rect, max_rect)
 
         # Round the rectangle to the nearest integer pixel, because sometimes 
         # images can't line up right (e.g. in Background widgets) if the widget 
         # has fractional coordinates.
-        content_rect.round()
+        aligned_rect.round()
 
         # Guarantee that do_resize() is only called if the size of the widget 
         # actually changed.  This is probably doesn't have a significant effect 
         # on performance, but hopefully it gives people reimplementing 
         # do_resize() less to worry about.
-        if self._rect is None or self._rect != content_rect:
-            self._rect = content_rect
-            self._padded_rect = content_rect.copy()
+        if self._rect is None or self._rect != aligned_rect:
+            self._rect = aligned_rect
+            self._padded_rect = aligned_rect.copy()
             self._padded_rect.left -= self.left_padding
             self._padded_rect.bottom -= self.bottom_padding
             self._padded_rect.width += self.total_horz_padding

@@ -24,22 +24,22 @@ def fill_vert(child_rect, parent_rect):
 @alignment
 def fill_top(child_rect, parent_rect):
     child_rect.width = parent_rect.width
-    child_rect.top = parent_rect.top
+    child_rect.top_left = parent_rect.top_left
 
 @alignment
 def fill_bottom(child_rect, parent_rect):
     child_rect.width = parent_rect.width
-    child_rect.bottom = parent_rect.bottom
+    child_rect.bottom_left = parent_rect.bottom_left
 
 @alignment
 def fill_left(child_rect, parent_rect):
     child_rect.height = parent_rect.height
-    child_rect.left = parent_rect.left
+    child_rect.bottom_left = parent_rect.bottom_left
 
 @alignment
 def fill_right(child_rect, parent_rect):
     child_rect.height = parent_rect.height
-    child_rect.right = parent_rect.right
+    child_rect.top_right = parent_rect.top_right
 
 @alignment
 def top_left(child_rect, parent_rect):
@@ -95,7 +95,17 @@ alignment string using the ``@glooey.drawing.alignment`` decorator.""")
     else:
         alignment_func = key_or_function
 
+    if __debug__:
+        parent_copy = parent_rect.copy()
+
     alignment_func(child_rect, parent_rect)
+
+    # Sanity check the alignment function.
+    if __debug__:
+        if parent_rect != parent_copy:
+            raise RuntimeError(f"{repr(key_or_function)} changed the parent rectangle (second argument) from {parent_copy} to {parent_rect}.  Alignment functions should only modify the child rectangle (first argument).")
+        if not child_rect.inside(parent_rect):
+            raise RuntimeError(f"{repr(key_or_function)} placed the child rectangle outside the parent rectangle.  This most likely indicates a bug in '{alignment_func.__qualname__}()'.\nchild:  {child_rect}\nparent: {parent_rect}")
 
 def fixed_size_align(key_or_function, child_rect, parent_rect):
     fixed_size = child_rect.size

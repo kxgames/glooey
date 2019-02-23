@@ -9,7 +9,7 @@ where a widgets goes within the space allocated for it, and size hints to
 control how big a widget is.
 
 In order to explain these concepts in more detail, it will be helpful to 
-establish some terminology.  Each widget is assigned (by it's parent) a 
+establish some terminology.  Each widget is assigned (by its parent) a 
 rectangle specifying the maximum amount of space it can occupy.  We'll call 
 this the "max rect".  Each widget also internally keeps track of the minimum 
 amount space it needs for itself and its children.  We'll call this the "min 
