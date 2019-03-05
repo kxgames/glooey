@@ -103,8 +103,27 @@ class Root(Stack):
 @autoprop
 class Gui(Root):
 
+
+    def __init__(self, window, clear_before_draw=True, cursor=None, 
+            hotspot=None, batch=None, group=None):
+
+        super().__init__(window, batch, group)
+
+        # Set the cursor, if the necessary arguments were given.
+        if cursor and not hotspot:
+            raise ValueError("Specified cursor but not hotspot.")
+        if hotspot and not cursor:
+            raise ValueError("Specified hotspot but not cursor.")
+        if cursor and hotspot:
+            self.set_cursor(cursor, hotspot)
+
+        # Disable clearing the window on each draw.
+        self.clear_before_draw = clear_before_draw
+
+
     def on_draw(self):
-        self.window.clear()
+        if self.clear_before_draw:
+            self.window.clear()
         self.batch.draw()
 
     def on_resize(self, width, height):
@@ -174,7 +193,6 @@ class PanningGui(Gui):
 
         self.cursor = pyglet.sprite.Sprite(
                 cursor, batch=self.batch, group=mouse_group)
-
 
     def do_resize(self):
         self.mouse = self.territory.center
