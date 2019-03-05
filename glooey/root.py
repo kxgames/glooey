@@ -129,11 +129,25 @@ class Gui(Root):
 @autoprop
 class PanningGui(Gui):
     """
-    A window with mouse exclusivity enabled.  This makes it possible to 
-    emit mouse pan events, but it also complicates a lot of things.  First of 
-    all, an image must be provided so that the mouse can be manually drawn.  
-    Second, the mouse coordinates must be manually tracked and fed to the event 
-    handlers. 
+    A window that emits ``on_mouse_pan`` events when the mouse is off-screen.
+    
+    `PanningGui` is typically used in conjunction with `Viewport`, which is a 
+    container that scrolls its children in response to ``on_mouse_pan`` events.  
+    Together, these two widgets allow the user to scroll widgets (e.g. a game 
+    map) by moving the mouse off the screen, which is a common motif in games.
+
+    The ``on_mouse_pan`` event fires continuously (e.g. 60 Hz) when the mouse 
+    is off the screen.  Each event specifies how far off the screen the mouse 
+    is in the vertical and horizontal dimensions, and how much time elapsed 
+    since the last event fired.
+
+    Normally, a window doesn't receive information about the mouse unless the 
+    mouse is within the boundaries of that window.  In order for `PanningGui` 
+    to break this rule and keep track of the mouse while it is outside the 
+    window, it has to enable `mouse exclusivity`__.  One consequence of this is 
+    that, unlike with `Gui`, a cursor image must be provided.
+
+    __ https://pyglet.readthedocs.io/en/pyglet-1.2-maintenance/programming_guide/mouse.html#mouse-exclusivity
     """
 
     def __init__(self, window, cursor, hotspot, batch=None, group=None):
@@ -143,14 +157,24 @@ class PanningGui(Gui):
         super().__init__(window, batch, gui_group)
         window.set_exclusive_mouse(True)
 
+        # Where the mouse is.  Because mouse exclusivity is enabled, we have to 
+        # keep track of this ourselves.
+        self.mouse = self.territory.center
+
+        # Where the mouse would be, if it wasn't confined to the window.  The 
+        # difference between `self.mouse` and `self.shadow_mouse` gives the 
+        # direction of each ``on_mouse_pan`` event that gets fired.
+        self.shadow_mouse = None
+
+        # Because mouse exclusivity is enabled, we have to provide an image for 
+        # the cursor.
         hotspot = vecrec.cast_anything_to_vector(hotspot)
         cursor.anchor_x = hotspot.x
         cursor.anchor_y = hotspot.y
 
-        self.mouse = self.territory.center
-        self.shadow_mouse = None
         self.cursor = pyglet.sprite.Sprite(
                 cursor, batch=self.batch, group=mouse_group)
+
 
     def do_resize(self):
         self.mouse = self.territory.center
@@ -229,7 +253,7 @@ class PanningGui(Gui):
             if self.territory.bottom < self.mouse.y < self.territory.top:
                 self.shadow_mouse.y = self.mouse.y
 
-        # Keep the mouse on screen.  This feels like there should be a function 
+        # Keep the mouse on screen.  It feels like there should be a function 
         # for this in vecrec...
 
         if self.mouse.x < self.territory.left:
