@@ -6,7 +6,6 @@ General-purpose utilities used throughout the project.
 
 import functools
 import contextlib
-import more_itertools
 
 # If `debugtools` is installed, import some functions into the global namespace 
 # that can make debugging a little easier.  If it isn't, no big deal.
@@ -59,16 +58,16 @@ class HoldUpdatesMixin:
 
     def _filter_pending_updates(self):
         """
-        Return all the updates  that need to be applied, from a list of all the 
+        Return all the updates that need to be applied, from a list of all the 
         updates that were called while the hold was active.  This method is 
         meant to be overridden by subclasses that want to customize how held 
         updates are applied.
 
-        The self._pending_updates list contains a (method, args, kwargs) tuple 
-        for each update that was called while updates were being held.  This 
-        list is in the order that the updates were actually called, and any 
-        updates that were called more than once will appear in this list more 
-        than once.
+        The `self._pending_updates` member variable is a list containing a 
+        (method, args, kwargs) tuple for each update that was called while 
+        updates were being held.  This list is in the order that the updates 
+        were actually called, and any updates that were called more than once 
+        will appear in this list more than once.
         
         This method should yield or return an list of the tuples in the same 
         format representing the updates that should be applied, in the order 
@@ -120,7 +119,13 @@ def late_binding_property(fget=None, fset=None, fdel=None, doc=None):
     return property(fget, fset, fdel, doc)
 
 def first_not_none(iterable):
-    return more_itertools.first_true(iterable, pred=lambda x: x is not None)
+    n = 0
+    for x in iterable:
+        if x is not None:
+            return x
+        n += 1
+
+    raise ValueError("No values given." if n == 0 else f"All {n} values `None`.")
 
 def clamp(value, low, high):
     return max(low, min(value, high))
