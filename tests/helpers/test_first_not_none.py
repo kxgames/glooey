@@ -1,11 +1,45 @@
 #!/usr/bin/env python3
 
-from glooey.helpers import first_not_none
+import glooey
+import pytest
 
-def test_first_not_none():
-    assert first_not_none((1, 0, None)) == 1
-    assert first_not_none((0, 1, None)) == 0
-    assert first_not_none((1, None, 0)) == 1
-    assert first_not_none((0, None, 1)) == 0
-    assert first_not_none((None, 1, 0)) == 1
-    assert first_not_none((None, 0, 1)) == 0
+@pytest.mark.parametrize(
+        ('args',   'expected'), [
+
+        ([1],               1),
+        ([0],               0),
+        ([1, None],         1),
+        ([0, None],         0),
+        ([None, 1],         1),
+        ([None, 0],         0),
+
+        ([1, None, None],   1),
+        ([0, None, None],   0),
+        ([None, 1, None],   1),
+        ([None, 0, None],   0),
+        ([None, None, 1],   1),
+        ([None, None, 0],   0),
+
+        ([1, 0],            1),
+        ([0, 1],            0),
+        ([None, 1, 0],      1),
+        ([None, 0, 1],      0),
+        ([1, None, 0],      1),
+        ([0, None, 1],      0),
+        ([1, 0, None],      1),
+        ([0, 1, None],      0),
+
+])
+def test_basic_usage(args, expected):
+    assert glooey.first_not_none(args) == expected
+
+@pytest.mark.parametrize(
+        ('args',        'err'), [
+        ([],            "No values"),
+        ([None],        "1 values"),
+        ([None, None],  "2 values"),
+])
+def test_bad_inputs(args, err):
+    with pytest.raises(ValueError, match=err):
+        glooey.first_not_none(args)
+
