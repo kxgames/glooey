@@ -186,6 +186,14 @@ class Frame(Widget):
         """
         return self.__decoration
 
+    def set_decoration(self, widget):
+        """
+        Set the widget appearing in the background of the frame.
+        """
+        self._detach_child(self.__decoration)
+        self.__decoration = self._attach_child(widget)
+        self._repack_and_regroup_children()
+
 
 @autoprop
 class Grid(Widget):

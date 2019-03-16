@@ -18,13 +18,13 @@ class TestBackground(glooey.Background): #
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
-frame = TestFrame()
-widget = TestBackground()
-frame.add(widget)
-gui.add(frame)
 
 @run_demos.on_space(gui) #
 def test_image():
+    frame = TestFrame()
+    widget = TestBackground()
+    frame.add(widget)
+    gui.add(frame)
     yield "A orange tiled background in green tiled frame."
 
     frame.padding = 32
@@ -33,8 +33,10 @@ def test_image():
     frame.box.padding = 48
     yield "Pad inside the frame."
 
-    frame.padding = 0
-    frame.box.padding = 16
+    bg = glooey.Background()
+    bg.set_appearance(center=pyglet.image.load('assets/64x64/purple.png'))
+    frame.decoration = bg
+    yield "Dynamically change the background."
 
 pyglet.app.run()
 
