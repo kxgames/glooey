@@ -43,11 +43,18 @@ attached to the GUI, it'll pretty much tell us what's going on::
 
 It can also be difficult to diagnose why widgets aren't appearing where you 
 think they should be.  To help with this, widgets have a method called 
-`debug_placement_problems()`.  This method draws a red rectangle showing what 
-size the widget claimed (this rectangle is always in the lower left corner, 
-because claims only have widths and heights but not positions), a yellow 
-rectangle showing the space the widget was assigned by its parent, and a blue 
-rectangle showing the space the widget ultimately took.  For example:
+`debug_placement_problems()`.  This method draws three rectangles relevant to 
+how the widget is being placed:
+
+- Red rectangle: What size the widget claimed.  This rectangle is always in the 
+  lower left corner, because claims only have widths and heights --- not 
+  positions.
+
+- Yellow rectangle: The space the widget was assigned by its parent
+  
+- Blue rectangle: The space the widget ultimately took.
+  
+For example:
 
 .. demo:: troubleshooting/debug_placement_problems.py
 
@@ -69,7 +76,7 @@ It's not uncommon for the blue rectangle to be completely covered by the yellow
 one, so don't be alarmed if you can't see it.
 
 If neither of these tools solve your problem, make an `issue`__ on Github and 
-I'll try to help you out.
+I'll try to help you out!
 
 __ https://github.com/kxgames/glooey/issues
 

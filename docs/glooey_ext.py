@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import re
 from docutils import nodes
 from docutils.parsers.rst import Directive
+from docutils.parsers.rst import directives
 from sphinx import addnodes
 from pathlib import Path
 
@@ -123,10 +125,28 @@ Error in \"demo\" directive: The following line isn't present in '{py_path}':
         return node
 
 
+class IndentedCodeBlock(directives.body.CodeBlock):
+    # https://stackoverflow.com/questions/7034745/how-to-force-whitespace-in-code-block-in-restructuredtext
+    INDENTATION_RE = re.compile("^ *")
+    EXPECTED_INDENTATION = 3
+
+    def run(self):
+        block_lines = self.block_text.splitlines()
+        block_header_len = self.content_offset - self.lineno + 1
+        block_indentation = self.measure_indentation(self.block_text)
+        code_indentation = block_indentation + self.EXPECTED_INDENTATION
+        self.content = [ln[code_indentation:] for ln in block_lines[block_header_len:]]
+        return super().run()
+
+    @classmethod
+    def measure_indentation(cls, line):
+        return cls.INDENTATION_RE.match(line).end()
+
 
 def setup(app): 
     app.add_directive('show-nodes', ShowNodes)
     app.add_directive('demo', Demo)
+    app.add_directive('code', IndentedCodeBlock)
 
     app.add_node(
             linebreak,

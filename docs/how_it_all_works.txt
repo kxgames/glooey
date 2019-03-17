@@ -354,8 +354,8 @@ will be immediately reflected.
    I mention above that regrouping is usually triggered internally by glooey 
    when a widget is added to the GUI.  You only need to worry about this if you 
    are writing a custom container widget.  That is, a widget that uses 
-   `_attach_child()` and `remove_child()` to add and remove children after it's 
-   been constructed.  If you're doing this, make sure to always call 
+   `_attach_child()` and `_detach_child()` to add and remove children after 
+   it's been constructed.  If you're doing this, make sure to always call 
    `_repack_and_regroup_children()` afterwards to trigger a repack and a 
    regroup if necessary.
 

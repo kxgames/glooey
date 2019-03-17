@@ -6,8 +6,8 @@ Sometimes you need a widget that is totally unlike any of the built-in ones.
 This scenario comes up fairly often in game programming, which lends itself to 
 non-standard user interfaces.  When this happens, you have no option but to 
 write your own widget class from scratch.  The :doc:`how_it_all_works` tutorial 
-describes all the things that a widget needs to do, but without some examples 
-that information would be hard to apply in practice.  This tutorial has three 
+describes all the things that a widget needs to do, but that information would 
+be hard to apply in practice without some examples.  This tutorial has three 
 examples: two showing how the make "normal" widgets and one showing how to make 
 a container widget.  Each example goes into a lot of detail, but here are the 
 important points to remember:
@@ -84,7 +84,7 @@ The "custom" attributes will allow subclasses to provide particular images for
 the various parts of the clock.  Internally, the widget maintains dictionaries 
 of both these images and sprite objects that will be used to render them.
 
-::
+.. code::
     
        def get_face(self):
            return self._images['face']
@@ -105,13 +105,13 @@ glossed over in the first snippet.  This decorator automatically creates
 properties (e.g. `self.face`) for each group of getters and setters.  This is 
 nice because it makes attribute access clear and concise for users of our 
 widget, without requiring hardly any boilerplate from us.  You don't need to 
-use this decorator in your own widgets, but all of the built-in widgets do, so 
-I thought it'd be good to mention.  For more information, check out the 
+use this decorator in your own widgets, but all of the built-in widgets use it, 
+so I thought it'd be good to mention.  For more information, check out the 
 `autoprop on Github`__.
 
 __ https://github.com/kalekundert/autoprop
 
-::
+.. code::
 
        def do_claim(self):
            width, height = 0, 0
@@ -138,13 +138,22 @@ none of the images are required (e.g. the user might not specify a clock face)
 and that the hands will be rotating, but hopefully the concept is 
 straight-forward.
 
-::
+.. code::
 
        def do_regroup(self):
            for sprite in self._sprites.values():
                if sprite is not None:
                    sprite.batch = self.batch
                    sprite.group = self._get_layer(k)
+
+       def _get_layer(self, key):
+           layers = {
+                   'face': 0,
+                   'hour': 1,
+                   'min': 2,
+                   'sec': 3,
+           }
+           return pyglet.graphics.OrderedGroup(layers[key], self.group)
 
 This method is called when the widget is assigned to a new group.  This always 
 happens when the widget is attached to the GUI, and may also happen if the 
@@ -157,7 +166,7 @@ Note that the sprites need to be in separate groups to ensure that they are
 drawn in the correct order.  The logic for doing this was factored out into the 
 `_get_layer()` method, because it'll also be used in `do_draw()`.
 
-::
+.. code::
 
        def do_draw(self):
            now = datetime.datetime.now()
@@ -209,7 +218,7 @@ The `do_undraw()` method just deletes all the vertex lists associated with the
 widget.  It also resets the sprites to ``None``, so that `do_draw()` knows to 
 recreate them the next time it's called. 
 
-::
+.. code::
 
        def on_update(self, dt):
            self._draw()
@@ -268,9 +277,10 @@ rectangles located at the origin and to position them on the clock face using
 comes with a few different "artists" like this to help draw simple shapes.  
 We'll be on our own for the clock face, but that actually makes this class an 
 even better demonstration because it'll show both how to use raw OpenGL 
-primitives and how much simpler things can be if you don't have to do that.
+primitives (for the face) and how much simpler things can be if you don't have 
+to do that (for the hands).
 
-::
+.. code::
 
        def get_radius(self):
            return self._radius
@@ -292,7 +302,7 @@ the size of widget, while `set_color()` can only change its appearance.  Also
 note that you never need to call `_repack()` and `_draw()` in the same method; 
 widgets are automatically redrawn when they're repacked.
 
-::
+.. code::
 
        def do_claim(self):
            width = height = 2 * self.radius
@@ -301,7 +311,7 @@ widgets are automatically redrawn when they're repacked.
 Calculating the minimum width and height needed by this widget is trivial, 
 because we have a radius.
 
-::
+.. code::
 
        def do_regroup(self):
            if self._face is not None:
@@ -321,7 +331,7 @@ updated differently.  For the face, we call `batch.migrate` if the vertex list
 has already been drawn.  For the hands, we just need to set the batch and group 
 attributes, regardless of whether or not they've been drawn before.  
 
-::
+.. code::
 
    class HandGroup(pyglet.graphics.Group):
 
@@ -360,13 +370,17 @@ original coordinate frame, not the rotated one.  `glPushMatrix()` and
 `glPopMatrix()` are used to easily restore the OpenGL state once the hands are 
 finished rendering.
 
-::
+.. code::
+
+   # class LineClock (cont.)
 
        def do_draw(self):
            self.do_draw_face()
            self.do_draw_hands()
 
-For clarity, the drawing routine has been broken into two separate methods::
+For clarity, the drawing routine has been broken into two separate methods:
+
+.. code::
 
        def do_draw_face(self):
            N = 48
@@ -413,7 +427,7 @@ separate from any other triangle strips we might use.  The only part specific
 to glooey is at the end, where we decide whether to create a new vertex list or 
 to update an existing one.
 
-::
+.. code::
 
        def do_draw_hands(self):
            # We're hard-coding the radii of the hands here.  Probably it would be 
@@ -454,7 +468,7 @@ time.  Lastly, we update the artists with the new rectangles and their groups
 with the new angles.  The artists will take care of creating or updating their 
 vertex lists as necessary.
 
-::
+.. code::
 
        def do_undraw(self):
            if self._face is not None:
@@ -535,12 +549,12 @@ attributes::
 We have two attributes: the radius and this list of children.  The radius can 
 be set at the class-level (using ``custom_radius``) or at the instance-level 
 (using the constructor or ``set_radius()``).  Note that ``set_radius()`` calls 
-`repack()`, since changing the radius will certainly change to amount of space 
+`_repack()`, since changing the radius will certainly change to amount of space 
 needed by the widget and all its children.  The list of children can be 
 modified using the ``add()``, ``remove()``, etc. methods (see below), but we 
 also provide a read-only getter.
 
-::
+.. code::
 
        def add(self, widget):
            self.insert(widget, len(self._children))
@@ -598,7 +612,7 @@ the with-block.  If the same method is called multiple times, it is only called
 once when the block ends.  This can be a useful way to reuse methods like 
 `insert()` and `remove()` without repacking the GUI more than once.
 
-::
+.. code::
 
        def do_claim(self):
            top = bottom = left = right = 0
@@ -624,7 +638,7 @@ The `do_resize_children()` method ends up pretty similar, since it's actually
 placing the children, so the ``_yield_offsets()`` helper factors out some 
 shared code.
 
-::
+.. code::
 
        def do_resize_children(self):
            for child, offset in self._yield_offsets():
