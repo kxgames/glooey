@@ -181,7 +181,6 @@ class Color:
     def interpolate(self, target, extent):
         self += extent * (target - self)
 
-
 def hex_to_float(hex):
     return Color.from_hex(hex).float
 

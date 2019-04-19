@@ -35,7 +35,6 @@ class Mover(Bin):
         def unset_state(self):
             pyglet.gl.glPopMatrix()
 
-
     def __init__(self):
         super().__init__()
 
@@ -223,7 +222,6 @@ class Mover(Bin):
 
         if self.child.rect is None:
             raise UsageError("can't pan/jump until the mover's child has been given a size.")
-
 
 Mover.register_event_type('on_translate')
 
@@ -422,7 +420,6 @@ class ScrollPane(Widget):
 
         if self.child.rect is None:
             raise UsageError("can't scroll until the scroll pane's child has been given a size.")
-
 
 ScrollPane.register_event_type('on_scroll')
 

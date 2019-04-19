@@ -528,8 +528,6 @@ class Grid:
     def _get_col_padding(self, j):
         return self._outer_padding if j == 0 else self._inner_padding
 
-
-
 def make_grid(rect, cells={}, num_rows=0, num_cols=0, padding=None,
         inner_padding=None, outer_padding=None, row_heights={}, col_widths={}, 
         default_row_height='expand', default_col_width='expand'):

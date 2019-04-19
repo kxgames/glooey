@@ -3,6 +3,7 @@
 from glooey.helpers import *
 
 alignments = {}
+
 def alignment(func):
     alignments[func.__name__.replace('_', ' ')] = func
     return func
