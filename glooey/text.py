@@ -15,6 +15,7 @@ from glooey.containers import Stack, Deck
 from glooey.helpers import *
 
 @autoprop
+@register_event_type('on_edit_text')
 class Label(Widget):
     custom_text = ""
     custom_font_name = None
@@ -303,9 +304,9 @@ class Label(Widget):
         self._repack()
 
 
-Label.register_event_type('on_edit_text')
-
 @autoprop
+@register_event_type('on_focus')
+@register_event_type('on_unfocus')
 class EditableLabel(Label):
     custom_selection_color = 'black'
     custom_selection_background_color = None
@@ -426,9 +427,6 @@ class EditableLabel(Label):
     def set_unfocus_on_enter(self, new_behavior):
         self._unfocus_on_enter = new_behavior
 
-
-EditableLabel.register_event_type('on_focus')
-EditableLabel.register_event_type('on_unfocus')
 
 @autoprop
 class Form(Widget):

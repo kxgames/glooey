@@ -99,6 +99,27 @@ class EventDispatcher(pyglet.event.EventDispatcher):
 
 
 @autoprop
+@register_event_type(
+    'on_attach',
+    'on_detach',
+    'on_attach_child',
+    'on_detach_child',
+    'on_mouse_press',
+    'on_mouse_release',
+    'on_mouse_hold',
+    'on_mouse_motion',
+    'on_mouse_enter',
+    'on_mouse_leave',
+    'on_mouse_drag',
+    'on_mouse_drag_enter',
+    'on_mouse_drag_leave',
+    'on_mouse_scroll',
+    'on_click',
+    'on_double_click',
+    'on_rollover',
+    'on_enable',
+    'on_disable',
+)
 class Widget(EventDispatcher, HoldUpdatesMixin):
     """
     The base class from which all widgets derive.
@@ -1875,25 +1896,4 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             The widgets that the mouse just stopped interacting with.
             """
             return self.previous - self.current
-
-
-Widget.register_event_type('on_attach')
-Widget.register_event_type('on_detach')
-Widget.register_event_type('on_attach_child')
-Widget.register_event_type('on_detach_child')
-Widget.register_event_type('on_mouse_press')
-Widget.register_event_type('on_mouse_release')
-Widget.register_event_type('on_mouse_hold')
-Widget.register_event_type('on_mouse_motion')
-Widget.register_event_type('on_mouse_enter')
-Widget.register_event_type('on_mouse_leave')
-Widget.register_event_type('on_mouse_drag')
-Widget.register_event_type('on_mouse_drag_enter')
-Widget.register_event_type('on_mouse_drag_leave')
-Widget.register_event_type('on_mouse_scroll')
-Widget.register_event_type('on_click')
-Widget.register_event_type('on_double_click')
-Widget.register_event_type('on_rollover')
-Widget.register_event_type('on_enable')
-Widget.register_event_type('on_disable')
 

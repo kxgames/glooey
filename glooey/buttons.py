@@ -193,6 +193,7 @@ class Button(Widget):
 
 
 @autoprop
+@register_event_type('on_toggle')
 class Checkbox(Widget):
     custom_checked_base = None; custom_unchecked_base = None
     custom_checked_over = None; custom_unchecked_over = None
@@ -284,9 +285,6 @@ class Checkbox(Widget):
         self._deck[True].remove_controller(widget)
         self._deck[False].remove_controller(widget)
         self._defer_clicks_to_proxies = exclusive
-
-
-Checkbox.register_event_type('on_toggle')
 
 @autoprop
 class RadioButton(Checkbox):

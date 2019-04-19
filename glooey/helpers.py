@@ -89,9 +89,10 @@ def update_function(method):
     return wrapped_method
 
 
-def register_event_type(event_type):
+def register_event_type(*event_types):
     def decorator(cls):
-        cls.register_event_type(event_type)
+        for event_type in event_types:
+            cls.register_event_type(event_type)
         return cls
     return decorator
 def late_binding_property(fget=None, fset=None, fdel=None, doc=None):

@@ -147,6 +147,7 @@ class Gui(Root):
 
 
 @autoprop
+@register_event_type('on_mouse_pan')
 class PanningGui(Gui):
     """
     A window that emits ``on_mouse_pan`` events when the mouse is off-screen.
@@ -299,7 +300,4 @@ class PanningGui(Gui):
     def _update_mouse_pan(self, dt):
         direction = self.shadow_mouse - self.mouse
         self.dispatch_event('on_mouse_pan', direction, dt)
-
-PanningGui.register_event_type('on_mouse_pan')
-
 

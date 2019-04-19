@@ -16,6 +16,7 @@ from glooey.misc import Spacer
 from glooey.helpers import *
 
 @autoprop
+@register_event_type('on_close')
 class Dialog(Frame):
 
     def open(self, gui):
@@ -26,9 +27,6 @@ class Dialog(Frame):
         if self.root is not None:
             self.root.remove(self)
             self.dispatch_event('on_close', self)
-
-
-Dialog.register_event_type('on_close')
 
 @autoprop
 class ButtonDialog(Dialog):

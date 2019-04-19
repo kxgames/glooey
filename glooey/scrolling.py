@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""
+"""\
 Widgets that allow the user to scroll through content that would otherwise be 
 too big to fit on the screen.
 """
@@ -19,6 +19,7 @@ from glooey.images import Image
 from glooey.helpers import *
 
 @autoprop
+@register_event_type('on_translate')
 class Mover(Bin):
 
     class TranslateGroup(pyglet.graphics.Group):
@@ -223,9 +224,8 @@ class Mover(Bin):
         if self.child.rect is None:
             raise UsageError("can't pan/jump until the mover's child has been given a size.")
 
-Mover.register_event_type('on_translate')
-
 @autoprop
+@register_event_type('on_scroll')
 class ScrollPane(Widget):
     """
     Provide basic support for scrolling.
@@ -421,8 +421,6 @@ class ScrollPane(Widget):
         if self.child.rect is None:
             raise UsageError("can't scroll until the scroll pane's child has been given a size.")
 
-ScrollPane.register_event_type('on_scroll')
-
 @autoprop
 class ScrollGripMixin:
     """
@@ -464,7 +462,6 @@ class ScrollGripMixin:
 
     def on_scroll(self, pane):
         self.mover.jump_percent(pane.position_percent)
-
 
 class ButtonScrollGrip(ScrollGripMixin, Button):
     pass
@@ -542,7 +539,6 @@ class HVScrollBar(Frame):
     def set_button_speed(self, new_speed):
         self._button_speed = new_speed
 
-
 @autoprop
 class HScrollBar(HVScrollBar):
     HVBox = HBox
@@ -613,7 +609,6 @@ class ScrollBox(Widget):
 
     def set_mouse_sensitivity(self, new_sensitivity):
         self._mouse_sensitivity = new_sensitivity
-
 
 @autoprop
 class Viewport(ScrollPane):
