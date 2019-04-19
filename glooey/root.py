@@ -20,11 +20,11 @@ class Root(Stack):
     def __init__(self, window, batch=None, group=None):
         super().__init__()
 
-        self._parent = self
-        self._window = window
-        self._batch = batch or pyglet.graphics.Batch()
-        self._group = group or pyglet.graphics.Group()
-        self._spurious_leave_event = False
+        self.__parent = self
+        self.__window = window
+        self.__batch = batch or pyglet.graphics.Batch()
+        self.__group = group or pyglet.graphics.Group()
+        self.__spurious_leave_event = False
 
         window.push_handlers(self)
 
@@ -36,8 +36,8 @@ class Root(Stack):
         # event was detected.  If the event is spurious, reset the flag, ignore 
         # the event, and stop it from propagating.
 
-        if self._spurious_leave_event:
-            self._spurious_leave_event = False
+        if self.__spurious_leave_event:
+            self.__spurious_leave_event = False
             return True
         else:
             super().on_mouse_enter(x, y)
@@ -51,7 +51,7 @@ class Root(Stack):
         # to stop it from propagating.
 
         if self.is_under_mouse(x, y):
-            self._spurious_leave_event = True
+            self.__spurious_leave_event = True
             return True
         else:
             super().on_mouse_leave(x, y)
@@ -60,20 +60,16 @@ class Root(Stack):
         return self
 
     def get_window(self):
-        return self._window
+        return self.__window
 
     def get_batch(self):
-        return self._batch
+        return self.__batch
 
     def get_group(self):
-        return self._group
+        return self.__group
 
     def get_territory(self):
         raise NotImplementedError
-
-    @property
-    def is_hidden(self):
-        return self._is_hidden
 
     @update_function
     def _repack(self):
@@ -120,7 +116,6 @@ class Gui(Root):
         # Disable clearing the window on each draw.
         self.clear_before_draw = first_not_none((
             clear_before_draw, self.custom_clear_before_draw))
-
 
     def on_draw(self):
         if self.clear_before_draw:
