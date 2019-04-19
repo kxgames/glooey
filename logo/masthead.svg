@@ -43,7 +43,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -76,5 +76,17 @@
          x="131.50237"
          y="194.65382"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'PT Sans';-inkscape-font-specification:'PT Sans Bold'">An object-oriented GUI library for pyglet</tspan></text>
+    <text
+       xml:space="preserve"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.82818127px;line-height:110.00000238%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Normal';text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;letter-spacing:0px;word-spacing:0px;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:start;display:inline;overflow:visible;visibility:visible;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker:none;enable-background:accumulate"
+       x="124.87179"
+       y="250.93475"
+       id="text4135-4"
+       sodipodi:linespacing="110%"><tspan
+         sodipodi:role="line"
+         id="tspan4137-0"
+         x="124.87179"
+         y="250.93475"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Infini;-inkscape-font-specification:'Infini Bold'">An object-oriented GUI library for pyglet</tspan></text>
   </g>
 </svg>
