@@ -31,7 +31,7 @@ cover more powerful ways to customize widgets.
 .. note::
 
     These tutorials will use the Wesnoth theme as an example.  Wesnoth is a 
-    popular open-source, fantasy-themed, turned based strategy game.  Although 
+    popular open-source, fantasy-themed, turn-based strategy game.  Although 
     Wesnoth itself does not use glooey, recapitulating parts of its user 
     interface is a good real-world demonstration of what glooey can do.
 
