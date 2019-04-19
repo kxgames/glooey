@@ -77,8 +77,6 @@ class HoldUpdatesMixin:
         """
         from more_itertools import unique_everseen as unique
         yield from reversed(list(unique(reversed(self._pending_updates))))
-
-
 def update_function(method):
 
     @functools.wraps(method)
@@ -91,7 +89,11 @@ def update_function(method):
     return wrapped_method
 
 
-
+def register_event_type(event_type):
+    def decorator(cls):
+        cls.register_event_type(event_type)
+        return cls
+    return decorator
 def late_binding_property(fget=None, fset=None, fdel=None, doc=None):
     import functools
 

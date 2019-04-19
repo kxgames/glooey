@@ -102,10 +102,10 @@ class Root(Stack):
 
 @autoprop
 class Gui(Root):
+    custom_clear_before_draw = True
 
-
-    def __init__(self, window, clear_before_draw=True, cursor=None, 
-            hotspot=None, batch=None, group=None):
+    def __init__(self, window, *, cursor=None, hotspot=None,
+            clear_before_draw=None, batch=None, group=None):
 
         super().__init__(window, batch, group)
 
@@ -118,7 +118,8 @@ class Gui(Root):
             self.set_cursor(cursor, hotspot)
 
         # Disable clearing the window on each draw.
-        self.clear_before_draw = clear_before_draw
+        self.clear_before_draw = first_not_none((
+            clear_before_draw, self.custom_clear_before_draw))
 
 
     def on_draw(self):
@@ -169,11 +170,11 @@ class PanningGui(Gui):
     __ https://pyglet.readthedocs.io/en/pyglet-1.2-maintenance/programming_guide/mouse.html#mouse-exclusivity
     """
 
-    def __init__(self, window, cursor, hotspot, batch=None, group=None):
+    def __init__(self, window, cursor, hotspot, *, batch=None, group=None):
         mouse_group = pyglet.graphics.OrderedGroup(1, parent=group)
         gui_group = pyglet.graphics.OrderedGroup(0, parent=group)
 
-        super().__init__(window, batch, gui_group)
+        super().__init__(window, batch=batch, group=gui_group)
         window.set_exclusive_mouse(True)
 
         # Where the mouse is.  Because mouse exclusivity is enabled, we have to 
@@ -298,7 +299,6 @@ class PanningGui(Gui):
     def _update_mouse_pan(self, dt):
         direction = self.shadow_mouse - self.mouse
         self.dispatch_event('on_mouse_pan', direction, dt)
-
 
 PanningGui.register_event_type('on_mouse_pan')
 
