@@ -98,7 +98,7 @@ we only need to look at one here because they're all the same.  The important
 part is the call to `self._repack()`.  This should be done whenever the 
 widget's size may have changed, because it causes glooey to recalculate how 
 much space each widget should have.  In this case, if the clock is given a new 
-face, it's size may very well change.
+face, its size may very well change.
 
 Another thing to draw attention to is the `@autoprop` class decorator that I 
 glossed over in the first snippet.  This decorator automatically creates 
@@ -131,12 +131,12 @@ __ https://github.com/kalekundert/autoprop
 
            return max(width, min_size), max(height, min_size)
 
-This method returns the minimum amount if space needed by the widget, and must 
-be implemented by every new widget (i.e. it's pure virtual).  This particular 
-implementation is a bit convoluted because we need to account for the fact that 
-none of the images are required (e.g. the user might not specify a clock face) 
-and that the hands will be rotating, but hopefully the concept is 
-straight-forward.
+The `do_claim()` method returns the minimum amount if space needed by the 
+widget, and must be implemented by every new widget (i.e. it's pure virtual).  
+This particular implementation is a bit convoluted because we need to account 
+for the fact that none of the images are required (e.g. the user might not 
+specify a clock face) and that the hands will be rotating, but hopefully the 
+concept is straight-forward.
 
 .. code::
 
@@ -155,10 +155,10 @@ straight-forward.
            }
            return pyglet.graphics.OrderedGroup(layers[key], self.group)
 
-This method is called when the widget is assigned to a new group.  This always 
-happens when the widget is attached to the GUI, and may also happen if the 
-widget is moved from one parent to another within the GUI.  The above code 
-actually won't do anything in the first case, because the sprites are all 
+The `do_regroup()` method is called when the widget is assigned to a new group.  
+This always happens when the widget is attached to the GUI, and may also happen 
+if the widget is moved from one parent to another within the GUI.  The above 
+code actually won't do anything in the first case, because the sprites are all 
 ``None`` until the widget is drawn for the first time, but in the second case 
 it will properly update the sprites.
 
@@ -329,7 +329,8 @@ will apply the proper transformations --- see the definition of the `HandGroup`
 class below.  Note also that the face (vertex list) and the hands (artists) are 
 updated differently.  For the face, we call `batch.migrate` if the vertex list 
 has already been drawn.  For the hands, we just need to set the batch and group 
-attributes, regardless of whether or not they've been drawn before.  
+attributes, regardless of whether or not they've been drawn before.  The 
+rectangle artist will take care of migrating the vertex lists if they exist.
 
 .. code::
 
