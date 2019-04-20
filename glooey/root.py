@@ -22,7 +22,7 @@ class Root(Stack):
 
         self.__window = window
         self.__batch = batch or pyglet.graphics.Batch()
-        self.__group = group or pyglet.graphics.Group()
+        self._regroup(group)
         self.__spurious_leave_event = False
 
         window.push_handlers(self)
@@ -66,9 +66,6 @@ class Root(Stack):
 
     def get_batch(self):
         return self.__batch
-
-    def get_group(self):
-        return self.__group
 
     def get_territory(self):
         raise NotImplementedError

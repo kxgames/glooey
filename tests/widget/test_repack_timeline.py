@@ -2,6 +2,7 @@
 
 import pytest
 import glooey
+import pyglet
 
 TIMELINE = []
 
@@ -53,6 +54,8 @@ class DummyBin(RepackObserver, glooey.Bin):
 class DummyPlaceholder(RepackObserver, glooey.Placeholder):
     pass
 
+class DummyGroup(pyglet.graphics.Group):
+    pass
 
 @pytest.fixture
 def dummy_widgets():
@@ -65,7 +68,6 @@ def test_add_widget_to_bin(dummy_widgets):
 
     del TIMELINE[:]
     bin.add(widget)
-    print(TIMELINE)
     assert TIMELINE == [
             bin.add,
     ]
@@ -135,8 +137,6 @@ def test_repack_widget(dummy_widgets):
 
     del TIMELINE[:]
     widget._repack()
-    from pprint import pprint
-    pprint(TIMELINE)
     assert TIMELINE == [
             widget._repack,
             widget._claim,
@@ -148,7 +148,7 @@ def test_regroup_gui(dummy_widgets):
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    gui._regroup(None)
+    gui._regroup(DummyGroup())
     assert TIMELINE == [
             gui._regroup,
             gui._draw,
@@ -163,7 +163,7 @@ def test_regroup_bin(dummy_widgets):
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    bin._regroup(None)
+    bin._regroup(DummyGroup())
     assert TIMELINE == [
             bin._regroup,
             bin._draw,
@@ -176,7 +176,7 @@ def test_regroup_widget(dummy_widgets):
     bin.add(widget); gui.add(bin)
 
     del TIMELINE[:]
-    widget._regroup(None)
+    widget._regroup(DummyGroup())
     assert TIMELINE == [
             widget._regroup,
             widget._draw,
