@@ -34,6 +34,10 @@ class Rollover(Deck):
         for widget in self._controllers:
             self._add_handlers(widget)
 
+        # Update the rollover state immediately; one of the controllers might 
+        # be disabled.  See #25.
+        self._update_state()
+
     def do_detach(self):
         for widget in self._controllers:
             self._remove_handlers(widget)
