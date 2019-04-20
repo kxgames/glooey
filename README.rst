@@ -32,7 +32,7 @@ and powerful enough to support even the most complicated games.
 |
 A quick example
 ===============
-The documentation thoroughly explains what ``glooey`` can do and how to use it, 
+The `documentation <https://glooey.readthedocs.io/en/latest/>`_ thoroughly explains what ``glooey`` can do and how to use it, 
 but here's a quick example to give a feel for what it looks like in action::
 
    $ pip3 install glooey
