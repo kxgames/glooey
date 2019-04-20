@@ -270,7 +270,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # smaller than self.claimed_rect, but it can be larger.
         self.__assigned_rect = None
 
-        # The rect the widget show actually use to render itself.  This is 
+        # The rect the widget should actually use to render itself.  This is 
         # determined by the alignment function from the content rect and the 
         # assigned rect.
         self.__rect = None
@@ -1346,11 +1346,6 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         self.__min_width = max(min_width, self.__width_hint)
         self.__min_height = max(min_height, self.__height_hint)
-
-        print(self)
-        print(self.__min_width, min_width, self.__width_hint)
-        print(self.__min_height, min_height, self.__height_hint)
-        print()
 
         self.__claimed_width = self.__min_width + self.total_horz_padding
         self.__claimed_height = self.__min_height + self.total_vert_padding

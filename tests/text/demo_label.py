@@ -9,13 +9,9 @@ class TestLabel(glooey.Label): #
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
-stack = glooey.Stack()
-stack.alignment = 'center'
 label = TestLabel()
-outline = glooey.Placeholder(color='purple')
-stack.add(outline)
-stack.add(label)
-gui.add(stack)
+label.alignment = 'center'
+gui.add(label)
 
 @run_demos.on_space(gui) #
 def test_label():

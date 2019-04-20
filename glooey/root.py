@@ -20,7 +20,6 @@ class Root(Stack):
     def __init__(self, window, batch=None, group=None):
         super().__init__()
 
-        self.__parent = self
         self.__window = window
         self.__batch = batch or pyglet.graphics.Batch()
         self.__group = group or pyglet.graphics.Group()
@@ -57,6 +56,9 @@ class Root(Stack):
             super().on_mouse_leave(x, y)
 
     def get_root(self):
+        return self
+
+    def get_parent(self):
         return self
 
     def get_window(self):

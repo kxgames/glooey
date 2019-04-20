@@ -9,7 +9,7 @@ gui = glooey.Gui(window)
 widget = glooey.Placeholder()
 gui.add(widget)
 
-@run_demos.on_space(gui) #
+@run_demos.on_space(gui)
 def test_size_hint():
     # Test setting and change the size hints.
     w = glooey.Placeholder(50, 50)
