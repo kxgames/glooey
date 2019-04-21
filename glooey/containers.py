@@ -286,6 +286,9 @@ class Grid(Widget):
         self.default_col_width = first_not_none((
                 default_col_width, self.custom_default_col_width))
 
+    def __iter__(self):
+        yield from self._children.items()
+
     def __getitem__(self, row_col):
         """
         Return the widget at the given position in the grid.
@@ -379,8 +382,8 @@ class Grid(Widget):
         under the mouse.
 
         The widget in the identified cell may not be under the mouse, but that 
-        will be checked by `_find_children_under_mouse()`.  See also the 
-        documentation for the base class method.
+        will be checked by `Widget.__find_children_under_mouse()`.  See also 
+        the documentation for the base class method.
         """
         cell = self._grid.find_cell_under_mouse(x, y)
         child = self._children.get(cell)
@@ -669,6 +672,9 @@ class HVBox(Widget):
         self.cell_alignment = self.custom_cell_alignment
         self.default_cell_size = first_not_none((
                 default_cell_size, self.custom_default_cell_size))
+
+    def __iter__(self):
+        yield from self._children
 
     def add(self, widget, size=None):
         """
@@ -1127,6 +1133,9 @@ class Stack(Widget):
         self._children = {} # {child: layer}
         self.one_child_gets_mouse = self.custom_one_child_gets_mouse
 
+    def __iter__(self):
+        yield from self._children.items()
+
     def add(self, widget):
         """
         Add a widget to the top of the stack.
@@ -1324,6 +1333,9 @@ class Deck(Widget):
         self._previous_state = initial_state
         self._states = {}
         self.add_states(**states)
+
+    def __iter__(self):
+        yield from self._states.items()
 
     def __getitem__(self, state):
         """

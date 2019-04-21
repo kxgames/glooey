@@ -323,12 +323,6 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
                 hex(id(self))[-4:],
         )
 
-    def __iter__(self):
-        """
-        Iterate through this widget's children.
-        """
-        yield from self.__children
-
     def __bool__(self):
         """
         Always consider widgets to be "true".
