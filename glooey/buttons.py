@@ -102,6 +102,13 @@ class Rollover(Deck):
 
 @autoprop
 class Button(Widget):
+    """
+    A button has three layers:
+
+    - An image (optional).
+    - Some text (optional).
+    - A rollover-responsive background.
+    """
     Label = Label
     Image = Image
 
@@ -124,21 +131,22 @@ class Button(Widget):
     custom_text = None
     custom_image = None
 
+    # There are also a bunch of dynamically generated/introspected custom 
+    # attributes for setting "appearance" options on the background widgets.
+
     def __init__(self, text=None, image=None):
         super().__init__()
         self._stack = Stack()
         self._label = self.Label(text or self.custom_text)
         self._image = self.Image(image or self.custom_image)
-        self._backgrounds = {
-                'base': (self.Base or self.Background)(),
-                'over': (self.Over or self.Background)(),
-                'down': (self.Down or self.Background)(),
-                'off':  (self.Off  or self.Background)(),
-        }
-        self._init_custom_background_appearances()
-
         self._rollover = Rollover(self, 'base', predicate=lambda w: not w.is_empty)
-        self._rollover.add_states(**self._backgrounds)
+        self._rollover.add_states(
+                base = (self.Base or self.Background)(),
+                over = (self.Over or self.Background)(),
+                down = (self.Down or self.Background)(),
+                off  = (self.Off  or self.Background)(),
+        )
+        self._init_custom_background_appearances()
         self._is_enabled = True
 
         self._attach_child(self._stack)
@@ -180,15 +188,53 @@ class Button(Widget):
         del self._image.image
 
     def set_background(self, **kwargs):
-        appearance_args = {k: {} for k in self._backgrounds}
+        """
+        Set appearance options for any of the background widgets.
+
+        This is a convenience method for calling `set_appearance()` on any of 
+        the background widgets.  Each keyword argument to this function should 
+        either be of the form `<rollover>` or `<rollover>_<kwarg>`, where 
+        `<rollover>` is the name of a rollover state and `<kwargs>` is the 
+        name of an argument to the `set_appearance()` method of the widget 
+        representing that state.
+        
+        Arguments of the `<rollover>` form specify actual widgets to use for 
+        the indicated state.  Arguments of the form `<rollover>_<kwarg>` 
+        specify keyword arguments to pass to that widget's `set_appearance()` 
+        method.  You can mix both kinds of arguments.
+        
+        The following rollover states are understood:
+
+        - `base`
+        - `over`
+        - `down`
+        - `off`
+
+        The `<option>` names must be valid keyword arguments to the underlying 
+        widget's `set_appearance()` method.  Of course, different widgets will 
+        accept different arguments.  These arguments also require that the 
+        background widgets implement the set_appearance()` method.  `Image` and 
+        `Background` both meet this requirement, but widgets derived from other 
+        classes may not.
+
+        Note that any appearance options not specified will not be displayed.  
+        In other words, if you only specify a base rollover state, the other 
+        rollover states will be disabled.  Or if you only specify edge images, 
+        no center images will be displayed.  A common mistake is to try to 
+        configure the appearance of a button with multiple calls to this 
+        method, but this will just result in the last call overriding all the 
+        earlier ones.
+        """
+        rollover_states = self._rollover.known_states
+        appearance_args = {k: {} for k in rollover_states}
 
         for key, arg in kwargs.items():
             tokens = key.split('_', 1)
 
             # Each keyword argument should begin with the name of one of the 
             # rollover states (e.g. 'base', 'over', 'down', 'off').
-            if tokens[0] not in self._backgrounds:
-                options = ', '.join(f"'{x}'" for x in self._backgrounds)
+            if tokens[0] not in rollover_states:
+                options = ', '.join(f"'{x}'" for x in rollover_states)
                 raise ValueError(f"keyword argument '{key}' should begin with one of {options}")
 
             # If we just got the name of a state with no suffix, replace that 
@@ -204,22 +250,34 @@ class Button(Widget):
         # We have to make only one call to `set_appearance()` per background 
         # widget, otherwise later calls would override earlier calls.
         for key, args in appearance_args.items():
-            self._backgrounds[key].set_appearance(**args)
+            self._rollover[key].set_appearance(**args)
 
     def del_background(self):
         self.set_background()
 
     def get_base_background(self):
-        return self._backgrounds['base']
+        return self._rollover['base']
+
+    def set_base_background(self, widget):
+        self._rollover.add_state('base', widget)
 
     def get_over_background(self):
-        return self._backgrounds['over']
+        return self._rollover['over']
 
-    def get_base_background(self):
-        return self._backgrounds['base']
+    def set_over_background(self, widget):
+        self._rollover.add_state('over', widget)
+
+    def get_down_background(self):
+        return self._rollover['down']
+
+    def set_down_background(self, widget):
+        self._rollover.add_state('down', widget)
 
     def get_off_background(self):
-        return self._backgrounds['off']
+        return self._rollover['off']
+
+    def set_off_background(self, widget):
+        self._rollover.add_state('off', widget)
 
     def _init_custom_background_appearances(self):
         """
@@ -229,10 +287,9 @@ class Button(Widget):
         For example, the class variable `custom_base_image = ...` would call 
         `set_appearance(image=...)` on the "base" background widget.
         """
-
         background_args = {}
 
-        for key in self._backgrounds:
+        for key in self._rollover.known_states:
             background_args.update({
                     k[len('custom_'):]: v
                     for k, v in self.__class__.__dict__.items()

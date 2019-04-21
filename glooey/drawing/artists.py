@@ -358,6 +358,12 @@ avoids this logic at the expense of less well-organized memory."""
 
 @autoprop
 class Background(HoldUpdatesMixin):
+    """\
+    Auto-tiling:
+    Basically the assumption is that if we specify images for one side (e.g. 
+    the top), then we will be tiling in the direction orthogonal to that side 
+    (e.g. vertically for the top).
+    """
 
     def __init__(self, *, rect=None, color=None, outline=None, image=None, 
             center=None, top=None, bottom=None, left=None, right=None, 
