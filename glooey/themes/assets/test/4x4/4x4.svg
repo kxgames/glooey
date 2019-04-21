@@ -14,7 +14,7 @@
    viewBox="0 0 744.09448819 1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.92.4 (unknown)"
    sodipodi:docname="4x4.svg">
   <defs
      id="defs4" />
@@ -167,6 +167,24 @@
        height="2"
        x="376.16635"
        y="365.81482"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:1;fill:#555753;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4136-7-3"
+       width="4"
+       height="4"
+       x="387.93466"
+       y="359.3942"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:1;fill:#888a85;fill-opacity:1;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4136-7-6"
+       width="4"
+       height="4"
+       x="396.33945"
+       y="363.77414"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>
