@@ -104,10 +104,15 @@ class Rollover(Deck):
 class Button(Widget):
     Label = Label
     Image = Image
-    Base = Background
-    Over = Background
-    Down = Background
-    Off = Background
+
+    # Background class should implement:
+    # - is_empty(): Return true if the widget has nothing to display
+    # - set_appearance(): Accept kwargs, change appearance accordingly.
+    Background = Background
+    Base = None
+    Over = None
+    Down = None
+    Off = None
 
     custom_label_layer = 3
     custom_image_layer = 2
@@ -125,11 +130,13 @@ class Button(Widget):
         self._label = self.Label(text or self.custom_text)
         self._image = self.Image(image or self.custom_image)
         self._backgrounds = {
-                'base': self.Base(),
-                'over': self.Over(),
-                'down': self.Down(),
-                'off': self.Off(),
+                'base': (self.Base or self.Background)(),
+                'over': (self.Over or self.Background)(),
+                'down': (self.Down or self.Background)(),
+                'off':  (self.Off  or self.Background)(),
         }
+        self._init_custom_background_appearances()
+
         self._rollover = Rollover(self, 'base', predicate=lambda w: not w.is_empty)
         self._rollover.add_states(**self._backgrounds)
         self._is_enabled = True
@@ -173,12 +180,31 @@ class Button(Widget):
         del self._image.image
 
     def set_background(self, **kwargs):
-        for state, widget in self._backgrounds.items():
-            widget.set_appearance(**{
-                k.split('_', 1)[1]: v
-                for k,v in kwargs.items()
-                if k.startswith(state)
-            })
+        appearance_args = {k: {} for k in self._backgrounds}
+
+        for key, arg in kwargs.items():
+            tokens = key.split('_', 1)
+
+            # Each keyword argument should begin with the name of one of the 
+            # rollover states (e.g. 'base', 'over', 'down', 'off').
+            if tokens[0] not in self._backgrounds:
+                options = ', '.join(f"'{x}'" for x in self._backgrounds)
+                raise ValueError(f"keyword argument '{key}' should begin with one of {options}")
+
+            # If we just got the name of a state with no suffix, replace that 
+            # state with the given argument (which should be a widget).
+            if len(tokens) == 1:
+                self._rollover.add_state(arg)
+
+            # Otherwise, pass the argument through to the `set_appearance()` 
+            # method for the indicated background widget.
+            else:
+                appearance_args[tokens[0]][tokens[1]] = arg
+
+        # We have to make only one call to `set_appearance()` per background 
+        # widget, otherwise later calls would override earlier calls.
+        for key, args in appearance_args.items():
+            self._backgrounds[key].set_appearance(**args)
 
     def del_background(self):
         self.set_background()
@@ -195,7 +221,27 @@ class Button(Widget):
     def get_off_background(self):
         return self._backgrounds['off']
 
+    def _init_custom_background_appearances(self):
+        """
+        Setup the background widgets from parameters found in dynamically named
+        `custom_...` class variables.
 
+        For example, the class variable `custom_base_image = ...` would call 
+        `set_appearance(image=...)` on the "base" background widget.
+        """
+
+        background_args = {}
+
+        for key in self._backgrounds:
+            background_args.update({
+                    k[len('custom_'):]: v
+                    for k, v in self.__class__.__dict__.items()
+                    if k.startswith(f'custom_{key}_')
+            })
+
+        if background_args:
+            self.set_background(**background_args)
+            
 @autoprop
 @register_event_type('on_toggle')
 class Checkbox(Widget):

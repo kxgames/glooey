@@ -55,11 +55,18 @@ class Label(Widget):
 
     def __repr__(self):
         import textwrap
-        return '{}(id={}, "{}")'.format(
-                self.__class__.__name__,
-                hex(id(self))[-4:],
-                textwrap.shorten(self.text, width=10, placeholder='...'),
-        )
+
+        repr = '{cls}(id={id}, "{text}")'
+        args = {
+                'cls': self.__class__.__name__,
+                'id': hex(id(self))[-4:],
+        }
+        try:
+            args['text'] = textwrap.shorten(self.text, width=10, placeholder='...'),
+        except:
+            repr = '{cls}(id={id})'
+
+        return repr.format(**args)
 
     def do_claim(self):
         # Make sure the label's text and style are up-to-date before we request 
