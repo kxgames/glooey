@@ -221,9 +221,9 @@ placeholders is "fill"), in which case the size hint wouldn't have mattered.
 You may have noticed that we achieved the same effect (i.e. setting the size of 
 a placeholder) in the alignment demo by passing width and height arguments to 
 the placeholder's constructor.  I don't want this to cause any confusion, so I 
-want to emphasize that this was only possible because the placeholder widget is 
-specifically written to accept those arguments.  Most other widgets aren't and 
-can only be resized using size hints.
+want to emphasize that the alignment demo was only possible because the 
+placeholder widget is specifically written to accept those size arguments.  
+Most other widgets aren't and can only be resized using size hints.
 
 As with padding, you can give widgets a size hint using normal attributes as 
 well as custom attributes.  You can also give hints for just the width or the 

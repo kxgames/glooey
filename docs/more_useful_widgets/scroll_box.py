@@ -19,6 +19,7 @@ class WesnothScrollBox(glooey.ScrollBox):
             custom_horz_padding = 2
 
     class VBar(glooey.VScrollBar):
+        custom_scale_grip = True
 
         class Decoration(glooey.Background):
             custom_top = pyglet.resource.image('bar_top.png')
@@ -27,44 +28,30 @@ class WesnothScrollBox(glooey.ScrollBox):
             custom_vert_padding = 25
 
         class Forward(glooey.Button):
-
-            class Base(glooey.Image):
-                custom_image = pyglet.resource.image('forward_base.png')
-
-            class Over(glooey.Image):
-                custom_image = pyglet.resource.image('forward_over.png')
-
-            class Down(glooey.Image):
-                custom_image = pyglet.resource.image('forward_down.png')
+            custom_base_image = pyglet.resource.image('forward_base.png')
+            custom_over_image = pyglet.resource.image('forward_over.png')
+            custom_down_image = pyglet.resource.image('forward_down.png')
 
         class Backward(glooey.Button):
+            custom_base_image = pyglet.resource.image('backward_base.png')
+            custom_over_image = pyglet.resource.image('backward_over.png')
+            custom_down_image = pyglet.resource.image('backward_down.png')
 
-            class Base(glooey.Image):
-                custom_image = pyglet.resource.image('backward_base.png')
+        class Grip(glooey.Button):
+            custom_height_hint = 20
+            custom_alignment = 'fill'
 
-            class Over(glooey.Image):
-                custom_image = pyglet.resource.image('backward_over.png')
+            custom_base_top = pyglet.resource.image('grip_top_base.png')
+            custom_base_center = pyglet.resource.texture('grip_vert_base.png')
+            custom_base_bottom = pyglet.resource.image('grip_bottom_base.png')
 
-            class Down(glooey.Image):
-                custom_image = pyglet.resource.image('backward_down.png')
+            custom_over_top = pyglet.resource.image('grip_top_over.png')
+            custom_over_center = pyglet.resource.texture('grip_vert_over.png')
+            custom_over_bottom = pyglet.resource.image('grip_bottom_over.png')
 
-        class Grip(glooey.ButtonScrollGrip):
-            custom_height_hint = 50
-
-            class Base(glooey.Background):
-                custom_top = pyglet.resource.image('grip_top_base.png')
-                custom_center = pyglet.resource.texture('grip_vert_base.png')
-                custom_bottom = pyglet.resource.image('grip_bottom_base.png')
-
-            class Over(glooey.Background):
-                custom_top = pyglet.resource.image('grip_top_over.png')
-                custom_center = pyglet.resource.texture('grip_vert_over.png')
-                custom_bottom = pyglet.resource.image('grip_bottom_over.png')
-
-            class Down(glooey.Background):
-                custom_top = pyglet.resource.image('grip_top_down.png')
-                custom_center = pyglet.resource.texture('grip_vert_down.png')
-                custom_bottom = pyglet.resource.image('grip_bottom_down.png')
+            custom_down_top = pyglet.resource.image('grip_top_down.png')
+            custom_down_center = pyglet.resource.texture('grip_vert_down.png')
+            custom_down_bottom = pyglet.resource.image('grip_bottom_down.png')
 
 class WesnothLoremIpsum(glooey.LoremIpsum):
     custom_font_name = 'Lato Regular'

@@ -13,7 +13,7 @@ pyglet.font.load('Lato Regular')
 
 class WesnothDialog(glooey.Dialog):
 
-    class Bin(glooey.Bin):
+    class Box(glooey.Bin):
         custom_right_padding = 14
         custom_top_padding = 14
         custom_left_padding = 17
@@ -30,25 +30,17 @@ class WesnothDialog(glooey.Dialog):
         custom_bottom_left = pyglet.resource.image('bottom_left.png')
         custom_bottom_right = pyglet.resource.image('bottom_right.png')
 
-
 class WesnothButton(glooey.Button):
 
-    class Label(glooey.Label):
+    class Foreground(glooey.Label):
         custom_font_name = 'Lato Regular'
         custom_font_size = 10
         custom_color = '#b9ad86'
         custom_alignment = 'center'
 
-    class Base(glooey.Image):
-        custom_image = pyglet.resource.image('base.png')
-
-    class Over(glooey.Image):
-        custom_image = pyglet.resource.image('over.png')
-
-    class Down(glooey.Image):
-        custom_image = pyglet.resource.image('down.png')
-
-
+    custom_base_image = pyglet.resource.image('base.png')
+    custom_over_image = pyglet.resource.image('over.png')
+    custom_down_image = pyglet.resource.image('down.png')
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)

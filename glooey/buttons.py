@@ -103,16 +103,14 @@ class Rollover(Deck):
 @autoprop
 class Button(Widget):
     """
-    A button has three layers:
+    A button has two layers:
 
-    - An image (optional).
-    - Some text (optional).
-    - A rollover-responsive background.
+    - Foreground (optional).
+    - Rollover-responsive background.
     """
-    Label = Label
-    Image = Image
+    Foreground = Label
 
-    # Background class should implement:
+    # Background should implement:
     # - is_empty(): Return true if the widget has nothing to display
     # - set_appearance(): Accept kwargs, change appearance accordingly.
     Background = Background
@@ -121,71 +119,91 @@ class Button(Widget):
     Down = None
     Off = None
 
-    custom_label_layer = 3
-    custom_image_layer = 2
+    custom_foreground_layer = 2
     custom_background_layer = 1
     custom_alignment = 'center'
 
-    # These attributes are just provided for convenience.  They're redundant, 
-    # strictly speaking, because they could also be set using inner classes.  
+    # These are provided for convenience.  If specified, the text/image 
+    # attribute of the instantiated foreground widget will be set with the 
+    # specified value.
     custom_text = None
     custom_image = None
 
     # There are also a bunch of dynamically generated/introspected custom 
     # attributes for setting "appearance" options on the background widgets.
 
-    def __init__(self, text=None, image=None):
+    def __init__(self, *args, **kwargs):
         super().__init__()
-        self._stack = Stack()
-        self._label = self.Label(text or self.custom_text)
-        self._image = self.Image(image or self.custom_image)
-        self._rollover = Rollover(self, 'base', predicate=lambda w: not w.is_empty)
-        self._rollover.add_states(
+
+        # Note that `Button` is basically a `Stack` with just two layers: 
+        # foreground (optional) and background.  I decided to reimplement the 
+        # stacking behavior---rather than using `Stack` internally---to keep 
+        # the widget hierarchy as shallow as possible for this very commonly 
+        # used widget.
+
+        self._foreground = self.Foreground(*args, **kwargs) \
+                if self.Foreground else None
+        self._background = Rollover(
+                self, 'base', predicate=lambda w: not w.is_empty)
+        self._background.add_states(
                 base = (self.Base or self.Background)(),
                 over = (self.Over or self.Background)(),
                 down = (self.Down or self.Background)(),
                 off  = (self.Off  or self.Background)(),
         )
+
+        if self.custom_text is not None:
+            self._foreground.text = self.custom_text
+        if self.custom_image is not None:
+            self._foreground.image = self.custom_image
+
         self._init_custom_background_appearances()
         self._is_enabled = True
 
-        self._attach_child(self._stack)
-        self._stack.insert(self._label, self.custom_label_layer)
-        self._stack.insert(self._image, self.custom_image_layer)
-        self._stack.insert(self._rollover, self.custom_background_layer)
+        if self._foreground is not None:
+            self._attach_child(self._foreground)
+        self._attach_child(self._background)
 
     def click(self):
         if self.is_enabled:
             self.dispatch_event('on_click')
 
     def do_claim(self):
-        return self._stack.claimed_size
+        from .containers import claim_stacked_widgets
+        return claim_stacked_widgets(*self._yield_layers())
 
-    def get_text(self):
-        return self._label.text
+    def do_resize_children(self):
+        from .containers import align_widget_in_box
+        for layer in self._yield_layers():
+            align_widget_in_box(layer, self.rect)
 
-    def set_text(self, text, **style):
-        self._label.set_text(text, **style)
+    def do_regroup_children(self):
+        from pyglet.graphics import OrderedGroup
 
-    def del_text(self):
-        del self._label.text
+        # Don't make unnecessary layers, see `Stack.do_regroup_children()`.
 
-    def get_label(self):
-        return self._label
+        if self._foreground is None:
+            self._background._regroup(self.group)
+        else:
+            self._foreground._regroup(OrderedGroup(2, self.group))
+            self._background._regroup(OrderedGroup(1, self.group))
 
-    def set_label(self, label, placement=None):
-        self._stack.remove(self._label)
-        self._label = label
-        self._stack.insert(self._label, self.custom_label_layer)
+    def get_foreground(self):
+        return self._foreground
+    
+    def set_foreground(self, widget):
+        if self._foreground is not None:
+            self._foreground._detach_child(self._foreground)
 
-    def get_image(self):
-        return self._image.image
+        self._attach_child(self._foreground)
+        self._foreground = widget
+        self._repack_and_regroup_children()
 
-    def set_image(self, image):
-        self._image.set_image(image)
-
-    def del_image(self):
-        del self._image.image
+    def del_foreground(self):
+        if self._foreground is not None:
+            self._foreground._detach_child(self._foreground)
+            self._foreground = None
+            self._repack_and_regroup_children()
 
     def set_background(self, **kwargs):
         """
@@ -225,7 +243,7 @@ class Button(Widget):
         method, but this will just result in the last call overriding all the 
         earlier ones.
         """
-        rollover_states = self._rollover.known_states
+        rollover_states = self._background.known_states
         appearance_args = {k: {} for k in rollover_states}
 
         for key, arg in kwargs.items():
@@ -240,7 +258,7 @@ class Button(Widget):
             # If we just got the name of a state with no suffix, replace that 
             # state with the given argument (which should be a widget).
             if len(tokens) == 1:
-                self._rollover.add_state(arg)
+                self._background.add_state(arg)
 
             # Otherwise, pass the argument through to the `set_appearance()` 
             # method for the indicated background widget.
@@ -250,34 +268,39 @@ class Button(Widget):
         # We have to make only one call to `set_appearance()` per background 
         # widget, otherwise later calls would override earlier calls.
         for key, args in appearance_args.items():
-            self._rollover[key].set_appearance(**args)
+            self._background[key].set_appearance(**args)
 
     def del_background(self):
         self.set_background()
 
     def get_base_background(self):
-        return self._rollover['base']
+        return self._background['base']
 
     def set_base_background(self, widget):
-        self._rollover.add_state('base', widget)
+        self._background.add_state('base', widget)
 
     def get_over_background(self):
-        return self._rollover['over']
+        return self._background['over']
 
     def set_over_background(self, widget):
-        self._rollover.add_state('over', widget)
+        self._background.add_state('over', widget)
 
     def get_down_background(self):
-        return self._rollover['down']
+        return self._background['down']
 
     def set_down_background(self, widget):
-        self._rollover.add_state('down', widget)
+        self._background.add_state('down', widget)
 
     def get_off_background(self):
-        return self._rollover['off']
+        return self._background['off']
 
     def set_off_background(self, widget):
-        self._rollover.add_state('off', widget)
+        self._background.add_state('off', widget)
+
+    def _yield_layers(self):
+        if self._foreground:
+            yield self._foreground
+        yield self._background
 
     def _init_custom_background_appearances(self):
         """
@@ -289,10 +312,11 @@ class Button(Widget):
         """
         background_args = {}
 
-        for key in self._rollover.known_states:
+        for key in self._background.known_states:
             background_args.update({
                     k[len('custom_'):]: v
-                    for k, v in self.__class__.__dict__.items()
+                    for cls in self.__class__.__mro__
+                    for k, v in cls.__dict__.items()
                     if k.startswith(f'custom_{key}_')
             })
 

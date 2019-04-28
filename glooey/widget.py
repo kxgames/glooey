@@ -1272,7 +1272,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         if not self.is_attached_to_gui:
             raise UsageError("the widget must be attached to the GUI to debug placement problems.")
 
-        layer = pyglet.graphics.OrderedGroup(1)
+        layer = pyglet.graphics.OrderedGroup(
+                len(self.root.layers) + 1, self.root.group)
 
         drawing.Outline(
             rect=self.claimed_rect,
@@ -1281,14 +1282,14 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             group=pyglet.graphics.OrderedGroup(1, layer),
         )
         drawing.Outline(
-            rect=self.rect,
-            color=content,
+            rect=self.__assigned_rect,
+            color=assigned,
             batch=self.batch,
             group=pyglet.graphics.OrderedGroup(2, layer),
         )
         drawing.Outline(
-            rect=self.__assigned_rect,
-            color=assigned,
+            rect=self.rect,
+            color=content,
             batch=self.batch,
             group=pyglet.graphics.OrderedGroup(3, layer),
         )

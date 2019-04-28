@@ -13,16 +13,11 @@ class WesnothLabel(glooey.Label):
     custom_alignment = 'center'
 
 class WesnothButton(glooey.Button):
-    Label = WesnothLabel
-
-    class Base(glooey.Image):
-        custom_image = pyglet.resource.image('base.png')
-
-    class Over(glooey.Image):
-        custom_image = pyglet.resource.image('over.png')
-
-    class Down(glooey.Image):
-        custom_image = pyglet.resource.image('down.png')
+    Foreground = WesnothLabel
+    Background = glooey.Image
+    custom_base_image = pyglet.resource.image('base.png')
+    custom_over_image = pyglet.resource.image('over.png')
+    custom_down_image = pyglet.resource.image('down.png')
 
 class WesnothDialog(glooey.YesNoDialog):
 

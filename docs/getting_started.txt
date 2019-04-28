@@ -73,9 +73,9 @@ To add a widget to the GUI, we just need to instantiate one and pass it to
 
 As mentioned before, a placeholder is a simple widget that just draws a box 
 with a cross through it.  That's good enough for this simple example, but in a 
-real GUI we would add a widget that can contain other widgets (e.g. Grid, HBox, 
-VBox) before anything else, so we could build up an interface with multiple 
-widgets.
+real GUI we would add a widget that can contain other widgets (e.g. `Grid`, 
+`HBox`, `VBox`) before anything else, so we could build up an interface with 
+multiple widgets.
 
 Running the event loop
 ======================

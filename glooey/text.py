@@ -62,7 +62,7 @@ class Label(Widget):
                 'id': hex(id(self))[-4:],
         }
         try:
-            args['text'] = textwrap.shorten(self.text, width=10, placeholder='...'),
+            args['text'] = textwrap.shorten(self.text, width=10, placeholder='...')
         except:
             repr = '{cls}(id={id})'
 
