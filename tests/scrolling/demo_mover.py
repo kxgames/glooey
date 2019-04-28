@@ -16,7 +16,7 @@ mover.alignment = 'center'
 frame.add(mover)
 gui.add(frame)
 
-@run_demos.on_space(gui) #
+@run_demos.on_space(gui)
 def interactive_mover_tests():
     unpadded = glooey.EventLogger(50, 50, 'orange')
     padded = glooey.EventLogger(10, 10, 'purple')

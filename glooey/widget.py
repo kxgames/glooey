@@ -215,6 +215,13 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
     This setting has priority over `custom_size_hint`.
     """
 
+    custom_grab_mouse_on_click = False
+    """
+    Indicate that the widget should automatically grab the mouse when being 
+    clicked.  This behavior is useful for widgets that emit interesting 
+    ``on_hold`` events, or that can be dragged around.
+    """
+
     custom_propagate_mouse_events = True
     """
     Whether or not this widget should propagate mouse events to its children.
@@ -284,6 +291,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self.__is_enabled = True
 
         # Attribute controlling mouse events.
+        self.__grab_mouse_on_click = self.custom_grab_mouse_on_click
         self.__propagate_mouse_events = self.custom_propagate_mouse_events
 
         # Attributes for keeping track of the mouse-event related information, 
@@ -359,7 +367,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         if self.is_visible:
             self._ungrab_mouse()
-            self._undraw()
+            self._undraw_all()
         self.__is_hidden = True
         self._hide_children()
 
@@ -373,7 +381,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         self.__is_hidden = False
         if self.is_visible and draw:
-            self._draw()
+            self._draw_all()
         self._unhide_children(draw)
 
     def enable(self):
@@ -576,9 +584,11 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Start firing "on_mouse_hold" events every frame.
         self.start_event('on_mouse_hold')
 
+        if self.grab_mouse_on_click:
+            self._grab_mouse()
+
         # Update the widget's rollover state.
-        self.__rollover_state = 'down'
-        self.__dispatch_rollover_event()
+        self.__update_rollover_state('down', x, y)
 
     def on_mouse_release(self, x, y, button, modifiers):
         """
@@ -601,6 +611,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Stop firing "on_mouse_hold" events every frame.
         self.stop_event('on_mouse_hold')
         
+        if self.grab_mouse_on_click:
+            self._ungrab_mouse()
+
         # Decide whether to emit 'on_click' or 'on_double_click' events.  A 
         # click requires that the widget is enabled (i.e. not greyed out) and 
         # that user user pressed and released the mouse without leaving the 
@@ -616,8 +629,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
                 self.__double_click_timer = time.perf_counter()
 
         # Update the widget's rollover state.
-        self.__rollover_state = 'over'
-        self.__dispatch_rollover_event()
+        self.__update_rollover_state('over', x, y)
 
     def on_mouse_motion(self, x, y, dx, dy):
         """
@@ -657,8 +669,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
                 child.dispatch_event('on_mouse_enter', x, y)
 
         # Update the widget's rollover state.
-        self.__rollover_state = 'over'
-        self.__dispatch_rollover_event()
+        self.__update_rollover_state('over', x, y)
         
     def on_mouse_leave(self, x, y):
         """
@@ -684,8 +695,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self.stop_event('on_mouse_hold')
 
         # Update the widget's rollover state.
-        self.__rollover_state = 'base'
-        self.__dispatch_rollover_event()
+        self.__update_rollover_state('base', x, y)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         """
@@ -746,8 +756,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         # Reset the rollover to its base state if the user drags the mouse 
         # outside of the widget.
-        self.__rollover_state = 'base'
-        self.__dispatch_rollover_event()
+        self.__update_rollover_state('base', x, y)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         """
@@ -818,6 +827,18 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         return self.__rect
 
+    def get_width(self):
+        """
+        Return the width of the widget.
+        """
+        return self.__rect.width
+
+    def get_height(self):
+        """
+        Return the height of the widget.
+        """
+        return self.__rect.height
+
     def get_size_hint(self):
         """
         Return the user-set minimum dimensions of this widget.
@@ -839,9 +860,6 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self.__width_hint = new_width
         self.__height_hint = new_height
         self._repack()
-
-    size_hint = property(
-            get_size_hint, lambda self, size: self.set_size_hint(*size))
 
     def get_width_hint(self):
         """
@@ -923,9 +941,6 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         self.__set_padding(all, horz, vert, left, right, top, bottom)
         self._repack()
-
-    padding = late_binding_property(get_padding, set_padding)
-
     def get_horz_padding(self):
         """
         Return the padding on the left and right sides of this widget.
@@ -1078,6 +1093,12 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         return self.__last_rollover_state
 
+    def get_grab_mouse_on_click(self):
+        return self.__grab_mouse_on_click
+
+    def set_grab_mouse_on_click(self, new_setting):
+        self.__grab_mouse_on_click = new_setting
+
     def get_propagate_mouse_events(self):
         """
         Return whether or not this widget will propagate mouse events to its 
@@ -1091,6 +1112,13 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         children.
         """
         self.__propagate_mouse_events = new_setting
+
+    @property
+    def is_root(self):
+        """
+        True if this is the root of the widget hierarchy.
+        """
+        return self.root is self
 
     @property
     def is_hidden(self):
@@ -1147,6 +1175,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         if self.rect is None:
             return False
+        if self.parent and self.parent.__mouse_grabber is self:
+            return True
         return (x, y) in self.rect
 
     def debug_drawing_problems(self):
@@ -1375,7 +1405,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         Update the amount of space available for the widget's content, given 
         the amount of space assigned to it by its parent.
 
-        Starting from the mount of space assigned to this widget by its parent, 
+        Starting from the amount of space assigned to this widget by its parent, 
         this means subtracting the padding, performing the proper alignment, 
         and rounding to the nearest integer pixel to prevent seams from 
         appearing.  The final result is stored in ``self.__rect``.  
@@ -1389,6 +1419,9 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         This method should not be called outside of a repack, because it 
         assumes that the claims have already been updated.
         """
+        if self.__assigned_rect is None:
+            return
+
         # Subtract padding from the full amount of space assigned to this 
         # widget.
         max_rect = self.__assigned_rect.copy()
@@ -1640,7 +1673,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         This method will fail with an exception if another widget is already 
         grabbing the mouse.
         """
-        if self.parent is self:
+        if self.is_root:
             return
 
         if self.parent.__mouse_grabber is not None:
@@ -1650,19 +1683,29 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self.parent.__mouse_grabber = self
         self.parent._grab_mouse()
 
-    def _ungrab_mouse(self):
+    def _ungrab_mouse(self, x=None, y=None):
         """
         Release the mouse and allow mouse events to be handled as usual again.
 
+        If ``x`` and ``y`` coordinates are provided, an ``on_mouse_motion`` 
+        event will be triggered by the root widget.  In some circumstances, 
+        this is necessary to get widgets to re-evaluate their appearance (e.g.  
+        rollover state) after the mouse is released.
+        
         It is not an error to call this method if the widget is not actually 
         grabbing the mouse, it just won't do anything.
         """
-        if self.parent is None: return
-        if self.parent is self: return
+        if not self.is_attached_to_gui:
+            return
+
+        if self.is_root:
+            if (x, y) != (None, None):
+                self.dispatch_event('on_mouse_motion', x, y, 0, 0)
+            return
 
         if self.parent.__mouse_grabber is self:
             self.parent.__mouse_grabber = None
-            self.parent._ungrab_mouse()
+            self.parent._ungrab_mouse(x, y)
 
     def _hide_children(self):
         """
@@ -1797,7 +1840,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
         return recursive_find(self)
 
-    def __dispatch_rollover_event(self):
+    def __update_rollover_state(self, new_state, x, y):
         """
         Notify anyone who's interested that the mouse just interacted with this 
         widget.
@@ -1807,9 +1850,19 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         the widget from dispatching rollover events if nothing actually changed
         (i.e. you can't transition from "over" to "over").
         """
+        self.__rollover_state = new_state
+        
+        # Check to see if the widget is actually under the mouse, and put it in 
+        # the base state if it isn't.  This helps avoid visual artifacts when 
+        # the mouse is ungrabbed.
+        if not self.is_under_mouse(x, y):
+            self.__rollover_state = 'base'
+
         if self.__rollover_state != self.__last_rollover_state:
-            self.dispatch_event('on_rollover',
-                    self, self.__rollover_state, self.__last_rollover_state)
+            self.dispatch_event(
+                    'on_rollover',
+                    self, self.__rollover_state, self.__last_rollover_state,
+            )
             self.__last_rollover_state = self.__rollover_state
 
     def __get_num_children(self):
@@ -1817,9 +1870,6 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         Return the number of children attached to this widget.
         """
         return len(self.__children)
-
-    __num_children = property(__get_num_children)
-
     def __set_padding(self, all=None, horz=None, vert=None,
             left=None, right=None, top=None, bottom=None):
         """
@@ -1836,6 +1886,11 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         self.__right_padding = first_not_none((right, horz, all, 0))
         self.__top_padding = first_not_none((top, vert, all, 0))
         self.__bottom_padding = first_not_none((bottom, vert, all, 0))
+
+    size_hint = property(
+            get_size_hint, lambda self, size: self.set_size_hint(*size))
+    padding = late_binding_property(get_padding, set_padding)
+    __num_children = property(__get_num_children)
 
 
     class __ChildrenUnderMouse:

@@ -16,6 +16,7 @@ from glooey.widget import Widget
 from glooey.containers import Bin, Frame, Grid, HVBox, HBox, VBox
 from glooey.buttons import Button
 from glooey.images import Image
+from glooey.misc import Spacer
 from glooey.helpers import *
 
 @autoprop
@@ -421,6 +422,8 @@ class ScrollPane(Widget):
         if self.child.rect is None:
             raise UsageError("can't scroll until the scroll pane's child has been given a size.")
 
+
+
 @autoprop
 class ScrollGripMixin:
     """
@@ -469,15 +472,78 @@ class ButtonScrollGrip(ScrollGripMixin, Button):
 class ImageScrollGrip(ScrollGripMixin, Image):
     pass
 
+
+
 @autoprop
 class HVScrollBar(Frame):
     HVBox = HVBox
-    Grip = ButtonScrollGrip
+    Grip = None
     Forward = None
     Backward = None
 
+    class GripWrapper(Widget):
+        custom_alignment = 'center'
+
+        def __init__(self, bar, grip):
+            super().__init__()
+            self.bar = bar
+            self.mover = bar._mover
+            self.pane = bar._pane
+            self.grip = grip
+            self.reference_point = None
+
+            self.pane.push_handlers(self.on_scroll)
+            self.grip.push_handlers(
+                    on_mouse_press=self.on_grip_press,
+                    on_mouse_drag=self.on_grip_drag,
+            )
+            self.grip.grab_mouse_on_click = True
+            self._attach_child(grip)
+
+        def do_claim(self):
+            grip_width, grip_height = self.grip.claimed_size
+
+            if self.bar.scale_grip:
+                scaled_width, scaled_height = self.bar._get_scaled_grip_size()
+                return max(scaled_width, grip_width), \
+                       max(scaled_height, grip_height)
+            else:
+                return grip_width, grip_height
+
+        def on_grip_press(self, x, y, button, modifiers):
+            self.reference_point = Vector(x, y)
+
+        def on_grip_drag(self, x, y, dx, dy, buttons, modifiers):
+            if self.reference_point is not None:
+                drag_pixels = (x,y) - self.reference_point
+                drag_percent = self.mover.pixels_to_percent(drag_pixels)
+                self.pane.scroll_percent(drag_percent)
+
+        def on_scroll(self, pane):
+            self.mover.jump_percent(pane.position_percent)
+
+    custom_button_speed = 200
+    """\
+    How fast to scroll (in px/sec) while the forward and backward buttons are 
+    being pressed.
+    """
+
+    custom_scale_grip = False
+    """\
+    If true, scale the grip such that its size relative to the scroll bar is 
+    the same as the size of the visible region relative to the total scrollable 
+    region.  
+    
+    Note that this option only affects the space made available to the grip;
+    like any other widget, the space it actually occupies depends on its 
+    alignment, padding, and size hint parameters.  Pay particular attention to 
+    alignment.  `Button` and `Image`, the two most common grip widgets, have 
+    ``'center'`` alignments by default.  This means they will not expand to 
+    fill the space available to them unless their alignment is changed to 
+    ``'fill'`` or similar.
+    """
+
     custom_alignment = 'fill'
-    custom_button_speed = 200 # px/sec
 
     def __init__(self, pane):
         super().__init__()
@@ -485,20 +551,26 @@ class HVScrollBar(Frame):
         self._pane = pane
         self._hvbox = self.HVBox()
         self._button_speed = self.custom_button_speed
+        self._scale_grip = self.custom_scale_grip
 
         if self.Backward is not None:
             self._backward = self.Backward()
+            self._backward.grab_mouse_on_click = True
             self._backward.push_handlers(on_mouse_hold=self.on_backward_click)
             self._hvbox.add(self._backward, 0)
 
-        self._mover = Mover()
-        self._mover.push_handlers(on_mouse_press=self.on_bar_click)
-        self._grip = self.Grip(self._mover, self._pane)
-        self._mover.add(self._grip)
-        self._hvbox.add(self._mover)
+        if self.Grip is not None:
+            self._mover = Mover()
+            self._mover.push_handlers(on_mouse_press=self.on_bar_click)
+            self._grip = self.GripWrapper(self, self.Grip())
+            self._mover.add(self._grip)
+            self._hvbox.add(self._mover)
+        else:
+            self._hvbox.add(Spacer())
 
         if self.Forward is not None:
             self._forward = self.Forward()
+            self._forward.grab_mouse_on_click = True
             self._forward.push_handlers(on_mouse_hold=self.on_forward_click)
             self._hvbox.add(self._forward, 0)
 
@@ -539,13 +611,33 @@ class HVScrollBar(Frame):
     def set_button_speed(self, new_speed):
         self._button_speed = new_speed
 
+    def get_scale_grip(self):
+        return self._scale_grip
+
+    def set_scale_grip(self, new_scale):
+        self._scale_grip = new_scale
+        self._repack()
+
+    def _get_scaled_grip_size(self, grip):
+        # Reimplement in subclasses to account for the direction of the scroll 
+        # bar.
+        raise NotImplementedError
+
 @autoprop
 class HScrollBar(HVScrollBar):
     HVBox = HBox
 
+    def _get_scaled_grip_size(self):
+        width = self._pane.width**2 / self._pane.child.width
+        return width, self.height
+
 @autoprop
 class VScrollBar(HVScrollBar):
     HVBox = VBox
+
+    def _get_scaled_grip_size(self):
+        height = self._pane.height**2 / self._pane.child.height
+        return self.width, height
 
 @autoprop
 class ScrollBox(Widget):

@@ -19,59 +19,41 @@ class TestScrollContent(glooey.Grid):
             for j in range(2):
                 self.add(i, j, glooey.EventLogger(150, 150, 'orange'))
 
-
 class TestScrollPane(glooey.ScrollPane):
     custom_vert_scrolling = True
     custom_horz_scrolling = True
 
-class TestHVScrollBar(glooey.HVScrollBar):
+class TestHVScrollBar:
 
     class Decoration(glooey.Background):
         custom_color = 'dark'
 
     class Forward(glooey.Button):
         custom_size_hint = 20, 20
-
-        class Base(glooey.Background):
-            custom_color = 'green'
-
-        class Over(glooey.Background):
-            custom_color = 'orange'
-
-        class Down(glooey.Background):
-            custom_color = 'purple'
+        custom_alignment = 'fill'
+        custom_base_color = 'green'
+        custom_over_color = 'orange'
+        custom_down_color = 'purple'
 
     class Backward(glooey.Button):
         custom_size_hint = 20, 20
+        custom_alignment = 'fill'
+        custom_base_color = 'green'
+        custom_over_color = 'orange'
+        custom_down_color = 'purple'
 
-        class Base(glooey.Background):
-            custom_color = 'green'
-
-        class Over(glooey.Background):
-            custom_color = 'orange'
-
-        class Down(glooey.Background):
-            custom_color = 'purple'
-
-    class Grip(glooey.VScrollBar.Grip):
+    class Grip(glooey.Button):
         custom_size_hint = 20, 20
+        custom_alignment = 'fill'
+        custom_base_color = 'green'
+        custom_over_color = 'orange'
+        custom_down_color = 'purple'
 
-        class Base(glooey.Background):
-            custom_color = 'green'
+class TestHScrollBar(TestHVScrollBar, glooey.HScrollBar):
+    pass
 
-        class Over(glooey.Background):
-            custom_color = 'orange'
-
-        class Down(glooey.Background):
-            custom_color = 'purple'
-
-
-class TestHScrollBar(TestHVScrollBar):
-    HVBox = glooey.HBox
-
-class TestVScrollBar(TestHVScrollBar):
-    HVBox = glooey.VBox
-
+class TestVScrollBar(TestHVScrollBar, glooey.VScrollBar):
+    pass
 
 window = pyglet.window.Window()
 gui = glooey.Gui(window)
@@ -97,6 +79,16 @@ grid.add(0, 0, frame)
 grid.add(0, 1, vbar)
 grid.add(1, 0, hbar)
 gui.add(grid)
+
+@run_demos.on_space(gui)
+def interactive_mover_tests():
+    vbar.scale_grip = False
+    hbar.scale_grip = False
+    yield "Horizontal and vertical scroll bars."
+
+    vbar.scale_grip = True
+    hbar.scale_grip = True
+    yield "Scaled scroll grips."
 
 pyglet.app.run()
 
