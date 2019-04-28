@@ -18,13 +18,16 @@ class Image(Widget):
     custom_image = None
     custom_alignment = 'center'
 
-    def __init__(self, image=None):
+    def __init__(self, image=None, responsive=False):
+        if responsive:
+            self.custom_alignment = 'fill'
         super().__init__()
         self._image = image or self.custom_image
+        self._responsive = responsive
         self._sprite = None
 
     def do_claim(self):
-        if self.image is not None:
+        if self.image is not None and not self._responsive:
             return self.image.width, self.image.height
         else:
             return 0, 0
@@ -47,6 +50,15 @@ class Image(Widget):
 
         self._sprite.x = self.rect.left
         self._sprite.y = self.rect.bottom
+
+        if self._responsive:
+            scale_x = self.rect.width / self.image.width
+            scale_y = self.rect.height / self.image.height
+            scale = min(scale_x, scale_y)
+            self._sprite.scale = scale
+
+            self._sprite.x += (self.rect.width - self._sprite.width) / 2
+            self._sprite.y += (self.rect.height - self._sprite.height) / 2
 
     def do_undraw(self):
         if self._sprite is not None:
