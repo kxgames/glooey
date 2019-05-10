@@ -7,11 +7,6 @@ General-purpose utilities used throughout the project.
 import functools
 import contextlib
 
-# If `debugtools` is installed, import some functions into the global namespace 
-# that can make debugging a little easier.  If it isn't, no big deal.
-try: from debugtools import p, pp, pv
-except ImportError: pass
-
 class UsageError (Exception):
     pass
 
