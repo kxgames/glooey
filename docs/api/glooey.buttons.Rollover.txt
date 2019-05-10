@@ -36,7 +36,7 @@ glooey.buttons.Rollover
          ~Rollover.do_claim
          ~Rollover.do_detach
          ~Rollover.do_draw
-         ~Rollover.do_find_children_under_mouse
+         ~Rollover.do_find_children_near_mouse
          ~Rollover.do_regroup
          ~Rollover.do_regroup_children
          ~Rollover.do_resize
@@ -51,7 +51,9 @@ glooey.buttons.Rollover
          ~Rollover.get_claimed_rect
          ~Rollover.get_claimed_size
          ~Rollover.get_claimed_width
+         ~Rollover.get_grab_mouse_on_click
          ~Rollover.get_group
+         ~Rollover.get_height
          ~Rollover.get_height_hint
          ~Rollover.get_horz_padding
          ~Rollover.get_known_states
@@ -75,6 +77,7 @@ glooey.buttons.Rollover
          ~Rollover.get_total_vert_padding
          ~Rollover.get_vert_padding
          ~Rollover.get_widget
+         ~Rollover.get_width
          ~Rollover.get_width_hint
          ~Rollover.get_window
          ~Rollover.hide
@@ -105,6 +108,7 @@ glooey.buttons.Rollover
          ~Rollover.resume_updates
          ~Rollover.set_alignment
          ~Rollover.set_bottom_padding
+         ~Rollover.set_grab_mouse_on_click
          ~Rollover.set_handler
          ~Rollover.set_handlers
          ~Rollover.set_height_hint
@@ -143,6 +147,7 @@ glooey.buttons.Rollover
          ~Rollover.claimed_width
          ~Rollover.custom_alignment
          ~Rollover.custom_bottom_padding
+         ~Rollover.custom_grab_mouse_on_click
          ~Rollover.custom_height_hint
          ~Rollover.custom_horz_padding
          ~Rollover.custom_left_padding
@@ -155,13 +160,16 @@ glooey.buttons.Rollover
          ~Rollover.custom_vert_padding
          ~Rollover.custom_width_hint
          ~Rollover.event_types
+         ~Rollover.grab_mouse_on_click
          ~Rollover.group
+         ~Rollover.height
          ~Rollover.height_hint
          ~Rollover.horz_padding
          ~Rollover.is_attached_to_gui
          ~Rollover.is_disabled
          ~Rollover.is_enabled
          ~Rollover.is_hidden
+         ~Rollover.is_root
          ~Rollover.is_visible
          ~Rollover.known_states
          ~Rollover.last_rollover_state
@@ -184,6 +192,7 @@ glooey.buttons.Rollover
          ~Rollover.total_padding
          ~Rollover.total_vert_padding
          ~Rollover.vert_padding
+         ~Rollover.width
          ~Rollover.width_hint
          ~Rollover.window
    

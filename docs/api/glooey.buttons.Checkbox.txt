@@ -33,7 +33,7 @@ glooey.buttons.Checkbox
          ~Checkbox.do_claim
          ~Checkbox.do_detach
          ~Checkbox.do_draw
-         ~Checkbox.do_find_children_under_mouse
+         ~Checkbox.do_find_children_near_mouse
          ~Checkbox.do_regroup
          ~Checkbox.do_regroup_children
          ~Checkbox.do_resize
@@ -48,7 +48,9 @@ glooey.buttons.Checkbox
          ~Checkbox.get_claimed_rect
          ~Checkbox.get_claimed_size
          ~Checkbox.get_claimed_width
+         ~Checkbox.get_grab_mouse_on_click
          ~Checkbox.get_group
+         ~Checkbox.get_height
          ~Checkbox.get_height_hint
          ~Checkbox.get_horz_padding
          ~Checkbox.get_last_rollover_state
@@ -67,6 +69,7 @@ glooey.buttons.Checkbox
          ~Checkbox.get_total_padding
          ~Checkbox.get_total_vert_padding
          ~Checkbox.get_vert_padding
+         ~Checkbox.get_width
          ~Checkbox.get_width_hint
          ~Checkbox.get_window
          ~Checkbox.hide
@@ -93,6 +96,7 @@ glooey.buttons.Checkbox
          ~Checkbox.resume_updates
          ~Checkbox.set_alignment
          ~Checkbox.set_bottom_padding
+         ~Checkbox.set_grab_mouse_on_click
          ~Checkbox.set_handler
          ~Checkbox.set_handlers
          ~Checkbox.set_height_hint
@@ -135,6 +139,7 @@ glooey.buttons.Checkbox
          ~Checkbox.custom_checked_down
          ~Checkbox.custom_checked_off
          ~Checkbox.custom_checked_over
+         ~Checkbox.custom_grab_mouse_on_click
          ~Checkbox.custom_height_hint
          ~Checkbox.custom_horz_padding
          ~Checkbox.custom_left_padding
@@ -150,7 +155,9 @@ glooey.buttons.Checkbox
          ~Checkbox.custom_vert_padding
          ~Checkbox.custom_width_hint
          ~Checkbox.event_types
+         ~Checkbox.grab_mouse_on_click
          ~Checkbox.group
+         ~Checkbox.height
          ~Checkbox.height_hint
          ~Checkbox.horz_padding
          ~Checkbox.images
@@ -159,6 +166,7 @@ glooey.buttons.Checkbox
          ~Checkbox.is_disabled
          ~Checkbox.is_enabled
          ~Checkbox.is_hidden
+         ~Checkbox.is_root
          ~Checkbox.is_visible
          ~Checkbox.last_rollover_state
          ~Checkbox.left_padding
@@ -176,6 +184,7 @@ glooey.buttons.Checkbox
          ~Checkbox.total_padding
          ~Checkbox.total_vert_padding
          ~Checkbox.vert_padding
+         ~Checkbox.width
          ~Checkbox.width_hint
          ~Checkbox.window
    

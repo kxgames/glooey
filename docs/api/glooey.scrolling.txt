@@ -10,13 +10,10 @@ glooey.scrolling
    .. autosummary::
       :toctree: .
    
-      ButtonScrollGrip
       HScrollBar
       HVScrollBar
-      ImageScrollGrip
       Mover
       ScrollBox
-      ScrollGripMixin
       ScrollPane
       VScrollBar
       Viewport

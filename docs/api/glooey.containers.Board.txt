@@ -32,7 +32,7 @@ glooey.containers.Board
          ~Board.do_claim
          ~Board.do_detach
          ~Board.do_draw
-         ~Board.do_find_children_under_mouse
+         ~Board.do_find_children_near_mouse
          ~Board.do_regroup
          ~Board.do_regroup_children
          ~Board.do_resize
@@ -47,7 +47,9 @@ glooey.containers.Board
          ~Board.get_claimed_rect
          ~Board.get_claimed_size
          ~Board.get_claimed_width
+         ~Board.get_grab_mouse_on_click
          ~Board.get_group
+         ~Board.get_height
          ~Board.get_height_hint
          ~Board.get_horz_padding
          ~Board.get_last_rollover_state
@@ -66,6 +68,7 @@ glooey.containers.Board
          ~Board.get_total_padding
          ~Board.get_total_vert_padding
          ~Board.get_vert_padding
+         ~Board.get_width
          ~Board.get_width_hint
          ~Board.get_window
          ~Board.hide
@@ -92,6 +95,7 @@ glooey.containers.Board
          ~Board.resume_updates
          ~Board.set_alignment
          ~Board.set_bottom_padding
+         ~Board.set_grab_mouse_on_click
          ~Board.set_handler
          ~Board.set_handlers
          ~Board.set_height_hint
@@ -127,6 +131,7 @@ glooey.containers.Board
          ~Board.claimed_width
          ~Board.custom_alignment
          ~Board.custom_bottom_padding
+         ~Board.custom_grab_mouse_on_click
          ~Board.custom_height_hint
          ~Board.custom_horz_padding
          ~Board.custom_left_padding
@@ -138,13 +143,16 @@ glooey.containers.Board
          ~Board.custom_vert_padding
          ~Board.custom_width_hint
          ~Board.event_types
+         ~Board.grab_mouse_on_click
          ~Board.group
+         ~Board.height
          ~Board.height_hint
          ~Board.horz_padding
          ~Board.is_attached_to_gui
          ~Board.is_disabled
          ~Board.is_enabled
          ~Board.is_hidden
+         ~Board.is_root
          ~Board.is_visible
          ~Board.last_rollover_state
          ~Board.left_padding
@@ -162,6 +170,7 @@ glooey.containers.Board
          ~Board.total_padding
          ~Board.total_vert_padding
          ~Board.vert_padding
+         ~Board.width
          ~Board.width_hint
          ~Board.window
    

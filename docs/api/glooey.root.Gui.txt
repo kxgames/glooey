@@ -34,7 +34,7 @@ glooey.root.Gui
          ~Gui.do_claim
          ~Gui.do_detach
          ~Gui.do_draw
-         ~Gui.do_find_children_under_mouse
+         ~Gui.do_find_children_near_mouse
          ~Gui.do_regroup
          ~Gui.do_regroup_children
          ~Gui.do_resize
@@ -50,7 +50,9 @@ glooey.root.Gui
          ~Gui.get_claimed_rect
          ~Gui.get_claimed_size
          ~Gui.get_claimed_width
+         ~Gui.get_grab_mouse_on_click
          ~Gui.get_group
+         ~Gui.get_height
          ~Gui.get_height_hint
          ~Gui.get_horz_padding
          ~Gui.get_last_rollover_state
@@ -71,6 +73,7 @@ glooey.root.Gui
          ~Gui.get_total_padding
          ~Gui.get_total_vert_padding
          ~Gui.get_vert_padding
+         ~Gui.get_width
          ~Gui.get_width_hint
          ~Gui.get_window
          ~Gui.hide
@@ -100,6 +103,7 @@ glooey.root.Gui
          ~Gui.set_alignment
          ~Gui.set_bottom_padding
          ~Gui.set_cursor
+         ~Gui.set_grab_mouse_on_click
          ~Gui.set_handler
          ~Gui.set_handlers
          ~Gui.set_height_hint
@@ -136,6 +140,8 @@ glooey.root.Gui
          ~Gui.claimed_width
          ~Gui.custom_alignment
          ~Gui.custom_bottom_padding
+         ~Gui.custom_clear_before_draw
+         ~Gui.custom_grab_mouse_on_click
          ~Gui.custom_height_hint
          ~Gui.custom_horz_padding
          ~Gui.custom_left_padding
@@ -148,13 +154,16 @@ glooey.root.Gui
          ~Gui.custom_vert_padding
          ~Gui.custom_width_hint
          ~Gui.event_types
+         ~Gui.grab_mouse_on_click
          ~Gui.group
+         ~Gui.height
          ~Gui.height_hint
          ~Gui.horz_padding
          ~Gui.is_attached_to_gui
          ~Gui.is_disabled
          ~Gui.is_enabled
          ~Gui.is_hidden
+         ~Gui.is_root
          ~Gui.is_visible
          ~Gui.last_rollover_state
          ~Gui.layers
@@ -174,6 +183,7 @@ glooey.root.Gui
          ~Gui.total_padding
          ~Gui.total_vert_padding
          ~Gui.vert_padding
+         ~Gui.width
          ~Gui.width_hint
          ~Gui.window
    

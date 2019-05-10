@@ -33,7 +33,7 @@ glooey.dialogs.OkDialog
          ~OkDialog.do_claim
          ~OkDialog.do_detach
          ~OkDialog.do_draw
-         ~OkDialog.do_find_children_under_mouse
+         ~OkDialog.do_find_children_near_mouse
          ~OkDialog.do_regroup
          ~OkDialog.do_regroup_children
          ~OkDialog.do_resize
@@ -50,9 +50,11 @@ glooey.dialogs.OkDialog
          ~OkDialog.get_claimed_rect
          ~OkDialog.get_claimed_size
          ~OkDialog.get_claimed_width
+         ~OkDialog.get_content
          ~OkDialog.get_decoration
-         ~OkDialog.get_foreground
+         ~OkDialog.get_grab_mouse_on_click
          ~OkDialog.get_group
+         ~OkDialog.get_height
          ~OkDialog.get_height_hint
          ~OkDialog.get_horz_padding
          ~OkDialog.get_last_rollover_state
@@ -72,6 +74,7 @@ glooey.dialogs.OkDialog
          ~OkDialog.get_total_padding
          ~OkDialog.get_total_vert_padding
          ~OkDialog.get_vert_padding
+         ~OkDialog.get_width
          ~OkDialog.get_width_hint
          ~OkDialog.get_window
          ~OkDialog.hide
@@ -98,6 +101,8 @@ glooey.dialogs.OkDialog
          ~OkDialog.resume_updates
          ~OkDialog.set_alignment
          ~OkDialog.set_bottom_padding
+         ~OkDialog.set_decoration
+         ~OkDialog.set_grab_mouse_on_click
          ~OkDialog.set_handler
          ~OkDialog.set_handlers
          ~OkDialog.set_height_hint
@@ -135,11 +140,13 @@ glooey.dialogs.OkDialog
          ~OkDialog.claimed_rect
          ~OkDialog.claimed_size
          ~OkDialog.claimed_width
+         ~OkDialog.content
          ~OkDialog.custom_alignment
-         ~OkDialog.custom_autoadd_foreground
+         ~OkDialog.custom_autoadd_content
          ~OkDialog.custom_bottom_padding
          ~OkDialog.custom_box_layer
          ~OkDialog.custom_decoration_layer
+         ~OkDialog.custom_grab_mouse_on_click
          ~OkDialog.custom_height_hint
          ~OkDialog.custom_horz_padding
          ~OkDialog.custom_left_padding
@@ -152,14 +159,16 @@ glooey.dialogs.OkDialog
          ~OkDialog.custom_width_hint
          ~OkDialog.decoration
          ~OkDialog.event_types
-         ~OkDialog.foreground
+         ~OkDialog.grab_mouse_on_click
          ~OkDialog.group
+         ~OkDialog.height
          ~OkDialog.height_hint
          ~OkDialog.horz_padding
          ~OkDialog.is_attached_to_gui
          ~OkDialog.is_disabled
          ~OkDialog.is_enabled
          ~OkDialog.is_hidden
+         ~OkDialog.is_root
          ~OkDialog.is_visible
          ~OkDialog.last_rollover_state
          ~OkDialog.left_padding
@@ -178,6 +187,7 @@ glooey.dialogs.OkDialog
          ~OkDialog.total_padding
          ~OkDialog.total_vert_padding
          ~OkDialog.vert_padding
+         ~OkDialog.width
          ~OkDialog.width_hint
          ~OkDialog.window
    

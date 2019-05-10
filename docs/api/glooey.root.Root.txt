@@ -34,7 +34,7 @@ glooey.root.Root
          ~Root.do_claim
          ~Root.do_detach
          ~Root.do_draw
-         ~Root.do_find_children_under_mouse
+         ~Root.do_find_children_near_mouse
          ~Root.do_regroup
          ~Root.do_regroup_children
          ~Root.do_resize
@@ -50,7 +50,9 @@ glooey.root.Root
          ~Root.get_claimed_rect
          ~Root.get_claimed_size
          ~Root.get_claimed_width
+         ~Root.get_grab_mouse_on_click
          ~Root.get_group
+         ~Root.get_height
          ~Root.get_height_hint
          ~Root.get_horz_padding
          ~Root.get_last_rollover_state
@@ -71,6 +73,7 @@ glooey.root.Root
          ~Root.get_total_padding
          ~Root.get_total_vert_padding
          ~Root.get_vert_padding
+         ~Root.get_width
          ~Root.get_width_hint
          ~Root.get_window
          ~Root.hide
@@ -97,6 +100,7 @@ glooey.root.Root
          ~Root.resume_updates
          ~Root.set_alignment
          ~Root.set_bottom_padding
+         ~Root.set_grab_mouse_on_click
          ~Root.set_handler
          ~Root.set_handlers
          ~Root.set_height_hint
@@ -133,6 +137,7 @@ glooey.root.Root
          ~Root.claimed_width
          ~Root.custom_alignment
          ~Root.custom_bottom_padding
+         ~Root.custom_grab_mouse_on_click
          ~Root.custom_height_hint
          ~Root.custom_horz_padding
          ~Root.custom_left_padding
@@ -145,13 +150,16 @@ glooey.root.Root
          ~Root.custom_vert_padding
          ~Root.custom_width_hint
          ~Root.event_types
+         ~Root.grab_mouse_on_click
          ~Root.group
+         ~Root.height
          ~Root.height_hint
          ~Root.horz_padding
          ~Root.is_attached_to_gui
          ~Root.is_disabled
          ~Root.is_enabled
          ~Root.is_hidden
+         ~Root.is_root
          ~Root.is_visible
          ~Root.last_rollover_state
          ~Root.layers
@@ -171,6 +179,7 @@ glooey.root.Root
          ~Root.total_padding
          ~Root.total_vert_padding
          ~Root.vert_padding
+         ~Root.width
          ~Root.width_hint
          ~Root.window
    

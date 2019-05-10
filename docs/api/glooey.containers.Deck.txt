@@ -34,7 +34,7 @@ glooey.containers.Deck
          ~Deck.do_claim
          ~Deck.do_detach
          ~Deck.do_draw
-         ~Deck.do_find_children_under_mouse
+         ~Deck.do_find_children_near_mouse
          ~Deck.do_regroup
          ~Deck.do_regroup_children
          ~Deck.do_resize
@@ -49,7 +49,9 @@ glooey.containers.Deck
          ~Deck.get_claimed_rect
          ~Deck.get_claimed_size
          ~Deck.get_claimed_width
+         ~Deck.get_grab_mouse_on_click
          ~Deck.get_group
+         ~Deck.get_height
          ~Deck.get_height_hint
          ~Deck.get_horz_padding
          ~Deck.get_known_states
@@ -72,6 +74,7 @@ glooey.containers.Deck
          ~Deck.get_total_vert_padding
          ~Deck.get_vert_padding
          ~Deck.get_widget
+         ~Deck.get_width
          ~Deck.get_width_hint
          ~Deck.get_window
          ~Deck.hide
@@ -100,6 +103,7 @@ glooey.containers.Deck
          ~Deck.resume_updates
          ~Deck.set_alignment
          ~Deck.set_bottom_padding
+         ~Deck.set_grab_mouse_on_click
          ~Deck.set_handler
          ~Deck.set_handlers
          ~Deck.set_height_hint
@@ -137,6 +141,7 @@ glooey.containers.Deck
          ~Deck.claimed_width
          ~Deck.custom_alignment
          ~Deck.custom_bottom_padding
+         ~Deck.custom_grab_mouse_on_click
          ~Deck.custom_height_hint
          ~Deck.custom_horz_padding
          ~Deck.custom_left_padding
@@ -148,13 +153,16 @@ glooey.containers.Deck
          ~Deck.custom_vert_padding
          ~Deck.custom_width_hint
          ~Deck.event_types
+         ~Deck.grab_mouse_on_click
          ~Deck.group
+         ~Deck.height
          ~Deck.height_hint
          ~Deck.horz_padding
          ~Deck.is_attached_to_gui
          ~Deck.is_disabled
          ~Deck.is_enabled
          ~Deck.is_hidden
+         ~Deck.is_root
          ~Deck.is_visible
          ~Deck.known_states
          ~Deck.last_rollover_state
@@ -176,6 +184,7 @@ glooey.containers.Deck
          ~Deck.total_padding
          ~Deck.total_vert_padding
          ~Deck.vert_padding
+         ~Deck.width
          ~Deck.width_hint
          ~Deck.window
    

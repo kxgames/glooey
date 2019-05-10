@@ -1,0 +1,6 @@
+glooey.helpers.register_event_type
+==================================
+
+.. currentmodule:: glooey.helpers
+
+.. autofunction:: register_event_type

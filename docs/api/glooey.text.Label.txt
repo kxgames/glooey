@@ -44,7 +44,7 @@ glooey.text.Label
          ~Label.do_claim
          ~Label.do_detach
          ~Label.do_draw
-         ~Label.do_find_children_under_mouse
+         ~Label.do_find_children_near_mouse
          ~Label.do_make_new_layout
          ~Label.do_regroup
          ~Label.do_regroup_children
@@ -67,7 +67,9 @@ glooey.text.Label
          ~Label.get_color
          ~Label.get_font_name
          ~Label.get_font_size
+         ~Label.get_grab_mouse_on_click
          ~Label.get_group
+         ~Label.get_height
          ~Label.get_height_hint
          ~Label.get_horz_padding
          ~Label.get_italic
@@ -93,6 +95,7 @@ glooey.text.Label
          ~Label.get_total_vert_padding
          ~Label.get_underline
          ~Label.get_vert_padding
+         ~Label.get_width
          ~Label.get_width_hint
          ~Label.get_window
          ~Label.hide
@@ -125,6 +128,7 @@ glooey.text.Label
          ~Label.set_color
          ~Label.set_font_name
          ~Label.set_font_size
+         ~Label.set_grab_mouse_on_click
          ~Label.set_handler
          ~Label.set_handlers
          ~Label.set_height_hint
@@ -177,6 +181,7 @@ glooey.text.Label
          ~Label.custom_color
          ~Label.custom_font_name
          ~Label.custom_font_size
+         ~Label.custom_grab_mouse_on_click
          ~Label.custom_height_hint
          ~Label.custom_horz_padding
          ~Label.custom_italic
@@ -196,13 +201,16 @@ glooey.text.Label
          ~Label.event_types
          ~Label.font_name
          ~Label.font_size
+         ~Label.grab_mouse_on_click
          ~Label.group
+         ~Label.height
          ~Label.height_hint
          ~Label.horz_padding
          ~Label.is_attached_to_gui
          ~Label.is_disabled
          ~Label.is_enabled
          ~Label.is_hidden
+         ~Label.is_root
          ~Label.is_visible
          ~Label.italic
          ~Label.kerning
@@ -226,6 +234,7 @@ glooey.text.Label
          ~Label.total_vert_padding
          ~Label.underline
          ~Label.vert_padding
+         ~Label.width
          ~Label.width_hint
          ~Label.window
    

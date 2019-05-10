@@ -33,7 +33,7 @@ glooey.dialogs.Dialog
          ~Dialog.do_claim
          ~Dialog.do_detach
          ~Dialog.do_draw
-         ~Dialog.do_find_children_under_mouse
+         ~Dialog.do_find_children_near_mouse
          ~Dialog.do_regroup
          ~Dialog.do_regroup_children
          ~Dialog.do_resize
@@ -49,9 +49,11 @@ glooey.dialogs.Dialog
          ~Dialog.get_claimed_rect
          ~Dialog.get_claimed_size
          ~Dialog.get_claimed_width
+         ~Dialog.get_content
          ~Dialog.get_decoration
-         ~Dialog.get_foreground
+         ~Dialog.get_grab_mouse_on_click
          ~Dialog.get_group
+         ~Dialog.get_height
          ~Dialog.get_height_hint
          ~Dialog.get_horz_padding
          ~Dialog.get_last_rollover_state
@@ -70,6 +72,7 @@ glooey.dialogs.Dialog
          ~Dialog.get_total_padding
          ~Dialog.get_total_vert_padding
          ~Dialog.get_vert_padding
+         ~Dialog.get_width
          ~Dialog.get_width_hint
          ~Dialog.get_window
          ~Dialog.hide
@@ -95,6 +98,8 @@ glooey.dialogs.Dialog
          ~Dialog.resume_updates
          ~Dialog.set_alignment
          ~Dialog.set_bottom_padding
+         ~Dialog.set_decoration
+         ~Dialog.set_grab_mouse_on_click
          ~Dialog.set_handler
          ~Dialog.set_handlers
          ~Dialog.set_height_hint
@@ -121,8 +126,8 @@ glooey.dialogs.Dialog
 
       .. autosummary::
       
+         ~Dialog.Content
          ~Dialog.Decoration
-         ~Dialog.Foreground
          ~Dialog.alignment
          ~Dialog.batch
          ~Dialog.bottom_padding
@@ -131,11 +136,13 @@ glooey.dialogs.Dialog
          ~Dialog.claimed_rect
          ~Dialog.claimed_size
          ~Dialog.claimed_width
+         ~Dialog.content
          ~Dialog.custom_alignment
-         ~Dialog.custom_autoadd_foreground
+         ~Dialog.custom_autoadd_content
          ~Dialog.custom_bottom_padding
          ~Dialog.custom_box_layer
          ~Dialog.custom_decoration_layer
+         ~Dialog.custom_grab_mouse_on_click
          ~Dialog.custom_height_hint
          ~Dialog.custom_horz_padding
          ~Dialog.custom_left_padding
@@ -148,14 +155,16 @@ glooey.dialogs.Dialog
          ~Dialog.custom_width_hint
          ~Dialog.decoration
          ~Dialog.event_types
-         ~Dialog.foreground
+         ~Dialog.grab_mouse_on_click
          ~Dialog.group
+         ~Dialog.height
          ~Dialog.height_hint
          ~Dialog.horz_padding
          ~Dialog.is_attached_to_gui
          ~Dialog.is_disabled
          ~Dialog.is_enabled
          ~Dialog.is_hidden
+         ~Dialog.is_root
          ~Dialog.is_visible
          ~Dialog.last_rollover_state
          ~Dialog.left_padding
@@ -173,6 +182,7 @@ glooey.dialogs.Dialog
          ~Dialog.total_padding
          ~Dialog.total_vert_padding
          ~Dialog.vert_padding
+         ~Dialog.width
          ~Dialog.width_hint
          ~Dialog.window
    

@@ -36,7 +36,7 @@ glooey.containers.HBox
          ~HBox.do_claim
          ~HBox.do_detach
          ~HBox.do_draw
-         ~HBox.do_find_children_under_mouse
+         ~HBox.do_find_children_near_mouse
          ~HBox.do_get_index
          ~HBox.do_get_row_col
          ~HBox.do_regroup
@@ -58,7 +58,9 @@ glooey.containers.HBox
          ~HBox.get_claimed_size
          ~HBox.get_claimed_width
          ~HBox.get_default_cell_size
+         ~HBox.get_grab_mouse_on_click
          ~HBox.get_group
+         ~HBox.get_height
          ~HBox.get_height_hint
          ~HBox.get_horz_padding
          ~HBox.get_last_rollover_state
@@ -77,6 +79,7 @@ glooey.containers.HBox
          ~HBox.get_total_padding
          ~HBox.get_total_vert_padding
          ~HBox.get_vert_padding
+         ~HBox.get_width
          ~HBox.get_width_hint
          ~HBox.get_window
          ~HBox.hide
@@ -110,6 +113,7 @@ glooey.containers.HBox
          ~HBox.set_cell_alignment
          ~HBox.set_cell_padding
          ~HBox.set_default_cell_size
+         ~HBox.set_grab_mouse_on_click
          ~HBox.set_handler
          ~HBox.set_handlers
          ~HBox.set_height_hint
@@ -151,6 +155,7 @@ glooey.containers.HBox
          ~HBox.custom_cell_alignment
          ~HBox.custom_cell_padding
          ~HBox.custom_default_cell_size
+         ~HBox.custom_grab_mouse_on_click
          ~HBox.custom_height_hint
          ~HBox.custom_horz_padding
          ~HBox.custom_left_padding
@@ -163,13 +168,16 @@ glooey.containers.HBox
          ~HBox.custom_width_hint
          ~HBox.default_cell_size
          ~HBox.event_types
+         ~HBox.grab_mouse_on_click
          ~HBox.group
+         ~HBox.height
          ~HBox.height_hint
          ~HBox.horz_padding
          ~HBox.is_attached_to_gui
          ~HBox.is_disabled
          ~HBox.is_enabled
          ~HBox.is_hidden
+         ~HBox.is_root
          ~HBox.is_visible
          ~HBox.last_rollover_state
          ~HBox.left_padding
@@ -187,6 +195,7 @@ glooey.containers.HBox
          ~HBox.total_padding
          ~HBox.total_vert_padding
          ~HBox.vert_padding
+         ~HBox.width
          ~HBox.width_hint
          ~HBox.window
    

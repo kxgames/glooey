@@ -36,7 +36,7 @@ glooey.containers.VBox
          ~VBox.do_claim
          ~VBox.do_detach
          ~VBox.do_draw
-         ~VBox.do_find_children_under_mouse
+         ~VBox.do_find_children_near_mouse
          ~VBox.do_get_index
          ~VBox.do_get_row_col
          ~VBox.do_regroup
@@ -58,7 +58,9 @@ glooey.containers.VBox
          ~VBox.get_claimed_size
          ~VBox.get_claimed_width
          ~VBox.get_default_cell_size
+         ~VBox.get_grab_mouse_on_click
          ~VBox.get_group
+         ~VBox.get_height
          ~VBox.get_height_hint
          ~VBox.get_horz_padding
          ~VBox.get_last_rollover_state
@@ -77,6 +79,7 @@ glooey.containers.VBox
          ~VBox.get_total_padding
          ~VBox.get_total_vert_padding
          ~VBox.get_vert_padding
+         ~VBox.get_width
          ~VBox.get_width_hint
          ~VBox.get_window
          ~VBox.hide
@@ -110,6 +113,7 @@ glooey.containers.VBox
          ~VBox.set_cell_alignment
          ~VBox.set_cell_padding
          ~VBox.set_default_cell_size
+         ~VBox.set_grab_mouse_on_click
          ~VBox.set_handler
          ~VBox.set_handlers
          ~VBox.set_height_hint
@@ -151,6 +155,7 @@ glooey.containers.VBox
          ~VBox.custom_cell_alignment
          ~VBox.custom_cell_padding
          ~VBox.custom_default_cell_size
+         ~VBox.custom_grab_mouse_on_click
          ~VBox.custom_height_hint
          ~VBox.custom_horz_padding
          ~VBox.custom_left_padding
@@ -163,13 +168,16 @@ glooey.containers.VBox
          ~VBox.custom_width_hint
          ~VBox.default_cell_size
          ~VBox.event_types
+         ~VBox.grab_mouse_on_click
          ~VBox.group
+         ~VBox.height
          ~VBox.height_hint
          ~VBox.horz_padding
          ~VBox.is_attached_to_gui
          ~VBox.is_disabled
          ~VBox.is_enabled
          ~VBox.is_hidden
+         ~VBox.is_root
          ~VBox.is_visible
          ~VBox.last_rollover_state
          ~VBox.left_padding
@@ -187,6 +195,7 @@ glooey.containers.VBox
          ~VBox.total_padding
          ~VBox.total_vert_padding
          ~VBox.vert_padding
+         ~VBox.width
          ~VBox.width_hint
          ~VBox.window
    

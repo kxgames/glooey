@@ -25,8 +25,7 @@ glooey.buttons.Button
          ~Button.debug_drawing_problems
          ~Button.debug_placement_problems
          ~Button.del_background
-         ~Button.del_image
-         ~Button.del_text
+         ~Button.del_foreground
          ~Button.disable
          ~Button.discard_updates
          ~Button.dispatch_event
@@ -34,7 +33,7 @@ glooey.buttons.Button
          ~Button.do_claim
          ~Button.do_detach
          ~Button.do_draw
-         ~Button.do_find_children_under_mouse
+         ~Button.do_find_children_near_mouse
          ~Button.do_regroup
          ~Button.do_regroup_children
          ~Button.do_resize
@@ -50,11 +49,13 @@ glooey.buttons.Button
          ~Button.get_claimed_rect
          ~Button.get_claimed_size
          ~Button.get_claimed_width
+         ~Button.get_down_background
+         ~Button.get_foreground
+         ~Button.get_grab_mouse_on_click
          ~Button.get_group
+         ~Button.get_height
          ~Button.get_height_hint
          ~Button.get_horz_padding
-         ~Button.get_image
-         ~Button.get_label
          ~Button.get_last_rollover_state
          ~Button.get_left_padding
          ~Button.get_off_background
@@ -68,12 +69,12 @@ glooey.buttons.Button
          ~Button.get_rollover_state
          ~Button.get_root
          ~Button.get_size_hint
-         ~Button.get_text
          ~Button.get_top_padding
          ~Button.get_total_horz_padding
          ~Button.get_total_padding
          ~Button.get_total_vert_padding
          ~Button.get_vert_padding
+         ~Button.get_width
          ~Button.get_width_hint
          ~Button.get_window
          ~Button.hide
@@ -98,19 +99,22 @@ glooey.buttons.Button
          ~Button.resume_updates
          ~Button.set_alignment
          ~Button.set_background
+         ~Button.set_base_background
          ~Button.set_bottom_padding
+         ~Button.set_down_background
+         ~Button.set_foreground
+         ~Button.set_grab_mouse_on_click
          ~Button.set_handler
          ~Button.set_handlers
          ~Button.set_height_hint
          ~Button.set_horz_padding
-         ~Button.set_image
-         ~Button.set_label
          ~Button.set_left_padding
+         ~Button.set_off_background
+         ~Button.set_over_background
          ~Button.set_padding
          ~Button.set_propagate_mouse_events
          ~Button.set_right_padding
          ~Button.set_size_hint
-         ~Button.set_text
          ~Button.set_top_padding
          ~Button.set_vert_padding
          ~Button.set_width_hint
@@ -128,6 +132,10 @@ glooey.buttons.Button
 
       .. autosummary::
       
+         ~Button.Base
+         ~Button.Down
+         ~Button.Off
+         ~Button.Over
          ~Button.alignment
          ~Button.background
          ~Button.base_background
@@ -140,11 +148,11 @@ glooey.buttons.Button
          ~Button.custom_alignment
          ~Button.custom_background_layer
          ~Button.custom_bottom_padding
+         ~Button.custom_foreground_layer
+         ~Button.custom_grab_mouse_on_click
          ~Button.custom_height_hint
          ~Button.custom_horz_padding
          ~Button.custom_image
-         ~Button.custom_image_layer
-         ~Button.custom_label_layer
          ~Button.custom_left_padding
          ~Button.custom_padding
          ~Button.custom_propagate_mouse_events
@@ -154,17 +162,20 @@ glooey.buttons.Button
          ~Button.custom_top_padding
          ~Button.custom_vert_padding
          ~Button.custom_width_hint
+         ~Button.down_background
          ~Button.event_types
+         ~Button.foreground
+         ~Button.grab_mouse_on_click
          ~Button.group
+         ~Button.height
          ~Button.height_hint
          ~Button.horz_padding
-         ~Button.image
          ~Button.is_attached_to_gui
          ~Button.is_disabled
          ~Button.is_enabled
          ~Button.is_hidden
+         ~Button.is_root
          ~Button.is_visible
-         ~Button.label
          ~Button.last_rollover_state
          ~Button.left_padding
          ~Button.off_background
@@ -178,12 +189,12 @@ glooey.buttons.Button
          ~Button.rollover_state
          ~Button.root
          ~Button.size_hint
-         ~Button.text
          ~Button.top_padding
          ~Button.total_horz_padding
          ~Button.total_padding
          ~Button.total_vert_padding
          ~Button.vert_padding
+         ~Button.width
          ~Button.width_hint
          ~Button.window
    

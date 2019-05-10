@@ -30,7 +30,7 @@ glooey.misc.EventLogger
          ~EventLogger.do_claim
          ~EventLogger.do_detach
          ~EventLogger.do_draw
-         ~EventLogger.do_find_children_under_mouse
+         ~EventLogger.do_find_children_near_mouse
          ~EventLogger.do_regroup
          ~EventLogger.do_regroup_children
          ~EventLogger.do_resize
@@ -46,7 +46,9 @@ glooey.misc.EventLogger
          ~EventLogger.get_claimed_size
          ~EventLogger.get_claimed_width
          ~EventLogger.get_color
+         ~EventLogger.get_grab_mouse_on_click
          ~EventLogger.get_group
+         ~EventLogger.get_height
          ~EventLogger.get_height_hint
          ~EventLogger.get_horz_padding
          ~EventLogger.get_last_rollover_state
@@ -67,6 +69,7 @@ glooey.misc.EventLogger
          ~EventLogger.get_total_padding
          ~EventLogger.get_total_vert_padding
          ~EventLogger.get_vert_padding
+         ~EventLogger.get_width
          ~EventLogger.get_width_hint
          ~EventLogger.get_window
          ~EventLogger.hide
@@ -96,6 +99,7 @@ glooey.misc.EventLogger
          ~EventLogger.set_alignment
          ~EventLogger.set_bottom_padding
          ~EventLogger.set_color
+         ~EventLogger.set_grab_mouse_on_click
          ~EventLogger.set_handler
          ~EventLogger.set_handlers
          ~EventLogger.set_height_hint
@@ -135,6 +139,7 @@ glooey.misc.EventLogger
          ~EventLogger.custom_alignment
          ~EventLogger.custom_bottom_padding
          ~EventLogger.custom_color
+         ~EventLogger.custom_grab_mouse_on_click
          ~EventLogger.custom_height_hint
          ~EventLogger.custom_horz_padding
          ~EventLogger.custom_left_padding
@@ -146,13 +151,16 @@ glooey.misc.EventLogger
          ~EventLogger.custom_vert_padding
          ~EventLogger.custom_width_hint
          ~EventLogger.event_types
+         ~EventLogger.grab_mouse_on_click
          ~EventLogger.group
+         ~EventLogger.height
          ~EventLogger.height_hint
          ~EventLogger.horz_padding
          ~EventLogger.is_attached_to_gui
          ~EventLogger.is_disabled
          ~EventLogger.is_enabled
          ~EventLogger.is_hidden
+         ~EventLogger.is_root
          ~EventLogger.is_visible
          ~EventLogger.last_rollover_state
          ~EventLogger.left_padding
@@ -172,6 +180,7 @@ glooey.misc.EventLogger
          ~EventLogger.total_padding
          ~EventLogger.total_vert_padding
          ~EventLogger.vert_padding
+         ~EventLogger.width
          ~EventLogger.width_hint
          ~EventLogger.window
    

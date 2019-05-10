@@ -30,7 +30,7 @@ glooey.widget.Widget
          ~Widget.do_claim
          ~Widget.do_detach
          ~Widget.do_draw
-         ~Widget.do_find_children_under_mouse
+         ~Widget.do_find_children_near_mouse
          ~Widget.do_regroup
          ~Widget.do_regroup_children
          ~Widget.do_resize
@@ -45,7 +45,9 @@ glooey.widget.Widget
          ~Widget.get_claimed_rect
          ~Widget.get_claimed_size
          ~Widget.get_claimed_width
+         ~Widget.get_grab_mouse_on_click
          ~Widget.get_group
+         ~Widget.get_height
          ~Widget.get_height_hint
          ~Widget.get_horz_padding
          ~Widget.get_last_rollover_state
@@ -64,6 +66,7 @@ glooey.widget.Widget
          ~Widget.get_total_padding
          ~Widget.get_total_vert_padding
          ~Widget.get_vert_padding
+         ~Widget.get_width
          ~Widget.get_width_hint
          ~Widget.get_window
          ~Widget.hide
@@ -88,6 +91,7 @@ glooey.widget.Widget
          ~Widget.resume_updates
          ~Widget.set_alignment
          ~Widget.set_bottom_padding
+         ~Widget.set_grab_mouse_on_click
          ~Widget.set_handler
          ~Widget.set_handlers
          ~Widget.set_height_hint
@@ -123,6 +127,7 @@ glooey.widget.Widget
          ~Widget.claimed_width
          ~Widget.custom_alignment
          ~Widget.custom_bottom_padding
+         ~Widget.custom_grab_mouse_on_click
          ~Widget.custom_height_hint
          ~Widget.custom_horz_padding
          ~Widget.custom_left_padding
@@ -134,13 +139,16 @@ glooey.widget.Widget
          ~Widget.custom_vert_padding
          ~Widget.custom_width_hint
          ~Widget.event_types
+         ~Widget.grab_mouse_on_click
          ~Widget.group
+         ~Widget.height
          ~Widget.height_hint
          ~Widget.horz_padding
          ~Widget.is_attached_to_gui
          ~Widget.is_disabled
          ~Widget.is_enabled
          ~Widget.is_hidden
+         ~Widget.is_root
          ~Widget.is_visible
          ~Widget.last_rollover_state
          ~Widget.left_padding
@@ -158,6 +166,7 @@ glooey.widget.Widget
          ~Widget.total_padding
          ~Widget.total_vert_padding
          ~Widget.vert_padding
+         ~Widget.width
          ~Widget.width_hint
          ~Widget.window
    

@@ -33,7 +33,7 @@ glooey.scrolling.Mover
          ~Mover.do_claim
          ~Mover.do_detach
          ~Mover.do_draw
-         ~Mover.do_find_children_under_mouse
+         ~Mover.do_find_children_near_mouse
          ~Mover.do_regroup
          ~Mover.do_regroup_children
          ~Mover.do_resize
@@ -51,7 +51,9 @@ glooey.scrolling.Mover
          ~Mover.get_claimed_width
          ~Mover.get_expand_horz
          ~Mover.get_expand_vert
+         ~Mover.get_grab_mouse_on_click
          ~Mover.get_group
+         ~Mover.get_height
          ~Mover.get_height_hint
          ~Mover.get_horz_padding
          ~Mover.get_last_rollover_state
@@ -73,6 +75,7 @@ glooey.scrolling.Mover
          ~Mover.get_total_vert_padding
          ~Mover.get_unoccupied_size
          ~Mover.get_vert_padding
+         ~Mover.get_width
          ~Mover.get_width_hint
          ~Mover.get_window
          ~Mover.hide
@@ -107,6 +110,7 @@ glooey.scrolling.Mover
          ~Mover.set_bottom_padding
          ~Mover.set_expand_horz
          ~Mover.set_expand_vert
+         ~Mover.set_grab_mouse_on_click
          ~Mover.set_handler
          ~Mover.set_handlers
          ~Mover.set_height_hint
@@ -143,6 +147,7 @@ glooey.scrolling.Mover
          ~Mover.claimed_width
          ~Mover.custom_alignment
          ~Mover.custom_bottom_padding
+         ~Mover.custom_grab_mouse_on_click
          ~Mover.custom_height_hint
          ~Mover.custom_horz_padding
          ~Mover.custom_left_padding
@@ -156,13 +161,16 @@ glooey.scrolling.Mover
          ~Mover.event_types
          ~Mover.expand_horz
          ~Mover.expand_vert
+         ~Mover.grab_mouse_on_click
          ~Mover.group
+         ~Mover.height
          ~Mover.height_hint
          ~Mover.horz_padding
          ~Mover.is_attached_to_gui
          ~Mover.is_disabled
          ~Mover.is_enabled
          ~Mover.is_hidden
+         ~Mover.is_root
          ~Mover.is_visible
          ~Mover.last_rollover_state
          ~Mover.left_padding
@@ -183,6 +191,7 @@ glooey.scrolling.Mover
          ~Mover.total_vert_padding
          ~Mover.unoccupied_size
          ~Mover.vert_padding
+         ~Mover.width
          ~Mover.width_hint
          ~Mover.window
    

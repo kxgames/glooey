@@ -44,7 +44,7 @@ glooey.text.EditableLabel
          ~EditableLabel.do_claim
          ~EditableLabel.do_detach
          ~EditableLabel.do_draw
-         ~EditableLabel.do_find_children_under_mouse
+         ~EditableLabel.do_find_children_near_mouse
          ~EditableLabel.do_make_new_layout
          ~EditableLabel.do_regroup
          ~EditableLabel.do_regroup_children
@@ -68,7 +68,9 @@ glooey.text.EditableLabel
          ~EditableLabel.get_color
          ~EditableLabel.get_font_name
          ~EditableLabel.get_font_size
+         ~EditableLabel.get_grab_mouse_on_click
          ~EditableLabel.get_group
+         ~EditableLabel.get_height
          ~EditableLabel.get_height_hint
          ~EditableLabel.get_horz_padding
          ~EditableLabel.get_italic
@@ -97,6 +99,7 @@ glooey.text.EditableLabel
          ~EditableLabel.get_underline
          ~EditableLabel.get_unfocus_on_enter
          ~EditableLabel.get_vert_padding
+         ~EditableLabel.get_width
          ~EditableLabel.get_width_hint
          ~EditableLabel.get_window
          ~EditableLabel.hide
@@ -132,6 +135,7 @@ glooey.text.EditableLabel
          ~EditableLabel.set_color
          ~EditableLabel.set_font_name
          ~EditableLabel.set_font_size
+         ~EditableLabel.set_grab_mouse_on_click
          ~EditableLabel.set_handler
          ~EditableLabel.set_handlers
          ~EditableLabel.set_height_hint
@@ -188,6 +192,7 @@ glooey.text.EditableLabel
          ~EditableLabel.custom_color
          ~EditableLabel.custom_font_name
          ~EditableLabel.custom_font_size
+         ~EditableLabel.custom_grab_mouse_on_click
          ~EditableLabel.custom_height_hint
          ~EditableLabel.custom_horz_padding
          ~EditableLabel.custom_italic
@@ -210,13 +215,16 @@ glooey.text.EditableLabel
          ~EditableLabel.event_types
          ~EditableLabel.font_name
          ~EditableLabel.font_size
+         ~EditableLabel.grab_mouse_on_click
          ~EditableLabel.group
+         ~EditableLabel.height
          ~EditableLabel.height_hint
          ~EditableLabel.horz_padding
          ~EditableLabel.is_attached_to_gui
          ~EditableLabel.is_disabled
          ~EditableLabel.is_enabled
          ~EditableLabel.is_hidden
+         ~EditableLabel.is_root
          ~EditableLabel.is_visible
          ~EditableLabel.italic
          ~EditableLabel.kerning
@@ -243,6 +251,7 @@ glooey.text.EditableLabel
          ~EditableLabel.underline
          ~EditableLabel.unfocus_on_enter
          ~EditableLabel.vert_padding
+         ~EditableLabel.width
          ~EditableLabel.width_hint
          ~EditableLabel.window
    

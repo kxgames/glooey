@@ -33,7 +33,7 @@ glooey.dialogs.YesNoDialog
          ~YesNoDialog.do_claim
          ~YesNoDialog.do_detach
          ~YesNoDialog.do_draw
-         ~YesNoDialog.do_find_children_under_mouse
+         ~YesNoDialog.do_find_children_near_mouse
          ~YesNoDialog.do_regroup
          ~YesNoDialog.do_regroup_children
          ~YesNoDialog.do_resize
@@ -50,9 +50,11 @@ glooey.dialogs.YesNoDialog
          ~YesNoDialog.get_claimed_rect
          ~YesNoDialog.get_claimed_size
          ~YesNoDialog.get_claimed_width
+         ~YesNoDialog.get_content
          ~YesNoDialog.get_decoration
-         ~YesNoDialog.get_foreground
+         ~YesNoDialog.get_grab_mouse_on_click
          ~YesNoDialog.get_group
+         ~YesNoDialog.get_height
          ~YesNoDialog.get_height_hint
          ~YesNoDialog.get_horz_padding
          ~YesNoDialog.get_last_rollover_state
@@ -73,6 +75,7 @@ glooey.dialogs.YesNoDialog
          ~YesNoDialog.get_total_padding
          ~YesNoDialog.get_total_vert_padding
          ~YesNoDialog.get_vert_padding
+         ~YesNoDialog.get_width
          ~YesNoDialog.get_width_hint
          ~YesNoDialog.get_window
          ~YesNoDialog.get_yes_button
@@ -101,6 +104,8 @@ glooey.dialogs.YesNoDialog
          ~YesNoDialog.resume_updates
          ~YesNoDialog.set_alignment
          ~YesNoDialog.set_bottom_padding
+         ~YesNoDialog.set_decoration
+         ~YesNoDialog.set_grab_mouse_on_click
          ~YesNoDialog.set_handler
          ~YesNoDialog.set_handlers
          ~YesNoDialog.set_height_hint
@@ -139,11 +144,13 @@ glooey.dialogs.YesNoDialog
          ~YesNoDialog.claimed_rect
          ~YesNoDialog.claimed_size
          ~YesNoDialog.claimed_width
+         ~YesNoDialog.content
          ~YesNoDialog.custom_alignment
-         ~YesNoDialog.custom_autoadd_foreground
+         ~YesNoDialog.custom_autoadd_content
          ~YesNoDialog.custom_bottom_padding
          ~YesNoDialog.custom_box_layer
          ~YesNoDialog.custom_decoration_layer
+         ~YesNoDialog.custom_grab_mouse_on_click
          ~YesNoDialog.custom_height_hint
          ~YesNoDialog.custom_horz_padding
          ~YesNoDialog.custom_left_padding
@@ -156,14 +163,16 @@ glooey.dialogs.YesNoDialog
          ~YesNoDialog.custom_width_hint
          ~YesNoDialog.decoration
          ~YesNoDialog.event_types
-         ~YesNoDialog.foreground
+         ~YesNoDialog.grab_mouse_on_click
          ~YesNoDialog.group
+         ~YesNoDialog.height
          ~YesNoDialog.height_hint
          ~YesNoDialog.horz_padding
          ~YesNoDialog.is_attached_to_gui
          ~YesNoDialog.is_disabled
          ~YesNoDialog.is_enabled
          ~YesNoDialog.is_hidden
+         ~YesNoDialog.is_root
          ~YesNoDialog.is_visible
          ~YesNoDialog.last_rollover_state
          ~YesNoDialog.left_padding
@@ -183,6 +192,7 @@ glooey.dialogs.YesNoDialog
          ~YesNoDialog.total_padding
          ~YesNoDialog.total_vert_padding
          ~YesNoDialog.vert_padding
+         ~YesNoDialog.width
          ~YesNoDialog.width_hint
          ~YesNoDialog.window
          ~YesNoDialog.yes_button

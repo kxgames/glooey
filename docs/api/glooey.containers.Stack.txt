@@ -34,7 +34,7 @@ glooey.containers.Stack
          ~Stack.do_claim
          ~Stack.do_detach
          ~Stack.do_draw
-         ~Stack.do_find_children_under_mouse
+         ~Stack.do_find_children_near_mouse
          ~Stack.do_regroup
          ~Stack.do_regroup_children
          ~Stack.do_resize
@@ -50,7 +50,9 @@ glooey.containers.Stack
          ~Stack.get_claimed_rect
          ~Stack.get_claimed_size
          ~Stack.get_claimed_width
+         ~Stack.get_grab_mouse_on_click
          ~Stack.get_group
+         ~Stack.get_height
          ~Stack.get_height_hint
          ~Stack.get_horz_padding
          ~Stack.get_last_rollover_state
@@ -70,6 +72,7 @@ glooey.containers.Stack
          ~Stack.get_total_padding
          ~Stack.get_total_vert_padding
          ~Stack.get_vert_padding
+         ~Stack.get_width
          ~Stack.get_width_hint
          ~Stack.get_window
          ~Stack.hide
@@ -96,6 +99,7 @@ glooey.containers.Stack
          ~Stack.resume_updates
          ~Stack.set_alignment
          ~Stack.set_bottom_padding
+         ~Stack.set_grab_mouse_on_click
          ~Stack.set_handler
          ~Stack.set_handlers
          ~Stack.set_height_hint
@@ -132,6 +136,7 @@ glooey.containers.Stack
          ~Stack.claimed_width
          ~Stack.custom_alignment
          ~Stack.custom_bottom_padding
+         ~Stack.custom_grab_mouse_on_click
          ~Stack.custom_height_hint
          ~Stack.custom_horz_padding
          ~Stack.custom_left_padding
@@ -144,13 +149,16 @@ glooey.containers.Stack
          ~Stack.custom_vert_padding
          ~Stack.custom_width_hint
          ~Stack.event_types
+         ~Stack.grab_mouse_on_click
          ~Stack.group
+         ~Stack.height
          ~Stack.height_hint
          ~Stack.horz_padding
          ~Stack.is_attached_to_gui
          ~Stack.is_disabled
          ~Stack.is_enabled
          ~Stack.is_hidden
+         ~Stack.is_root
          ~Stack.is_visible
          ~Stack.last_rollover_state
          ~Stack.layers
@@ -169,6 +177,7 @@ glooey.containers.Stack
          ~Stack.total_padding
          ~Stack.total_vert_padding
          ~Stack.vert_padding
+         ~Stack.width
          ~Stack.width_hint
          ~Stack.window
    

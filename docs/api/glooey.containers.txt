@@ -10,15 +10,15 @@ glooey.containers
    .. autosummary::
       :toctree: .
    
-      Grid
-      HVBox
-      HBox
-      VBox
       Bin
       Board
       Deck
-      Stack
       Frame
+      Grid
+      HBox
+      HVBox
+      Stack
+      VBox
    
    
 

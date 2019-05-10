@@ -30,7 +30,7 @@ glooey.text.Form
          ~Form.do_claim
          ~Form.do_detach
          ~Form.do_draw
-         ~Form.do_find_children_under_mouse
+         ~Form.do_find_children_near_mouse
          ~Form.do_regroup
          ~Form.do_regroup_children
          ~Form.do_resize
@@ -45,7 +45,9 @@ glooey.text.Form
          ~Form.get_claimed_rect
          ~Form.get_claimed_size
          ~Form.get_claimed_width
+         ~Form.get_grab_mouse_on_click
          ~Form.get_group
+         ~Form.get_height
          ~Form.get_height_hint
          ~Form.get_horz_padding
          ~Form.get_label
@@ -66,6 +68,7 @@ glooey.text.Form
          ~Form.get_total_padding
          ~Form.get_total_vert_padding
          ~Form.get_vert_padding
+         ~Form.get_width
          ~Form.get_width_hint
          ~Form.get_window
          ~Form.hide
@@ -90,6 +93,7 @@ glooey.text.Form
          ~Form.resume_updates
          ~Form.set_alignment
          ~Form.set_bottom_padding
+         ~Form.set_grab_mouse_on_click
          ~Form.set_handler
          ~Form.set_handlers
          ~Form.set_height_hint
@@ -127,6 +131,7 @@ glooey.text.Form
          ~Form.claimed_width
          ~Form.custom_alignment
          ~Form.custom_bottom_padding
+         ~Form.custom_grab_mouse_on_click
          ~Form.custom_height_hint
          ~Form.custom_horz_padding
          ~Form.custom_left_padding
@@ -138,13 +143,16 @@ glooey.text.Form
          ~Form.custom_vert_padding
          ~Form.custom_width_hint
          ~Form.event_types
+         ~Form.grab_mouse_on_click
          ~Form.group
+         ~Form.height
          ~Form.height_hint
          ~Form.horz_padding
          ~Form.is_attached_to_gui
          ~Form.is_disabled
          ~Form.is_enabled
          ~Form.is_hidden
+         ~Form.is_root
          ~Form.is_visible
          ~Form.label
          ~Form.last_rollover_state
@@ -164,6 +172,7 @@ glooey.text.Form
          ~Form.total_padding
          ~Form.total_vert_padding
          ~Form.vert_padding
+         ~Form.width
          ~Form.width_hint
          ~Form.window
    

@@ -31,7 +31,7 @@ glooey.images.Image
          ~Image.do_claim
          ~Image.do_detach
          ~Image.do_draw
-         ~Image.do_find_children_under_mouse
+         ~Image.do_find_children_near_mouse
          ~Image.do_regroup
          ~Image.do_regroup_children
          ~Image.do_resize
@@ -47,7 +47,9 @@ glooey.images.Image
          ~Image.get_claimed_rect
          ~Image.get_claimed_size
          ~Image.get_claimed_width
+         ~Image.get_grab_mouse_on_click
          ~Image.get_group
+         ~Image.get_height
          ~Image.get_height_hint
          ~Image.get_horz_padding
          ~Image.get_image
@@ -67,6 +69,7 @@ glooey.images.Image
          ~Image.get_total_padding
          ~Image.get_total_vert_padding
          ~Image.get_vert_padding
+         ~Image.get_width
          ~Image.get_width_hint
          ~Image.get_window
          ~Image.hide
@@ -92,6 +95,7 @@ glooey.images.Image
          ~Image.set_alignment
          ~Image.set_appearance
          ~Image.set_bottom_padding
+         ~Image.set_grab_mouse_on_click
          ~Image.set_handler
          ~Image.set_handlers
          ~Image.set_height_hint
@@ -129,6 +133,7 @@ glooey.images.Image
          ~Image.claimed_width
          ~Image.custom_alignment
          ~Image.custom_bottom_padding
+         ~Image.custom_grab_mouse_on_click
          ~Image.custom_height_hint
          ~Image.custom_horz_padding
          ~Image.custom_image
@@ -141,7 +146,9 @@ glooey.images.Image
          ~Image.custom_vert_padding
          ~Image.custom_width_hint
          ~Image.event_types
+         ~Image.grab_mouse_on_click
          ~Image.group
+         ~Image.height
          ~Image.height_hint
          ~Image.horz_padding
          ~Image.image
@@ -150,6 +157,7 @@ glooey.images.Image
          ~Image.is_empty
          ~Image.is_enabled
          ~Image.is_hidden
+         ~Image.is_root
          ~Image.is_visible
          ~Image.last_rollover_state
          ~Image.left_padding
@@ -167,6 +175,7 @@ glooey.images.Image
          ~Image.total_padding
          ~Image.total_vert_padding
          ~Image.vert_padding
+         ~Image.width
          ~Image.width_hint
          ~Image.window
    

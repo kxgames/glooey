@@ -44,7 +44,7 @@ glooey.misc.LoremIpsum
          ~LoremIpsum.do_claim
          ~LoremIpsum.do_detach
          ~LoremIpsum.do_draw
-         ~LoremIpsum.do_find_children_under_mouse
+         ~LoremIpsum.do_find_children_near_mouse
          ~LoremIpsum.do_make_new_layout
          ~LoremIpsum.do_regroup
          ~LoremIpsum.do_regroup_children
@@ -67,7 +67,9 @@ glooey.misc.LoremIpsum
          ~LoremIpsum.get_color
          ~LoremIpsum.get_font_name
          ~LoremIpsum.get_font_size
+         ~LoremIpsum.get_grab_mouse_on_click
          ~LoremIpsum.get_group
+         ~LoremIpsum.get_height
          ~LoremIpsum.get_height_hint
          ~LoremIpsum.get_horz_padding
          ~LoremIpsum.get_italic
@@ -93,6 +95,7 @@ glooey.misc.LoremIpsum
          ~LoremIpsum.get_total_vert_padding
          ~LoremIpsum.get_underline
          ~LoremIpsum.get_vert_padding
+         ~LoremIpsum.get_width
          ~LoremIpsum.get_width_hint
          ~LoremIpsum.get_window
          ~LoremIpsum.hide
@@ -125,6 +128,7 @@ glooey.misc.LoremIpsum
          ~LoremIpsum.set_color
          ~LoremIpsum.set_font_name
          ~LoremIpsum.set_font_size
+         ~LoremIpsum.set_grab_mouse_on_click
          ~LoremIpsum.set_handler
          ~LoremIpsum.set_handlers
          ~LoremIpsum.set_height_hint
@@ -177,6 +181,7 @@ glooey.misc.LoremIpsum
          ~LoremIpsum.custom_color
          ~LoremIpsum.custom_font_name
          ~LoremIpsum.custom_font_size
+         ~LoremIpsum.custom_grab_mouse_on_click
          ~LoremIpsum.custom_height_hint
          ~LoremIpsum.custom_horz_padding
          ~LoremIpsum.custom_italic
@@ -196,13 +201,16 @@ glooey.misc.LoremIpsum
          ~LoremIpsum.event_types
          ~LoremIpsum.font_name
          ~LoremIpsum.font_size
+         ~LoremIpsum.grab_mouse_on_click
          ~LoremIpsum.group
+         ~LoremIpsum.height
          ~LoremIpsum.height_hint
          ~LoremIpsum.horz_padding
          ~LoremIpsum.is_attached_to_gui
          ~LoremIpsum.is_disabled
          ~LoremIpsum.is_enabled
          ~LoremIpsum.is_hidden
+         ~LoremIpsum.is_root
          ~LoremIpsum.is_visible
          ~LoremIpsum.italic
          ~LoremIpsum.kerning
@@ -226,6 +234,7 @@ glooey.misc.LoremIpsum
          ~LoremIpsum.total_vert_padding
          ~LoremIpsum.underline
          ~LoremIpsum.vert_padding
+         ~LoremIpsum.width
          ~LoremIpsum.width_hint
          ~LoremIpsum.window
    

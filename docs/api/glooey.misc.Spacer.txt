@@ -30,7 +30,7 @@ glooey.misc.Spacer
          ~Spacer.do_claim
          ~Spacer.do_detach
          ~Spacer.do_draw
-         ~Spacer.do_find_children_under_mouse
+         ~Spacer.do_find_children_near_mouse
          ~Spacer.do_regroup
          ~Spacer.do_regroup_children
          ~Spacer.do_resize
@@ -45,7 +45,9 @@ glooey.misc.Spacer
          ~Spacer.get_claimed_rect
          ~Spacer.get_claimed_size
          ~Spacer.get_claimed_width
+         ~Spacer.get_grab_mouse_on_click
          ~Spacer.get_group
+         ~Spacer.get_height
          ~Spacer.get_height_hint
          ~Spacer.get_horz_padding
          ~Spacer.get_last_rollover_state
@@ -64,6 +66,7 @@ glooey.misc.Spacer
          ~Spacer.get_total_padding
          ~Spacer.get_total_vert_padding
          ~Spacer.get_vert_padding
+         ~Spacer.get_width
          ~Spacer.get_width_hint
          ~Spacer.get_window
          ~Spacer.hide
@@ -88,6 +91,7 @@ glooey.misc.Spacer
          ~Spacer.resume_updates
          ~Spacer.set_alignment
          ~Spacer.set_bottom_padding
+         ~Spacer.set_grab_mouse_on_click
          ~Spacer.set_handler
          ~Spacer.set_handlers
          ~Spacer.set_height_hint
@@ -123,6 +127,7 @@ glooey.misc.Spacer
          ~Spacer.claimed_width
          ~Spacer.custom_alignment
          ~Spacer.custom_bottom_padding
+         ~Spacer.custom_grab_mouse_on_click
          ~Spacer.custom_height_hint
          ~Spacer.custom_horz_padding
          ~Spacer.custom_left_padding
@@ -134,13 +139,16 @@ glooey.misc.Spacer
          ~Spacer.custom_vert_padding
          ~Spacer.custom_width_hint
          ~Spacer.event_types
+         ~Spacer.grab_mouse_on_click
          ~Spacer.group
+         ~Spacer.height
          ~Spacer.height_hint
          ~Spacer.horz_padding
          ~Spacer.is_attached_to_gui
          ~Spacer.is_disabled
          ~Spacer.is_enabled
          ~Spacer.is_hidden
+         ~Spacer.is_root
          ~Spacer.is_visible
          ~Spacer.last_rollover_state
          ~Spacer.left_padding
@@ -158,6 +166,7 @@ glooey.misc.Spacer
          ~Spacer.total_padding
          ~Spacer.total_vert_padding
          ~Spacer.vert_padding
+         ~Spacer.width
          ~Spacer.width_hint
          ~Spacer.window
    

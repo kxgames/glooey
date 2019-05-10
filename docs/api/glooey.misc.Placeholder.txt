@@ -30,7 +30,7 @@ glooey.misc.Placeholder
          ~Placeholder.do_claim
          ~Placeholder.do_detach
          ~Placeholder.do_draw
-         ~Placeholder.do_find_children_under_mouse
+         ~Placeholder.do_find_children_near_mouse
          ~Placeholder.do_regroup
          ~Placeholder.do_regroup_children
          ~Placeholder.do_resize
@@ -46,7 +46,9 @@ glooey.misc.Placeholder
          ~Placeholder.get_claimed_size
          ~Placeholder.get_claimed_width
          ~Placeholder.get_color
+         ~Placeholder.get_grab_mouse_on_click
          ~Placeholder.get_group
+         ~Placeholder.get_height
          ~Placeholder.get_height_hint
          ~Placeholder.get_horz_padding
          ~Placeholder.get_last_rollover_state
@@ -67,6 +69,7 @@ glooey.misc.Placeholder
          ~Placeholder.get_total_padding
          ~Placeholder.get_total_vert_padding
          ~Placeholder.get_vert_padding
+         ~Placeholder.get_width
          ~Placeholder.get_width_hint
          ~Placeholder.get_window
          ~Placeholder.hide
@@ -92,6 +95,7 @@ glooey.misc.Placeholder
          ~Placeholder.set_alignment
          ~Placeholder.set_bottom_padding
          ~Placeholder.set_color
+         ~Placeholder.set_grab_mouse_on_click
          ~Placeholder.set_handler
          ~Placeholder.set_handlers
          ~Placeholder.set_height_hint
@@ -131,6 +135,7 @@ glooey.misc.Placeholder
          ~Placeholder.custom_alignment
          ~Placeholder.custom_bottom_padding
          ~Placeholder.custom_color
+         ~Placeholder.custom_grab_mouse_on_click
          ~Placeholder.custom_height_hint
          ~Placeholder.custom_horz_padding
          ~Placeholder.custom_left_padding
@@ -142,13 +147,16 @@ glooey.misc.Placeholder
          ~Placeholder.custom_vert_padding
          ~Placeholder.custom_width_hint
          ~Placeholder.event_types
+         ~Placeholder.grab_mouse_on_click
          ~Placeholder.group
+         ~Placeholder.height
          ~Placeholder.height_hint
          ~Placeholder.horz_padding
          ~Placeholder.is_attached_to_gui
          ~Placeholder.is_disabled
          ~Placeholder.is_enabled
          ~Placeholder.is_hidden
+         ~Placeholder.is_root
          ~Placeholder.is_visible
          ~Placeholder.last_rollover_state
          ~Placeholder.left_padding
@@ -168,6 +176,7 @@ glooey.misc.Placeholder
          ~Placeholder.total_padding
          ~Placeholder.total_vert_padding
          ~Placeholder.vert_padding
+         ~Placeholder.width
          ~Placeholder.width_hint
          ~Placeholder.window
    

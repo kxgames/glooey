@@ -32,7 +32,7 @@ glooey.scrolling.ScrollPane
          ~ScrollPane.do_claim
          ~ScrollPane.do_detach
          ~ScrollPane.do_draw
-         ~ScrollPane.do_find_children_under_mouse
+         ~ScrollPane.do_find_children_near_mouse
          ~ScrollPane.do_regroup
          ~ScrollPane.do_regroup_children
          ~ScrollPane.do_resize
@@ -48,7 +48,9 @@ glooey.scrolling.ScrollPane
          ~ScrollPane.get_claimed_rect
          ~ScrollPane.get_claimed_size
          ~ScrollPane.get_claimed_width
+         ~ScrollPane.get_grab_mouse_on_click
          ~ScrollPane.get_group
+         ~ScrollPane.get_height
          ~ScrollPane.get_height_hint
          ~ScrollPane.get_horz_padding
          ~ScrollPane.get_horz_scrolling
@@ -73,6 +75,7 @@ glooey.scrolling.ScrollPane
          ~ScrollPane.get_vert_padding
          ~ScrollPane.get_vert_scrolling
          ~ScrollPane.get_view
+         ~ScrollPane.get_width
          ~ScrollPane.get_width_hint
          ~ScrollPane.get_window
          ~ScrollPane.hide
@@ -102,6 +105,7 @@ glooey.scrolling.ScrollPane
          ~ScrollPane.scroll_percent
          ~ScrollPane.set_alignment
          ~ScrollPane.set_bottom_padding
+         ~ScrollPane.set_grab_mouse_on_click
          ~ScrollPane.set_handler
          ~ScrollPane.set_handlers
          ~ScrollPane.set_height_hint
@@ -142,6 +146,7 @@ glooey.scrolling.ScrollPane
          ~ScrollPane.claimed_width
          ~ScrollPane.custom_alignment
          ~ScrollPane.custom_bottom_padding
+         ~ScrollPane.custom_grab_mouse_on_click
          ~ScrollPane.custom_height_hint
          ~ScrollPane.custom_horz_padding
          ~ScrollPane.custom_horz_scrolling
@@ -156,7 +161,9 @@ glooey.scrolling.ScrollPane
          ~ScrollPane.custom_vert_scrolling
          ~ScrollPane.custom_width_hint
          ~ScrollPane.event_types
+         ~ScrollPane.grab_mouse_on_click
          ~ScrollPane.group
+         ~ScrollPane.height
          ~ScrollPane.height_hint
          ~ScrollPane.horz_padding
          ~ScrollPane.horz_scrolling
@@ -165,6 +172,7 @@ glooey.scrolling.ScrollPane
          ~ScrollPane.is_disabled
          ~ScrollPane.is_enabled
          ~ScrollPane.is_hidden
+         ~ScrollPane.is_root
          ~ScrollPane.is_visible
          ~ScrollPane.last_rollover_state
          ~ScrollPane.left_padding
@@ -186,6 +194,7 @@ glooey.scrolling.ScrollPane
          ~ScrollPane.vert_padding
          ~ScrollPane.vert_scrolling
          ~ScrollPane.view
+         ~ScrollPane.width
          ~ScrollPane.width_hint
          ~ScrollPane.window
    

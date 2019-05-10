@@ -33,7 +33,7 @@ glooey.dialogs.ButtonDialog
          ~ButtonDialog.do_claim
          ~ButtonDialog.do_detach
          ~ButtonDialog.do_draw
-         ~ButtonDialog.do_find_children_under_mouse
+         ~ButtonDialog.do_find_children_near_mouse
          ~ButtonDialog.do_regroup
          ~ButtonDialog.do_regroup_children
          ~ButtonDialog.do_resize
@@ -50,9 +50,11 @@ glooey.dialogs.ButtonDialog
          ~ButtonDialog.get_claimed_rect
          ~ButtonDialog.get_claimed_size
          ~ButtonDialog.get_claimed_width
+         ~ButtonDialog.get_content
          ~ButtonDialog.get_decoration
-         ~ButtonDialog.get_foreground
+         ~ButtonDialog.get_grab_mouse_on_click
          ~ButtonDialog.get_group
+         ~ButtonDialog.get_height
          ~ButtonDialog.get_height_hint
          ~ButtonDialog.get_horz_padding
          ~ButtonDialog.get_last_rollover_state
@@ -71,6 +73,7 @@ glooey.dialogs.ButtonDialog
          ~ButtonDialog.get_total_padding
          ~ButtonDialog.get_total_vert_padding
          ~ButtonDialog.get_vert_padding
+         ~ButtonDialog.get_width
          ~ButtonDialog.get_width_hint
          ~ButtonDialog.get_window
          ~ButtonDialog.hide
@@ -96,6 +99,8 @@ glooey.dialogs.ButtonDialog
          ~ButtonDialog.resume_updates
          ~ButtonDialog.set_alignment
          ~ButtonDialog.set_bottom_padding
+         ~ButtonDialog.set_decoration
+         ~ButtonDialog.set_grab_mouse_on_click
          ~ButtonDialog.set_handler
          ~ButtonDialog.set_handlers
          ~ButtonDialog.set_height_hint
@@ -132,11 +137,13 @@ glooey.dialogs.ButtonDialog
          ~ButtonDialog.claimed_rect
          ~ButtonDialog.claimed_size
          ~ButtonDialog.claimed_width
+         ~ButtonDialog.content
          ~ButtonDialog.custom_alignment
-         ~ButtonDialog.custom_autoadd_foreground
+         ~ButtonDialog.custom_autoadd_content
          ~ButtonDialog.custom_bottom_padding
          ~ButtonDialog.custom_box_layer
          ~ButtonDialog.custom_decoration_layer
+         ~ButtonDialog.custom_grab_mouse_on_click
          ~ButtonDialog.custom_height_hint
          ~ButtonDialog.custom_horz_padding
          ~ButtonDialog.custom_left_padding
@@ -149,14 +156,16 @@ glooey.dialogs.ButtonDialog
          ~ButtonDialog.custom_width_hint
          ~ButtonDialog.decoration
          ~ButtonDialog.event_types
-         ~ButtonDialog.foreground
+         ~ButtonDialog.grab_mouse_on_click
          ~ButtonDialog.group
+         ~ButtonDialog.height
          ~ButtonDialog.height_hint
          ~ButtonDialog.horz_padding
          ~ButtonDialog.is_attached_to_gui
          ~ButtonDialog.is_disabled
          ~ButtonDialog.is_enabled
          ~ButtonDialog.is_hidden
+         ~ButtonDialog.is_root
          ~ButtonDialog.is_visible
          ~ButtonDialog.last_rollover_state
          ~ButtonDialog.left_padding
@@ -174,6 +183,7 @@ glooey.dialogs.ButtonDialog
          ~ButtonDialog.total_padding
          ~ButtonDialog.total_vert_padding
          ~ButtonDialog.vert_padding
+         ~ButtonDialog.width
          ~ButtonDialog.width_hint
          ~ButtonDialog.window
    

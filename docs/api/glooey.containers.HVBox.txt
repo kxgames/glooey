@@ -34,7 +34,7 @@ glooey.containers.HVBox
          ~HVBox.do_claim
          ~HVBox.do_detach
          ~HVBox.do_draw
-         ~HVBox.do_find_children_under_mouse
+         ~HVBox.do_find_children_near_mouse
          ~HVBox.do_get_index
          ~HVBox.do_get_row_col
          ~HVBox.do_regroup
@@ -56,7 +56,9 @@ glooey.containers.HVBox
          ~HVBox.get_claimed_size
          ~HVBox.get_claimed_width
          ~HVBox.get_default_cell_size
+         ~HVBox.get_grab_mouse_on_click
          ~HVBox.get_group
+         ~HVBox.get_height
          ~HVBox.get_height_hint
          ~HVBox.get_horz_padding
          ~HVBox.get_last_rollover_state
@@ -75,6 +77,7 @@ glooey.containers.HVBox
          ~HVBox.get_total_padding
          ~HVBox.get_total_vert_padding
          ~HVBox.get_vert_padding
+         ~HVBox.get_width
          ~HVBox.get_width_hint
          ~HVBox.get_window
          ~HVBox.hide
@@ -108,6 +111,7 @@ glooey.containers.HVBox
          ~HVBox.set_cell_alignment
          ~HVBox.set_cell_padding
          ~HVBox.set_default_cell_size
+         ~HVBox.set_grab_mouse_on_click
          ~HVBox.set_handler
          ~HVBox.set_handlers
          ~HVBox.set_height_hint
@@ -149,6 +153,7 @@ glooey.containers.HVBox
          ~HVBox.custom_cell_alignment
          ~HVBox.custom_cell_padding
          ~HVBox.custom_default_cell_size
+         ~HVBox.custom_grab_mouse_on_click
          ~HVBox.custom_height_hint
          ~HVBox.custom_horz_padding
          ~HVBox.custom_left_padding
@@ -161,13 +166,16 @@ glooey.containers.HVBox
          ~HVBox.custom_width_hint
          ~HVBox.default_cell_size
          ~HVBox.event_types
+         ~HVBox.grab_mouse_on_click
          ~HVBox.group
+         ~HVBox.height
          ~HVBox.height_hint
          ~HVBox.horz_padding
          ~HVBox.is_attached_to_gui
          ~HVBox.is_disabled
          ~HVBox.is_enabled
          ~HVBox.is_hidden
+         ~HVBox.is_root
          ~HVBox.is_visible
          ~HVBox.last_rollover_state
          ~HVBox.left_padding
@@ -185,6 +193,7 @@ glooey.containers.HVBox
          ~HVBox.total_padding
          ~HVBox.total_vert_padding
          ~HVBox.vert_padding
+         ~HVBox.width
          ~HVBox.width_hint
          ~HVBox.window
    

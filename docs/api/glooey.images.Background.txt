@@ -30,7 +30,7 @@ glooey.images.Background
          ~Background.do_claim
          ~Background.do_detach
          ~Background.do_draw
-         ~Background.do_find_children_under_mouse
+         ~Background.do_find_children_near_mouse
          ~Background.do_regroup
          ~Background.do_regroup_children
          ~Background.do_resize
@@ -47,7 +47,9 @@ glooey.images.Background
          ~Background.get_claimed_size
          ~Background.get_claimed_width
          ~Background.get_color
+         ~Background.get_grab_mouse_on_click
          ~Background.get_group
+         ~Background.get_height
          ~Background.get_height_hint
          ~Background.get_horz_padding
          ~Background.get_last_rollover_state
@@ -67,6 +69,7 @@ glooey.images.Background
          ~Background.get_total_padding
          ~Background.get_total_vert_padding
          ~Background.get_vert_padding
+         ~Background.get_width
          ~Background.get_width_hint
          ~Background.get_window
          ~Background.hide
@@ -93,6 +96,7 @@ glooey.images.Background
          ~Background.set_appearance
          ~Background.set_bottom_padding
          ~Background.set_color
+         ~Background.set_grab_mouse_on_click
          ~Background.set_handler
          ~Background.set_handlers
          ~Background.set_height_hint
@@ -137,6 +141,7 @@ glooey.images.Background
          ~Background.custom_bottom_right
          ~Background.custom_center
          ~Background.custom_color
+         ~Background.custom_grab_mouse_on_click
          ~Background.custom_height_hint
          ~Background.custom_horz_padding
          ~Background.custom_htile
@@ -157,7 +162,9 @@ glooey.images.Background
          ~Background.custom_vtile
          ~Background.custom_width_hint
          ~Background.event_types
+         ~Background.grab_mouse_on_click
          ~Background.group
+         ~Background.height
          ~Background.height_hint
          ~Background.horz_padding
          ~Background.image
@@ -166,6 +173,7 @@ glooey.images.Background
          ~Background.is_empty
          ~Background.is_enabled
          ~Background.is_hidden
+         ~Background.is_root
          ~Background.is_visible
          ~Background.last_rollover_state
          ~Background.left_padding
@@ -184,6 +192,7 @@ glooey.images.Background
          ~Background.total_padding
          ~Background.total_vert_padding
          ~Background.vert_padding
+         ~Background.width
          ~Background.width_hint
          ~Background.window
    

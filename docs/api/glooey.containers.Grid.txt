@@ -34,7 +34,7 @@ glooey.containers.Grid
          ~Grid.do_claim
          ~Grid.do_detach
          ~Grid.do_draw
-         ~Grid.do_find_children_under_mouse
+         ~Grid.do_find_children_near_mouse
          ~Grid.do_regroup
          ~Grid.do_regroup_children
          ~Grid.do_resize
@@ -55,7 +55,9 @@ glooey.containers.Grid
          ~Grid.get_col_width
          ~Grid.get_default_col_width
          ~Grid.get_default_row_height
+         ~Grid.get_grab_mouse_on_click
          ~Grid.get_group
+         ~Grid.get_height
          ~Grid.get_height_hint
          ~Grid.get_horz_padding
          ~Grid.get_last_rollover_state
@@ -77,6 +79,7 @@ glooey.containers.Grid
          ~Grid.get_total_padding
          ~Grid.get_total_vert_padding
          ~Grid.get_vert_padding
+         ~Grid.get_width
          ~Grid.get_width_hint
          ~Grid.get_window
          ~Grid.hide
@@ -107,6 +110,7 @@ glooey.containers.Grid
          ~Grid.set_col_width
          ~Grid.set_default_col_width
          ~Grid.set_default_row_height
+         ~Grid.set_grab_mouse_on_click
          ~Grid.set_handler
          ~Grid.set_handlers
          ~Grid.set_height_hint
@@ -152,6 +156,7 @@ glooey.containers.Grid
          ~Grid.custom_cell_padding
          ~Grid.custom_default_col_width
          ~Grid.custom_default_row_height
+         ~Grid.custom_grab_mouse_on_click
          ~Grid.custom_height_hint
          ~Grid.custom_horz_padding
          ~Grid.custom_left_padding
@@ -167,13 +172,16 @@ glooey.containers.Grid
          ~Grid.default_col_width
          ~Grid.default_row_height
          ~Grid.event_types
+         ~Grid.grab_mouse_on_click
          ~Grid.group
+         ~Grid.height
          ~Grid.height_hint
          ~Grid.horz_padding
          ~Grid.is_attached_to_gui
          ~Grid.is_disabled
          ~Grid.is_enabled
          ~Grid.is_hidden
+         ~Grid.is_root
          ~Grid.is_visible
          ~Grid.last_rollover_state
          ~Grid.left_padding
@@ -193,6 +201,7 @@ glooey.containers.Grid
          ~Grid.total_padding
          ~Grid.total_vert_padding
          ~Grid.vert_padding
+         ~Grid.width
          ~Grid.width_hint
          ~Grid.window
    

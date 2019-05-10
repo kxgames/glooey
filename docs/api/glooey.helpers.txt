@@ -24,6 +24,7 @@ glooey.helpers
       clamp
       first_not_none
       late_binding_property
+      register_event_type
       update_function
    
    

@@ -33,7 +33,7 @@ glooey.buttons.RadioButton
          ~RadioButton.do_claim
          ~RadioButton.do_detach
          ~RadioButton.do_draw
-         ~RadioButton.do_find_children_under_mouse
+         ~RadioButton.do_find_children_near_mouse
          ~RadioButton.do_regroup
          ~RadioButton.do_regroup_children
          ~RadioButton.do_resize
@@ -48,7 +48,9 @@ glooey.buttons.RadioButton
          ~RadioButton.get_claimed_rect
          ~RadioButton.get_claimed_size
          ~RadioButton.get_claimed_width
+         ~RadioButton.get_grab_mouse_on_click
          ~RadioButton.get_group
+         ~RadioButton.get_height
          ~RadioButton.get_height_hint
          ~RadioButton.get_horz_padding
          ~RadioButton.get_last_rollover_state
@@ -68,6 +70,7 @@ glooey.buttons.RadioButton
          ~RadioButton.get_total_padding
          ~RadioButton.get_total_vert_padding
          ~RadioButton.get_vert_padding
+         ~RadioButton.get_width
          ~RadioButton.get_width_hint
          ~RadioButton.get_window
          ~RadioButton.hide
@@ -95,6 +98,7 @@ glooey.buttons.RadioButton
          ~RadioButton.resume_updates
          ~RadioButton.set_alignment
          ~RadioButton.set_bottom_padding
+         ~RadioButton.set_grab_mouse_on_click
          ~RadioButton.set_handler
          ~RadioButton.set_handlers
          ~RadioButton.set_height_hint
@@ -138,6 +142,7 @@ glooey.buttons.RadioButton
          ~RadioButton.custom_checked_down
          ~RadioButton.custom_checked_off
          ~RadioButton.custom_checked_over
+         ~RadioButton.custom_grab_mouse_on_click
          ~RadioButton.custom_height_hint
          ~RadioButton.custom_horz_padding
          ~RadioButton.custom_left_padding
@@ -153,7 +158,9 @@ glooey.buttons.RadioButton
          ~RadioButton.custom_vert_padding
          ~RadioButton.custom_width_hint
          ~RadioButton.event_types
+         ~RadioButton.grab_mouse_on_click
          ~RadioButton.group
+         ~RadioButton.height
          ~RadioButton.height_hint
          ~RadioButton.horz_padding
          ~RadioButton.images
@@ -162,6 +169,7 @@ glooey.buttons.RadioButton
          ~RadioButton.is_disabled
          ~RadioButton.is_enabled
          ~RadioButton.is_hidden
+         ~RadioButton.is_root
          ~RadioButton.is_visible
          ~RadioButton.last_rollover_state
          ~RadioButton.left_padding
@@ -180,6 +188,7 @@ glooey.buttons.RadioButton
          ~RadioButton.total_padding
          ~RadioButton.total_vert_padding
          ~RadioButton.vert_padding
+         ~RadioButton.width
          ~RadioButton.width_hint
          ~RadioButton.window
    

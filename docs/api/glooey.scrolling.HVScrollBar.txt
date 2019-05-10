@@ -32,7 +32,7 @@ glooey.scrolling.HVScrollBar
          ~HVScrollBar.do_claim
          ~HVScrollBar.do_detach
          ~HVScrollBar.do_draw
-         ~HVScrollBar.do_find_children_under_mouse
+         ~HVScrollBar.do_find_children_near_mouse
          ~HVScrollBar.do_regroup
          ~HVScrollBar.do_regroup_children
          ~HVScrollBar.do_resize
@@ -49,9 +49,11 @@ glooey.scrolling.HVScrollBar
          ~HVScrollBar.get_claimed_rect
          ~HVScrollBar.get_claimed_size
          ~HVScrollBar.get_claimed_width
+         ~HVScrollBar.get_content
          ~HVScrollBar.get_decoration
-         ~HVScrollBar.get_foreground
+         ~HVScrollBar.get_grab_mouse_on_click
          ~HVScrollBar.get_group
+         ~HVScrollBar.get_height
          ~HVScrollBar.get_height_hint
          ~HVScrollBar.get_horz_padding
          ~HVScrollBar.get_last_rollover_state
@@ -65,12 +67,14 @@ glooey.scrolling.HVScrollBar
          ~HVScrollBar.get_right_padding
          ~HVScrollBar.get_rollover_state
          ~HVScrollBar.get_root
+         ~HVScrollBar.get_scale_grip
          ~HVScrollBar.get_size_hint
          ~HVScrollBar.get_top_padding
          ~HVScrollBar.get_total_horz_padding
          ~HVScrollBar.get_total_padding
          ~HVScrollBar.get_total_vert_padding
          ~HVScrollBar.get_vert_padding
+         ~HVScrollBar.get_width
          ~HVScrollBar.get_width_hint
          ~HVScrollBar.get_window
          ~HVScrollBar.hide
@@ -99,6 +103,8 @@ glooey.scrolling.HVScrollBar
          ~HVScrollBar.set_alignment
          ~HVScrollBar.set_bottom_padding
          ~HVScrollBar.set_button_speed
+         ~HVScrollBar.set_decoration
+         ~HVScrollBar.set_grab_mouse_on_click
          ~HVScrollBar.set_handler
          ~HVScrollBar.set_handlers
          ~HVScrollBar.set_height_hint
@@ -107,6 +113,7 @@ glooey.scrolling.HVScrollBar
          ~HVScrollBar.set_padding
          ~HVScrollBar.set_propagate_mouse_events
          ~HVScrollBar.set_right_padding
+         ~HVScrollBar.set_scale_grip
          ~HVScrollBar.set_size_hint
          ~HVScrollBar.set_top_padding
          ~HVScrollBar.set_vert_padding
@@ -126,9 +133,10 @@ glooey.scrolling.HVScrollBar
       .. autosummary::
       
          ~HVScrollBar.Backward
+         ~HVScrollBar.Content
          ~HVScrollBar.Decoration
-         ~HVScrollBar.Foreground
          ~HVScrollBar.Forward
+         ~HVScrollBar.Grip
          ~HVScrollBar.alignment
          ~HVScrollBar.batch
          ~HVScrollBar.bottom_padding
@@ -138,32 +146,37 @@ glooey.scrolling.HVScrollBar
          ~HVScrollBar.claimed_rect
          ~HVScrollBar.claimed_size
          ~HVScrollBar.claimed_width
+         ~HVScrollBar.content
          ~HVScrollBar.custom_alignment
-         ~HVScrollBar.custom_autoadd_foreground
+         ~HVScrollBar.custom_autoadd_content
          ~HVScrollBar.custom_bottom_padding
          ~HVScrollBar.custom_box_layer
          ~HVScrollBar.custom_button_speed
          ~HVScrollBar.custom_decoration_layer
+         ~HVScrollBar.custom_grab_mouse_on_click
          ~HVScrollBar.custom_height_hint
          ~HVScrollBar.custom_horz_padding
          ~HVScrollBar.custom_left_padding
          ~HVScrollBar.custom_padding
          ~HVScrollBar.custom_propagate_mouse_events
          ~HVScrollBar.custom_right_padding
+         ~HVScrollBar.custom_scale_grip
          ~HVScrollBar.custom_size_hint
          ~HVScrollBar.custom_top_padding
          ~HVScrollBar.custom_vert_padding
          ~HVScrollBar.custom_width_hint
          ~HVScrollBar.decoration
          ~HVScrollBar.event_types
-         ~HVScrollBar.foreground
+         ~HVScrollBar.grab_mouse_on_click
          ~HVScrollBar.group
+         ~HVScrollBar.height
          ~HVScrollBar.height_hint
          ~HVScrollBar.horz_padding
          ~HVScrollBar.is_attached_to_gui
          ~HVScrollBar.is_disabled
          ~HVScrollBar.is_enabled
          ~HVScrollBar.is_hidden
+         ~HVScrollBar.is_root
          ~HVScrollBar.is_visible
          ~HVScrollBar.last_rollover_state
          ~HVScrollBar.left_padding
@@ -176,12 +189,14 @@ glooey.scrolling.HVScrollBar
          ~HVScrollBar.right_padding
          ~HVScrollBar.rollover_state
          ~HVScrollBar.root
+         ~HVScrollBar.scale_grip
          ~HVScrollBar.size_hint
          ~HVScrollBar.top_padding
          ~HVScrollBar.total_horz_padding
          ~HVScrollBar.total_padding
          ~HVScrollBar.total_vert_padding
          ~HVScrollBar.vert_padding
+         ~HVScrollBar.width
          ~HVScrollBar.width_hint
          ~HVScrollBar.window
    

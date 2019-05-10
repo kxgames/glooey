@@ -32,7 +32,7 @@ glooey.scrolling.VScrollBar
          ~VScrollBar.do_claim
          ~VScrollBar.do_detach
          ~VScrollBar.do_draw
-         ~VScrollBar.do_find_children_under_mouse
+         ~VScrollBar.do_find_children_near_mouse
          ~VScrollBar.do_regroup
          ~VScrollBar.do_regroup_children
          ~VScrollBar.do_resize
@@ -49,9 +49,11 @@ glooey.scrolling.VScrollBar
          ~VScrollBar.get_claimed_rect
          ~VScrollBar.get_claimed_size
          ~VScrollBar.get_claimed_width
+         ~VScrollBar.get_content
          ~VScrollBar.get_decoration
-         ~VScrollBar.get_foreground
+         ~VScrollBar.get_grab_mouse_on_click
          ~VScrollBar.get_group
+         ~VScrollBar.get_height
          ~VScrollBar.get_height_hint
          ~VScrollBar.get_horz_padding
          ~VScrollBar.get_last_rollover_state
@@ -65,12 +67,14 @@ glooey.scrolling.VScrollBar
          ~VScrollBar.get_right_padding
          ~VScrollBar.get_rollover_state
          ~VScrollBar.get_root
+         ~VScrollBar.get_scale_grip
          ~VScrollBar.get_size_hint
          ~VScrollBar.get_top_padding
          ~VScrollBar.get_total_horz_padding
          ~VScrollBar.get_total_padding
          ~VScrollBar.get_total_vert_padding
          ~VScrollBar.get_vert_padding
+         ~VScrollBar.get_width
          ~VScrollBar.get_width_hint
          ~VScrollBar.get_window
          ~VScrollBar.hide
@@ -99,6 +103,8 @@ glooey.scrolling.VScrollBar
          ~VScrollBar.set_alignment
          ~VScrollBar.set_bottom_padding
          ~VScrollBar.set_button_speed
+         ~VScrollBar.set_decoration
+         ~VScrollBar.set_grab_mouse_on_click
          ~VScrollBar.set_handler
          ~VScrollBar.set_handlers
          ~VScrollBar.set_height_hint
@@ -107,6 +113,7 @@ glooey.scrolling.VScrollBar
          ~VScrollBar.set_padding
          ~VScrollBar.set_propagate_mouse_events
          ~VScrollBar.set_right_padding
+         ~VScrollBar.set_scale_grip
          ~VScrollBar.set_size_hint
          ~VScrollBar.set_top_padding
          ~VScrollBar.set_vert_padding
@@ -126,9 +133,10 @@ glooey.scrolling.VScrollBar
       .. autosummary::
       
          ~VScrollBar.Backward
+         ~VScrollBar.Content
          ~VScrollBar.Decoration
-         ~VScrollBar.Foreground
          ~VScrollBar.Forward
+         ~VScrollBar.Grip
          ~VScrollBar.alignment
          ~VScrollBar.batch
          ~VScrollBar.bottom_padding
@@ -138,32 +146,37 @@ glooey.scrolling.VScrollBar
          ~VScrollBar.claimed_rect
          ~VScrollBar.claimed_size
          ~VScrollBar.claimed_width
+         ~VScrollBar.content
          ~VScrollBar.custom_alignment
-         ~VScrollBar.custom_autoadd_foreground
+         ~VScrollBar.custom_autoadd_content
          ~VScrollBar.custom_bottom_padding
          ~VScrollBar.custom_box_layer
          ~VScrollBar.custom_button_speed
          ~VScrollBar.custom_decoration_layer
+         ~VScrollBar.custom_grab_mouse_on_click
          ~VScrollBar.custom_height_hint
          ~VScrollBar.custom_horz_padding
          ~VScrollBar.custom_left_padding
          ~VScrollBar.custom_padding
          ~VScrollBar.custom_propagate_mouse_events
          ~VScrollBar.custom_right_padding
+         ~VScrollBar.custom_scale_grip
          ~VScrollBar.custom_size_hint
          ~VScrollBar.custom_top_padding
          ~VScrollBar.custom_vert_padding
          ~VScrollBar.custom_width_hint
          ~VScrollBar.decoration
          ~VScrollBar.event_types
-         ~VScrollBar.foreground
+         ~VScrollBar.grab_mouse_on_click
          ~VScrollBar.group
+         ~VScrollBar.height
          ~VScrollBar.height_hint
          ~VScrollBar.horz_padding
          ~VScrollBar.is_attached_to_gui
          ~VScrollBar.is_disabled
          ~VScrollBar.is_enabled
          ~VScrollBar.is_hidden
+         ~VScrollBar.is_root
          ~VScrollBar.is_visible
          ~VScrollBar.last_rollover_state
          ~VScrollBar.left_padding
@@ -176,12 +189,14 @@ glooey.scrolling.VScrollBar
          ~VScrollBar.right_padding
          ~VScrollBar.rollover_state
          ~VScrollBar.root
+         ~VScrollBar.scale_grip
          ~VScrollBar.size_hint
          ~VScrollBar.top_padding
          ~VScrollBar.total_horz_padding
          ~VScrollBar.total_padding
          ~VScrollBar.total_vert_padding
          ~VScrollBar.vert_padding
+         ~VScrollBar.width
          ~VScrollBar.width_hint
          ~VScrollBar.window
    

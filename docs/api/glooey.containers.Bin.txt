@@ -32,7 +32,7 @@ glooey.containers.Bin
          ~Bin.do_claim
          ~Bin.do_detach
          ~Bin.do_draw
-         ~Bin.do_find_children_under_mouse
+         ~Bin.do_find_children_near_mouse
          ~Bin.do_regroup
          ~Bin.do_regroup_children
          ~Bin.do_resize
@@ -48,7 +48,9 @@ glooey.containers.Bin
          ~Bin.get_claimed_rect
          ~Bin.get_claimed_size
          ~Bin.get_claimed_width
+         ~Bin.get_grab_mouse_on_click
          ~Bin.get_group
+         ~Bin.get_height
          ~Bin.get_height_hint
          ~Bin.get_horz_padding
          ~Bin.get_last_rollover_state
@@ -67,6 +69,7 @@ glooey.containers.Bin
          ~Bin.get_total_padding
          ~Bin.get_total_vert_padding
          ~Bin.get_vert_padding
+         ~Bin.get_width
          ~Bin.get_width_hint
          ~Bin.get_window
          ~Bin.hide
@@ -91,6 +94,7 @@ glooey.containers.Bin
          ~Bin.resume_updates
          ~Bin.set_alignment
          ~Bin.set_bottom_padding
+         ~Bin.set_grab_mouse_on_click
          ~Bin.set_handler
          ~Bin.set_handlers
          ~Bin.set_height_hint
@@ -127,6 +131,7 @@ glooey.containers.Bin
          ~Bin.claimed_width
          ~Bin.custom_alignment
          ~Bin.custom_bottom_padding
+         ~Bin.custom_grab_mouse_on_click
          ~Bin.custom_height_hint
          ~Bin.custom_horz_padding
          ~Bin.custom_left_padding
@@ -138,13 +143,16 @@ glooey.containers.Bin
          ~Bin.custom_vert_padding
          ~Bin.custom_width_hint
          ~Bin.event_types
+         ~Bin.grab_mouse_on_click
          ~Bin.group
+         ~Bin.height
          ~Bin.height_hint
          ~Bin.horz_padding
          ~Bin.is_attached_to_gui
          ~Bin.is_disabled
          ~Bin.is_enabled
          ~Bin.is_hidden
+         ~Bin.is_root
          ~Bin.is_visible
          ~Bin.last_rollover_state
          ~Bin.left_padding
@@ -162,6 +170,7 @@ glooey.containers.Bin
          ~Bin.total_padding
          ~Bin.total_vert_padding
          ~Bin.vert_padding
+         ~Bin.width
          ~Bin.width_hint
          ~Bin.window
    

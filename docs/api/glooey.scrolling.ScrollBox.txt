@@ -32,7 +32,7 @@ glooey.scrolling.ScrollBox
          ~ScrollBox.do_claim
          ~ScrollBox.do_detach
          ~ScrollBox.do_draw
-         ~ScrollBox.do_find_children_under_mouse
+         ~ScrollBox.do_find_children_near_mouse
          ~ScrollBox.do_regroup
          ~ScrollBox.do_regroup_children
          ~ScrollBox.do_resize
@@ -47,7 +47,9 @@ glooey.scrolling.ScrollBox
          ~ScrollBox.get_claimed_rect
          ~ScrollBox.get_claimed_size
          ~ScrollBox.get_claimed_width
+         ~ScrollBox.get_grab_mouse_on_click
          ~ScrollBox.get_group
+         ~ScrollBox.get_height
          ~ScrollBox.get_height_hint
          ~ScrollBox.get_horz_padding
          ~ScrollBox.get_last_rollover_state
@@ -67,6 +69,7 @@ glooey.scrolling.ScrollBox
          ~ScrollBox.get_total_padding
          ~ScrollBox.get_total_vert_padding
          ~ScrollBox.get_vert_padding
+         ~ScrollBox.get_width
          ~ScrollBox.get_width_hint
          ~ScrollBox.get_window
          ~ScrollBox.hide
@@ -91,6 +94,7 @@ glooey.scrolling.ScrollBox
          ~ScrollBox.resume_updates
          ~ScrollBox.set_alignment
          ~ScrollBox.set_bottom_padding
+         ~ScrollBox.set_grab_mouse_on_click
          ~ScrollBox.set_handler
          ~ScrollBox.set_handlers
          ~ScrollBox.set_height_hint
@@ -131,6 +135,7 @@ glooey.scrolling.ScrollBox
          ~ScrollBox.claimed_width
          ~ScrollBox.custom_alignment
          ~ScrollBox.custom_bottom_padding
+         ~ScrollBox.custom_grab_mouse_on_click
          ~ScrollBox.custom_height_hint
          ~ScrollBox.custom_horz_padding
          ~ScrollBox.custom_left_padding
@@ -143,13 +148,16 @@ glooey.scrolling.ScrollBox
          ~ScrollBox.custom_vert_padding
          ~ScrollBox.custom_width_hint
          ~ScrollBox.event_types
+         ~ScrollBox.grab_mouse_on_click
          ~ScrollBox.group
+         ~ScrollBox.height
          ~ScrollBox.height_hint
          ~ScrollBox.horz_padding
          ~ScrollBox.is_attached_to_gui
          ~ScrollBox.is_disabled
          ~ScrollBox.is_enabled
          ~ScrollBox.is_hidden
+         ~ScrollBox.is_root
          ~ScrollBox.is_visible
          ~ScrollBox.last_rollover_state
          ~ScrollBox.left_padding
@@ -168,6 +176,7 @@ glooey.scrolling.ScrollBox
          ~ScrollBox.total_padding
          ~ScrollBox.total_vert_padding
          ~ScrollBox.vert_padding
+         ~ScrollBox.width
          ~ScrollBox.width_hint
          ~ScrollBox.window
    

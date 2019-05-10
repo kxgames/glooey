@@ -32,7 +32,7 @@ glooey.scrolling.Viewport
          ~Viewport.do_claim
          ~Viewport.do_detach
          ~Viewport.do_draw
-         ~Viewport.do_find_children_under_mouse
+         ~Viewport.do_find_children_near_mouse
          ~Viewport.do_regroup
          ~Viewport.do_regroup_children
          ~Viewport.do_resize
@@ -48,7 +48,9 @@ glooey.scrolling.Viewport
          ~Viewport.get_claimed_rect
          ~Viewport.get_claimed_size
          ~Viewport.get_claimed_width
+         ~Viewport.get_grab_mouse_on_click
          ~Viewport.get_group
+         ~Viewport.get_height
          ~Viewport.get_height_hint
          ~Viewport.get_horz_padding
          ~Viewport.get_horz_scrolling
@@ -74,6 +76,7 @@ glooey.scrolling.Viewport
          ~Viewport.get_vert_padding
          ~Viewport.get_vert_scrolling
          ~Viewport.get_view
+         ~Viewport.get_width
          ~Viewport.get_width_hint
          ~Viewport.get_window
          ~Viewport.hide
@@ -105,6 +108,7 @@ glooey.scrolling.Viewport
          ~Viewport.set_alignment
          ~Viewport.set_bottom_padding
          ~Viewport.set_center_of_view
+         ~Viewport.set_grab_mouse_on_click
          ~Viewport.set_handler
          ~Viewport.set_handlers
          ~Viewport.set_height_hint
@@ -147,6 +151,7 @@ glooey.scrolling.Viewport
          ~Viewport.claimed_width
          ~Viewport.custom_alignment
          ~Viewport.custom_bottom_padding
+         ~Viewport.custom_grab_mouse_on_click
          ~Viewport.custom_height_hint
          ~Viewport.custom_horz_padding
          ~Viewport.custom_horz_scrolling
@@ -162,7 +167,9 @@ glooey.scrolling.Viewport
          ~Viewport.custom_vert_scrolling
          ~Viewport.custom_width_hint
          ~Viewport.event_types
+         ~Viewport.grab_mouse_on_click
          ~Viewport.group
+         ~Viewport.height
          ~Viewport.height_hint
          ~Viewport.horz_padding
          ~Viewport.horz_scrolling
@@ -171,6 +178,7 @@ glooey.scrolling.Viewport
          ~Viewport.is_disabled
          ~Viewport.is_enabled
          ~Viewport.is_hidden
+         ~Viewport.is_root
          ~Viewport.is_visible
          ~Viewport.last_rollover_state
          ~Viewport.left_padding
@@ -193,6 +201,7 @@ glooey.scrolling.Viewport
          ~Viewport.vert_padding
          ~Viewport.vert_scrolling
          ~Viewport.view
+         ~Viewport.width
          ~Viewport.width_hint
          ~Viewport.window
    

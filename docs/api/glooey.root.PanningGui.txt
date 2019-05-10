@@ -34,7 +34,7 @@ glooey.root.PanningGui
          ~PanningGui.do_claim
          ~PanningGui.do_detach
          ~PanningGui.do_draw
-         ~PanningGui.do_find_children_under_mouse
+         ~PanningGui.do_find_children_near_mouse
          ~PanningGui.do_regroup
          ~PanningGui.do_regroup_children
          ~PanningGui.do_resize
@@ -50,7 +50,9 @@ glooey.root.PanningGui
          ~PanningGui.get_claimed_rect
          ~PanningGui.get_claimed_size
          ~PanningGui.get_claimed_width
+         ~PanningGui.get_grab_mouse_on_click
          ~PanningGui.get_group
+         ~PanningGui.get_height
          ~PanningGui.get_height_hint
          ~PanningGui.get_horz_padding
          ~PanningGui.get_last_rollover_state
@@ -71,6 +73,7 @@ glooey.root.PanningGui
          ~PanningGui.get_total_padding
          ~PanningGui.get_total_vert_padding
          ~PanningGui.get_vert_padding
+         ~PanningGui.get_width
          ~PanningGui.get_width_hint
          ~PanningGui.get_window
          ~PanningGui.hide
@@ -100,6 +103,7 @@ glooey.root.PanningGui
          ~PanningGui.set_alignment
          ~PanningGui.set_bottom_padding
          ~PanningGui.set_cursor
+         ~PanningGui.set_grab_mouse_on_click
          ~PanningGui.set_handler
          ~PanningGui.set_handlers
          ~PanningGui.set_height_hint
@@ -136,6 +140,8 @@ glooey.root.PanningGui
          ~PanningGui.claimed_width
          ~PanningGui.custom_alignment
          ~PanningGui.custom_bottom_padding
+         ~PanningGui.custom_clear_before_draw
+         ~PanningGui.custom_grab_mouse_on_click
          ~PanningGui.custom_height_hint
          ~PanningGui.custom_horz_padding
          ~PanningGui.custom_left_padding
@@ -148,13 +154,16 @@ glooey.root.PanningGui
          ~PanningGui.custom_vert_padding
          ~PanningGui.custom_width_hint
          ~PanningGui.event_types
+         ~PanningGui.grab_mouse_on_click
          ~PanningGui.group
+         ~PanningGui.height
          ~PanningGui.height_hint
          ~PanningGui.horz_padding
          ~PanningGui.is_attached_to_gui
          ~PanningGui.is_disabled
          ~PanningGui.is_enabled
          ~PanningGui.is_hidden
+         ~PanningGui.is_root
          ~PanningGui.is_visible
          ~PanningGui.last_rollover_state
          ~PanningGui.layers
@@ -174,6 +183,7 @@ glooey.root.PanningGui
          ~PanningGui.total_padding
          ~PanningGui.total_vert_padding
          ~PanningGui.vert_padding
+         ~PanningGui.width
          ~PanningGui.width_hint
          ~PanningGui.window
    

@@ -30,7 +30,7 @@ glooey.misc.FillBar
          ~FillBar.do_claim
          ~FillBar.do_detach
          ~FillBar.do_draw
-         ~FillBar.do_find_children_under_mouse
+         ~FillBar.do_find_children_near_mouse
          ~FillBar.do_regroup
          ~FillBar.do_regroup_children
          ~FillBar.do_resize
@@ -48,7 +48,9 @@ glooey.misc.FillBar
          ~FillBar.get_claimed_width
          ~FillBar.get_fill
          ~FillBar.get_fraction_filled
+         ~FillBar.get_grab_mouse_on_click
          ~FillBar.get_group
+         ~FillBar.get_height
          ~FillBar.get_height_hint
          ~FillBar.get_horz_padding
          ~FillBar.get_last_rollover_state
@@ -67,6 +69,7 @@ glooey.misc.FillBar
          ~FillBar.get_total_padding
          ~FillBar.get_total_vert_padding
          ~FillBar.get_vert_padding
+         ~FillBar.get_width
          ~FillBar.get_width_hint
          ~FillBar.get_window
          ~FillBar.hide
@@ -92,6 +95,7 @@ glooey.misc.FillBar
          ~FillBar.set_alignment
          ~FillBar.set_bottom_padding
          ~FillBar.set_fraction_filled
+         ~FillBar.set_grab_mouse_on_click
          ~FillBar.set_handler
          ~FillBar.set_handlers
          ~FillBar.set_height_hint
@@ -128,6 +132,7 @@ glooey.misc.FillBar
          ~FillBar.claimed_width
          ~FillBar.custom_alignment
          ~FillBar.custom_bottom_padding
+         ~FillBar.custom_grab_mouse_on_click
          ~FillBar.custom_height_hint
          ~FillBar.custom_horz_padding
          ~FillBar.custom_left_padding
@@ -141,13 +146,16 @@ glooey.misc.FillBar
          ~FillBar.event_types
          ~FillBar.fill
          ~FillBar.fraction_filled
+         ~FillBar.grab_mouse_on_click
          ~FillBar.group
+         ~FillBar.height
          ~FillBar.height_hint
          ~FillBar.horz_padding
          ~FillBar.is_attached_to_gui
          ~FillBar.is_disabled
          ~FillBar.is_enabled
          ~FillBar.is_hidden
+         ~FillBar.is_root
          ~FillBar.is_visible
          ~FillBar.last_rollover_state
          ~FillBar.left_padding
@@ -165,6 +173,7 @@ glooey.misc.FillBar
          ~FillBar.total_padding
          ~FillBar.total_vert_padding
          ~FillBar.vert_padding
+         ~FillBar.width
          ~FillBar.width_hint
          ~FillBar.window
    
