@@ -120,6 +120,9 @@ class Label(Widget):
         # line wrapping is no loner enabled).
         document = pyglet.text.decode_text(self._text)
         document.push_handlers(self.on_insert_text, self.on_delete_text)
+
+        if self._layout:
+            self._layout.delete()
         self._layout = self.do_make_new_layout(document, kwargs)
 
         # Use begin_update() and end_update() to prevent the layout from 
@@ -128,7 +131,7 @@ class Label(Widget):
         self._layout.begin_update()
 
         # The layout will crash if it doesn't have an explicit width and the 
-        # style specifies an alignment.  I
+        # style specifies an alignment.
         if self._layout.width is None:
             self._layout.width = self._layout.content_width
 
@@ -401,18 +404,44 @@ class EditableLabel(Label):
         return True
 
     def do_make_new_layout(self, document, kwargs):
-        # Create a layout and a caret that can be used to edit it.
-        layout = pyglet.text.layout.IncrementalTextLayout(document, **kwargs)
+        # Make a new layout (optimized for editing).
+        new_layout = pyglet.text.layout.IncrementalTextLayout(document, **kwargs)
 
-        layout.selection_color = drawing.Color.from_anything(
+        new_layout.selection_color = drawing.Color.from_anything(
                 self._selection_color).tuple
-        layout.selection_background_color = drawing.Color.from_anything(
+        new_layout.selection_background_color = drawing.Color.from_anything(
                 self._selection_background_color or self.color).tuple
 
-        self._caret = pyglet.text.caret.Caret(layout, color=self.color[:3])
-        self._caret.on_deactivate()
+        # If the previous layout had a selection, keep it.  Note that the 
+        # normal text layout doesn't have the concept of a selection, so 
+        # this logic needs to be here rather than in the base class.
+        if self._layout:
+            new_layout.set_selection(
+                    self._layout._selection_start, 
+                    self._layout._selection_end, 
+            )
 
-        return layout
+        # Make a new caret.
+        new_caret = pyglet.text.caret.Caret(new_layout, color=self.color[:3])
+
+        # Keep the caret in the same place as it was before, and clean up the 
+        # old caret object.
+        if self._caret:
+            new_caret.position = self._caret.position
+            new_caret.mark = self._caret.mark
+
+            self.window.remove_handlers(self._caret)
+            self._caret.delete()
+
+        # Match the caret's behavior to the widget's current focus state.
+        if self._focus:
+            new_caret.on_activate()
+            self.window.push_handlers(new_caret)
+        else:
+            new_caret.on_deactivate()
+
+        self._caret = new_caret
+        return new_layout
 
     def get_selection_color(self):
         return self._selection_color
