@@ -193,7 +193,7 @@ class Button(Widget):
     
     def set_foreground(self, widget):
         if self._foreground is not None:
-            self._foreground._detach_child(self._foreground)
+            self._detach_child(self._foreground)
 
         self._attach_child(self._foreground)
         self._foreground = widget

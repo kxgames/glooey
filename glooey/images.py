@@ -104,23 +104,23 @@ class Background(Widget):
     custom_vtile = 'auto'
     custom_htile = 'auto'
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         self._artist = drawing.Background(
-                color=self.custom_color,
-                outline=self.custom_outline,
-                image=self.custom_image,
-                center=self.custom_center,
-                top=self.custom_top,
-                bottom=self.custom_bottom,
-                left=self.custom_left,
-                right=self.custom_right,
-                top_left=self.custom_top_left,
-                top_right=self.custom_top_right,
-                bottom_left=self.custom_bottom_left,
-                bottom_right=self.custom_bottom_right,
-                vtile=self.custom_vtile,
-                htile=self.custom_htile,
+                color=kwargs.get('color', self.custom_color),
+                outline=kwargs.get('outline', self.custom_outline),
+                image=kwargs.get('image', self.custom_image),
+                center=kwargs.get('center', self.custom_center),
+                top=kwargs.get('top', self.custom_top),
+                bottom=kwargs.get('bottom', self.custom_bottom),
+                left=kwargs.get('left', self.custom_left),
+                right=kwargs.get('right', self.custom_right),
+                top_left=kwargs.get('top_left', self.custom_top_left),
+                top_right=kwargs.get('top_right', self.custom_top_right),
+                bottom_left=kwargs.get('bottom_left', self.custom_bottom_left),
+                bottom_right=kwargs.get('bottom_right', self.custom_bottom_right),
+                vtile=kwargs.get('vtile', self.custom_vtile),
+                htile=kwargs.get('htile', self.custom_htile),
                 hidden=True,
         )
 
