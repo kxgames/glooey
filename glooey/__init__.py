@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = '0.1.2'
+__version__ = '0.2.0'
 
 from .widget import *
 from .root import *
