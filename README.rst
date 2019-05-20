@@ -29,7 +29,7 @@ and powerful enough to support even the most complicated games.
    :target: https://travis-ci.org/kxgames/glooey
 .. image:: https://readthedocs.org/projects/glooey/badge/?version=latest
    :target: http://glooey.readthedocs.io/en/latest/
-|
+
 A quick example
 ===============
 The `documentation <https://glooey.readthedocs.io/en/latest/>`_ thoroughly explains what ``glooey`` can do and how to use it, 
@@ -64,12 +64,12 @@ but here's a quick example to give a feel for what it looks like in action::
 
    # It's also common to style a widget with existing widgets or with new 
    # widgets made just for that purpose.  The button widget is a good example.  
-   # You can give it a Label subclass (like MyLabel from above) to tell it how 
-   # to style text, and Background subclasses to tell it how to style the 
+   # You can give it a Foreground subclass (like MyLabel from above) to tell it 
+   # how to style text, and Background subclasses to tell it how to style the
    # different mouse rollover states:
 
    class MyButton(glooey.Button):
-       Label = MyLabel
+       Foreground = MyLabel
        custom_alignment = 'fill'
 
        # More often you'd specify images for the different rollover states, but 
