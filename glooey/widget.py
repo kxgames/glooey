@@ -104,6 +104,8 @@ class EventDispatcher(pyglet.event.EventDispatcher):
     'on_detach',
     'on_attach_child',
     'on_detach_child',
+    'on_repack',
+    'on_regroup',
     'on_mouse_press',
     'on_mouse_release',
     'on_mouse_hold',
@@ -1325,6 +1327,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         else:
             self._realign()
 
+        self.dispatch_event('on_repack')
+
     def _claim(self):
         """
         Make sure the widget's claim is up-to-date.
@@ -1492,6 +1496,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
             if self.__num_children > 0:
                 self.do_regroup_children()
+
+            self.dispatch_event('on_regroup')
 
     @update_function
     def _repack_and_regroup_children(self):

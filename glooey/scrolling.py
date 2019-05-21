@@ -227,6 +227,7 @@ class Mover(Bin):
 
 @autoprop
 @register_event_type('on_scroll')
+@register_event_type('on_resize_children')
 class ScrollPane(Widget):
     """
     Provide basic support for scrolling.
@@ -271,7 +272,7 @@ class ScrollPane(Widget):
             self._apply_initial_view = True
 
     def clear(self):
-        self._mover.clear(child)
+        self._mover.clear()
 
     @vecrec.accept_anything_as_vector
     def scroll(self, step):
@@ -438,7 +439,10 @@ class HVScrollBar(Frame):
             self.grip = grip
             self.reference_point = None
 
-            self.pane.push_handlers(self.on_scroll)
+            self.pane.push_handlers(
+                    on_repack=self.on_pane_repack,
+                    on_scroll=self.on_pane_scroll,
+            )
             self.grip.push_handlers(
                     on_mouse_press=self.on_grip_press,
                     on_mouse_drag=self.on_grip_drag,
@@ -451,11 +455,11 @@ class HVScrollBar(Frame):
 
             if self.bar.scale_grip:
                 scaled_width, scaled_height = self.bar._get_scaled_grip_size()
-                grip_width = max(scaled_width, grip_width)
-                grip_height = max(scaled_height, grip_height)
+                grip_width = clamp(scaled_width, grip_width, self.width)
+                grip_height = clamp(scaled_height, grip_height, self.height)
 
             # Copied from `Mover.do_resize_children()`; refer there for 
-            # details.
+            # details.  Maybe should be more DRY...
             child_rect = Rect.from_size(grip_width, grip_height)
             self.child._resize(child_rect)
             self._keep_child_in_rect()
@@ -469,8 +473,13 @@ class HVScrollBar(Frame):
                 drag_percent = self.pixels_to_percent(drag_pixels)
                 self.pane.scroll_percent(drag_percent)
 
-        def on_scroll(self, pane):
+        def on_pane_repack(self):
+            if self.bar.scale_grip:
+                self._repack()
+
+        def on_pane_scroll(self, pane):
             self.jump_percent(pane.position_percent)
+
 
     custom_button_speed = 200
     """\
@@ -595,6 +604,7 @@ class ScrollBox(Widget):
     HBar = None
     VBar = None
     Corner = None
+
     custom_mouse_sensitivity = 15 # px/click
 
     def __init__(self):
