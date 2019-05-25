@@ -378,7 +378,13 @@ class ScrollPane(Widget):
 
         view_rect = self.rect.copy()
         child_rect = self.child.claimed_rect
-        drawing.fixed_size_align(new_alignment, view_rect, child_rect)
+
+        # Here we're aligning the *view* in the *child*!  This is because we're 
+        # going to keep the bottom left corner of the child at (0, 0), and we 
+        # need to figure out how much to translate the child so that we see 
+        # what we want.
+        drawing.fixed_size_align(
+                new_alignment, view_rect, child_rect, outside_ok=True)
 
         child_to_view = view_rect.bottom_left - child_rect.bottom_left
         self.jump(child_to_view)

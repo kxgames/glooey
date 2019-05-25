@@ -63,7 +63,8 @@ frame = glooey.Frame()
 pane = TestScrollPane()
 hbar = TestHScrollBar(pane)
 vbar = TestVScrollBar(pane)
-content = TestScrollContent()
+big_content = TestScrollContent()
+small_content = glooey.Placeholder(100, 100)
 
 grid.size_hint = 200, 200
 grid.padding = 10
@@ -73,7 +74,7 @@ grid.alignment = 'center'
 frame.alignment = 'fill'
 frame.decoration.outline = 'green'
 
-pane.add(content)
+pane.add(big_content)
 frame.add(pane)
 grid.add(0, 0, frame)
 grid.add(0, 1, vbar)
@@ -84,11 +85,19 @@ gui.add(grid)
 def interactive_mover_tests():
     vbar.scale_grip = False
     hbar.scale_grip = False
-    yield "Horizontal and vertical scroll bars."
+    #yield "Horizontal and vertical scroll bars."
 
+    pane.add(small_content)
+    yield "Content smaller than the pane."
+    pane.add(big_content)
+    
     vbar.scale_grip = True
     hbar.scale_grip = True
     yield "Scaled scroll grips."
+
+    pane.add(small_content)
+    yield "Scaled scroll grips with content smaller than the pane."
+    pane.add(big_content)
 
 pyglet.app.run()
 
