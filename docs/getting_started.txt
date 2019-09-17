@@ -54,7 +54,7 @@ use while drawing a set of polygons.  You can specify these objects like so::
     window = pyglet.window.Window()
     batch = pyglet.graphics.Batch()
     group = pyglet.graphics.Group()
-    gui = glooey.Gui(window, batch, group)
+    gui = glooey.Gui(window, batch=batch, group=group)
 
 Whether or not you do this depends mostly on how the rest of your game is 
 written.  Having the GUI and the game in the same batch is slightly preferable 
