@@ -4,6 +4,8 @@ python:
 dist: xenial
 services:
   - xvfb
+before_install:
+  - sudo apt-get install --force-yes freeglut3-dev
 install:
   - pip install .
 before_script:
