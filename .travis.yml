@@ -1,9 +1,12 @@
 language: python
 python:
   - '3.6'
+dist: xenial
+services:
+  - xvfb
 install:
   - pip install .
 before_script:
   - "ls -R"
 script:
-  - xvfb-run py.test
+  - py.test
