@@ -64,7 +64,7 @@ class HoldUpdatesMixin:
         were actually called, and any updates that were called more than once 
         will appear in this list more than once.
         
-        This method should yield or return an list of the tuples in the same 
+        This method should yield or return a list of the tuples in the same 
         format representing the updates that should be applied, in the order 
         they should be applied.  The default implementation filters out 
         duplicate updates without changing their order.  In cases where it 
@@ -72,6 +72,7 @@ class HoldUpdatesMixin:
         """
         from more_itertools import unique_everseen as unique
         yield from reversed(list(unique(reversed(self._pending_updates))))
+
 def update_function(method):
 
     @functools.wraps(method)

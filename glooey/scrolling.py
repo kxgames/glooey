@@ -459,7 +459,9 @@ class HVScrollBar(Frame):
         def do_resize_children(self):
             grip_width, grip_height = self.grip.claimed_size
 
-            if self.bar.scale_grip:
+            # Don't try to calculate a scaled grip size if the scroll pane 
+            # doesn't have a child yet.  See #36.
+            if self.bar.scale_grip and self.pane.child:
                 scaled_width, scaled_height = self.bar._get_scaled_grip_size()
                 grip_width = clamp(scaled_width, grip_width, self.width)
                 grip_height = clamp(scaled_height, grip_height, self.height)
@@ -485,7 +487,6 @@ class HVScrollBar(Frame):
 
         def on_pane_scroll(self, pane):
             self.jump_percent(pane.position_percent)
-
 
     custom_button_speed = 200
     """\
@@ -585,7 +586,14 @@ class HVScrollBar(Frame):
     def _get_scaled_grip_size(self):
         # Reimplement in subclasses to account for the direction of the scroll 
         # bar.
-        raise NotImplementedError
+        raise NotImplementedError("""\
+don't know which direction to scale grip.
+
+This error usual means that you need to inherit your HBar/VBar inner
+class(es) from glooey.HScrollBar/glooey.VScrollBar, respectively.  If you want 
+HBar/VBar to inherit common settings from a shared base class, use multiple 
+inheritance.  More details are in the documentation.""")
+
 
 @autoprop
 class HScrollBar(HVScrollBar):
