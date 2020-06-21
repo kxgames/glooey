@@ -1,6 +1,6 @@
-********************************************************
-``glooey`` --- An object-oriented GUI library for pyglet
-********************************************************
+******************************************************
+``glooey`` — An object-oriented GUI library for pyglet
+******************************************************
 
 Every game needs a user interface that matches its look and feel.  The purpose 
 of ``glooey`` is to help you make such an interface.  Towards this end, 

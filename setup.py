@@ -37,6 +37,12 @@ setup(
         'debugtools',
         'pyyaml',
     ],
+    extras_require={
+        'docs': [
+            'sphinx>=3.1',
+            'autoclasstoc',
+        ],
+    },
     license='MIT',
     zip_safe=False,
     keywords=[
