@@ -1,6 +1,0 @@
-glooey.helpers.update_function
-==============================
-
-.. currentmodule:: glooey.helpers
-
-.. autofunction:: update_function

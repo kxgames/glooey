@@ -155,5 +155,5 @@ def setup(app):
             text=(linebreak.visit_text, linebreak.depart),
     )
 
-    app.add_stylesheet('css/custom.css')
+    app.add_css_file('css/custom.css')
 

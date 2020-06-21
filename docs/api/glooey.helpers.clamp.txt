@@ -1,6 +1,0 @@
-glooey.helpers.clamp
-====================
-
-.. currentmodule:: glooey.helpers
-
-.. autofunction:: clamp

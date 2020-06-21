@@ -1,6 +1,0 @@
-glooey.helpers.NoParentError
-============================
-
-.. currentmodule:: glooey.helpers
-
-.. autoexception:: NoParentError

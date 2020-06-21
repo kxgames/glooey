@@ -128,12 +128,12 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     This class implements the features that are common to all widgets.  These 
     features include the ability to be drawn on the screen and assigned a size 
-    and shape in the context of the rest of the GUI.  See `do_draw()`, 
-    `do_claim()`, and `do_resize_children()`.  
+    and shape in the context of the rest of the GUI.  See: `do_draw()`, 
+    `do_claim()`, `do_resize_children()`.
 
     These features also include every widget's ability to control its size and 
     shape using padding, alignment, and size hints.  See the corresponding 
-    getters, setters, and ``custom`` attributes.
+    getters, setters, and custom attributes.
 
     In addition, all widgets are capable of having children and propagating 
     mouse events to those children.  See `enable()`, `disable()`, 
@@ -1137,7 +1137,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         False if this widgets or one of its parents is hidden.
 
-        This property is just the opposite of `~Widget.is_hidden`.
+        This property is just the opposite of `is_hidden`.
         """
         return not self.is_hidden
 
@@ -1156,7 +1156,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         True if the widget can be clicked on.
 
-        This property is just the opposite of `~Widget.is_enabled`.
+        This property is just the opposite of `is_enabled`.
         """
         return not self.is_enabled
 
@@ -1788,7 +1788,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         reimplementing the `is_under_mouse()` method.  Making widgets that seem 
         to be circular is a common reason to do this, for example.  You can 
         also change how the children widgets are searched by reimplementing the 
-        `find_children_near_mouse()` method.  The `Grid` widget does this to 
+        `do_find_children_near_mouse()` method.  The `Grid` widget does this to 
         replace the default linear-time search with a constant-time one that 
         takes advantage of the grids predictable geometry.
         """

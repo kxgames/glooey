@@ -1,6 +1,0 @@
-glooey.containers.claim_stacked_widgets
-=======================================
-
-.. currentmodule:: glooey.containers
-
-.. autofunction:: claim_stacked_widgets
