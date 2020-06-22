@@ -25,7 +25,6 @@ needs_sphinx = '3.1'
 extensions = [ #
     'glooey_ext',
     'autoclasstoc',
-    'show_nodes',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
