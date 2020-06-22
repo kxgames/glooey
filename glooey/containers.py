@@ -148,7 +148,7 @@ class Frame(Widget):
 
         This method just calls `add()` on whatever widget the `Box` class is.  
         Normally `Box` is a `Bin`, so this makes sense.  If you replace `Box` 
-        with something else, fro example `Grid`, you might want to also 
+        with something else, for example `Grid`, you might want to also 
         reimplement this method.
         """
         self.box.add(widget)
@@ -1316,7 +1316,7 @@ class Deck(Widget):
         """
         Initialize a deck.
 
-        The `initial_state` argument is the name of the state that the deck 
+        The ``initial_state`` argument is the name of the state that the deck 
         will begin in.  This can be changed at any time by calling 
         `set_state()`.  Keyword arguments can be used to associate an initial 
         set of states (keys) with widgets (values).  
@@ -1347,7 +1347,7 @@ class Deck(Widget):
         """
         Add a state to the deck.
 
-        This is an alias for `self.add_state(state, widget)`
+        This is an alias for `add_state(state, widget)`
         """
         return self.add_state(state, widget)
 

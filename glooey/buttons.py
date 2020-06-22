@@ -311,10 +311,10 @@ class Button(Widget):
     def _init_custom_background_appearances(self):
         """
         Setup the background widgets from parameters found in dynamically named
-        `custom_...` class variables.
+        ``custom_...`` class variables.
 
-        For example, the class variable `custom_base_image = ...` would call 
-        `set_appearance(image=...)` on the "base" background widget.
+        For example, the class variable ``custom_base_image = ...`` would call 
+        ``set_appearance(image=...)`` on the "base" background widget.
         """
         background_args = {}
 

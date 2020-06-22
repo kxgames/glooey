@@ -38,15 +38,58 @@ intersphinx_mapping = { #
 }
 autodoc_default_flags = [ #
 ]
-autosummary_generate = False
+autosummary_generate = True
 pygments_style = 'sphinx'
 todo_include_todos = False
 default_role = 'smartxref'
 smartxref_overrides = {
         'Grid': 'glooey.containers.Grid',
+        'HVBox': 'glooey.containers.HVBox',
         'Background': 'glooey.images.Background',
         'Frame': 'glooey.containers.Frame',
         'Label': 'glooey.text.Label',
+}
+smartxref_literals = {
+        'args',
+        'atlas',
+        'batch',
+        '_children',
+        'drawing.Grid',
+        'EVENT_HANDLED',
+        'event_type',
+        'EVENT_UNHANDLED',
+        "'expand'",
+        'expand',
+        'flip_x',
+        'flip_y',
+        'font.load',
+        'FormattedDocument',
+        'get_script_home',
+        'handler',
+        'Hbox',
+        'Location',
+        'media.load',
+        'media.Source',
+        'Model',
+        '__name__',
+        'name',
+        'parent',
+        'path',
+        'pyglet.text.formats.attributed',
+        'rotate',
+        'script_home',
+        'self._pending_updates',
+        'size',
+        'size=0',
+        'size=100',
+        "size='expand'",
+        'sizes',
+        'streaming',
+        'Texture',
+        'UnformattedDocument',
+        'w1',
+        'w2',
+        'w3',
 }
 
 def is_custom(name, attr):

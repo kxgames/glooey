@@ -135,10 +135,14 @@ class SmartXRefRole(AnyXRefRole):
     def __init__(self):
         super().__init__(warn_dangling=True)
 
-    def run(self, *args, **kwargs):
+    def run(self):
         self.name = 'any'
         self.reftype = 'any'
-        return super().run(*args, **kwargs)
+
+        if self.target in self.config.smartxref_literals:
+            return [nodes.literal(self.target, self.target)], []
+
+        return super().run()
 
     def process_link(self, env, refnode, has_explicit_title, title, target):
         if target.startswith('~'):
@@ -165,6 +169,7 @@ def setup(app):
 
     app.add_role('smartxref', SmartXRefRole())
     app.add_config_value('smartxref_overrides', {}, '')
+    app.add_config_value('smartxref_literals', set(), '')
 
     app.add_css_file('css/custom.css')
 
