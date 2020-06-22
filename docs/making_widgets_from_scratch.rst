@@ -5,23 +5,23 @@ Making widgets from scratch
 Sometimes you need a widget that is totally unlike any of the built-in ones.  
 This scenario comes up fairly often in game programming, which lends itself to 
 non-standard user interfaces.  When this happens, you have no option but to 
-write your own widget class from scratch.  The :doc:`how_it_all_works` tutorial 
+write your own widget class from scratch.  The `how_it_all_works` tutorial 
 describes all the things that a widget needs to do, but that information would 
 be hard to apply in practice without some examples.  This tutorial has three 
 examples: two showing how the make "normal" widgets and one showing how to make 
 a container widget.  Each example goes into a lot of detail, but here are the 
 important points to remember:
 
-- Always implement `do_claim()`.
-- Remember that `do_draw()` may be called multiple times, so check whether the 
-  things you're drawing (sprites, vertex lists, etc.) need to be created or 
-  just updated.
-- Always call `_repack()` after doing something that might change the size of 
-  the widget.
-- Always call `_draw()` after doing something that might change the appearance 
-  of the widget.
-- Always call `_repack_and_regroup_children()` after adding or removing a child 
-  widget (unless you do it in the constructor).
+- Always implement `~Widget.do_claim()`.
+- Remember that `~Widget.do_draw()` may be called multiple times, so check 
+  whether the things you're drawing (sprites, vertex lists, etc.) need to be 
+  created or just updated.
+- Always call `~Widget._repack()` after doing something that might change the 
+  size of the widget.
+- Always call `~Widget._draw()` after doing something that might change the 
+  appearance of the widget.
+- Always call `~Widget._repack_and_regroup_children()` after adding or removing 
+  a child widget (unless you do it in the constructor).
 
 Making a custom widget
 ======================
@@ -95,14 +95,14 @@ of both these images and sprite objects that will be used to render them.
 
 The complete widget has similar getters and setters for all of the images, but 
 we only need to look at one here because they're all the same.  The important 
-part is the call to `self._repack()`.  This should be done whenever the 
-widget's size may have changed, because it causes glooey to recalculate how 
-much space each widget should have.  In this case, if the clock is given a new 
-face, its size may very well change.
+part is the call to `self._repack() <Widget._repack>`.  This should be done 
+whenever the widget's size may have changed, because it causes glooey to 
+recalculate how much space each widget should have.  In this case, if the clock 
+is given a new face, its size may very well change.
 
-Another thing to draw attention to is the `@autoprop` class decorator that I 
+Another thing to draw attention to is the ``@autoprop`` class decorator that I 
 glossed over in the first snippet.  This decorator automatically creates 
-properties (e.g. `self.face`) for each group of getters and setters.  This is 
+properties (e.g. ``self.face``) for each group of getters and setters.  This is 
 nice because it makes attribute access clear and concise for users of our 
 widget, without requiring hardly any boilerplate from us.  You don't need to 
 use this decorator in your own widgets, but all of the built-in widgets use it, 
@@ -131,12 +131,12 @@ __ https://github.com/kalekundert/autoprop
 
            return max(width, min_size), max(height, min_size)
 
-The `do_claim()` method returns the minimum amount if space needed by the 
-widget, and must be implemented by every new widget (i.e. it's pure virtual).  
-This particular implementation is a bit convoluted because we need to account 
-for the fact that none of the images are required (e.g. the user might not 
-specify a clock face) and that the hands will be rotating, but hopefully the 
-concept is straight-forward.
+The `~Widget.do_claim()` method returns the minimum amount if space needed by 
+the widget, and must be implemented by every new widget (i.e. it's pure 
+virtual).  This particular implementation is a bit convoluted because we need 
+to account for the fact that none of the images are required (e.g. the user 
+might not specify a clock face) and that the hands will be rotating, but 
+hopefully the concept is straight-forward.
 
 .. code::
 
@@ -155,16 +155,16 @@ concept is straight-forward.
            }
            return pyglet.graphics.OrderedGroup(layers[key], self.group)
 
-The `do_regroup()` method is called when the widget is assigned to a new group.  
-This always happens when the widget is attached to the GUI, and may also happen 
-if the widget is moved from one parent to another within the GUI.  The above 
-code actually won't do anything in the first case, because the sprites are all 
-``None`` until the widget is drawn for the first time, but in the second case 
-it will properly update the sprites.
+The `~Widget.do_regroup()` method is called when the widget is assigned to a 
+new group.  This always happens when the widget is attached to the GUI, and may 
+also happen if the widget is moved from one parent to another within the GUI.  
+The above code actually won't do anything in the first case, because the 
+sprites are all ``None`` until the widget is drawn for the first time, but in 
+the second case it will properly update the sprites.
 
 Note that the sprites need to be in separate groups to ensure that they are 
 drawn in the correct order.  The logic for doing this was factored out into the 
-`_get_layer()` method, because it'll also be used in `do_draw()`.
+``_get_layer()`` method, because it'll also be used in `~Widget.do_draw()`.
 
 .. code::
 
@@ -206,17 +206,17 @@ drawn in the correct order.  The logic for doing this was factored out into the
                    self._sprites[k].delete()
                    self._sprites[k] = None
                 
-The `do_draw()` method is called whenever the widget's appearance may have 
-changed.  A perennial complexity with this method is that you have to check if 
-the vertex lists that make up the widget already exist or not.  They won't if 
-the widget is being drawn for the first time (or was previously undrawn), 
-otherwise they will.  This is the motivation behind the various ``None`` checks 
-littering this method.  Also note that the rotation of each clock hand is based 
-on the current time.
+The `~Widget.do_draw()` method is called whenever the widget's appearance may 
+have changed.  A perennial complexity with this method is that you have to 
+check if the vertex lists that make up the widget already exist or not.  They 
+won't if the widget is being drawn for the first time (or was previously 
+undrawn), otherwise they will.  This is the motivation behind the various 
+``None`` checks littering this method.  Also note that the rotation of each 
+clock hand is based on the current time.
 
-The `do_undraw()` method just deletes all the vertex lists associated with the 
-widget.  It also resets the sprites to ``None``, so that `do_draw()` knows to 
-recreate them the next time it's called. 
+The `~Widget.do_undraw()` method just deletes all the vertex lists associated 
+with the widget.  It also resets the sprites to ``None``, so that 
+`~Widget.do_draw()` knows to recreate them the next time it's called. 
 
 .. code::
 
@@ -272,13 +272,13 @@ and its attributes::
 Now that we'll be drawing the clock and its hands ourselves, we have attributes 
 that define its geometry.  Our strategy for drawing the hands will be to draw 
 rectangles located at the origin and to position them on the clock face using  
-`glTranslate()` and `glRotate()`.  Note that we're using 
-`glooey.drawing.Rectangle` to draw the rectangles.  The `glooey.drawing` module 
-comes with a few different "artists" like this to help draw simple shapes.  
-We'll be on our own for the clock face, but that actually makes this class an 
-even better demonstration because it'll show both how to use raw OpenGL 
-primitives (for the face) and how much simpler things can be if you don't have 
-to do that (for the hands).
+``glTranslate()`` and ``glRotate()``.  Note that we're using 
+`glooey.drawing.artists.Rectangle` to draw the rectangles.  The 
+`glooey.drawing` module comes with a few different "artists" like this to help 
+draw simple shapes.  We'll be on our own for the clock face, but that actually 
+makes this class an even better demonstration because it'll show both how to 
+use raw OpenGL primitives (for the face) and how much simpler things can be if 
+you don't have to do that (for the hands).
 
 .. code::
 
@@ -296,11 +296,12 @@ to do that (for the hands).
            self._color = color
            self._draw()
 
-The thing to notice in these methods is that `set_radius()` calls `_repack()` 
-while `set_color()` calls `_draw()`.  This is because `set_radius()` can change 
-the size of widget, while `set_color()` can only change its appearance.  Also 
-note that you never need to call `_repack()` and `_draw()` in the same method; 
-widgets are automatically redrawn when they're repacked.
+The thing to notice in these methods is that ``set_radius()`` calls 
+`~Widget._repack()` while ``set_color()`` calls `~Widget._draw()`.  This is 
+because ``set_radius()`` can change the size of widget, while ``set_color()`` 
+can only change its appearance.  Also note that you never need to call 
+`~Widget._repack()` and `~Widget._draw()` in the same method; widgets are 
+automatically redrawn when they're repacked.
 
 .. code::
 
@@ -324,13 +325,14 @@ because we have a radius.
 
 Regrouping is particularly important for this clock implementation, because 
 groups are how we'll rotate and translate the hands.  Specifically, we'll put 
-the rectangle artists representing the hands in custom `HandGroup` groups which 
-will apply the proper transformations --- see the definition of the `HandGroup` 
-class below.  Note also that the face (vertex list) and the hands (artists) are 
-updated differently.  For the face, we call `batch.migrate` if the vertex list 
-has already been drawn.  For the hands, we just need to set the batch and group 
-attributes, regardless of whether or not they've been drawn before.  The 
-rectangle artist will take care of migrating the vertex lists if they exist.
+the rectangle artists representing the hands in custom ``HandGroup`` groups 
+which will apply the proper transformations --- see the definition of the 
+``HandGroup`` class below.  Note also that the face (vertex list) and the hands 
+(artists) are updated differently.  For the face, we call 
+:meth:`pyglet.graphics.Batch.migrate` if the vertex list has already been 
+drawn.  For the hands, we just need to set the batch and group attributes, 
+regardless of whether or not they've been drawn before.  The rectangle artist 
+will take care of migrating the vertex lists if they exist.
 
 .. code::
 
@@ -356,20 +358,21 @@ rectangle artist will take care of migrating the vertex lists if they exist.
 Groups are the mechanism by which you can set and unset OpenGL state while 
 rendering with pyglet.  For a complete introduction, see the `relevant pyglet 
 documentation`__.  For our purposes here, it is enough to know that groups have 
-a `set_state()` method to configure the OpenGL state and an `unset_state()` 
-method to restore it.  A group can also have a parent, in which case the 
-parent's state will be applied just before the child's.
+a :meth:`~pyglet.graphics.Group.set_state` method to configure the OpenGL state 
+and an :meth:`~pyglet.graphics.Group.unset_state()` method to restore it.  A 
+group can also have a parent, in which case the parent's state will be applied 
+just before the child's.
 
 __ https://pyglet.readthedocs.io/en/pyglet-1.2-maintenance/api/pyglet/pyglet.graphics.html
 
-In the constructor, we initialize the `HandGroup` with the clock's group as its 
+In the constructor, we initialize the ``HandGroup`` with the clock's group as its 
 parent.  This way, if the clock has a group that (for example) puts it above or 
-below other widgets, the hands will respect that ordering.  The `set_state()` 
-method takes care of the necessary translation and rotation.  It's important 
-that the translation be done first, because we want to translate in the 
-original coordinate frame, not the rotated one.  `glPushMatrix()` and 
-`glPopMatrix()` are used to easily restore the OpenGL state once the hands are 
-finished rendering.
+below other widgets, the hands will respect that ordering.  The 
+:meth:`~pyglet.graphics.Group.set_state()` method takes care of the necessary 
+translation and rotation.  It's important that the translation be done first, 
+because we want to translate in the original coordinate frame, not the rotated 
+one.  ``glPushMatrix()`` and ``glPopMatrix()`` are used to easily restore the 
+OpenGL state once the hands are finished rendering.
 
 .. code::
 
@@ -500,9 +503,9 @@ position the center of each child at that radius.  It will also keep its
 children evenly spaced, so as children or added or removed, it will adjust the 
 angle at which each is positioned.  It would be possible to obtain a similar 
 layout using the `Board` container, but it would be very cumbersome, so we are 
-justified in writing this `Ring` container from scratch.
+justified in writing this ``Ring`` container from scratch.
 
-Here is how our container will look in action.  We start by creating a `Ring` 
+Here is how our container will look in action.  We start by creating a ``Ring`` 
 and adding ten green placeholders to it, then we demonstrate that we can 
 subsequently add or remove widgets by replacing every other green placeholder 
 with an orange one:
@@ -550,9 +553,9 @@ attributes::
 We have two attributes: the radius and this list of children.  The radius can 
 be set at the class-level (using ``custom_radius``) or at the instance-level 
 (using the constructor or ``set_radius()``).  Note that ``set_radius()`` calls 
-`_repack()`, since changing the radius will certainly change to amount of space 
-needed by the widget and all its children.  The list of children can be 
-modified using the ``add()``, ``remove()``, etc. methods (see below), but we 
+`~Widget._repack()`, since changing the radius will certainly change to amount 
+of space needed by the widget and all its children.  The list of children can 
+be modified using the ``add()``, ``remove()``, etc. methods (see below), but we 
 also provide a read-only getter.
 
 .. code::
@@ -581,7 +584,7 @@ also provide a read-only getter.
                for child in self._children[:]:
                    self.remove(child)
 
-Let's begin by looking at the `insert()` method.  The three steps taken by this 
+Let's begin by looking at the ``insert()`` method.  The three steps taken by this 
 method are very characteristic of how a widget should be added to a container:
 
 1. ``self._attach_child(widget)``: The first step is to attach the widget and 
@@ -592,26 +595,28 @@ method are very characteristic of how a widget should be added to a container:
    
 2. ``self._children.insert(index, widget)``: The second step is to update the 
    internal data structures the container will use to figure out where each 
-   child should go.  This should be done after `_attach_child()`; there are 
-   several reasons why trying to attach a widget might raise an exception, and 
-   you don't want your widget to end up in a corrupt state if that happens.
+   child should go.  This should be done after `~Widget._attach_child()`; there 
+   are several reasons why trying to attach a widget might raise an exception, 
+   and you don't want your widget to end up in a corrupt state if that happens.
 
 3. ``self._repack_and_regroup_children()``: The third and final step is to 
    update all of the container's children.  That means repacking the container 
    itself to make space for the new widget, and recalculating groups for each 
-   of its children.  The rule of thumb is that any time `_attach_child()` or 
-   `_detach_child()` is called outside the constructor, 
-   `_repack_and_regroup_children()` should be called afterwards.
+   of its children.  The rule of thumb is that any time 
+   `~Widget._attach_child()` or `~Widget._detach_child()` is called outside the 
+   constructor, `~Widget._repack_and_regroup_children()` should be called 
+   afterwards.
 
-The `remove()` method is the same idea, but in reverse, and the remaining 
+The ``remove()`` method is the same idea, but in reverse, and the remaining 
 methods just build on those two.  The one interesting thing about some of those 
-remaining methods is that they use the `hold_updates()` context manager to 
-avoid triggering multiple repacks.  The context manager basically catches any 
-calls to potentially expensive update methods (specifically: `_repack()`, 
-`_draw()`, and `_repack_and_regroup_children()`) and defers them to the end of 
-the with-block.  If the same method is called multiple times, it is only called 
+remaining methods is that they use the `~Widget.hold_updates()` context manager 
+to avoid triggering multiple repacks.  The context manager basically catches 
+any calls to potentially expensive update methods (specifically: 
+`~Widget._repack()`, `~Widget._draw()`, and 
+`~Widget._repack_and_regroup_children()`) and defers them to the end of the 
+with-block.  If the same method is called multiple times, it is only called 
 once when the block ends.  This can be a useful way to reuse methods like 
-`insert()` and `remove()` without repacking the GUI more than once.
+``insert()`` and ``remove()`` without repacking the GUI more than once.
 
 .. code::
 
@@ -632,12 +637,12 @@ once when the block ends.  This can be a useful way to reuse methods like
                offset = self.radius * Vector.from_degrees(360 * i / N)
                yield child, offset
 
-The `do_claim()` method returns the minimum width and height needed to fit all 
-the children.  It does this by basically mock-placing each child and 
+The `~Widget.do_claim()` method returns the minimum width and height needed to 
+fit all the children.  It does this by basically mock-placing each child and 
 calculating the greatest offsets in the horizontal and vertical directions.  
-The `do_resize_children()` method ends up pretty similar, since it's actually 
-placing the children, so the ``_yield_offsets()`` helper factors out some 
-shared code.
+The `~Widget.do_resize_children()` method ends up pretty similar, since it's 
+actually placing the children, so the ``_yield_offsets()`` helper factors out 
+some shared code.
 
 .. code::
 
@@ -648,8 +653,8 @@ shared code.
                child._resize(rect)
 
 This method is how containers position their children.  It's job is to call 
-`_resize()` to provide a new rectangle to each of its children.  That rectangle 
-should be at least as large as that child's claim, which is accessible via the 
-`claimed_rect` property.  This implementation gives each child exactly the 
-space it claimed, but positions it along the edge of a circle centered at the 
-center of the container itself.
+`~Widget._resize()` to provide a new rectangle to each of its children.  That 
+rectangle should be at least as large as that child's claim, which is 
+accessible via the `~Widget.claimed_rect` property.  This implementation gives 
+each child exactly the space it claimed, but positions it along the edge of a 
+circle centered at the center of the container itself.

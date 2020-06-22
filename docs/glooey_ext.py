@@ -5,6 +5,7 @@ from docutils import nodes
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 from sphinx import addnodes
+from sphinx.roles import AnyXRefRole
 from pathlib import Path
 
 class linebreak(nodes.General, nodes.Element):
@@ -26,18 +27,6 @@ class linebreak(nodes.General, nodes.Element):
         pass
 
 
-
-class ShowNodes(Directive):
-    has_content = True
-
-    def run(self): #
-        wrapper = nodes.paragraph()
-        self.state.nested_parse(self.content, self.content_offset, wrapper)
-
-        for node in wrapper.children:
-            print(node.pformat())
-
-        return wrapper.children
 
 class Demo(Directive):
     has_content = True
@@ -141,10 +130,29 @@ class IndentedCodeBlock(directives.body.CodeBlock):
     @classmethod
     def measure_indentation(cls, line):
         return cls.INDENTATION_RE.match(line).end()
+class SmartXRefRole(AnyXRefRole):
 
+    def __init__(self):
+        super().__init__(warn_dangling=True)
+
+    def run(self, *args, **kwargs):
+        self.name = 'any'
+        self.reftype = 'any'
+        return super().run(*args, **kwargs)
+
+    def process_link(self, env, refnode, has_explicit_title, title, target):
+        if target.startswith('~'):
+            target = target[1:]
+            title = target.split('.')[-1]
+
+        target = self.config.smartxref_overrides.get(target, target)
+
+        if '(' in target:
+            target = target.split('(')[0]
+
+        return super().process_link(env, refnode, has_explicit_title, title, target)
 
 def setup(app): 
-    app.add_directive('show-nodes', ShowNodes)
     app.add_directive('demo', Demo)
     app.add_directive('code', IndentedCodeBlock)
 
@@ -154,6 +162,9 @@ def setup(app):
             latex=(linebreak.visit_latex, linebreak.depart),
             text=(linebreak.visit_text, linebreak.depart),
     )
+
+    app.add_role('smartxref', SmartXRefRole())
+    app.add_config_value('smartxref_overrides', {}, '')
 
     app.add_css_file('css/custom.css')
 

@@ -500,7 +500,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         or not it's been drawn before.  The simplest case are high-level APIs 
         like `pyglet.sprite.Sprite` that allow you to simply change a 
         ``group`` attribute.  On the other hand, if you're drawing vertex lists 
-        yourself, you need to call the `pyglet.graphics.Batch.migrate()` 
+        yourself, you need to call the :meth:`pyglet.graphics.Batch.migrate()`
         method.  This method needs to know the OpenGL mode (e.g. GL_QUADS) 
         associated with the vertex list, so you will have to keep track of 
         that.
@@ -555,15 +555,15 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         
         The order in which the children are yielded has no significance.  It's 
         ok to yield children that are hidden or are not actually under the 
-        given coordinate; `__find_children_under_mouse()` will check these 
-        things for every widget produced by this method.  However, failing to 
-        yield a child that actually is under the mouse will result in that 
-        child not responding to the mouse.
+        given coordinate; `_Widget__find_children_under_mouse()` will 
+        check these things for every widget produced by this method.  However, 
+        failing to yield a child that actually is under the mouse will result 
+        in that child not responding to the mouse.
         
         The default implementation just yields all of the widgets children, but 
         subclasses may be able to use knowledge of their geometry to quickly 
-        yield a smaller set of children to check.  `Grid` is a good example of 
-        a widget that does this.
+        yield a smaller set of children to check.  :class:`~glooey.Grid` is a 
+        good example of a widget that does this.
         """
         yield from self.__children
 
@@ -820,7 +820,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     def get_rect(self):
         """
-        Return the `vecrec.Rectangle` indicating where this widget is located 
+        Return the `vecrec.Rect` indicating where this widget is located 
         on the screen.
 
         This rectangle already accounts for the widget's padding, alignment, 
@@ -891,7 +891,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     def get_claimed_rect(self):
         """
-        Return a `vecrec.Rectangle` indicating the amount of space needed to 
+        Return a `vecrec.Rect` indicating the amount of space needed to 
         render this widget.
 
         Only the width and height of the rectangle matter, the position is 
@@ -920,7 +920,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
 
     def get_padded_rect(self):
         """
-        Return a `vecrec.Rectangle` indicating the amount of space needed for 
+        Return a `vecrec.Rect` indicating the amount of space needed for 
         the widget's content plus its padding.
 
         This information is useful to container widgets, which need to work out 
@@ -1049,8 +1049,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         it.
 
         The alignment can be either a string or a function.  For more 
-        information, see the tutorial on `padding_alignment_size_hints` or the 
-        API documentation for the `glooey.drawing.alignment` module.
+        information, see the tutorial on `/padding_alignment_size_hints` or 
+        the API documentation for the :mod:`glooey.drawing.alignment` module.
         """
         return self.__alignment
 
@@ -1060,8 +1060,8 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         it.
 
         The alignment can be either a string or a function.  For more 
-        information, see the tutorial on `padding_alignment_size_hints` or the 
-        API documentation for the `glooey.drawing.alignment` module.
+        information, see the tutorial on `/padding_alignment_size_hints` or 
+        the API documentation for the :mod:`glooey.drawing.alignment` module.
         """
         self.__alignment = new_alignment
         self._repack()
@@ -1788,9 +1788,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         reimplementing the `is_under_mouse()` method.  Making widgets that seem 
         to be circular is a common reason to do this, for example.  You can 
         also change how the children widgets are searched by reimplementing the 
-        `do_find_children_near_mouse()` method.  The `Grid` widget does this to 
-        replace the default linear-time search with a constant-time one that 
-        takes advantage of the grids predictable geometry.
+        `do_find_children_near_mouse()` method.  The :class:`~glooey.Grid` 
+        widget does this to replace the default linear-time search with a 
+        constant-time one that takes advantage of the grids predictable 
+        geometry.
         """
         previously_under_mouse = self.__children_under_mouse
 

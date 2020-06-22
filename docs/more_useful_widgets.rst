@@ -7,9 +7,9 @@ introduce some of the widgets that really rely on those customizations.
 
 Frame --- pretty outlines
 =========================
-The purpose of the frame widget is to put a nice border around another widget.  
-It achieves this effect by delegating to two inner classes: ``Decoration`` and 
-``Box``.  
+The purpose of the `Frame` widget is to put a nice border around another 
+widget.  It achieves this effect by delegating to two inner classes: 
+``Decoration`` and ``Box``.  
 
 ``Decoration`` is responsible for drawing the border.  There's no actual widget 
 called "Decoration", that's just the name of the inner class you have to 
@@ -81,7 +81,7 @@ Third, there are inner classes for each button in the dialog box. For
 `OkDialog`, this is ``OkButton``; for `YesNoDialog`, this is `YesButton` and 
 `NoButton`.  Finally, unlike every other widget, dialog boxes do not need to be 
 added to a parent widget.  Instead, they are displayed by calling their 
-`open()` method with the root GUI widget as the argument.
+`~Dialog.open()` method with the root GUI widget as the argument.
 
 This example shows how to use `YesNoDialog`:
 
@@ -199,7 +199,7 @@ configured with a different inner class:
   If you want to have both vertical and horizontal scroll bars: put all your 
   customizations in a common class that doesn't inherit from any widget, then 
   use multiple inheritance to derive ``HBar`` and ``VBar`` classes that derive 
-  from both the common class and either `HScrollbar` or `VscrollBar`.  
+  from both the common class and either `HScrollBar` or `VScrollBar`.  
   
 - ``Corner``: This inner class fills in the space created by the two scroll 
   bars in the bottom right corner of the scroll box.  It typically inherits 

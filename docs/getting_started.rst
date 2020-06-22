@@ -15,7 +15,7 @@ frequently in the rest of the tutorials.
 
 Importing everything
 ====================
-First, we need to import both glooey and pyglet::
+First, we need to import both glooey and :mod:`pyglet`::
 
     import pyglet
     import glooey
@@ -66,7 +66,7 @@ just stick with the defaults.
 Making a widget
 ===============
 To add a widget to the GUI, we just need to instantiate one and pass it to  
-``gui.add()``::
+`gui.add() <Gui.add>`::
 
     widget = glooey.Placeholder()
     gui.add(widget)

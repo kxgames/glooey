@@ -5,29 +5,29 @@ Especially useful widgets
 Glooey comes with a wide variety of built-in widgets, but you can go a long way 
 with just a few.  This tutorial introduces some of the most fundamental  
 widgets to give you a feel for what's available and how to make GUIs that are 
-more "real" than the :doc:`getting_started` example.  These introductions are  
-very brief, but you can find complete documentation for every widget in the 
-:doc:`api`.
+more "real" than the `getting_started` example.  These introductions are very 
+brief, but you can find complete documentation for every widget in the API 
+documentation.
 
 Keep in mind that the built-in widgets are unstyled, so they're all kinda ugly 
 and/or aggressively minimalist [1]_.  Glooey's philosophy is that subclassing 
 widgets is the easiest and most powerful way to control how they look, so all 
 the built-in widgets try to remain blank slates in terms of style.  The 
-:doc:`stylizing_widgets` tutorial has more information on how to change what 
-the built-in widgets look like.
+`stylizing_widgets` tutorial has more information on how to change what the 
+built-in widgets look like.
 
 .. note::
 
     All the examples in this tutorial leave out the code to create the GUI and 
     run the pyglet event loop.  Those steps are explained in the  
-    :doc:`getting_started` tutorial.  If you want to see those steps, you can 
+    `getting_started` tutorial.  If you want to see those steps, you can 
     download the script associated with each example.
 
 Grid --- organize widgets
 =========================
-The Grid widget is a container that organizes widgets into a grid.  Along with 
-HBox and VBox, it is one of the most common ways to control how widgets are 
-arranged:
+The `Grid <containers.Grid>` widget is a container that organizes widgets into 
+a grid.  Along with `HBox` and `VBox`, it is one of the most common ways to 
+control how widgets are arranged:
 
 .. demo:: especially_useful_widgets/grid.py
 
@@ -40,8 +40,8 @@ arranged:
     gui.add(grid)
 
 In this example, the grid infers how many rows and columns to make from the 
-indices provided to the ``add()`` calls.  You can also explicitly tell the grid 
-how many rows and columns to make::
+indices provided to the `add() <Grid.add>` calls.  You can also explicitly tell 
+the grid how many rows and columns to make::
 
     # Initialize a grid with 3 rows and 4 columns.
     grid = glooey.Grid(3, 4)
@@ -60,7 +60,7 @@ to fit all its widgets::
 
 HBox --- horizontal layout
 ==========================
-HBox arranges widgets horizontally.  It's essentially a simplified Grid with 
+`HBox` arranges widgets horizontally.  It's essentially a simplified Grid with 
 only one row:
 
 .. demo:: especially_useful_widgets/hbox.py
@@ -73,8 +73,8 @@ only one row:
     
 VBox --- vertical layout
 ========================
-VBox arranges widgets vertically.  It's essentially a simplified Grid with only 
-one column:
+`VBox` arranges widgets vertically.  It's essentially a simplified Grid with 
+only one column:
 
 .. demo:: especially_useful_widgets/vbox.py
 
@@ -86,7 +86,7 @@ one column:
     
 Label --- show text
 ===================
-The label widget displays text:
+The `Label <text.Label>` widget displays text:
 
 .. demo:: especially_useful_widgets/label.py
     
@@ -111,9 +111,9 @@ limitation in how glooey assigns space to widgets [2]_.
 
 Background --- tile images
 ==========================
-The background widget fills in space using tiled images.  You can think of it 
-like a picture frame: you specify images for the corners and edges, and it 
-tiles the edges to fill in all the space it needs to.  
+The `Background <images.Background>` widget fills in space using tiled images.  
+You can think of it like a picture frame: you specify images for the corners 
+and edges, and it tiles the edges to fill in all the space it needs to.  
 
 .. demo:: especially_useful_widgets/background.py
 
@@ -141,22 +141,22 @@ In addition to what you see above, it can:
 But the true power of the background widget is how easily it can be customized 
 and incorporated into other widgets.  Those topics are beyond the scope of this 
 tutorial, but it's worth mentioning that you should very rarely need to use the 
-``set_appearance()`` method.  See the tutorials on :doc:`stylizing_widgets` and 
-:doc:`composing_widgets` for more details.
+`set_appearance() <images.Background.set_appearance>` method.  See the 
+tutorials on `stylizing_widgets` and `composing_widgets` for more details.
 
 The caveat with the background widget is that the images you give it must fill 
 their whole textures in the dimensions being tiled.  Usually this means images 
 with power-of-two sizes (e.g. 16, 32, 64 px) that were loaded using 
-``pyglet.resource.texture()``.  The reason for this caveat is that the 
+:func:`pyglet.resource.texture`.  The reason for this caveat is that the 
 background widget tiles images by manipulating their texture coordinates.  This 
 approach is very efficient, but it doesn't work if the image is loaded into a 
 texture with extra space around the edges.
 
 Button --- react to clicks
 ==========================
-The button widget can display text or images, and can also have a rollover 
+The `Button` widget can display text or images, and can also have a rollover 
 background.  You can tell when the button has been clicked because it will emit 
-an `on_click` event via the `event framework`__ provided by pyglet.  In this 
+an ``on_click`` event via the `event framework`__ provided by pyglet.  In this 
 example, we connect the event to a simple handler that just prints a message to 
 stdout.  The event has one argument, which is the widget that generated the it:
 

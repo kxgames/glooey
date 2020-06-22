@@ -5,9 +5,9 @@ Troubleshooting
 Glooey includes a few tools to help you figure out what's going wrong when 
 things don't work like you expect them to.  Perhaps the most difficult problem 
 to diagnose is when a widget simply doesn't appear on the screen.  To help with 
-this, widgets have a method called `debug_drawing_problems()`.  This method 
-checks the internal state of the widget and suggests reasons why it might not 
-be showing up.  These reasons include things like:
+this, widgets have a method called `~Widget.debug_drawing_problems()`.  This 
+method checks the internal state of the widget and suggests reasons why it 
+might not be showing up.  These reasons include things like:
 
 - It (or one of it's parents) is not attached to the GUI. [#]_
 - It was never assigned any space by its parent.
@@ -30,8 +30,8 @@ don't have any "real" content, and as a result the screen is black.
 
    gui.add(widget)
 
-If we add a call to `debug_drawing_problems()` after the widget has been 
-attached to the GUI, it'll pretty much tell us what's going on::
+If we add a call to `~Widget.debug_drawing_problems()` after the widget has 
+been attached to the GUI, it'll pretty much tell us what's going on::
   
    gui.add(widget)
    widget.debug_drawing_problems()
@@ -43,8 +43,8 @@ attached to the GUI, it'll pretty much tell us what's going on::
 
 It can also be difficult to diagnose why widgets aren't appearing where you 
 think they should be.  To help with this, widgets have a method called 
-`debug_placement_problems()`.  This method draws three rectangles relevant to 
-how the widget is being placed:
+`~Widget.debug_placement_problems()`.  This method draws three rectangles 
+relevant to how the widget is being placed:
 
 - Red rectangle: What size the widget claimed.  This rectangle is always in the 
   lower left corner, because claims only have widths and heights --- not 

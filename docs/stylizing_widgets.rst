@@ -25,8 +25,8 @@ class).
 
 This tutorial focuses on the simplest and easiest customizations, which 
 typically amount to changing the appearance of existing widgets.  The 
-:doc:`composing_widgets` and :doc:`making_widgets_from_scratch` tutorials will 
-cover more powerful ways to customize widgets.
+`composing_widgets` and `making_widgets_from_scratch` tutorials will cover more 
+powerful ways to customize widgets.
 
 .. note::
 
@@ -56,11 +56,11 @@ widget is a good example:
 Here ``custom_font_name``, ``custom_font_size``, ``custom_colors``, and 
 ``custom_alignment`` are all attributes defined in the Label class (or one of 
 its superclasses) for the explicit purpose of being overridden in subclasses.  
-The Label class has a lot more of these attributes too, check the :doc:`API 
-documentation <widgets/button>` for a complete list.
+The Label class has a lot more of these attributes too, check the `API 
+documentation <Label>` for a complete list.
 
 The background widget is another good example.  The more idiomatic way to write 
-the demo from the :doc:`especially_useful_widgets` tutorial is like this:
+the demo from the `especially_useful_widgets` tutorial is like this:
 
 .. demo:: stylizing_widgets/background.py
 
@@ -106,26 +106,28 @@ very succinct way to customize composite widgets:
     gui.add(button)
 
 The ``WesnothButton`` class in this example has four widget classes being 
-overriden: ``Foreground``, ``Base``, ``Over``, ``Down``.  The first is used to 
-display whatever is in the foreground of the button.  Typically this is either 
-a `Label` or an `Image`, but it could be anything (e.g. an `HBox` that puts a 
-label next to an image).  The remaining overridden classes are used to 
-display different background images in the different rollover states.
+overridden: `~Button.Foreground`, `~Button.Base`, `~Button.Over`, 
+`~Button.Down`.  The first is used to display whatever is in the foreground of 
+the button.  Typically this is either a `Label` or an `Image`, but it could be 
+anything (e.g. an `HBox` that puts a label next to an image).  The remaining 
+overridden classes are used to display different background images in the 
+different rollover states.
 
 This example shows off both ways of using widgets to define style.  The 
-``Foreground`` attribute is directly set to an existing widget class.  The 
-``WesnothLabel`` widget we created earlier in this tutorial already has the 
+`~Button.Foreground` attribute is directly set to an existing widget class.  
+The ``WesnothLabel`` widget we created earlier in this tutorial already has the 
 style we want for this button, so it's nice that we can simply reuse it here.  
-The ``Base``, ``Over``, and ``Down`` attributes are overridden by new widget 
-classes defined in place.  These background images aren't useful outside the 
-button, so it's nice that we don't have to define them separately.
+The `~Button.Base`, `~Button.Over`, and `~Button.Down` attributes are 
+overridden by new widget classes defined in place.  These background images 
+aren't useful outside the button, so it's nice that we don't have to define 
+them separately.
 
 This is the first time we've seen the `Image` widget, but hopefully it's not 
 too hard to understand.  It just displays the image specified by 
-``custom_image``.  It's perhaps more common to derive ``Base``, ``Over``, and 
-``Down`` from `Background` (which allows the button to grow and shrink with the 
-text), but we use `Image` here because the Wesnoth theme has fixed-size 
-buttons.
+``custom_image``.  It's perhaps more common to derive `~Button.Base`, 
+`~Button.Over`, and `~Button.Down` from `Background` (which allows the button 
+to grow and shrink with the text), but we use `Image` here because the Wesnoth 
+theme has fixed-size buttons.
 
 .. note::
 
@@ -142,16 +144,17 @@ buttons.
           custom_over_image = pyglet.resource.image('over.png')
           custom_down_image = pyglet.resource.image('down.png')
 
-  The ``Background`` class is used for all the rollover states.  If you want, 
-  you can override ``Background`` for specific rollover states by also 
-  specifying ``Base``, ``Over``, or ``Down``.  The default ``Background`` class 
-  is `glooey.Background`, but here we change it to `glooey.Image`.
+  The `~Button.Background` class is used for all the rollover states.  If you 
+  want, you can override `~Button.Background` for specific rollover states by 
+  also specifying `~Button.Base`, `~Button.Over`, or `~Button.Down`.  The 
+  default `~Button.Background` class is `glooey.Background <Background>`, but 
+  here we change it to `glooey.Image <Image>`.
   
-  The ``custom_base_image`` attribute is equivalent to the ``custom_image`` 
-  attribute in the background widget for the ``Base`` state, which in this 
-  example is `Image`.  This is a little bit magical: the button basically finds 
-  any attributes matching ``custom_base_*``, renames them to ``custom_*``, then 
-  provides them to the ``Base`` background class.  In this way, any custom 
-  attributes provided by any of the background classes are mirrored in the 
-  button class itself.
+  The ``custom_base_image`` attribute is equivalent to the 
+  `~Button.custom_image` attribute in the background widget for the 
+  `~Button.Base` state, which in this example is `Image`.  This is a little bit 
+  magical: the button basically finds any attributes matching 
+  ``custom_base_*``, renames them to ``custom_*``, then provides them to the 
+  `~Button.Base` background class.  In this way, any custom attributes provided 
+  by any of the background classes are mirrored in the button class itself.
 

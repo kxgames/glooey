@@ -4,7 +4,8 @@
 .. title:: glooey — An object-oriented GUI library for pyglet
 
 .. include:: ../README.rst
-    :start-line: 4
+   :start-line: 4
+   :end-before: A quick example
 
 .. toctree::
     :caption: Tutorials

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import os, sys; sys.path.insert(0, os.path.abspath('.'))
+import os, sys
 import glooey
 from autoclasstoc import Section, PublicMethods, PublicDataAttrs
+sys.path.insert(0, os.path.abspath('.'))  # glooey_ext
 
 ## General configuration
 
@@ -24,6 +25,7 @@ needs_sphinx = '3.1'
 extensions = [ #
     'glooey_ext',
     'autoclasstoc',
+    'show_nodes',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
@@ -32,19 +34,26 @@ extensions = [ #
 ]
 intersphinx_mapping = { #
         'pyglet': ('http://pyglet.readthedocs.io/en/latest', None),
+        'vecrec': ('https://vecrec.readthedocs.io/en/latest', None),
 }
 autodoc_default_flags = [ #
 ]
-autosummary_generate = True
-autosummary_generate_overwrite = True
+autosummary_generate = False
 pygments_style = 'sphinx'
 todo_include_todos = False
-default_role = 'any'
+default_role = 'smartxref'
+smartxref_overrides = {
+        'Grid': 'glooey.containers.Grid',
+        'Background': 'glooey.images.Background',
+        'Frame': 'glooey.containers.Frame',
+        'Label': 'glooey.text.Label',
+}
 
 def is_custom(name, attr):
     from inspect import isclass
     return name.startswith('custom_') or \
-            (isclass(attr) and issubclass(attr, glooey.Widget))
+            (isclass(attr) and issubclass(attr, glooey.Widget)) or \
+            (name[0].isupper() and attr is None)
 
 def is_virtual(name):
     return name.startswith('do_')

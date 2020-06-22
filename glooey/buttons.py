@@ -107,6 +107,11 @@ class Button(Widget):
 
     - Foreground (optional).
     - Rollover-responsive background.
+
+    You can specify custom attributes like ``custom_<state>_<attr>``.  This is 
+    the same as specifying ``custom_<attr>`` on the <state> inner class.  For 
+    example, ``custom_base_image`` specifies the image for the `~Button.Base` 
+    rollover state.
     """
     Foreground = Label
 
@@ -209,31 +214,32 @@ class Button(Widget):
         """
         Set appearance options for any of the background widgets.
 
-        This is a convenience method for calling `set_appearance()` on any of 
-        the background widgets.  Each keyword argument to this function should 
-        either be of the form `<rollover>` or `<rollover>_<kwarg>`, where 
-        `<rollover>` is the name of a rollover state and `<kwargs>` is the 
-        name of an argument to the `set_appearance()` method of the widget 
-        representing that state.
+        This is a convenience method for calling ``set_appearance()`` 
+        on any of the background widgets.  Each keyword argument to this 
+        function should either be of the form ``<rollover>`` or 
+        ``<rollover>_<kwarg>``, where ``<rollover>`` is the name of a rollover 
+        state and ``<kwargs>`` is the name of an argument to the 
+        ``set_appearance()`` method of the widget representing that state.
         
-        Arguments of the `<rollover>` form specify actual widgets to use for 
-        the indicated state.  Arguments of the form `<rollover>_<kwarg>` 
-        specify keyword arguments to pass to that widget's `set_appearance()` 
-        method.  You can mix both kinds of arguments.
+        Arguments of the ``<rollover>`` form specify actual widgets to use for 
+        the indicated state.  Arguments of the form ``<rollover>_<kwarg>`` 
+        specify keyword arguments to pass to that widget's 
+        ``set_appearance()`` method.  You can mix both kinds of 
+        arguments.
         
         The following rollover states are understood:
 
-        - `base`
-        - `over`
-        - `down`
-        - `off`
+        - ``base``
+        - ``over``
+        - ``down``
+        - ``off``
 
-        The `<option>` names must be valid keyword arguments to the underlying 
-        widget's `set_appearance()` method.  Of course, different widgets will 
-        accept different arguments.  These arguments also require that the 
-        background widgets implement the set_appearance()` method.  `Image` and 
-        `Background` both meet this requirement, but widgets derived from other 
-        classes may not.
+        The ``<option>`` names must be valid keyword arguments to the 
+        underlying widget's ``set_appearance()`` method.  Of course, 
+        different widgets will accept different arguments.  These arguments 
+        also require that the background widgets implement the 
+        ``set_appearance()`` method.  `Image` and `Background` both 
+        meet this requirement, but widgets derived from other classes may not.
 
         Note that any appearance options not specified will not be displayed.  
         In other words, if you only specify a base rollover state, the other 

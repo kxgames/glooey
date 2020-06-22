@@ -9,5 +9,6 @@
    :private-members:
    :show-inheritance:
    :special-members:
+   :inherited-members:
 
    .. autoclasstoc::

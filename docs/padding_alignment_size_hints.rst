@@ -68,10 +68,10 @@ these attributes::
     widget.left_padding = ...
     widget.right_padding = ...
 
-The Grid, HBox, and VBox widgets use the ``padding`` attribute to determine how 
-much space to put between their cells.  They also have a ``cell_padding`` 
-attribute (not shown in this example) that controls inter-cell spacing without 
-affecting normal padding:
+The `Grid`, `HBox`, and `VBox` widgets use the `~Widget.padding` attribute to 
+determine how much space to put between their cells.  They also have a 
+`~Grid.cell_padding` attribute (not shown in this example) that controls 
+inter-cell spacing without affecting normal padding:
 
 .. demo:: padding_alignment_size_hints/grid_padding.py
 
@@ -181,8 +181,8 @@ well as custom attributes.  Both uses are common::
 
 You can also align a widget using a custom-written function.  The function 
 should take two arguments.  The first is the min rect and the second is the max 
-rect (both are ``vecrec.Rect`` instances).  The function should modify the 
-first argument (which really represents the widget being aligned) in place to 
+rect (both are `vecrec.Rect` instances).  The function should modify the first 
+argument (which really represents the widget being aligned) in place to 
 position it somewhere within the max rect::
 
     def fill_70(widget_rect, max_rect):

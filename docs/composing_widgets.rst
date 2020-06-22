@@ -42,9 +42,9 @@ new widget:
 Basic implementation
 ====================
 To make this into a self-contained widget, we need to derive a new class from 
-``glooey.Widget``.  Within the constructor of this class, we can create and 
-configure the HBox, Checkbox, and Label widgets the same way as before.  Then 
-we just need to use the  ``self._attach_child()`` method to attach the HBox to 
+`Widget`.  Within the constructor of this class, we can create and configure 
+the `HBox`, `Checkbox`, and `Label` widgets the same way as before.  Then we 
+just need to use the `~Widget._attach_child()` method to attach the `HBox` to 
 our new widget (rather than to the GUI):
 
 .. demo:: composing_widgets/labeled_checkbox.py
@@ -70,19 +70,19 @@ our new widget (rather than to the GUI):
    checkbox = WesnothLabeledCheckbox('Toggle something')
    gui.add(checkbox)
 
-The most unfamiliar part of this code is the call to ``self._attach_child()``.  
+The most unfamiliar part of this code is the call to `~Widget._attach_child()`.  
 You can think of this method as the behind-the-scenes version of the ``add()`` 
-methods that containers like HBox, VBox, and Grid have.  More specifically, it 
-makes the given widget (``hbox`` in this case) a child of the widget that the 
-method is being called on (``self`` in this case).  Child widgets are placed 
-and drawn relative to their parents, and parent widgets are obligated to make 
-enough room for all their children.
+methods that containers like `HBox`, `VBox`, and `Grid` have.  More 
+specifically, it makes the given widget (``hbox`` in this case) a child of the 
+widget that the method is being called on (``self`` in this case).  Child 
+widgets are placed and drawn relative to their parents, and parent widgets are 
+obligated to make enough room for all their children.
 
-The leading underscore in ``_attach_child()`` indicates that this method is not 
-part of the public Widget interface.  In other words, you shouldn't call this 
-method unless you're writing a widget class.  The reason is that most widgets
-don't know how to handle having children attached to them.  Those that do 
-provide public methods like ``add()`` that attach children and keep track of 
+The leading underscore in `~Widget._attach_child()` indicates that this method 
+is not part of the public Widget interface.  In other words, you shouldn't call 
+this method unless you're writing a widget class.  The reason is that most 
+widgets don't know how to handle having children attached to them.  Those that 
+do provide public methods like ``add()`` that attach children and keep track of 
 what to do with them.
 
 Polished implementation
@@ -90,13 +90,14 @@ Polished implementation
 Although the basic implementation achieves its goal of making labeled 
 checkboxes reusable, there are a few ways it could be more idiomatic and 
 user-friendly.  First, it could allow subclasses to control the specific 
-Checkbox and Label widgets that it uses, and the spacing between them.  We can 
-accomplish this by making HBox, Label, and Checkbox inner classes.  Second, it 
-could toggle the checkbox in response to clicks anywhere in the widget.  Third, 
-it could mimic more of the checkbox interface, so users wouldn't need to know 
-about the underlying checkbox.  None of these improvements are really central 
-to the topic of how to make a composite widget, but I think it's worth seeing a 
-more polished implementation:
+`Checkbox` and `Label <glooey.text.Label>` widgets that it uses, and the 
+spacing between them.  We can accomplish this by making `HBox`, `Label 
+<glooey.text.Label>`, and `Checkbox` inner classes.  Second, it could toggle 
+the checkbox in response to clicks anywhere in the widget.  Third, it could 
+mimic more of the checkbox interface, so users wouldn't need to know about the 
+underlying checkbox.  None of these improvements are really central to the 
+topic of how to make a composite widget, but I think it's worth seeing a more 
+polished implementation:
 
 .. demo:: composing_widgets/polished_labeled_checkbox.py
 
@@ -144,8 +145,8 @@ more polished implementation:
 Why not inherit from HBox?
 ==========================
 Another tempting way to create a LabeledCheckbox widget is to inherit from 
-HBox.  This avoids the unfamiliar ``_attach_child()`` method and is even a 
-little more succinct than the code above::
+`HBox`.  This avoids the unfamiliar :meth:`~Widget._attach_child()` method and 
+is even a little more succinct than the code above::
 
    class WesnothLabeledCheckbox(glooey.HBox):
       custom_alignment = 'center'
@@ -160,19 +161,19 @@ little more succinct than the code above::
           self.pack(self.checkbox)
           self.add(self.label)
 
-The problem is that this inherits a lot of unwanted functionality from HBox, 
+The problem is that this inherits a lot of unwanted functionality from `HBox`, 
 namely public methods to add new widgets and remove existing ones.  In some 
 cases this might be what you want; there are certainly good applications for 
-inheriting from containers like HBox.  But it doesn't make sense for a labeled 
-checkbox to have methods that can get rid of both the label and the checkbox, 
-so for this application it's better to inherit from Widget.
+inheriting from containers like `HBox`.  But it doesn't make sense for a 
+labeled checkbox to have methods that can get rid of both the label and the 
+checkbox, so for this application it's better to inherit from `Widget`.
 
 Attaching multiple children
 ===========================
-In the previous two labeled checkbox implementations, we only attached the HBox 
-directly to our new widget.  We then proceeded to attach the actual label and 
-checkbox to that HBox.  What if we wanted to leave out the HBox and just attach 
-both the label and checkbox directly to our widget?
+In the previous two labeled checkbox implementations, we only attached the 
+`HBox` directly to our new widget.  We then proceeded to attach the actual 
+label and checkbox to that `HBox`.  What if we wanted to leave out the `HBox` 
+and just attach both the label and checkbox directly to our widget?
 
 This approach turns out to be more complicated and more powerful than you might 
 expect.  The reason is that widgets are responsible for positioning and making 
@@ -187,8 +188,8 @@ The upside of this added responsibility is that we can arrange the children in
 absolutely any way we like.  It follows that you should only write widgets like 
 this when none of the existing containers do what you want, or when you're 
 making a new container.  (Hopefully neither scenario is common.)  Writing 
-LabeledCheckbox like this is overkill because it basically means writing a 
-poor-man's version of HBox.  But we're going to do it anyway, and hopefully 
+``LabeledCheckbox`` like this is overkill because it basically means writing a 
+poor-man's version of `HBox`.  But we're going to do it anyway, and hopefully 
 you'll find it easy to apply the ideas in this example to widgets that might 
 need them more:
 
@@ -233,18 +234,19 @@ need them more:
 
 The constructor is a little simpler than before.  Now we just have to create 
 the label and the checkbox and attach them both to the new widget.  The work of 
-positioning those two widgets falls to ``do_claim()`` and 
-``do_resize_children()``.
+positioning those two widgets falls to :meth:`~Widget.do_claim()` and 
+:meth:`~Widget.do_resize_children()`.
 
-The ``do_claim()`` method returns the minimum width and height our widget needs 
-to fit all of its children.  This example needs enough width to fit label and 
-the checkbox side-by-side, but only enough height to fit the taller of the two.  
-The minimum sizes of the child widgets, which are important for this 
-calculation, can be accessed via their ``claimed_rect``, ``claimed_width``, and 
-``claimed_height`` attributes.
+The :meth:`~Widget.do_claim()` method returns the minimum width and height our 
+widget needs to fit all of its children.  This example needs enough width to 
+fit label and the checkbox side-by-side, but only enough height to fit the 
+taller of the two.  The minimum sizes of the child widgets, which are important 
+for this calculation, can be accessed via their :attr:`~Widget.claimed_rect`, 
+:attr:`~Widget.claimed_width`, and :attr:`~Widget.claimed_height` attributes.
 
-The ``do_resize_children()`` method actually sets the sizes and positions of 
-all the children.  It does this by calling the ``_resize()`` method on each 
-one.  This method expects a rectangle in the form of a ``vecrec.Rect`` object 
-(the same type of object returned by ``Widget.claimed_rect``).  This rectangle 
-may be larger than the widget's claimed size, but it cannot be smaller.
+The :meth:`~Widget.do_resize_children()` method actually sets the sizes and 
+positions of all the children.  It does this by calling the 
+:meth:`~Widget._resize()` method on each one.  This method expects a rectangle 
+in the form of a `vecrec.Rect` object (the same type of object returned by 
+`Widget.claimed_rect`).  This rectangle may be larger than the widget's claimed 
+size, but it cannot be smaller.

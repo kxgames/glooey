@@ -37,7 +37,7 @@ but here's a quick example to give a feel for what it looks like in action::
 
    $ pip3 install glooey
 
-.. code:: python
+.. code-block:: python
 
    #!/usr/bin/env python3
 
