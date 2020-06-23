@@ -2,7 +2,7 @@
 
 import os, sys
 import glooey
-from autoclasstoc import Section, PublicMethods, PublicDataAttrs
+from autoclasstoc import Section, PublicMethods, PublicDataAttrs, PrivateDataAttrs
 sys.path.insert(0, os.path.abspath('.'))  # glooey_ext
 
 ## General configuration
@@ -30,6 +30,7 @@ extensions = [ #
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
 ]
 intersphinx_mapping = { #
         'pyglet': ('http://pyglet.readthedocs.io/en/latest', None),
@@ -69,26 +70,23 @@ smartxref_literals = {
         'Location',
         'media.load',
         'media.Source',
+        'mode',
         'Model',
         '__name__',
         'name',
+        'order',
         'parent',
         'path',
         'pyglet.text.formats.attributed',
         'rotate',
         'script_home',
         'self._pending_updates',
+        'set',
         'size',
-        'size=0',
-        'size=100',
-        "size='expand'",
         'sizes',
         'streaming',
         'Texture',
         'UnformattedDocument',
-        'w1',
-        'w2',
-        'w3',
 }
 
 def is_custom(name, attr):
@@ -97,40 +95,30 @@ def is_custom(name, attr):
             (isclass(attr) and issubclass(attr, glooey.Widget)) or \
             (name[0].isupper() and attr is None)
 
-def is_virtual(name):
-    return name.startswith('do_')
-
 class CustomAttrs(Section):
-    key = 'custom-props'
-    title = "Custom attributes:"
+    key = 'custom-attrs'
+    title = "Custom Attributes:"
 
     def predicate(self, name, attr, meta):
         return is_custom(name, attr)
-
-class CustomMethods(Section):
-    key = 'custom-methods'
-    title = "Customizable methods:"
-
-    def predicate(self, name, attr, meta):
-        return is_virtual(name)
 
 class OtherPublicMethods(PublicMethods):
 
     def predicate(self, name, attr, meta):
         return super().predicate(name, attr, meta) and not \
-                is_custom(name, attr) and not \
-                is_virtual(name)
+                is_custom(name, attr)
 
 class OtherPublicDataAttrs(PublicDataAttrs):
+    title = "Public Properties"
 
     def predicate(self, name, attr, meta):
         return super().predicate(name, attr, meta) and not \
-                is_custom(name, attr) and not \
-                is_virtual(name)
+                is_custom(name, attr)
+
+PrivateDataAttrs.title = "Private Properties"
 
 autoclasstoc_sections = [
-        'custom-props',
-        'custom-methods',
+        'custom-attrs',
         'public-attrs',
         'public-methods',
         'private-attrs',

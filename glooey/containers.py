@@ -201,7 +201,7 @@ class Grid(Widget):
     Arrange widgets in a rectangular grid.
 
     You can add widgets to the grid using either the `add()` method or the 
-    square-bracket operator (e.g. `grid[row, col] = widget`).  You don't need 
+    square-bracket operator (e.g. ``grid[row, col] = widget``).  You don't need 
     to specify the size of the grid in advance, it will automatically create 
     enough rows and columns to fit all of its children.  The `set_row_height()` 
     and `set_col_width()` methods are useful for controlling the dimensions of 
@@ -382,8 +382,8 @@ class Grid(Widget):
         under the mouse.
 
         The widget in the identified cell may not be under the mouse, but that 
-        will be checked by `Widget.__find_children_under_mouse()`.  See also 
-        the documentation for the base class method.
+        will be checked by `Widget._Widget__find_children_under_mouse()`.  See 
+        also the documentation for the base class method.
         """
         cell = self._grid.find_cell_under_mouse(x, y)
         child = self._children.get(cell)
@@ -681,26 +681,29 @@ class HVBox(Widget):
         Add the given widget to the layout.
 
         The widget will be added to the back of the layout (i.e. right for 
-        `HBox`, bottom for `VBox`).  The `size` argument specifies how much 
+        `HBox`, bottom for `VBox`).  The ``size`` argument specifies how much 
         space (i.e. width for `HBox`, height for `VBox`) to allocate for the 
         "cell" that will contain the widget (if you think of the hbox/vbox as a 
         1-dimensional grid).  The size can either be an integer number of 
-        pixels or the string `'expand'`:
+        pixels or the string ``'expand'``:
 
         - number of pixels (int): The specified number of pixels will be 
           allocated for the widget, unless that number is smaller than the 
           widget's minimum size (i.e. its claim).  In that case, the widget's 
           minimum size will be allocated instead (because a widget can't be 
-          smaller than its minimum size).  For this reason, `size=0` is a 
+          smaller than its minimum size).  For this reason, ``size=0`` is a 
           common setting meaning: "take as little space as possible".  Of 
-          course, you can also specify `size=100` to make a cell exactly 100px 
-          wide/tall, assuming that the widget in question is smaller than that.
+          course, you can also specify ``size=100`` to make a cell exactly 
+          100px wide/tall, assuming that the widget in question is smaller than 
+          that.
 
-        - `'expand'` (str): A special value indicating that the widget should 
+        - ``'expand'`` (str): A special value indicating that the widget should 
           expand to fill any space available to the container but not used by 
           any other cells.  For example, imagine you have a `HBox` that's 500px 
-          wide (or a `VBox that's 500 px tall).  If you add two widgets with 
-          `size='expand'`, each will get 250 px.  If you add one widget with `size=100` and two with `size='expand'`, the first will 
+          wide (or a `VBox` that's 500 px tall).  If you add two widgets with 
+          ``size='expand'``, each will get 250 px.  If you add one widget with 
+          ``size=100`` and two with ``size='expand'``, the latter two will get 
+          200px each.
 
         If no size is specified, a default is used.  The default can be set (in 
         order of precedence) either via `set_default_cell_size()`, an argument 
@@ -710,17 +713,17 @@ class HVBox(Widget):
         
         These are with `HBox`, but could equivalently be with `VBox`.  Assume 
         for the sake of simplicity that the `HBox` is 500px wide.  Further 
-        assume that `w1`, `w2`, and `w3` are arbitrary widgets with no minimum 
-        size (e.g. `Placeholder`).
+        assume that ``w1``, ``w2``, and ``w3`` are arbitrary widgets with no 
+        minimum size (e.g. `Placeholder`).
 
-        In this example, `w1` and `w2` will both be 250px wide (i.e. half the 
+        In this example, ``w1`` and ``w2`` will both be 250px wide (i.e. half the 
         width of the container):
 
         >>> h1 = glooey.HBox()  # 500px wide
         >>> h1.add(w1, size='expand')
         >>> h1.add(w2, size='expand')
 
-        In this example, `w1` will be 100px wide and `w2` and `w3` will split 
+        In this example, ``w1`` will be 100px wide and ``w2`` and ``w3`` will split 
         the remaining space and be 200px each:
 
         >>> h2 = glooey.HBox()  # 500px wide
@@ -1010,12 +1013,13 @@ class HBox(HVBox):
 
     The primary way to control the horizontal layout of an HBox is to specify a 
     size for each widget.  Widgets can either take up as little space as 
-    possible (`size=0`), a specific number of pixels (`size=100`), or as much 
-    space as possible (`size='expand'`).  You can specify this size when adding 
-    a widget to the container.  The `add()` method lets you specify a size via 
-    an argument, with the default being to take as much space as possible.  The 
-    `pack()` method is simply an alias for `add()` with a size of 0 (i.e. take 
-    as little space as possible).  Refer to `add()` for more details.
+    possible (``size=0``), a specific number of pixels (``size=100``), or as 
+    much space as possible (``size='expand'``).  You can specify this size when 
+    adding a widget to the container.  The `add()` method lets you specify a 
+    size via an argument, with the default being to take as much space as 
+    possible.  The `pack()` method is simply an alias for `add()` with a size 
+    of 0 (i.e. take as little space as possible).  Refer to `add()` for more 
+    details.
 
     The vertical layout is more simple: it is the same for each child widget, 
     and is controlled by `set_cell_alignment()`.  
@@ -1055,12 +1059,13 @@ class VBox(HVBox):
 
     The primary way to control the vertical layout of an VBox is to specify a 
     size for each widget.  Widgets can either take up as little space as 
-    possible (`size=0`), a specific number of pixels (`size=100`), or as much 
-    space as possible (`size='expand'`).  You can specify this size when adding 
-    a widget to the container.  The `add()` method lets you specify a size via 
-    an argument, with the default being to take as much space as possible.  The 
-    `pack()` method is simply an alias for `add()` with a size of 0 (i.e. take 
-    as little space as possible).  Refer to `add()` for more details.
+    possible (``size=0``), a specific number of pixels (``size=100``), or as 
+    much space as possible (``size='expand'``).  You can specify this size when 
+    adding a widget to the container.  The `add()` method lets you specify a 
+    size via an argument, with the default being to take as much space as 
+    possible.  The `pack()` method is simply an alias for `add()` with a size 
+    of 0 (i.e. take as little space as possible).  Refer to `add()` for more 
+    details.
 
     The horizontal layout is more simple: it is the same for each child widget, 
     and is controlled by `set_cell_alignment()`.  
@@ -1107,7 +1112,7 @@ class Stack(Widget):
     treated as "opaque" or "transparent" in terms of mouse events.  In other 
     words, should mouse events just go to the upper-most widget, or should they 
     go to all the widgets?  The latter is the default, but this can be changed 
-    by setting `custom_one_child_gets_mouse = True`.
+    by setting ``custom_one_child_gets_mouse = True``.
 
     Under the hood, each child widget is associated with a "layer", which is 
     just an integer.  The stacking effect is produced by putting each widget in 
@@ -1118,10 +1123,10 @@ class Stack(Widget):
 
     custom_one_child_gets_mouse = False
     """
-    If `True`, each mouse event will be propagated only to the upper-most 
+    If ``True``, each mouse event will be propagated only to the upper-most 
     widget under the mouse.  Note that if the stack contains widgets of 
     different sizes, the "upper-most widget under the mouse" might not 
-    be the widget on the top of the stack.  If `False`, mouse-events will be 
+    be the widget on the top of the stack.  If ``False``, mouse-events will be 
     propagated to all widgets.
     """
 
@@ -1237,7 +1242,7 @@ class Stack(Widget):
         """
         Return the visible children under the given mouse coordinate.
 
-        If `custom_one_child_gets_mouse == True`, only the first applicable 
+        If `custom_one_child_gets_mouse` is ``True``, only the first applicable 
         widget will be returned.  Otherwise, all applicable widgets will be 
         returned.
         """
