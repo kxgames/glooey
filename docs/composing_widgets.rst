@@ -187,8 +187,8 @@ its children should be positioned within that space.
 The upside of this added responsibility is that we can arrange the children in 
 absolutely any way we like.  It follows that you should only write widgets like 
 this when none of the existing containers do what you want, or when you're 
-making a new container.  (Hopefully neither scenario is common.)  Writing 
-``LabeledCheckbox`` like this is overkill because it basically means writing a 
+making a new container.  (Hopefully neither scenario is common.)  Writing a 
+labeled checkbox like this is overkill because it basically means writing a 
 poor-man's version of `HBox`.  But we're going to do it anyway, and hopefully 
 you'll find it easy to apply the ideas in this example to widgets that might 
 need them more:

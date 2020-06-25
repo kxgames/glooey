@@ -503,12 +503,12 @@ position the center of each child at that radius.  It will also keep its
 children evenly spaced, so as children or added or removed, it will adjust the 
 angle at which each is positioned.  It would be possible to obtain a similar 
 layout using the `Board` container, but it would be very cumbersome, so we are 
-justified in writing this ``Ring`` container from scratch.
+justified in writing this "Ring" container from scratch.
 
-Here is how our container will look in action.  We start by creating a ``Ring`` 
-and adding ten green placeholders to it, then we demonstrate that we can 
-subsequently add or remove widgets by replacing every other green placeholder 
-with an orange one:
+Here is how our container will look in action.  We start by creating a ring 
+instance and adding ten green placeholders to it, then we demonstrate that we 
+can subsequently add or remove widgets by replacing every other green 
+placeholder with an orange one:
 
 .. demo:: making_widgets_from_scratch/ring.py
 

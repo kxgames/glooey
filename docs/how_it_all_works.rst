@@ -77,23 +77,23 @@ widgets can also initiate it manually by calling their `~Widget._draw()` method
 (e.g.  a health bar widget would have to redraw itself whenever its health 
 changes, since that's not associated with a change in size).  The 
 `~Widget._draw()` method first checks to make sure the widget has all of the 
-following information:
+following properties defined:
 
-1. ``self.rect``: a position and size.  This information depends on the 
+1. `~Widget.rect`: a position and size.  This information depends on the 
    positions and sizes of all the other widgets in the GUI, and is worked out 
    when the GUI is repacked.  See `How repacking works`_ for more detail.
 
-2. ``self.group``: a pyglet graphics group.  This determines how the widget is 
+2. `~Widget.group`: a pyglet graphics group.  This determines how the widget is 
    drawn relative to other widgets, i.e. is it on top, is it translated, is it 
    clipped, etc.  The widget's group comes from its parents.  See `How 
    regrouping works`_ for more detail.
 
-3. ``self.batch``: a pyglet graphics batch.  This keeps all the vertex data for 
-   the whole GUI as contiguous as possible for efficient rendering.  You can 
-   find more information about what a batch is and how it's used in the `pyglet 
-   documentation`__.  The whole GUI shares a single batch, and that batch is 
-   stored in the root widget, so a widget just needs to be attached to the 
-   hierarchy to have access to the batch.
+3. `~Widget.batch`: a pyglet graphics batch.  This keeps all the vertex data 
+   for the whole GUI as contiguous as possible for efficient rendering.  You 
+   can find more information about what a batch is and how it's used in the 
+   `pyglet documentation`__.  The whole GUI shares a single batch, and that 
+   batch is stored in the root widget, so a widget just needs to be attached to 
+   the hierarchy to have access to the batch.
 
 __ http://pyglet.readthedocs.io/en/latest/programming_guide/graphics.html#batched-rendering
 
@@ -121,7 +121,7 @@ Typically this means calling
 :meth:`~pyglet.graphics.vertexdomain.VertexList.delete` on one or more vertex 
 lists.  The only caveat is that because `~Widget.do_undraw()` can be called 
 several times in a row or even before the widget has been drawn in the first 
-place, care must be taken to avoid deleting vertex lists that don't exist.
+place, so care must be taken to avoid deleting vertex lists that don't exist.
 
 The snippet below demonstrates how you'd implement these methods to make a 
 widget that fills itself with a solid color:
