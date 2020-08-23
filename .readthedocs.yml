@@ -1,0 +1,16 @@
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+# Required
+version: 2
+
+# How to install the project.  We need to specify to use `pip`, because 
+# otherwise RTD may try to directly execute `setup.py`, which doesn't exist.
+python:
+  version: 3.6
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
+
