@@ -1,0 +1,49 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "glooey"
+author = "Kale Kundert"
+author-email = "kale@thekunderts.net"
+home-page = 'https://github.com/kxgames/glooey'
+description-file = 'README.rst'
+requires-python = "~=3.6"
+requires = [
+  'pyglet',
+  'more_itertools',
+  'vecrec', 
+  'autoprop',
+  'pyyaml',
+]
+classifiers = [
+  'Programming Language :: Python :: 3',
+  'Topic :: Games/Entertainment',
+  'Topic :: Software Development :: User Interfaces',
+  'Topic :: Software Development :: Libraries',
+  'License :: OSI Approved :: MIT License',
+  'Intended Audience :: Developers',
+]
+
+[tool.flit.metadata.requires-extra]
+tests = [
+  'pytest',
+  'pytest-cov',
+  'coveralls',
+]
+docs = [
+  'sphinx>=3.1',
+  'sphinx_rtd_theme',
+  'autoclasstoc',
+]
+
+[tool.flit.metadata.urls]
+'Documentation' = 'https://glooey.readthedocs.io/en/latest/'
+'Version Control' = 'https://github.com/kxgames/glooey'
+'Bug Tracker' = 'https://github.com/kxgames/glooey/issues'
+'Continuous Integration' = 'https://github.com/kxgames/glooey/actions'
+'Test Coverage' = 'https://coveralls.io/github/kxgames/glooey'
+
+[tool.semantic_release]
+version_variable = 'glooey/__init__.py:__version__'
+build_command = 'python -m pip install flit && flit build'

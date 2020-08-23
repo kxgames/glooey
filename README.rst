@@ -25,10 +25,10 @@ and powerful enough to support even the most complicated games.
    :target: https://pypi.python.org/pypi/glooey
 .. image:: https://img.shields.io/pypi/pyversions/glooey.svg
    :target: https://pypi.python.org/pypi/glooey
-.. image:: https://img.shields.io/travis/kxgames/glooey.svg
-   :target: https://travis-ci.org/kxgames/glooey
-.. image:: https://readthedocs.org/projects/glooey/badge/?version=latest
-   :target: http://glooey.readthedocs.io/en/latest/
+.. image:: https://img.shields.io/github/workflow/status/kxgames/glooey/Test%20and%20release/master
+   :target: https://github.com/kxgames/glooey/actions
+.. image:: https://img.shields.io/readthedocs/glooey.svg
+   :target: https://glooey.readthedocs.io/en/latest/?badge=latest
 
 A quick example
 ===============
@@ -138,5 +138,3 @@ but here's a quick example to give a feel for what it looks like in action::
    # Run pyglet's event loop as usual.
 
    pyglet.app.run()
-
-

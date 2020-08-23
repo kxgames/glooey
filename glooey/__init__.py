@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+An object-oriented GUI library for pyglet.
+"""
+
 __version__ = '0.3.0'
 
 from .widget import *
