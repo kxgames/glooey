@@ -41,16 +41,22 @@ class on_space:
         )
         self.test_generator = lambda: iter(())
         self.test_iterator = iter(())
-        self.window.push_handlers(self)
+
+        # I used to have `on_key_press()` as a method, and I'd use this call to 
+        # attach the handlers.  I don't know why, but that stopped working.  
+        # (Glooey was unaffected, even though it does the same thing.)
+        #self.window.push_handlers(self)
+
+        def on_key_press(symbol, modifiers):
+            if symbol == pyglet.window.key.SPACE:
+                self.run_next_test()
+
+        self.window.push_handlers(on_key_press=on_key_press)
 
     def __call__(self, test_generator):
         self.test_generator = test_generator
         self.test_iterator = test_generator()
         self.run_next_test()
-
-    def on_key_press(self, symbol, modifiers):
-        if symbol == pyglet.window.key.SPACE:
-            self.run_next_test()
 
     def run_next_test(self):
         try:

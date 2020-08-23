@@ -1680,6 +1680,7 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         This method will fail with an exception if another widget is already 
         grabbing the mouse.
         """
+
         if self.is_root:
             return
 

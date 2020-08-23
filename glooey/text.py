@@ -392,8 +392,17 @@ class EditableLabel(Label):
 
             # This event will get swallowed by the caret, so dispatch a new 
             # event after the caret handlers have been popped.
+            #
+            # Update (2020/08/23): The above doesn't seem to be true anymore.  
+            # Specifically, the problem in #40 is that the below line causes 
+            # the same mouse press event to be dispatched twice, which 
+            # ultimately causes a scroll bar grip to get choked up trying to 
+            # grab the mouse twice.  Furthermore, removing this line didn't 
+            # create any noticeable regressions in the tests.  I'm going to 
+            # remove the extra event, but leave these comments in case this 
+            # ends up creating another subtle bug.
 
-            self.window.dispatch_event('on_mouse_press', x, y, button, modifiers)
+            #self.window.dispatch_event('on_mouse_press', x, y, button, modifiers)
     
     def on_window_key_press(self, symbol, modifiers):
         if self._unfocus_on_enter and symbol == pyglet.window.key.ENTER:
