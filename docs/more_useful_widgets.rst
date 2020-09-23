@@ -193,14 +193,24 @@ configured with a different inner class:
      expand vertically.  This requires that its alignment be ``'fill'`` and 
      that it uses `Background` (either directly or via `Button`).
      
+  .. note::
+    
+    If no ``VBar`` inner class is specified, the scroll box will not be 
+    scrollable in the vertical direction.  Likewise for ``HBar`` and horizontal 
+    scrolling.  Therefore, a class that inherits from ``ScrollBox`` but that 
+    doesn't implement either ``HBar`` or ``VBar`` will not actually be 
+    scrollable.  This is an easy mistake to make.
+    
+  .. note::
+
+    If you want to have both vertical and horizontal scroll bars: put all your 
+    customizations in a common class that doesn't inherit from any widget, then 
+    use multiple inheritance to derive ``HBar`` and ``VBar`` classes that 
+    derive from both the common class and either `HScrollBar` or `VScrollBar`.  
+
 - ``HBar``: This inner class is responsible for the horizontal scroll bar.  
   It's pretty much identical to ``VBar``, but it inherits from `HScrollBar`.
 
-  If you want to have both vertical and horizontal scroll bars: put all your 
-  customizations in a common class that doesn't inherit from any widget, then 
-  use multiple inheritance to derive ``HBar`` and ``VBar`` classes that derive 
-  from both the common class and either `HScrollBar` or `VScrollBar`.  
-  
 - ``Corner``: This inner class fills in the space created by the two scroll 
   bars in the bottom right corner of the scroll box.  It typically inherits 
   from `Image`, and it will only be displayed if there are two scroll bars.
