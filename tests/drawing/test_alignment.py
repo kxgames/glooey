@@ -18,7 +18,7 @@ def test_parent_changed():
         glooey.drawing.align(change_parent, child, parent)
 
 def test_child_outside_parent():
-    child = Rect.from_square(5)
+    child = Rect.from_square(4.5)
     parent = Rect.from_square(6)
 
     def move_1px_right(child_rect, parent_rect):
@@ -27,7 +27,11 @@ def test_child_outside_parent():
     # This should be fine the first time...
     glooey.drawing.align(move_1px_right, child, parent)
 
-    # ...but out-of-bounds the second time.
+    # ...and also fine the second time, because the child is allowed to exceed 
+    # its parent by 1 px to account for rounding errors...
+    glooey.drawing.align(move_1px_right, child, parent)
+
+    # ...but out-of-bounds the third time.
     with pytest.raises(RuntimeError, match='move_1px_right'):
         glooey.drawing.align(move_1px_right, child, parent)
     

@@ -15,12 +15,12 @@ def fill(child_rect, parent_rect):
 @alignment
 def fill_horz(child_rect, parent_rect):
     child_rect.width = parent_rect.width
-    child_rect.center = parent_rect.center
+    child_rect.center_left = parent_rect.center_left
 
 @alignment
 def fill_vert(child_rect, parent_rect):
     child_rect.height = parent_rect.height
-    child_rect.center = parent_rect.center
+    child_rect.bottom_center = parent_rect.bottom_center
 
 @alignment
 def fill_top(child_rect, parent_rect):
@@ -105,7 +105,8 @@ alignment string using the ``@glooey.drawing.alignment`` decorator.""")
     if __debug__:
         if parent_rect != parent_copy:
             raise RuntimeError(f"{repr(key_or_function)} changed the parent rectangle (second argument) from {parent_copy} to {parent_rect}.  Alignment functions should only modify the child rectangle (first argument).")
-        if not outside_ok and not child_rect.inside(parent_rect):
+        # Grow the parent rectangle by 1 px to be resilient to rounding errors.
+        if not outside_ok and not child_rect.inside(parent_rect.get_grown(1)):
             raise RuntimeError(f"{repr(key_or_function)} placed the child rectangle outside the parent rectangle.  This most likely indicates a bug in '{alignment_func.__qualname__}()'.\nchild:  {child_rect}\nparent: {parent_rect}")
 
 def fixed_size_align(key_or_function, child_rect, parent_rect, outside_ok=False):
