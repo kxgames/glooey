@@ -4,7 +4,7 @@
 An object-oriented GUI library for pyglet.
 """
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 from .widget import *
 from .root import *
