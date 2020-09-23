@@ -103,41 +103,144 @@ class Rollover(Deck):
 @autoprop
 class Button(Widget):
     """
-    A button has two layers:
+    A widget that is meant for the user to click on.
 
-    - Foreground (optional).
-    - Rollover-responsive background.
+    In order for the user to know that a widget is meant to be clicked on, the 
+    widget should react visually to the mouse.  A common way to do this is to 
+    design different background images for the different rollover states, and 
+    to use those images behind a foreground (e.g. text) that doesn't react to 
+    the mouse.
 
-    You can specify custom attributes like ``custom_<state>_<attr>``.  This is 
-    the same as specifying ``custom_<attr>`` on the <state> inner class.  For 
-    example, ``custom_base_image`` specifies the image for the `~Button.Base` 
-    rollover state.
+    The role of the `Button` widget is to make it very easy to create button 
+    subclasses that follow this broad paradigm of having a fixed foreground and 
+    a mouse-responsive background.  When subclassing `Button`, it should 
+    rarely be necessary to define more than a handful of custom attributes and 
+    maybe an inner class or two.  Of course, if you want buttons that don't 
+    follow the above paradigm (e.g. buttons that have mouse-responsive 
+    foregrounds, more than two layers, etc.), it may be simpler to create a 
+    custom widget derived from `Widget` than to shoehorn `Button` into a case 
+    it wasn't meant for.
+
+    Buttons have four states with regard to the mouse.  These are the same 
+    states managed by the `Rollover` widget:
+
+    - ``base``: The mouse is not interacting with the widget.
+    - ``over``: The mouse is hovering over the widget, but not 
+      pressed.
+    - ``down``: The mouse is actively clicking on the widget.
+    - ``off``: The widget has been deactivated and cannot be clicked on.
+
+    The widgets to use for the foreground and background of the button can be 
+    specified using inner classes, although the defaults are often sufficient.  
+    The foreground, which does not react to the mouse, is simply given by 
+    `Button.Foreground`.  Any widget class can be used, but the two most common 
+    choices are `Label` (the default) and `Image`.  
+
+    The background, which does react to the mouse, is composed of a different 
+    widget for each rollover state.  Usually these widgets are all of the same 
+    class, which is given by the `Button.Background` inner class.  However, 
+    it's also possible to specify a different class for each state: 
+    `Button.Base`, `Button.Over`, `Button.Down`, `Button.Off`.  Any background 
+    class must implement the following methods:
+    
+    - is_empty(): Return true if the widget has nothing to display
+    - set_appearance(): Accept kwargs, change appearance accordingly.
+
+    `Background` (the default) and `Image` are the only two built-in widgets 
+    which implement these methods.
+
+    The most common way to customize a `Button` subclass is using custom 
+    attributes.  You can specify different attributes for each background 
+    widget using the following shorthand notation: ``custom_<state>_<attr> = 
+    <value>``.  This ultimately results in ``set_appearance(<attr>=<value>)`` 
+    being called on the ``<state>`` background widget.  Note that ``<attr>`` 
+    can be any valid python identifier.  It can even include underscores.  This 
+    allows custom widgets to be used seamlessly as background widgets, provided 
+    that they implement the required methods.
     """
-    Foreground = Label
 
-    # Background should implement:
-    # - is_empty(): Return true if the widget has nothing to display
-    # - set_appearance(): Accept kwargs, change appearance accordingly.
-    Background = Background
+    class Foreground(Label):
+        """
+        The widget class to use for the foreground.
+
+        Any widget class can be used, but the two most common choices are 
+        `Label` (the default) and `Image`.
+        """
+        pass
+
+    class Background(Background):
+        """
+        The default widget class to use for the background in each state.
+
+        This default can be overridden for each specific rollover state by the 
+        `Button.Base`, `Button.Over`, `Button.Down`, and `Button.Off` inner 
+        classes, although this shouldn't often be necessary.
+        """
+        pass
+
     Base = None
-    Over = None
-    Down = None
-    Off = None
+    """
+    The widget class to use for the base-state background.
+    """
 
-    custom_foreground_layer = 2
-    custom_background_layer = 1
+    Over = None
+    """
+    The widget class to use for the over-state background.
+    """
+
+    Down = None
+    """
+    The widget class to use for the down-state background.
+    """
+
+    Off = None
+    """
+    The widget class to use for the off-state background.
+    """
+
     custom_alignment = 'center'
 
-    # These are provided for convenience.  If specified, the text/image 
-    # attribute of the instantiated foreground widget will be set with the 
-    # specified value.
-    custom_text = None
-    custom_image = None
+    custom_foreground_layer = 2
+    """
+    The z-coordinate of the foreground widget.
 
-    # There are also a bunch of dynamically generated/introspected custom 
-    # attributes for setting "appearance" options on the background widgets.
+    You can change this to put the "background" in front of the foreground, 
+    which is sometimes desirable.
+    """
+
+    custom_background_layer = 1
+    """
+    The z-coordinate of the background widget.
+
+    You can change this to put the "background" in front of the foreground, 
+    which is sometimes desirable.
+    """
+
+    custom_text = None
+    """
+    The text to display on the button.
+
+    This custom attribute simply sets the ``text`` attribute of the foreground 
+    widget.  Note that this will only have any effect if the foreground widget 
+    has a text attribute, like `Label` does.
+    """
+
+    custom_image = None
+    """
+    The image to display on the button.
+
+    This custom attribute simply sets the ``image`` attribute of the foreground 
+    widget.  Note that this will have any effect if the foreground widget has 
+    an ``image`` attribute, like `Image` does.
+    """
 
     def __init__(self, *args, **kwargs):
+        """
+        Create a new button widget.
+
+        Any arguments are passed directly to the constructor for the foreground 
+        widget.
+        """
         super().__init__()
 
         # Note that `Button` is basically a `Stack` with just two layers: 
@@ -332,6 +435,18 @@ class Button(Widget):
 @autoprop
 @register_event_type('on_toggle')
 class Checkbox(Widget):
+    """
+    A button that can be in one of two states: checked and unchecked.
+
+    A checkbox has a total of eight states: two checked states (checked and 
+    unchecked) and four mouse states (base, over, down, and off).  Each of 
+    these states is represented by an image widget.  Use custom attributes to 
+    specify the specific images to use for each state.
+
+    The `add_proxy()` method is useful for toggling the checkbox when another 
+    widget is clicked.  This can be used to implement the common idiom of 
+    toggling a checkbox when its label is clicked on.
+    """
     custom_checked_base = None; custom_unchecked_base = None
     custom_checked_over = None; custom_unchecked_over = None
     custom_checked_down = None; custom_unchecked_down = None
@@ -339,6 +454,15 @@ class Checkbox(Widget):
     custom_alignment = 'center'
 
     def __init__(self, is_checked=False):
+        """
+        Instantiate a new checkbox.
+
+        Arguments:
+            is_checked (bool):
+                If true, the checkbox will begin in the checked state.  
+                Clicking on the checkbox will still toggle it to the unchecked 
+                state.
+        """
         super().__init__()
         self._deck = Deck(is_checked)
         self._attach_child(self._deck)
@@ -425,8 +549,33 @@ class Checkbox(Widget):
 
 @autoprop
 class RadioButton(Checkbox):
+    """
+    A checkbox in a group of checkboxes, where only one can be checked at any 
+    given time.
+    """
 
     def __init__(self, peers=None, *, is_checked=False, **images):
+        """
+        Instantiate a new radio button.
+
+        Arguments:
+            peers (list):
+                A list of radio buttons to group together, such that only one 
+                can be checked at a time.  This button will be added to the 
+                list automatically.  A common idiom is to create an empty list 
+                and pass it to the constructor of each radio button in a group, 
+                e.g.::
+
+                    >>> import glooey
+                    >>> g = []
+                    >>> b1 = glooey.RadioButton(g)
+                    >>> b2 = glooey.RadioButton(g)
+                    >>> b3 = glooey.RadioButton(g)
+
+                Since each button holds a reference to the same list, and each 
+                button adds itself to that list, this lets each button in the 
+                group know about all of its peers.
+        """
         super().__init__(is_checked=is_checked, **images)
         self.peers = peers if peers is not None else []
 
