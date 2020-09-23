@@ -554,7 +554,7 @@ class RadioButton(Checkbox):
     given time.
     """
 
-    def __init__(self, peers=None, *, is_checked=False, **images):
+    def __init__(self, peers=None, *, is_checked=False):
         """
         Instantiate a new radio button.
 
@@ -575,8 +575,13 @@ class RadioButton(Checkbox):
                 Since each button holds a reference to the same list, and each 
                 button adds itself to that list, this lets each button in the 
                 group know about all of its peers.
+
+            is_checked (bool):
+                If true, the checkbox will begin in the checked state.  See 
+                `Checkbox.__init__` for details.
+                
         """
-        super().__init__(is_checked=is_checked, **images)
+        super().__init__(is_checked=is_checked)
         self.peers = peers if peers is not None else []
 
     def on_toggle(self, widget):
