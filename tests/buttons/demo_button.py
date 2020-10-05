@@ -60,6 +60,9 @@ def test_button():
     yield "Grey inactive button (no rollover)."
     button.enable()
 
+    button.foreground = TestLabel("Different foreground widget")
+    yield "Replace the foreground widget."
+
     button.set_background(
             base_top    = pyglet.image.load('assets/64x4/green.png'),
             base_bottom = pyglet.image.load('assets/64x4/green.png'),
@@ -82,22 +85,22 @@ def test_button():
     button = TestButton('Constructor text')
     button.push_handlers(on_click, on_double_click)
     gui.clear(); gui.add(button)
-    yield "Different button text."
+    yield "Set text via constructor."
 
     button = TestButtonNoForeground()
     button.push_handlers(on_click, on_double_click)
     gui.clear(); gui.add(button)
-    yield "No button text."
+    yield "No foreground."
 
     button = TestButtonCustomAttrIntrospection("Custom attribute introspection")
     button.push_handlers(on_click, on_double_click)
     gui.clear(); gui.add(button)
-    yield "Custom attribute introspection (same appearance as before)"
+    yield "Custom attribute introspection (same appearance as first test)"
 
     button = TestButtonSuperclassIntrospection("Superclass introspection")
     button.push_handlers(on_click, on_double_click)
     gui.clear(); gui.add(button)
-    yield "Superclass introspection (same appearance as before)"
+    yield "Superclass introspection (same appearance as first test)"
 
 
 pyglet.app.run()

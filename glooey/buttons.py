@@ -303,7 +303,7 @@ class Button(Widget):
         if self._foreground is not None:
             self._detach_child(self._foreground)
 
-        self._attach_child(self._foreground)
+        self._attach_child(widget)
         self._foreground = widget
         self._repack_and_regroup_children()
 
