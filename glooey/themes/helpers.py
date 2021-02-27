@@ -14,5 +14,5 @@ class ResourceLoader(pyglet.resource.Loader):
         super().__init__(paths, Path(__file__).parent / 'assets')
 
     def yaml(self, name):
-        return yaml.load(self.file(name))
+        return yaml.safe_load(self.file(name))
 

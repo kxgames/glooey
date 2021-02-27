@@ -235,7 +235,7 @@ class Button(glooey.Button):
     custom_gloss = 'high' # 'low', 'matte'
     custom_font_color = 'white'
 
-    class Label(Label):
+    class Foreground(Label):
         custom_alignment = 'center'
         custom_font_weight = 'bold'
         custom_horz_padding = 30
@@ -247,13 +247,13 @@ class Button(glooey.Button):
         self._gloss = self.custom_gloss
         self._update_background()
 
-        self.label.color = self.custom_font_color
+        self.foreground.color = self.custom_font_color
 
     def on_rollover(self, widget, new_state, old_state):
         if new_state == 'down':
-            self.label.top_padding = 2 * 4
+            self.foreground.top_padding = 2 * 4
         if old_state == 'down':
-            self.label.top_padding = 0
+            self.foreground.top_padding = 0
 
     def get_color(self):
         return self._color
@@ -314,7 +314,7 @@ class RoundButton(glooey.Button):
     custom_color = 'red'
     custom_icon = 'cross'
 
-    class Label(BigLabel):
+    class Foreground(BigLabel):
         custom_color = 'white'
         custom_alignment = 'center'
         custom_font_size = 16

@@ -19,7 +19,7 @@ class Gui(glooey.Gui):
     custom_cursor = 'gold'
         
     def __init__(self, window, *, batch=None, cursor=None):
-        super().__init__(window, batch)
+        super().__init__(window, batch=batch)
         self.set_cursor(cursor or self.custom_cursor)
 
     def set_cursor(self, cursor):
@@ -56,6 +56,9 @@ class Form(glooey.Form):
 
 @autoprop
 class RoundButton(glooey.Button):
+    class Foreground(glooey.Image):
+        pass
+
     custom_color = 'red'
     custom_icon = None
 
@@ -83,23 +86,23 @@ class RoundButton(glooey.Button):
 
     def set_icon(self, name):
         if name is None:
-            return self.del_image()
+            del self.foreground.image
+            return
+
         try:
             self._icon = name
-            self.set_image(
-                    assets.image(f'buttons/round/icon_{name}.png'),
-            )
+            self.foreground.image = assets.image(f'buttons/round/icon_{name}.png')
         except pyglet.resource.ResourceNotFoundException:
             raise UsageError(f"the Golden theme doesn't have a '{name}' icon.")
 
     def del_icon(self):
-        self.del_image()
+        self.del_foreground()
 
 
 @autoprop
 class BasicButton(glooey.Button):
 
-    class Label(Label):
+    class Foreground(Label):
         custom_horz_padding = 12
         custom_bottom_padding = 3
         custom_alignment = 'center'
@@ -118,7 +121,7 @@ class BasicButton(glooey.Button):
 @autoprop
 class FancyButton(glooey.Button):
 
-    class Label(Label):
+    class Foreground(Label):
         custom_color = '#140c1c'
         custom_alignment = 'center'
         custom_horz_padding = 30
@@ -293,7 +296,7 @@ class ScrollBox(glooey.ScrollBox):
             custom_left_padding = 1
             custom_right_padding = 5
 
-        class Grip(glooey.ImageScrollGrip):
+        class Grip(glooey.Image):
             custom_image = assets.image('scroll_bars/grip.png')
             custom_left_padding = 2
             custom_right_padding = 6
