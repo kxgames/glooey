@@ -44,6 +44,9 @@ docs = [
 'Continuous Integration' = 'https://github.com/kxgames/glooey/actions'
 'Test Coverage' = 'https://coveralls.io/github/kxgames/glooey'
 
+[tool.pytest.ini_options]
+norecursedirs = ".* .git *.egg assets __pycache__"
+
 [tool.semantic_release]
 version_variable = 'glooey/__init__.py:__version__'
 build_command = 'python -m pip install flit && flit build'
