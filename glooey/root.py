@@ -22,8 +22,9 @@ class Root(Stack):
 
         self.__window = window
         self.__batch = batch or pyglet.graphics.Batch()
-        self._regroup(group)
         self.__spurious_leave_event = False
+
+        self._init_group(group)
 
         window.push_handlers(self)
 

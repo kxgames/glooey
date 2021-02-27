@@ -1477,10 +1477,18 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         """
         Change the `pyglet.graphics.Group` associated with this widget.
 
-        Three callbacks are invoked to allow the widget to react to this 
-        change: `do_regroup()`, `do_draw()`, and `do_regroup_children()`.  The 
-        last initiates a recursive descent down the widget hierarchy updating 
-        the groups of the widget's children and all of their children.
+        Four callbacks are invoked to allow the widget to react to this 
+        change.  In the following order:
+
+        - `do_regroup()`
+        - `do_undraw()`
+          - Called indirectly by `do_regroup()` and not by this method, so this 
+            can be overridden.
+        - `do_draw()`
+        - `do_regroup_children()`
+
+        The last initiates a recursive descent down the widget hierarchy 
+        updating the groups of the widget's children and all of their children.
         """
         # Changing the group is often an expensive operation, so don't do 
         # anything unless we have to.  It is assumed that do_regroup_children() 
@@ -1529,6 +1537,18 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
             self._repack()
             if self.__num_children > 0:
                 self.do_regroup_children()
+
+    def _init_group(self, group):
+        """
+        Set the `pyglet.graphics.Group` associated with this object, without 
+        invoking any of the callbacks that `_regroup()` would.
+
+        This method is only meant to be used in constructors---specifically 
+        `Root.__init__()`---where drawing/regrouping children doesn't make 
+        sense and can create complications (e.g. the need for `do_draw()` to 
+        guard against uninitialized member variables).
+        """
+        self.__group = group
 
     def _attach_child(self, child):
         """
