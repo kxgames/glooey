@@ -24,7 +24,10 @@ class Root(Stack):
         self.__batch = batch or pyglet.graphics.Batch()
         self.__spurious_leave_event = False
 
-        self._init_group(group)
+        # We need to instantiate an actual group if we weren't given one, 
+        # because glooey interprets None as "my parent hasn't given me a group 
+        # yet."
+        self._init_group(group or pyglet.graphics.Group())
 
         window.push_handlers(self)
 
@@ -89,12 +92,6 @@ class Root(Stack):
             ))
 
         self._resize(self.territory)
-
-    def _regroup(self, group):
-        # We need to replace None with an actual group, because glooey 
-        # interprets None as "my parent hasn't given me a group yet."
-        super()._regroup(group or pyglet.graphics.Group())
-
 
 @autoprop
 class Gui(Root):
