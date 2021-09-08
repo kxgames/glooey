@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.6 (2021-09-08)
+### Fix
+* Correctly replace dialog 'on_click' handlers ([`7c15377`](https://github.com/kxgames/glooey/commit/7c153775dca275c02f1b5c3961c2a96eb8d1ca9d))
+
 ## v0.3.5 (2021-02-27)
 ### Fix
 * Correct how named colors are looked up ([`dc14949`](https://github.com/kxgames/glooey/commit/dc149493c36564b8892f09167134fd31c7e155e9))
