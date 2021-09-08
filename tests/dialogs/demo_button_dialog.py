@@ -7,8 +7,8 @@ import run_demos
 class TestButton(glooey.Button):
     custom_size_hint = 100, 20
 
-    class Label(glooey.Label): #
-        custom_color = 'black'
+    class Foreground(glooey.Label): #
+        custom_color = 'white'
         custom_alignment = 'center'
 
     class Base(glooey.Background): #
@@ -31,8 +31,7 @@ class TestOkDialog(glooey.OkDialog):
         custom_outline = 'green'
 
     class OkButton(TestButton): #
-        class Label(TestButton.Label):
-            custom_text = 'Ok'
+        custom_text = 'Ok'
 
 class TestYesNoDialog(glooey.YesNoDialog):
     Content = glooey.Placeholder
@@ -48,12 +47,10 @@ class TestYesNoDialog(glooey.YesNoDialog):
         custom_cell_padding = 5
 
     class YesButton(TestButton): #
-        class Label(TestButton.Label):
-            custom_text = 'Yes'
+        custom_text = 'Yes'
 
     class NoButton(TestButton): #
-        class Label(TestButton.Label):
-            custom_text = 'No'
+        custom_text = 'No'
 
 
 window = pyglet.window.Window()
@@ -65,6 +62,13 @@ def test_dialog():
     ok_dialog.open(gui)
     ok_dialog.push_handlers(on_close=lambda w: print(f"{w} closed"))
     yield 'Dialog with an "Ok" button.'
+    ok_dialog.close()
+
+    ok_dialog = TestOkDialog()
+    ok_dialog.open(gui)
+    ok_dialog.ok_button = TestButton(text='Custom')
+    ok_dialog.push_handlers(on_close=lambda w: print(f"{w} closed"))
+    yield 'Dialog with a custom "Ok" button.'
     ok_dialog.close()
 
     yes_no_dialog = TestYesNoDialog()

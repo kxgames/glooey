@@ -61,7 +61,7 @@ class ButtonDialog(Dialog):
         return self.__buttons
 
     def _replace_button(self, old_button, new_button, on_click):
-        old_button.remove_handlers(on_click)
+        old_button.remove_handlers(on_click=on_click)
         new_button.push_handlers(on_click=on_click)
         self.__buttons.replace(old_button, new_button)
     
