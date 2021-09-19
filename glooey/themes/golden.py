@@ -211,6 +211,7 @@ class BasicFillBar(glooey.FillBar):
         custom_left = assets.image('fill_bars/basic/base_left.png')
         custom_center = assets.texture('fill_bars/basic/base_center.png')
         custom_right = assets.image('fill_bars/basic/base_right.png')
+        custom_alignment = 'fill horz'
         custom_htile = True
 
     class Fill(glooey.Background):
@@ -244,6 +245,7 @@ class FancyFillBar(glooey.FillBar):
         custom_left = assets.image('fill_bars/fancy/base_left.png')
         custom_center = assets.texture('fill_bars/fancy/base_center.png')
         custom_right = assets.image('fill_bars/fancy/base_right.png')
+        custom_alignment = 'fill horz'
         custom_htile = True
 
     class Fill(glooey.Background):
