@@ -1443,7 +1443,10 @@ class Widget(EventDispatcher, HoldUpdatesMixin):
         # Round the rectangle to the nearest integer pixel, because sometimes 
         # images can't line up right (e.g. in Background widgets) if the widget 
         # has fractional coordinates.
-        aligned_rect.round()
+        aligned_rect._bottom = int(aligned_rect._bottom)
+        aligned_rect._height = int(aligned_rect._height)
+        aligned_rect._left = int(aligned_rect._left)
+        aligned_rect._width = int(aligned_rect._width)
 
         # Guarantee that do_resize() is only called if the size of the widget 
         # actually changed.  This is probably doesn't have a significant effect 
