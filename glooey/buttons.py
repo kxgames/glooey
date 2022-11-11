@@ -584,6 +584,14 @@ class RadioButton(Checkbox):
         super().__init__(is_checked=is_checked)
         self.peers = peers if peers is not None else []
 
+    def on_click(self, widget):
+        if self._defer_clicks_to_proxies and widget is self:
+            return
+        elif self._deck.state:
+            return
+        else:
+            self.toggle()
+
     def on_toggle(self, widget):
         if self.is_checked:
             for peer in self.peers:
